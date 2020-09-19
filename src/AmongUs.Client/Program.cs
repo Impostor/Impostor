@@ -1,0 +1,25 @@
+﻿using System;
+using System.IO;
+using AmongUs.Shared.Innersloth;
+
+namespace AmongUs.Client
+{
+    internal static class Program
+    {
+        private static void Main(string[] args)
+        {
+            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "..\\LocalLow");
+            var regionFile = Path.Combine(appData, "Innersloth", "Among Us", "regionInfo.dat");
+            var region = new RegionInfo("Private", "127.0.0.1", new []
+            {
+                new ServerInfo("Private-Master-1", "127.0.0.1", 22023)
+            });
+            
+            using (var file = File.Open(regionFile, FileMode.Create, FileAccess.Write))
+            using (var writer = new BinaryWriter(file))
+            {
+                region.Serialize(writer);
+            }
+        }
+    }
+}
