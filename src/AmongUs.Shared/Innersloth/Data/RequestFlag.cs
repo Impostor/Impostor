@@ -1,4 +1,4 @@
-﻿namespace AmongUs.Server.Net.Request
+﻿namespace AmongUs.Shared.Innersloth.Data
 {
     public enum RequestFlag : byte
     {

@@ -26,7 +26,7 @@ namespace AmongUs.Shared.Innersloth
         public int VotingTime { get; set; }
         public bool ConfirmImpostor { get; set; }
         public bool VisualTasks { get; set; }
-        public bool isDefaults { get; set; }
+        public bool IsDefaults { get; set; }
         
         public void Serialize(BinaryWriter writer, byte version)
         {
@@ -56,7 +56,7 @@ namespace AmongUs.Shared.Innersloth
                 result.KillDistance = reader.ReadByte();
                 result.DiscussionTime = reader.ReadInt32();
                 result.VotingTime = reader.ReadInt32();
-                result.isDefaults = reader.ReadBoolean();
+                result.IsDefaults = reader.ReadBoolean();
 
                 if (result.Version > 1)
                 {

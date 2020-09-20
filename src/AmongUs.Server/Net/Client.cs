@@ -1,8 +1,6 @@
 ﻿using System;
 using AmongUs.Server.Data;
-using AmongUs.Server.Exceptions;
 using AmongUs.Server.Extensions;
-using AmongUs.Server.Net.Request;
 using AmongUs.Server.Net.Response;
 using AmongUs.Shared.Innersloth;
 using AmongUs.Shared.Innersloth.Data;
@@ -35,6 +33,40 @@ namespace AmongUs.Server.Net
         public string Name { get; }
         public Connection Connection { get; }
         public ClientPlayer Player { get; }
+
+        public void Send(MessageWriter writer)
+        {
+            Connection.Send(writer);
+        }
+        
+        private bool IsPacketAllowed(MessageReader message, bool hostOnly)
+        {
+            var game = Player.Game;
+            if (game == null)
+            {
+                return false;
+            }
+
+            // GameCode must match code of the current game assigned to the player.
+            if (message.ReadInt32() != game.Code)
+            {
+                return false;
+            }
+            
+            // Some packets should only be sent by the host of the game.
+            if (hostOnly)
+            {
+                if (game.HostId == Id)
+                {
+                    return true;
+                }
+                
+                Logger.Warning("[{0}] Client sent packet only allowed by the host ({1}).", Id, game.HostId);
+                return false;
+            }
+
+            return true;
+        }
 
         private void OnDataReceived(DataReceivedEventArgs e)
         {
@@ -105,31 +137,41 @@ namespace AmongUs.Server.Net
                     game.HandleJoinGame(Player);
                     break;
                 }
-                
-                // 101A3960
+
                 case RequestFlag.StartGame:
+                {
+                    if (!IsPacketAllowed(message, true))
+                    {
+                        return;
+                    }
+
+                    Player.Game.HandleStartGame(message);
                     break;
+                }
                 
                 // 101A39EC
                 case RequestFlag.RemoveGame:
                     break;
                 
                 case RequestFlag.RemovePlayer:
+                {
+                    if (!IsPacketAllowed(message, true))
+                    {
+                        return;
+                    }
+
+                    var playerId = message.ReadPackedInt32();
+                    var reason = message.ReadByte();
+
+                    Player.Game.HandleRemovePlayer(playerId, reason);
                     break;
+                }
                 
                 case RequestFlag.GameData:
                 case RequestFlag.GameDataTo:
                 {
-                    var game = Player.Game;
-                    if (game == null)
+                    if (!IsPacketAllowed(message, false))
                     {
-                        throw new NullReferenceException("Game was not set for the client.");
-                    }
-                    
-                    var code = message.ReadInt32();
-                    if (code != game.Code)
-                    {
-                        // Packet was meant for another game.
                         return;
                     }
 
@@ -140,12 +182,12 @@ namespace AmongUs.Server.Net
                         {
                             var target = message.ReadPackedInt32();
                             writer.CopyFrom(message);
-                            game.SendTo(writer, target);
+                            Player.Game.SendTo(writer, target);
                         }
                         else
                         {
                             writer.CopyFrom(message);
-                            game.SendToAllExcept(writer, Player);
+                            Player.Game.SendToAllExcept(writer, Player);
                         }
                     }
                     break;
@@ -155,9 +197,16 @@ namespace AmongUs.Server.Net
                 case RequestFlag.JoinedGame:
                     break;
                 
-                // 101A3BD0
                 case RequestFlag.EndGame:
+                {
+                    if (!IsPacketAllowed(message, true))
+                    {
+                        return;
+                    }
+
+                    Player.Game.HandleEndGame(message);
                     break;
+                }
                 
                 default:
                     Logger.Warning("Server received unknown flag {0}.", flag);

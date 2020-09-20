@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using AmongUs.Server.Exceptions;
 using AmongUs.Server.Extensions;
@@ -18,29 +17,36 @@ namespace AmongUs.Server.Net
         private static readonly ILogger Logger = Log.ForContext<Game>();
         
         private readonly ConcurrentDictionary<int, ClientPlayer> _players;
-        private int _hostId;
-        
+
         public Game(int code, GameOptionsData options)
         {
             Code = code;
             CodeStr = GameCode.IntToGameName(code);
+            HostId = -1;
             GameState = GameStates.NotStarted;
             Options = options;
 
-            _hostId = -1;
             _players = new ConcurrentDictionary<int, ClientPlayer>();
         }
         
         public int Code { get; }
         public string CodeStr { get; }
-        public GameStates GameState { get; }
+        public bool IsPublic { get; private set; }
+        public int HostId { get; private set; }
+        public GameStates GameState { get; private set; }
         public GameOptionsData Options { get; }
 
         public void SendToAllExcept(MessageWriter message, ClientPlayer sender)
         {
             foreach (var (_, player) in _players.Where(x => x.Value != sender))
             {
-                player.Client.Connection.Send(message);
+                if (player.Client.Connection.State != ConnectionState.Connected)
+                {
+                    Logger.Warning("[{0}] Tried to sent data to a disconnected player ({1}).", sender?.Client.Id, player.Client.Id);
+                    continue;
+                }
+                
+                player.Client.Send(message);
             }
         }
 
@@ -48,11 +54,28 @@ namespace AmongUs.Server.Net
         {
             if (_players.TryGetValue(playerId, out var player))
             {
-                player.Client.Connection.Send(message);
+                if (player.Client.Connection.State != ConnectionState.Connected)
+                {
+                    Logger.Warning("[{0}] Sending data to {1} failed, player is not connected.", CodeStr, player.Client.Id);
+                    return;
+                }
+                
+                player.Client.Send(message);
             }
             else
             {
                 Logger.Warning("[{0}] Sending data to {1} failed, player does not exist.", CodeStr, playerId);
+            }
+        }
+
+        public void HandleStartGame(MessageReader message)
+        {
+            GameState = GameStates.Started;
+            
+            using (var packet = MessageWriter.Get(SendOption.Reliable))
+            {
+                packet.CopyFrom(message);
+                SendToAllExcept(packet, null);
             }
         }
 
@@ -63,15 +86,52 @@ namespace AmongUs.Server.Net
                 case GameStates.NotStarted:
                     HandleJoinGameNew(player);
                     break;
-                case GameStates.Started:
+                case GameStates.Ended:
                     HandleJoinGameNext(player);
                     break;
-                case GameStates.Ended:
+                case GameStates.Started:
                 case GameStates.Destroyed:
                     player.Client.Connection.Send(new Message1DisconnectReason(DisconnectReason.GameStarted));
                     return;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public void HandleEndGame(MessageReader message)
+        {
+            GameState = GameStates.Ended;
+            
+            // Broadcast end of the game.
+            using (var packet = MessageWriter.Get(SendOption.Reliable))
+            {
+                packet.CopyFrom(message);
+                SendToAllExcept(packet, null);
+            }
+            
+            // Remove all players from this game.
+            foreach (var player in _players)
+            {
+                player.Value.Game = null;
+            }
+            
+            _players.Clear();
+        }
+
+        public void HandleRemovePlayer(int playerId, byte reason)
+        {
+            _players.TryRemove(playerId, out var player);
+            
+            // TODO: Host migration
+
+            using (var packet = MessageWriter.Get(SendOption.Reliable))
+            {
+                packet.Write(Code);
+                packet.Write(playerId);
+                packet.Write(HostId);
+                packet.Write(reason);
+                
+                SendToAllExcept(packet, player);
             }
         }
 
@@ -89,55 +149,136 @@ namespace AmongUs.Server.Net
             player.Game = this;
 
             // Assign hostId if none is set.
-            if (_hostId == -1)
+            if (HostId == -1)
             {
-                _hostId = player.Client.Id;
+                HostId = player.Client.Id;
             }
 
-            if (_hostId == player.Client.Id)
+            if (HostId == player.Client.Id)
             {
                 player.LimboState = LimboStates.NotLimbo;
             }
 
             using (var message = MessageWriter.Get(SendOption.Reliable))
             {
-                // TODO: WriteJoinedMessage - Move to own method / class
-                message.StartMessage(7);
-                message.Write(Code);
-                message.Write(player.Client.Id);
-                message.Write(_hostId);
-                message.WritePacked(_players.Count - 1);
-            
-                foreach (var (_, p) in _players.Where(x => x.Value != player))
-                {
-                    message.WritePacked(p.Client.Id);
-                }
-            
-                message.EndMessage();
+                WriteJoinedGameMessage(message, player, false);
+                WriteAlterGameMessage(message, false);
+                
+                player.Client.Send(message);
 
-                message.StartMessage(10);
-                message.Write(Code);
-                message.Write((sbyte)1);
-                message.Write(false); // Private / Public
-                message.EndMessage();
-                
-                player.Client.Connection.Send(message);
-            
-                // TODO: BroadcastJoinMessage - Move to own method / class
-                message.Clear(SendOption.Reliable);
-                message.StartMessage(1);
-                message.Write(Code);
-                message.Write(player.Client.Id);
-                message.Write(_hostId);
-                message.EndMessage();
-                
-                SendToAllExcept(message, player);
+                BroadcastJoinMessage(message, player, true);
             }
         }
 
-        private void HandleJoinGameNext(ClientPlayer player)
+        private void HandleJoinGameNext(ClientPlayer sender)
         {
-            throw new NotImplementedException();
+            if (sender.Client.Id == HostId)
+            {
+                GameState = GameStates.NotStarted;
+                HandleJoinGameNew(sender);
+
+                using (var message = MessageWriter.Get(SendOption.Reliable))
+                {
+                    foreach (var (_, player) in _players.Where(x => x.Value != sender))
+                    {
+                        WriteJoinedGameMessage(message, player, true);
+                        WriteAlterGameMessage(message, false);
+                        player.Client.Send(message);
+                    }
+                }
+                
+                return;
+            }
+
+            if (_players.Count >= 9)
+            {
+                sender.Client.Connection.Send(new Message1DisconnectReason(DisconnectReason.GameFull));
+                return;
+            }
+
+            // Store player.
+            if (!_players.TryAdd(sender.Client.Id, sender))
+            {
+                throw new AmongUsException("Failed to add player to game.");
+            }
+            
+            // Assign player to this game for future packets.
+            sender.Game = this;
+            
+            // Limbo, yes.
+            sender.LimboState = LimboStates.WaitingForHost;
+
+            using (var packet = MessageWriter.Get(SendOption.Reliable))
+            {
+                WriteWaitForHostMessage(packet, sender, false);
+                sender.Client.Send(packet);
+
+                BroadcastJoinMessage(packet, sender, true);
+            }
+        }
+
+        private void WriteJoinedGameMessage(MessageWriter message, ClientPlayer player, bool clear)
+        {
+            if (clear)
+            {
+                message.Clear(SendOption.Reliable);
+            }
+            
+            message.StartMessage((byte) RequestFlag.JoinedGame);
+            message.Write(Code);
+            message.Write(player.Client.Id);
+            message.Write(HostId);
+            message.WritePacked(_players.Count - 1);
+            
+            foreach (var (_, p) in _players.Where(x => x.Value != player))
+            {
+                message.WritePacked(p.Client.Id);
+            }
+            
+            message.EndMessage();
+        }
+
+        private void WriteAlterGameMessage(MessageWriter message, bool clear)
+        {
+            if (clear)
+            {
+                message.Clear(SendOption.Reliable);
+            }
+            
+            message.StartMessage((byte) RequestFlag.AlterGame);
+            message.Write(Code);
+            message.Write((byte) AlterGameTags.ChangePrivacy);
+            message.Write(IsPublic);
+            message.EndMessage();
+        }
+
+        private void WriteWaitForHostMessage(MessageWriter message, ClientPlayer player, bool clear)
+        {
+            if (clear)
+            {
+                message.Clear(SendOption.Reliable);
+            }
+            
+            message.StartMessage((byte) RequestFlag.WaitForHost);
+            message.Write(Code);
+            message.Write(player.Client.Id);
+            message.EndMessage();
+        }
+        
+        private void BroadcastJoinMessage(MessageWriter message, ClientPlayer player, bool clear)
+        {
+            if (clear)
+            {
+                message.Clear(SendOption.Reliable);
+            }
+            
+            message.StartMessage((byte) RequestFlag.JoinGame);
+            message.Write(Code);
+            message.Write(player.Client.Id);
+            message.Write(HostId);
+            message.EndMessage();
+            
+            SendToAllExcept(message, player);
         }
     }
 }
