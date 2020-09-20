@@ -1,17 +1,18 @@
 ﻿using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using AmongUs.Shared.Innersloth;
+using Serilog;
 
 namespace AmongUs.Server.Net
 {
     public class GameManager
     {
-        private readonly RNGCryptoServiceProvider _random;
+        private static readonly ILogger Logger = Log.ForContext<GameManager>();
+        
         private readonly ConcurrentDictionary<int, Game> _games;
 
         public GameManager()
         {
-            _random = new RNGCryptoServiceProvider();
             _games = new ConcurrentDictionary<int, Game>();
         }
         
@@ -22,9 +23,11 @@ namespace AmongUs.Server.Net
 
             if (_games.TryAdd(gameCode, game))
             {
+                Logger.Debug("Created game with code {0} ({1}).", GameCode.IntToGameName(gameCode), gameCode);        
                 return game;
             }
 
+            Logger.Warning("Failed to create game.");
             return null;
         }
 
@@ -36,6 +39,7 @@ namespace AmongUs.Server.Net
 
         public void Remove(int gameCode)
         {
+            Logger.Debug("Remove game with code {0} ({1}).", GameCode.IntToGameName(gameCode), gameCode);   
             _games.TryRemove(gameCode, out _);
         }
     }
