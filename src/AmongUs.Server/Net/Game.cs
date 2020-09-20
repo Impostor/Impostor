@@ -160,7 +160,7 @@ namespace AmongUs.Server.Net
 
             using (var packet = MessageWriter.Get(SendOption.Reliable))
             {
-                WriteRemovePlayerMessage(packet, false, playerId, reason);
+                WriteRemovePlayerMessage(packet, false, playerId, (DisconnectReason) reason);
                 SendToAllExcept(packet, player);
             }
         }
@@ -177,7 +177,9 @@ namespace AmongUs.Server.Net
                     player.Game = null;
                 }
                 
-                WriteRemovePlayerMessage(message, true, playerId, 0);
+                WriteRemovePlayerMessage(message, true, playerId, isBan 
+                    ? DisconnectReason.Banned 
+                    : DisconnectReason.Kicked);
                 SendToAllExcept(message, player);
             }
         }
@@ -264,8 +266,11 @@ namespace AmongUs.Server.Net
             }
         }
 
-        private void WriteRemovePlayerMessage(MessageWriter message, bool clear, int playerId, byte reason)
+        private void WriteRemovePlayerMessage(MessageWriter message, bool clear, int playerId, DisconnectReason reason)
         {
+            // Only a subset of DisconnectReason shows an unique message.
+            // ExitGame, Banned and Kicked.
+            
             if (clear)
             {
                 message.Clear(SendOption.Reliable);
@@ -275,7 +280,7 @@ namespace AmongUs.Server.Net
             message.Write(Code);
             message.Write(playerId);
             message.Write(HostId);
-            message.Write(reason);
+            message.Write((byte) reason);
             message.EndMessage();
         }
         
