@@ -135,7 +135,7 @@ namespace AmongUs.Server.Net
             }
         }
         
-        public void HandleRemovePlayer(int playerId, byte reason)
+        public void HandleRemovePlayer(int playerId, DisconnectReason reason)
         {
             if (_players.TryRemove(playerId, out var player))
             {
@@ -160,7 +160,7 @@ namespace AmongUs.Server.Net
 
             using (var packet = MessageWriter.Get(SendOption.Reliable))
             {
-                WriteRemovePlayerMessage(packet, false, playerId, (DisconnectReason) reason);
+                WriteRemovePlayerMessage(packet, false, playerId, reason);
                 SendToAllExcept(packet, player);
             }
         }

@@ -162,7 +162,7 @@ namespace AmongUs.Server.Net
                     var playerId = message.ReadPackedInt32();
                     var reason = message.ReadByte();
 
-                    Player.Game.HandleRemovePlayer(playerId, reason);
+                    Player.Game.HandleRemovePlayer(playerId, (DisconnectReason) reason);
                     break;
                 }
                 
@@ -258,7 +258,7 @@ namespace AmongUs.Server.Net
             {
                 if (Player.Game != null)
                 {
-                    Player.Game.HandleRemovePlayer(Id, 0);
+                    Player.Game.HandleRemovePlayer(Id, DisconnectReason.ExitGame);
                 }
             }
             catch (Exception ex)
