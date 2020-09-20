@@ -160,17 +160,28 @@ namespace AmongUs.Server.Net
 
             using (var packet = MessageWriter.Get(SendOption.Reliable))
             {
-                packet.StartMessage((byte) RequestFlag.RemovePlayer);
-                packet.Write(Code);
-                packet.Write(playerId);
-                packet.Write(HostId);
-                packet.Write(reason);
-                packet.EndMessage();
-                
+                WriteRemovePlayerMessage(packet, false, playerId, reason);
                 SendToAllExcept(packet, player);
             }
         }
 
+        public void HandleKickPlayer(int playerId, bool isBan)
+        {
+            using (var message = MessageWriter.Get(SendOption.Reliable))
+            {
+                WriteKickPlayerMessage(message, false, playerId, isBan);
+                SendToAllExcept(message, null);
+                
+                if (_players.TryRemove(playerId, out var player))
+                {
+                    player.Game = null;
+                }
+                
+                WriteRemovePlayerMessage(message, true, playerId, 0);
+                SendToAllExcept(message, player);
+            }
+        }
+        
         private void HandleJoinGameNew(ClientPlayer player)
         {
             Logger.Verbose("[{0}] Player joined.", CodeStr);
@@ -197,12 +208,12 @@ namespace AmongUs.Server.Net
 
             using (var message = MessageWriter.Get(SendOption.Reliable))
             {
-                WriteJoinedGameMessage(message, player, false);
+                WriteJoinedGameMessage(message, false, player);
                 WriteAlterGameMessage(message, false);
                 
                 player.Client.Send(message);
 
-                BroadcastJoinMessage(message, player, true);
+                BroadcastJoinMessage(message, true, player);
             }
         }
 
@@ -217,7 +228,7 @@ namespace AmongUs.Server.Net
                 {
                     foreach (var (_, player) in _players.Where(x => x.Value != sender))
                     {
-                        WriteJoinedGameMessage(message, player, true);
+                        WriteJoinedGameMessage(message, true, player);
                         WriteAlterGameMessage(message, false);
                         player.Client.Send(message);
                     }
@@ -246,14 +257,29 @@ namespace AmongUs.Server.Net
 
             using (var packet = MessageWriter.Get(SendOption.Reliable))
             {
-                WriteWaitForHostMessage(packet, sender, false);
+                WriteWaitForHostMessage(packet, false, sender);
                 sender.Client.Send(packet);
 
-                BroadcastJoinMessage(packet, sender, true);
+                BroadcastJoinMessage(packet, true, sender);
             }
         }
 
-        private void WriteJoinedGameMessage(MessageWriter message, ClientPlayer player, bool clear)
+        private void WriteRemovePlayerMessage(MessageWriter message, bool clear, int playerId, byte reason)
+        {
+            if (clear)
+            {
+                message.Clear(SendOption.Reliable);
+            }
+            
+            message.StartMessage((byte) RequestFlag.RemovePlayer);
+            message.Write(Code);
+            message.Write(playerId);
+            message.Write(HostId);
+            message.Write(reason);
+            message.EndMessage();
+        }
+        
+        private void WriteJoinedGameMessage(MessageWriter message, bool clear, ClientPlayer player)
         {
             if (clear)
             {
@@ -288,7 +314,21 @@ namespace AmongUs.Server.Net
             message.EndMessage();
         }
 
-        private void WriteWaitForHostMessage(MessageWriter message, ClientPlayer player, bool clear)
+        private void WriteKickPlayerMessage(MessageWriter message, bool clear, int playerId, bool isBan)
+        {
+            if (clear)
+            {
+                message.Clear(SendOption.Reliable);
+            }
+            
+            message.StartMessage((byte) RequestFlag.KickPlayer);
+            message.Write(Code);
+            message.WritePacked(playerId);
+            message.Write(isBan);
+            message.EndMessage();
+        }
+        
+        private void WriteWaitForHostMessage(MessageWriter message, bool clear, ClientPlayer player)
         {
             if (clear)
             {
@@ -301,7 +341,7 @@ namespace AmongUs.Server.Net
             message.EndMessage();
         }
         
-        private void BroadcastJoinMessage(MessageWriter message, ClientPlayer player, bool clear)
+        private void BroadcastJoinMessage(MessageWriter message, bool clear, ClientPlayer player)
         {
             if (clear)
             {

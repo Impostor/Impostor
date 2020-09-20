@@ -149,7 +149,6 @@ namespace AmongUs.Server.Net
                     break;
                 }
                 
-                // 101A39EC
                 case RequestFlag.RemoveGame:
                     break;
                 
@@ -219,6 +218,20 @@ namespace AmongUs.Server.Net
                     var isPublic = message.ReadByte() == 1;
                     
                     Player.Game.HandleAlterGame(message, Player, isPublic);
+                    break;
+                }
+
+                case RequestFlag.KickPlayer:
+                {
+                    if (!IsPacketAllowed(message, true))
+                    {
+                        return;
+                    }
+
+                    var playerId = message.ReadPackedInt32();
+                    var isBan = message.ReadBoolean();
+
+                    Player.Game.HandleKickPlayer(playerId, isBan);
                     break;
                 }
                 
