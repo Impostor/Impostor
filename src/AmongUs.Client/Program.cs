@@ -10,9 +10,9 @@ namespace AmongUs.Client
         {
             var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "..\\LocalLow");
             var regionFile = Path.Combine(appData, "Innersloth", "Among Us", "regionInfo.dat");
-            var region = new RegionInfo("Private", "127.0.0.1", new []
+            var region = new RegionInfo("Private", "192.168.1.211", new []
             {
-                new ServerInfo("Private-Master-1", "127.0.0.1", 22023)
+                new ServerInfo("Private-Master-1", "192.168.1.211", 22023)
             });
             
             using (var file = File.Open(regionFile, FileMode.Create, FileAccess.Write))

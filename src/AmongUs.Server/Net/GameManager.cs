@@ -28,9 +28,15 @@ namespace AmongUs.Server.Net
             return null;
         }
 
-        public void Remove(int key)
+        public Game Find(int gameCode)
         {
-            _games.TryRemove(key, out _);
+            _games.TryGetValue(gameCode, out var game);
+            return game;
+        }
+
+        public void Remove(int gameCode)
+        {
+            _games.TryRemove(gameCode, out _);
         }
     }
 }

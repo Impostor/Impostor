@@ -44,7 +44,7 @@ namespace AmongUs.Server.Net
             }
             
             // Register client.
-            _clientManager.Add(new Client(_clientManager, _gameManager, e.Connection, clientVersion, clientName));
+            _clientManager.Add(new Client(_clientManager, _gameManager, _clientManager.NextId(), clientName, e.Connection));
         }
 
         public void Start()

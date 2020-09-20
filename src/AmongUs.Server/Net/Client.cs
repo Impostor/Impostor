@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Text.Json;
+using AmongUs.Server.Data;
+using AmongUs.Server.Exceptions;
 using AmongUs.Server.Extensions;
 using AmongUs.Server.Net.Request;
 using AmongUs.Server.Net.Response;
@@ -17,46 +18,55 @@ namespace AmongUs.Server.Net
         
         private readonly ClientManager _clientManager;
         private readonly GameManager _gameManager;
-        private readonly Connection _connection;
-        private readonly ClientState _state;
-        private readonly int _version;
-        private readonly string _name;
 
-        public Client(ClientManager clientManager, GameManager gameManager, Connection connection, int version, string name)
+        public Client(ClientManager clientManager, GameManager gameManager, int id, string name, Connection connection)
         {
             _clientManager = clientManager;
             _gameManager = gameManager;
-            _connection = connection;
-            _connection.DataReceived += OnDataReceived;
-            _connection.Disconnected += OnDisconnected;
-            _state = new ClientState(_connection);
-            _version = version;
-            _name = name;
+            Id = id;
+            Name = name;
+            Connection = connection;
+            Connection.DataReceived += OnDataReceived;
+            Connection.Disconnected += OnDisconnected;
+            Player = new ClientPlayer(this);
         }
+
+        public int Id { get; }
+        public string Name { get; }
+        public Connection Connection { get; }
+        public ClientPlayer Player { get; }
 
         private void OnDataReceived(DataReceivedEventArgs e)
         {
-            while (true)
+            try
             {
-                if (e.Message.Position >= e.Message.Length)
+                while (true)
                 {
-                    break;
+                    if (e.Message.Position >= e.Message.Length)
+                    {
+                        break;
+                    }
+
+                    OnMessageReceived(e.Message.ReadMessage(), e.SendOption);
                 }
-                
-                OnMessageReceived(e.Message.ReadMessage());
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Exception caught in client data handler.");
+                Connection.Send(new Message1DisconnectReason(DisconnectReason.Custom, DisconnectMessages.Error));
             }
         }
 
-        private void OnMessageReceived(MessageReader message)
+        private void OnMessageReceived(MessageReader message, SendOption sendOption)
         {
             var flag = (RequestFlag) message.Tag;
             
+            Logger.Verbose("[{0}] Server got {1}.", Id, flag);
+            
             switch (flag)
             {
-                // 101A3813
                 case RequestFlag.HostGame:
-                    Logger.Debug("Server got host game");
-                    
+                {
                     // Read game settings.
                     var gameInfoBytes = message.ReadBytesAndSize();
                     var gameInfo = GameOptionsData.Deserialize(gameInfoBytes);
@@ -65,69 +75,98 @@ namespace AmongUs.Server.Net
                     var game = _gameManager.Create(this, gameInfo);
                     if (game == null)
                     {
-                        _connection.Send(new Message1DisconnectReason(DisconnectReason.ServerFull));
+                        Connection.Send(new Message1DisconnectReason(DisconnectReason.ServerFull));
                         return;
                     }
 
-                    // Code (32) in the packet below will be used in JoinGame.
+                    // Code in the packet below will be used in JoinGame.
                     using (var writer = MessageWriter.Get(SendOption.Reliable))
                     {
                         writer.StartMessage(0);
-                        writer.Write(32);
+                        writer.Write(game.Code);
                         writer.EndMessage();
                 
-                        _connection.Send(writer);
+                        Connection.Send(writer);
                     }
                     break;
-                // 101A388C
+                }
+                
                 case RequestFlag.JoinGame:
-                    Logger.Debug("Server got join game");
-
+                {
                     var gameCode = message.ReadInt32();
-                    if (gameCode != 32)
+                    var unknown = message.ReadByte();
+                    var game = _gameManager.Find(gameCode);
+                    if (game == null)
                     {
-                        Logger.Debug("- Code {0}", gameCode, GameCode.IntToGameName(gameCode));
-                        
-                        _connection.Send(new Message1DisconnectReason(DisconnectReason.GameMissing));
+                        Connection.Send(new Message1DisconnectReason(DisconnectReason.GameMissing));
                         return;
                     }
-                    
-                    // TODO: JoinGame
-                    Logger.Debug("JoinGame {0} {1}", gameCode, message.ReadByte());
+
+                    game.HandleJoinGame(Player);
                     break;
+                }
+                
                 // 101A3960
                 case RequestFlag.StartGame:
-                    Logger.Debug("Server got StartGame");
                     break;
+                
                 // 101A39EC
                 case RequestFlag.RemoveGame:
-                    Logger.Debug("Server got RemoveGame");
                     break;
+                
                 case RequestFlag.RemovePlayer:
-                    Logger.Debug("Server got RemovePlayer");
                     break;
-                // 101A3A15
+                
                 case RequestFlag.GameData:
-                    Logger.Debug("Server got GameData");
-                    break;
-                // 101A3AAB
                 case RequestFlag.GameDataTo:
-                    Logger.Debug("Server got GameDataTo");
+                {
+                    var game = Player.Game;
+                    if (game == null)
+                    {
+                        throw new NullReferenceException("Game was not set for the client.");
+                    }
+                    
+                    var code = message.ReadInt32();
+                    if (code != game.Code)
+                    {
+                        // Packet was meant for another game.
+                        return;
+                    }
+
+                    // Broadcast packet to all other players.
+                    using (var writer = MessageWriter.Get(sendOption))
+                    {
+                        if (flag == RequestFlag.GameDataTo)
+                        {
+                            var target = message.ReadPackedInt32();
+                            writer.CopyFrom(message);
+                            game.SendTo(writer, target);
+                        }
+                        else
+                        {
+                            writer.CopyFrom(message);
+                            game.SendToAllExcept(writer, Player);
+                        }
+                    }
                     break;
+                }
+                
                 // 101A3BA6
                 case RequestFlag.JoinedGame:
-                    Logger.Debug("Server got JoinedGame");
                     break;
+                
                 // 101A3BD0
                 case RequestFlag.EndGame:
-                    Logger.Debug("Server got EndGame");
                     break;
+                
                 default:
-                    Logger.Debug("Server received unknown {0}", flag);
+                    Logger.Warning("Server received unknown flag {0}.", flag);
                     break;
             }
 
-            if (message.Position < message.Length)
+            if (flag != RequestFlag.GameData &&
+                flag != RequestFlag.GameDataTo &&
+                message.Position < message.Length)
             {
                 Logger.Warning("Server did not consume all bytes from {0} ({1} < {2}).", 
                     flag, 
