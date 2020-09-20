@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using AmongUs.Server.Data;
 using AmongUs.Server.Exceptions;
 using AmongUs.Server.Extensions;
 using AmongUs.Server.Net.Response;
@@ -16,17 +17,20 @@ namespace AmongUs.Server.Net
     {
         private static readonly ILogger Logger = Log.ForContext<Game>();
         
+        private readonly GameManager _gameManager;
         private readonly ConcurrentDictionary<int, ClientPlayer> _players;
 
-        public Game(int code, GameOptionsData options)
+        public Game(GameManager gameManager, int code, GameOptionsData options)
         {
+            _gameManager = gameManager;
+            _players = new ConcurrentDictionary<int, ClientPlayer>();
+            
             Code = code;
             CodeStr = GameCode.IntToGameName(code);
             HostId = -1;
             GameState = GameStates.NotStarted;
             Options = options;
 
-            _players = new ConcurrentDictionary<int, ClientPlayer>();
         }
         
         public int Code { get; }
@@ -79,19 +83,21 @@ namespace AmongUs.Server.Net
             }
         }
 
-        public void HandleJoinGame(ClientPlayer player)
+        public void HandleJoinGame(ClientPlayer sender)
         {
             switch (GameState)
             {
                 case GameStates.NotStarted:
-                    HandleJoinGameNew(player);
+                    HandleJoinGameNew(sender);
                     break;
                 case GameStates.Ended:
-                    HandleJoinGameNext(player);
+                    HandleJoinGameNext(sender);
                     break;
                 case GameStates.Started:
+                    sender.Client.Connection.Send(new Message1DisconnectReason(DisconnectReason.GameStarted));
+                    return;
                 case GameStates.Destroyed:
-                    player.Client.Connection.Send(new Message1DisconnectReason(DisconnectReason.GameStarted));
+                    sender.Client.Connection.Send(new Message1DisconnectReason(DisconnectReason.Custom, DisconnectMessages.Destroyed));
                     return;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -118,18 +124,48 @@ namespace AmongUs.Server.Net
             _players.Clear();
         }
 
+        public void HandleAlterGame(MessageReader message, ClientPlayer sender, bool isPublic)
+        {
+            IsPublic = isPublic;
+            
+            using (var packet = MessageWriter.Get(SendOption.Reliable))
+            {
+                packet.CopyFrom(message);
+                SendToAllExcept(packet, sender);
+            }
+        }
+        
         public void HandleRemovePlayer(int playerId, byte reason)
         {
-            _players.TryRemove(playerId, out var player);
-            
-            // TODO: Host migration
+            if (_players.TryRemove(playerId, out var player))
+            {
+                player.Game = null;
+            }
+
+            // Game is empty, remove it.
+            if (_players.Count == 0)
+            {
+                GameState = GameStates.Destroyed;
+
+                // Remove instance reference.
+                _gameManager.Remove(Code);
+                return;
+            }
+
+            // Host migration.
+            if (HostId == playerId)
+            {
+                HostId = _players.First().Value.Client.Id;
+            }
 
             using (var packet = MessageWriter.Get(SendOption.Reliable))
             {
+                packet.StartMessage((byte) RequestFlag.RemovePlayer);
                 packet.Write(Code);
                 packet.Write(playerId);
                 packet.Write(HostId);
                 packet.Write(reason);
+                packet.EndMessage();
                 
                 SendToAllExcept(packet, player);
             }

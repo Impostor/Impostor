@@ -193,10 +193,6 @@ namespace AmongUs.Server.Net
                     break;
                 }
                 
-                // 101A3BA6
-                case RequestFlag.JoinedGame:
-                    break;
-                
                 case RequestFlag.EndGame:
                 {
                     if (!IsPacketAllowed(message, true))
@@ -207,6 +203,24 @@ namespace AmongUs.Server.Net
                     Player.Game.HandleEndGame(message);
                     break;
                 }
+
+                case RequestFlag.AlterGame:
+                {
+                    if (!IsPacketAllowed(message, true))
+                    {
+                        return;
+                    }
+
+                    if (message.ReadByte() != (byte) AlterGameTags.ChangePrivacy)
+                    {
+                        return;
+                    }
+
+                    var isPublic = message.ReadByte() == 1;
+                    
+                    Player.Game.HandleAlterGame(message, Player, isPublic);
+                    break;
+                }
                 
                 default:
                     Logger.Warning("Server received unknown flag {0}.", flag);
@@ -215,6 +229,7 @@ namespace AmongUs.Server.Net
 
             if (flag != RequestFlag.GameData &&
                 flag != RequestFlag.GameDataTo &&
+                flag != RequestFlag.EndGame &&
                 message.Position < message.Length)
             {
                 Logger.Warning("Server did not consume all bytes from {0} ({1} < {2}).", 
@@ -226,6 +241,18 @@ namespace AmongUs.Server.Net
         
         private void OnDisconnected(object sender, DisconnectedEventArgs e)
         {
+            try
+            {
+                if (Player.Game != null)
+                {
+                    Player.Game.HandleRemovePlayer(Id, 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Exception caught in client disconnection.");
+            }
+
             _clientManager.Remove(this);
         }
     }

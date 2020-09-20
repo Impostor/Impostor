@@ -21,7 +21,11 @@ namespace AmongUs.Server
             
             // Configure logger.
             Log.Logger = new LoggerConfiguration()
+#if DEBUG
                 .MinimumLevel.Verbose()
+#else
+                .MinimumLevel.Information()
+#endif
                 .WriteTo.Console()
                 .CreateLogger();
 

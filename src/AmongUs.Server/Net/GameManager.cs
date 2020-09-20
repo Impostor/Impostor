@@ -18,7 +18,7 @@ namespace AmongUs.Server.Net
         public Game Create(Client owner, GameOptionsData options)
         {
             var gameCode = GameCode.GenerateCode(6);
-            var game = new Game(gameCode, options);
+            var game = new Game(this, gameCode, options);
 
             if (_games.TryAdd(gameCode, game))
             {
