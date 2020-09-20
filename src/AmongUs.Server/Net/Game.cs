@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using AmongUs.Server.Data;
 using AmongUs.Server.Exceptions;
 using AmongUs.Server.Extensions;
@@ -19,18 +21,19 @@ namespace AmongUs.Server.Net
         
         private readonly GameManager _gameManager;
         private readonly ConcurrentDictionary<int, ClientPlayer> _players;
+        private readonly HashSet<IPAddress> _bannedIps;
 
         public Game(GameManager gameManager, int code, GameOptionsData options)
         {
             _gameManager = gameManager;
             _players = new ConcurrentDictionary<int, ClientPlayer>();
+            _bannedIps = new HashSet<IPAddress>();
             
             Code = code;
             CodeStr = GameCode.IntToGameName(code);
             HostId = -1;
             GameState = GameStates.NotStarted;
             Options = options;
-
         }
         
         public int Code { get; }
@@ -85,6 +88,12 @@ namespace AmongUs.Server.Net
 
         public void HandleJoinGame(ClientPlayer sender)
         {
+            if (_bannedIps.Contains(sender.Client.Connection.EndPoint.Address))
+            {
+                sender.Client.Connection.Send(new Message1DisconnectReason(DisconnectReason.Banned));
+                return;
+            }
+            
             switch (GameState)
             {
                 case GameStates.NotStarted:
@@ -175,6 +184,11 @@ namespace AmongUs.Server.Net
                 if (_players.TryRemove(playerId, out var player))
                 {
                     player.Game = null;
+
+                    if (isBan)
+                    {
+                        _bannedIps.Add(player.Client.Connection.EndPoint.Address);
+                    }
                 }
                 
                 WriteRemovePlayerMessage(message, true, playerId, isBan 
