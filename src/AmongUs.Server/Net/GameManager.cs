@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Security.Cryptography;
 using AmongUs.Shared.Innersloth;
 using Serilog;
 

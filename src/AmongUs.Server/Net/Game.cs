@@ -150,6 +150,8 @@ namespace AmongUs.Server.Net
             {
                 player.Game = null;
             }
+            
+            Logger.Information("{0} - Player {1} ({2}) has left.", CodeStr, player?.Client.Name, playerId);
 
             // Game is empty, remove it.
             if (_players.Count == 0)
@@ -164,7 +166,9 @@ namespace AmongUs.Server.Net
             // Host migration.
             if (HostId == playerId)
             {
-                HostId = _players.First().Value.Client.Id;
+                var newHost = _players.First().Value;
+                HostId = newHost.Client.Id;
+                Logger.Information("{0} - Assigned {1} ({2}) as new host.", CodeStr, newHost.Client.Name, newHost.Client.Id);
             }
 
             using (var packet = MessageWriter.Get(SendOption.Reliable))
@@ -176,6 +180,9 @@ namespace AmongUs.Server.Net
 
         public void HandleKickPlayer(int playerId, bool isBan)
         {
+            _players.TryGetValue(playerId, out var p);
+            Logger.Information("{0} - Player {1} ({2}) has left.", CodeStr, p?.Client.Name, playerId);
+            
             using (var message = MessageWriter.Get(SendOption.Reliable))
             {
                 WriteKickPlayerMessage(message, false, playerId, isBan);
@@ -198,43 +205,45 @@ namespace AmongUs.Server.Net
             }
         }
         
-        private void HandleJoinGameNew(ClientPlayer player)
+        private void HandleJoinGameNew(ClientPlayer sender)
         {
-            Logger.Verbose("[{0}] Player joined.", CodeStr);
+            Logger.Information("{0} - Player {1} ({2}) is joining.", CodeStr, sender.Client.Name, sender.Client.Id);
             
             // Store player.
-            if (!_players.TryAdd(player.Client.Id, player))
+            if (!_players.TryAdd(sender.Client.Id, sender))
             {
                 throw new AmongUsException("Failed to add player to game.");
             }
             
             // Assign player to this game for future packets.
-            player.Game = this;
+            sender.Game = this;
 
             // Assign hostId if none is set.
             if (HostId == -1)
             {
-                HostId = player.Client.Id;
+                HostId = sender.Client.Id;
             }
 
-            if (HostId == player.Client.Id)
+            if (HostId == sender.Client.Id)
             {
-                player.LimboState = LimboStates.NotLimbo;
+                sender.LimboState = LimboStates.NotLimbo;
             }
 
             using (var message = MessageWriter.Get(SendOption.Reliable))
             {
-                WriteJoinedGameMessage(message, false, player);
+                WriteJoinedGameMessage(message, false, sender);
                 WriteAlterGameMessage(message, false);
                 
-                player.Client.Send(message);
+                sender.Client.Send(message);
 
-                BroadcastJoinMessage(message, true, player);
+                BroadcastJoinMessage(message, true, sender);
             }
         }
 
         private void HandleJoinGameNext(ClientPlayer sender)
         {
+            Logger.Information("{0} - Player {1} ({2}) is rejoining.", CodeStr, sender.Client.Name, sender.Client.Id);
+            
             if (sender.Client.Id == HostId)
             {
                 GameState = GameStates.NotStarted;
@@ -284,7 +293,6 @@ namespace AmongUs.Server.Net
         {
             // Only a subset of DisconnectReason shows an unique message.
             // ExitGame, Banned and Kicked.
-            
             if (clear)
             {
                 message.Clear(SendOption.Reliable);

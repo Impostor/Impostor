@@ -149,6 +149,7 @@ namespace AmongUs.Server.Net
                     break;
                 }
                 
+                // No idea how this flag is triggered.
                 case RequestFlag.RemoveGame:
                     break;
                 
