@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hazel", "..\submodules\Haze
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmongUs.Tests", "AmongUs.Tests\AmongUs.Tests.csproj", "{C1385C67-A7DD-46D2-80F6-FA428B85FB22}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{56DD9707-D811-4056-9E2C-8A9CC2479B07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmongUs.Tools.Proxy", "AmongUs.Tools.Proxy\AmongUs.Tools.Proxy.csproj", "{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +75,14 @@ Global
 		{C1385C67-A7DD-46D2-80F6-FA428B85FB22}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C1385C67-A7DD-46D2-80F6-FA428B85FB22}.Release|x86.ActiveCfg = Release|Any CPU
 		{C1385C67-A7DD-46D2-80F6-FA428B85FB22}.Release|x86.Build.0 = Release|Any CPU
+		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Debug|x86.Build.0 = Debug|Any CPU
+		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Release|x86.ActiveCfg = Release|Any CPU
+		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,5 +92,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{02CFBD30-D77D-400F-94B2-700F60EFDD7F} = {DFA3CC6A-A27C-4713-876D-A55912C78C45}
+		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D} = {56DD9707-D811-4056-9E2C-8A9CC2479B07}
 	EndGlobalSection
 EndGlobal

@@ -108,7 +108,7 @@ namespace AmongUs.Server.Net
                 message.Write(_hostId);
                 message.WritePacked(_players.Count - 1);
             
-                foreach (var (_, p) in _players.Where(x => x.Value == player))
+                foreach (var (_, p) in _players.Where(x => x.Value != player))
                 {
                     message.WritePacked(p.Client.Id);
                 }
