@@ -4,6 +4,7 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <RuntimeIdentifiers>win-x64;linux-x64;linux-musl-x64</RuntimeIdentifiers>
+        <PublishTrimmed>true</PublishTrimmed>
         <AssemblyTitle>Impostor.Server</AssemblyTitle>
         <Product>Impostor.Server</Product>
         <Copyright>Copyright © AeonLucid 2020</Copyright>
