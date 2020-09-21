@@ -11,7 +11,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           submodules: true
       - name: Setup .NET Core
@@ -28,11 +29,11 @@ jobs:
         run: dotnet test --no-restore -v normal -f netcoreapp3.1 ./src
       - name: Publish Impostor.Server (win-x64)
         run: dotnet publish -c release -o ./build/win-x64 -f netcoreapp3.1 -r win-x64 --self-contained --no-restore ./src/Impostor.Server/Impostor.Server.csproj
-      - name: Zip Imposter.Server (win-x64)
+      - name: Zip Impostor.Server (win-x64)
         run: cd ./build/win-x64; zip -r ../win-x64.zip .; cd ./../../
       - name: Publish Impostor.Server (linux-x64)
         run: dotnet publish -c release -o ./build/linux-x64 -f netcoreapp3.1 -r linux-x64 --self-contained --no-restore ./src/Impostor.Server/Impostor.Server.csproj
-      - name: Zip Imposter.Server (linux-x64)
+      - name: Zip Impostor.Server (linux-x64)
         run: cd ./build/linux-x64; zip -r ../linux-x64.zip .; cd ./../../
       - name: Create Release
         id: create_release
@@ -40,8 +41,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: test${{ github.ref }}
-          release_name: Release test${{ github.ref }}
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           body: |
             Changes in this Release
             - First Change
@@ -55,7 +56,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./build/win-x64.zip
-          asset_name: Imposter-Server-win-x64.zip
+          asset_name: Impostor-Server-win-x64.zip
           asset_content_type: application/zip
       - name: Upload Release Asset (linux-x64)
         uses: actions/upload-release-asset@v1
@@ -64,5 +65,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./build/linux-x64.zip
-          asset_name: Imposter-Server-linux-x64.zip
+          asset_name: Impostor-Server-linux-x64.zip
           asset_content_type: application/zip
