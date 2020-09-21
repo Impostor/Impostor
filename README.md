@@ -1,25 +1,58 @@
-# AmongUsServer
+# Impostor
 
-## Server details
+Impostor is one of the first **Among Us** private servers, written in C#.
 
-These are official server IPs.
+The latest version supported is `2020.9.9`, both desktop and mobile.
 
-### Matchmaking servers
+There are no special features at this moment, the goal is aiming to be as close as possible to the real server, for now. In a later stage, making modifications to game logic by modifying `GameData` can be looked at.
 
-| Name | Region | IP | Port | Hardcoded |
-|-|-|-|-|-|
-| Master-1 | North America | 50.116.1.42 | 22023 | True | 
-| Master-2 | North America | 104.237.135.186 | 22023 | True | 
-| Master-3 | North America | 45.79.40.75 | 22023 | True | 
-| Asia-Master-1 | Asia | 139.162.111.196 | 22023 | True | 
-| Asia-Master-2 | Asia | 172.104.96.99 | 22023 | False |
-| Europe-Master-1 | Europe | 172.105.251.170 | 22023 | True | 
-| Europe-Master-2 | Europe | 172.105.249.25 | 22023 | False | 
+[Discord server for Impostor](https://discord.gg/Mk3w6Tb)
 
-### Ping servers
+## Features
 
-| Region | IP |
-|-|-|
-| North America | 66.175.220.120 |
-| Asia | 139.162.111.196 |
-| Europe | 172.105.251.170 |
+Almost all standard features are implemented at this moment, except for public games. It is already possible to host and play private games.
+
+- [x] Create game
+- [x] Join game
+- [x] Start game
+- [ ] Find game
+- [x] V1 GameCodes (AAAA)
+- [x] V2 GameCodes (AAAAAA)
+- [x] Kick player
+- [x] Ban player
+- [ ] Server redirection
+- [ ] Server reselect
+
+## Installation
+
+When hosting a server, make sure port **22023** is open and forwarded for **UDP**. It is not possible to use a different port because Among Us seems to have hardcoded 22023, even though the functionality for setting a port exists.
+
+### Client
+
+If you just want to play on a server hosted by someone else, you need to follow these instructions.
+
+> W.I.P
+
+### Server (Docker)
+
+![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor?sort=semver)
+![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor/edge)
+
+```
+docker run -p 22023:22023/udp aeonlucid/impostor
+```
+
+### Server (Windows / Linux)
+
+1. Find the [latest release](https://github.com/AeonLucid/Impostor/releases/latest) 
+2. Download either the Windows or the Linux version.
+3. Extract the zip.
+4. Run `Impostor.Server.exe` (Windows) / `Impostor.Server` (Linux)
+
+## License
+
+This software is distributed under the **GNU GLPv3** License.
+
+## Credits
+
+- [willardf/Hazel-Networking](https://github.com/willardf/Hazel-Networking)

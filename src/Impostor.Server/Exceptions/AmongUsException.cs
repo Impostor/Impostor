@@ -13,11 +13,11 @@ namespace Impostor.Server.Exceptions
         {
         }
 
-        public AmongUsException(string? message) : base(message)
+        public AmongUsException(string message) : base(message)
         {
         }
 
-        public AmongUsException(string? message, Exception? innerException) : base(message, innerException)
+        public AmongUsException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }

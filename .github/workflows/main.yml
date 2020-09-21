@@ -3,8 +3,14 @@ name: Build
 on:
   push:
     branches: [ master, dev ]
+    paths:
+      - 'src/**'
+      - '.gitmodules'
   pull_request:
     branches: [ master, dev ]
+    paths:
+      - 'src/**'
+      - '.gitmodules'
 
 jobs:
   build:
