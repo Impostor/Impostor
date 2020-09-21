@@ -1,7 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFrameworks>net452;netcoreapp3.1</TargetFrameworks>
     </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Memory" Version="4.5.4" />
+    </ItemGroup>
 
 </Project>

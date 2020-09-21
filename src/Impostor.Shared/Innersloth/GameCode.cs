@@ -50,7 +50,11 @@ namespace Impostor.Shared.Innersloth
             // V1.
             Span<byte> code = stackalloc byte[4];
             BinaryPrimitives.WriteInt32LittleEndian(code, input);
+#if NET452
+            return Encoding.UTF8.GetString(code.Slice(0, 4).ToArray());
+#else
             return Encoding.UTF8.GetString(code.Slice(0, 4));
+#endif
         }
 
         private static string IntToGameNameV2(int input)
@@ -114,7 +118,11 @@ namespace Impostor.Shared.Innersloth
             }
             
             // Generate random bytes.
+#if NET452
+            var data = new byte[len];
+#else
             Span<byte> data = stackalloc byte[len];
+#endif
             Random.GetBytes(data);
             
             // Convert to their char representation.
@@ -123,8 +131,12 @@ namespace Impostor.Shared.Innersloth
             {
                 dataChar[i] = V2[V2Map[data[i] % 26]];
             }
-            
+
+#if NET452
+            return GameNameToInt(new string(dataChar.ToArray()));
+#else
             return GameNameToInt(new string(dataChar));
+#endif
         }
     }
 }
