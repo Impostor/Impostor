@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '0 10 * * *'
   push:
-    branches: [ master, ci, dev ]
+    branches: [ master, dev ]
     tags:
       - 'v*.*.*'
   pull_request:
