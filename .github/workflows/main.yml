@@ -20,7 +20,9 @@ jobs:
           dotnet-version: 3.1.301
       - name: Install dependencies
         run: dotnet restore ./src
-      - name: Build
-        run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src
+      - name: Build Impostor.Client
+        run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Server/Impostor.Client.csproj
+      - name: Build Impostor.Server
+        run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Server/Impostor.Server.csproj
       - name: Test
         run: dotnet test --no-restore -v normal -f netcoreapp3.1 ./src
