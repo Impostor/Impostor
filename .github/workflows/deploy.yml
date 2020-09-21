@@ -49,7 +49,6 @@ jobs:
           draft: true
           prerelease: false
       - name: Upload Release Asset (win-x64)
-        id: upload-release-asset 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,7 +58,6 @@ jobs:
           asset_name: Imposter-Server-win-x64.zip
           asset_content_type: application/zip
       - name: Upload Release Asset (linux-x64)
-        id: upload-release-asset 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
