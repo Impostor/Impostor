@@ -15,12 +15,14 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           submodules: true
+      - name: Setup MSBuild.exe
+        uses: warrenbuckley/Setup-MSBuild@v1
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
@@ -28,14 +30,14 @@ jobs:
       - name: Install dependencies
         run: dotnet restore ./src
       - name: Build Impostor.Client
-        run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Client/Impostor.Client.csproj
+        run: msbuild ./src/Impostor.Client/Impostor.Client.csproj /p:Configuration=Release
       - name: Build Impostor.Server
         run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Server/Impostor.Server.csproj
       - name: Test
         run: dotnet test --no-restore -v normal -f netcoreapp3.1 ./src
   deploy:
     name: Deploy
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
     if: github.event_name == 'release'
     steps:

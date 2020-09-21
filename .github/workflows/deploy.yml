@@ -8,12 +8,14 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           submodules: true
+      - name: Setup MSBuild.exe
+        uses: warrenbuckley/Setup-MSBuild@v1
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
@@ -21,19 +23,33 @@ jobs:
       - name: Install dependencies
         run: dotnet restore ./src
       - name: Build Impostor.Client
-        run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Client/Impostor.Client.csproj
+        run: msbuild ./src/Impostor.Client/Impostor.Client.csproj /p:Configuration=Release
       - name: Build Impostor.Server
         run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Server/Impostor.Server.csproj
       - name: Test
         run: dotnet test --no-restore -v normal -f netcoreapp3.1 ./src
+      - name: Zip Impostor.Client
+        shell: bash
+        run: |
+          cd ./src/Impostor.Client/bin/Release/net452/win-x64
+          7z a -r $GITHUB_WORKSPACE/build/win-x64-client.zip *
+          cd $GITHUB_WORKSPACE
       - name: Publish Impostor.Server (win-x64)
         run: dotnet publish -c release -o ./build/win-x64 -f netcoreapp3.1 -r win-x64 --self-contained --no-restore ./src/Impostor.Server/Impostor.Server.csproj
       - name: Zip Impostor.Server (win-x64)
-        run: cd ./build/win-x64; zip -r ../win-x64.zip .; cd ./../../
+        shell: bash
+        run: |
+          cd ./build/win-x64
+          7z a -r ../win-x64.zip *
+          cd $GITHUB_WORKSPACE
       - name: Publish Impostor.Server (linux-x64)
         run: dotnet publish -c release -o ./build/linux-x64 -f netcoreapp3.1 -r linux-x64 --self-contained --no-restore ./src/Impostor.Server/Impostor.Server.csproj
       - name: Zip Impostor.Server (linux-x64)
-        run: cd ./build/linux-x64; zip -r ../linux-x64.zip .; cd ./../../
+        shell: bash
+        run: |
+          cd ./build/linux-x64
+          7z a -r ../linux-x64.zip *
+          cd $GITHUB_WORKSPACE
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -48,7 +64,16 @@ jobs:
             - Second Change
           draft: true
           prerelease: false
-      - name: Upload Release Asset (win-x64)
+      - name: Upload Release Asset (win-x64) Client
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/win-x64-client.zip
+          asset_name: Impostor-Client-win-x64.zip
+          asset_content_type: application/zip
+      - name: Upload Release Asset (win-x64) Server
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,7 +82,7 @@ jobs:
           asset_path: ./build/win-x64.zip
           asset_name: Impostor-Server-win-x64.zip
           asset_content_type: application/zip
-      - name: Upload Release Asset (linux-x64)
+      - name: Upload Release Asset (linux-x64) Server
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
