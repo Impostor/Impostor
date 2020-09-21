@@ -39,10 +39,12 @@ If you just want to play on a server hosted by someone else, you need to follow 
 4. Run `Impostor.Client.exe`.
 5. Follow the instructions inside the application.
 
+![Client](docs/images/client.jpg)
+
 ### Server (Docker)
 
-![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor?sort=semver)
-![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor/edge)
+[![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor?sort=semver)](https://hub.docker.com/repository/docker/aeonlucid/impostor)
+[![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor/edge)](https://hub.docker.com/repository/docker/aeonlucid/impostor)
 
 ```
 docker run -p 22023:22023/udp aeonlucid/impostor
