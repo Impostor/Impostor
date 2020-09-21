@@ -61,7 +61,7 @@
             this.buttonLaunch.Name = "buttonLaunch";
             this.buttonLaunch.Size = new System.Drawing.Size(79, 23);
             this.buttonLaunch.TabIndex = 2;
-            this.buttonLaunch.Text = "Launch";
+            this.buttonLaunch.Text = "Save";
             this.buttonLaunch.UseVisualStyleBackColor = true;
             this.buttonLaunch.Click += new System.EventHandler(this.buttonLaunch_Click);
             // 
