@@ -17,8 +17,8 @@ jobs:
         with:
           dotnet-version: 3.1.301
       - name: Install dependencies
-        run: dotnet restore
+        run: dotnet restore ./src
       - name: Build
-        run: dotnet build --no-restore -c Release 
+        run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src
       - name: Test
-        run: dotnet test --no-restore -v normal
+        run: dotnet test --no-restore -v normal -f netcoreapp3.1 ./src
