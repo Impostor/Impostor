@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: dotnet restore ./src
       - name: Build Impostor.Client
-        run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Server/Impostor.Client.csproj
+        run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Client/Impostor.Client.csproj
       - name: Build Impostor.Server
         run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Server/Impostor.Server.csproj
       - name: Test
