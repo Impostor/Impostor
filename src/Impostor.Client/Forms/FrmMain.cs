@@ -1,68 +1,85 @@
 ﻿using System;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using Impostor.Shared.Innersloth;
+using Impostor.Client.Core;
+using Impostor.Client.Core.Events;
 
 namespace Impostor.Client.Forms
 {
     public partial class FrmMain : Form
     {
+        private readonly AmongUsModifier _modifier;
+        
         public FrmMain()
         {
             InitializeComponent();
+
+            AcceptButton = buttonLaunch;
+            
+            _modifier = new AmongUsModifier();
+            _modifier.Error += ModifierOnError;
+            _modifier.Saved += ModifierOnSaved;
+        }
+
+        private void ModifierOnError(object sender, ErrorEventArgs e)
+        {
+            MessageBox.Show(e.Message, "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+
+            textIp.Text = string.Empty;
+            textIp.Focus();
+            
+            textIp.Enabled = true;
+            buttonLaunch.Enabled = true;
+        }
+
+        private void ModifierOnSaved(object sender, SavedEventArgs e)
+        {
+            MessageBox.Show("The IP Address was saved, please (re)start Among Us.", "Success", 
+                MessageBoxButtons.OK, 
+                MessageBoxIcon.Information);
+
+            textIp.Text = e.IpAddress;
+            textIp.Enabled = true;
+            buttonLaunch.Enabled = true;
         }
 
         private void FrmMain_Load(object sender, EventArgs e)
         {
-            // TODO: Load old IP.
+            if (_modifier.TryLoadIp(out var ipAddress))
+            {
+                textIp.Text = ipAddress;
+            }
         }
 
-        private void buttonLaunch_Click(object sender, EventArgs e)
+        private void FrmMain_Shown(object sender, EventArgs e)
         {
-            var ipText = textIp.Text;
-            
-            if (!IPAddress.TryParse(ipText, out var ipAddress))
-            {
-                MessageBox.Show("Invalid IP Address entered", "Error", 
-                    MessageBoxButtons.OK, 
-                    MessageBoxIcon.Error);
-                
-                textIp.Text = string.Empty;
-                textIp.Focus();
-                return;
-            }
+            textIp.Focus();
+        }
 
-            if (ipAddress.AddressFamily == AddressFamily.InterNetworkV6)
+        private void textIp_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
             {
-                MessageBox.Show("Invalid IP Address entered, only IPv4 is allowed.", "Error", 
-                    MessageBoxButtons.OK, 
-                    MessageBoxIcon.Error);
+                e.Handled = true;
                 
-                textIp.Text = string.Empty;
-                textIp.Focus();
-                return;
+                buttonLaunch_Click(this, EventArgs.Empty);
             }
-            
-            // TODO: Clean up, move to somewhere else & error handling.
-            
-            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "..\\LocalLow");
-            var regionFile = Path.Combine(appData, "Innersloth", "Among Us", "regionInfo.dat");
-            var region = new RegionInfo("Private", ipText, new []
-            {
-                new ServerInfo("Private-Master-1", ipText, 22023)
-            });
-            
-            using (var file = File.Open(regionFile, FileMode.Create, FileAccess.Write))
-            using (var writer = new BinaryWriter(file))
-            {
-                region.Serialize(writer);
-            }
-            
-            MessageBox.Show("The IP Address was saved, please (re)start Among Us.", "Success", 
-                MessageBoxButtons.OK, 
-                MessageBoxIcon.Information);
+        }
+
+        private async void buttonLaunch_Click(object sender, EventArgs e)
+        {
+            textIp.Enabled = false;
+            buttonLaunch.Enabled = false;
+
+            await _modifier.SaveIp(textIp.Text);
+        }
+
+        private void lblUrl_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://github.com/AeonLucid/Impostor");
         }
     }
 }

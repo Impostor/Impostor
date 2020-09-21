@@ -34,32 +34,38 @@
             this.label2 = new System.Windows.Forms.Label();
             this.buttonLaunch = new System.Windows.Forms.Button();
             this.textIp = new System.Windows.Forms.TextBox();
+            this.lblUrl = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 90);
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(28, 139);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(62, 15);
+            this.label1.Size = new System.Drawing.Size(60, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "IP Address";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 9);
+            this.label2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(28, 23);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(230, 60);
+            this.label2.Size = new System.Drawing.Size(225, 91);
             this.label2.TabIndex = 1;
             this.label2.Text = "Welcome to Impostor\r\n\r\nPlease enter in the IP Address of the \r\nserver you would l" +
-    "ike to use for Among Us";
+    "ike to use for Among Us\r\n\r\nIf you want to stop playing on the server, \r\nsimply s" +
+    "elect another region";
             // 
             // buttonLaunch
             // 
-            this.buttonLaunch.Location = new System.Drawing.Point(168, 123);
+            this.buttonLaunch.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonLaunch.Location = new System.Drawing.Point(179, 155);
             this.buttonLaunch.Name = "buttonLaunch";
-            this.buttonLaunch.Size = new System.Drawing.Size(79, 23);
+            this.buttonLaunch.Size = new System.Drawing.Size(74, 22);
             this.buttonLaunch.TabIndex = 2;
             this.buttonLaunch.Text = "Save";
             this.buttonLaunch.UseVisualStyleBackColor = true;
@@ -67,16 +73,43 @@
             // 
             // textIp
             // 
-            this.textIp.Location = new System.Drawing.Point(12, 123);
+            this.textIp.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textIp.Location = new System.Drawing.Point(31, 155);
             this.textIp.Name = "textIp";
-            this.textIp.Size = new System.Drawing.Size(150, 23);
+            this.textIp.Size = new System.Drawing.Size(141, 22);
             this.textIp.TabIndex = 3;
+            this.textIp.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textIp_KeyDown);
+            // 
+            // lblUrl
+            // 
+            this.lblUrl.AutoSize = true;
+            this.lblUrl.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.lblUrl.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblUrl.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.lblUrl.Location = new System.Drawing.Point(39, 215);
+            this.lblUrl.Name = "lblUrl";
+            this.lblUrl.Size = new System.Drawing.Size(212, 13);
+            this.lblUrl.TabIndex = 4;
+            this.lblUrl.Text = "https://github.com/AeonLucid/Impostor";
+            this.lblUrl.Click += new System.EventHandler(this.lblUrl_Click);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(54, 199);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(182, 13);
+            this.label3.TabIndex = 5;
+            this.label3.Text = "Source code and latest versions at\r\n";
             // 
             // FrmMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(259, 161);
+            this.ClientSize = new System.Drawing.Size(283, 253);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.lblUrl);
             this.Controls.Add(this.textIp);
             this.Controls.Add(this.buttonLaunch);
             this.Controls.Add(this.label2);
@@ -84,11 +117,12 @@
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MaximizeBox = false;
             this.Name = "FrmMain";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Impostor";
             this.Load += new System.EventHandler(this.FrmMain_Load);
+            this.Shown += new System.EventHandler(this.FrmMain_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -98,9 +132,9 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button buttonL;
-        private System.Windows.Forms.TextBox txtIp;
         private System.Windows.Forms.Button buttonLaunch;
         private System.Windows.Forms.TextBox textIp;
+        private System.Windows.Forms.Label lblUrl;
+        private System.Windows.Forms.Label label3;
     }
 }
