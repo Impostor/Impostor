@@ -10,7 +10,7 @@
         <AssemblyTitle>Impostor</AssemblyTitle>
         <Product>Impostor</Product>
         <Copyright>Copyright © AeonLucid 2020</Copyright>
-        <Version>1.0.0</Version>
+        <Version>1.0.1</Version>
         <OutputPath>bin\$(Configuration)\</OutputPath>
         <ApplicationIcon>icon.ico</ApplicationIcon>
     </PropertyGroup>
