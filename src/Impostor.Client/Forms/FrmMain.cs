@@ -27,6 +27,7 @@ namespace Impostor.Client.Forms
 
         private void LoadSavedIpsFromCfg()
         {
+            comboIp.Items.Clear();
             if (File.Exists(IpListConfigPath))
             {
                 comboIp.Items.AddRange(File.ReadAllLines(IpListConfigPath).Reverse().ToArray());
