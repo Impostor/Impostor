@@ -25,18 +25,26 @@ Almost all standard features are implemented at this moment, except for public g
 
 ## Installation
 
+If you just want to play, follow the client instructions.
+
 When hosting a server, make sure port **22023** is open and forwarded for **UDP**. It is not possible to use a different port because Among Us seems to have hardcoded 22023, even though the functionality for setting a port exists.
 
 ### Client
 
 If you just want to play on a server hosted by someone else, you need to follow these instructions.
 
-> W.I.P
+1. Find the [latest release](https://github.com/AeonLucid/Impostor/releases/latest).
+2. Download `Impostor-Client-win-x64.zip`.
+3. Extract the zip.
+4. Run `Impostor.Client.exe`.
+5. Follow the instructions inside the application.
+
+![Client](docs/images/client.jpg)
 
 ### Server (Docker)
 
-![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor?sort=semver)
-![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor/edge)
+[![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor?sort=semver)](https://hub.docker.com/repository/docker/aeonlucid/impostor)
+[![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor/edge)](https://hub.docker.com/repository/docker/aeonlucid/impostor)
 
 ```
 docker run -p 22023:22023/udp aeonlucid/impostor
@@ -44,14 +52,14 @@ docker run -p 22023:22023/udp aeonlucid/impostor
 
 ### Server (Windows / Linux)
 
-1. Find the [latest release](https://github.com/AeonLucid/Impostor/releases/latest) 
+1. Find the [latest release](https://github.com/AeonLucid/Impostor/releases/latest).
 2. Download either the Windows or the Linux version.
 3. Extract the zip.
 4. Run `Impostor.Server.exe` (Windows) / `Impostor.Server` (Linux)
 
 ## License
 
-This software is distributed under the **GNU GLPv3** License.
+This software is distributed under the **GNU GPLv3** License.
 
 ## Credits
 
