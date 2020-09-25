@@ -91,13 +91,13 @@ namespace Impostor.Server.Net
 
         private void OnMessageReceived(MessageReader message, SendOption sendOption)
         {
-            var flag = (RequestFlag) message.Tag;
+            var flag = message.Tag;
             
             Logger.Verbose("[{0}] Server got {1}.", Id, flag);
             
             switch (flag)
             {
-                case RequestFlag.HostGame:
+                case MessageFlags.HostGame:
                 {
                     // Read game settings.
                     var gameInfo = Message00HostGame.Deserialize(message);
@@ -120,10 +120,12 @@ namespace Impostor.Server.Net
                     break;
                 }
                 
-                case RequestFlag.JoinGame:
+                case MessageFlags.JoinGame:
                 {
-                    var gameCode = message.ReadInt32();
-                    var unknown = message.ReadByte();
+                    Message01JoinGame.Deserialize(message, 
+                        out var gameCode, 
+                        out var unknown);
+                    
                     var game = _gameManager.Find(gameCode);
                     if (game == null)
                     {
@@ -135,7 +137,7 @@ namespace Impostor.Server.Net
                     break;
                 }
 
-                case RequestFlag.StartGame:
+                case MessageFlags.StartGame:
                 {
                     if (!IsPacketAllowed(message, true))
                     {
@@ -147,25 +149,26 @@ namespace Impostor.Server.Net
                 }
                 
                 // No idea how this flag is triggered.
-                case RequestFlag.RemoveGame:
+                case MessageFlags.RemoveGame:
                     break;
                 
-                case RequestFlag.RemovePlayer:
+                case MessageFlags.RemovePlayer:
                 {
                     if (!IsPacketAllowed(message, true))
                     {
                         return;
                     }
-
-                    var playerId = message.ReadPackedInt32();
-                    var reason = message.ReadByte();
+                    
+                    Message04RemovePlayer.Deserialize(message, 
+                        out var playerId, 
+                        out var reason);
 
                     Player.Game.HandleRemovePlayer(playerId, (DisconnectReason) reason);
                     break;
                 }
                 
-                case RequestFlag.GameData:
-                case RequestFlag.GameDataTo:
+                case MessageFlags.GameData:
+                case MessageFlags.GameDataTo:
                 {
                     if (!IsPacketAllowed(message, false))
                     {
@@ -175,7 +178,7 @@ namespace Impostor.Server.Net
                     // Broadcast packet to all other players.
                     using (var writer = MessageWriter.Get(sendOption))
                     {
-                        if (flag == RequestFlag.GameDataTo)
+                        if (flag == MessageFlags.GameDataTo)
                         {
                             var target = message.ReadPackedInt32();
                             writer.CopyFrom(message);
@@ -190,7 +193,7 @@ namespace Impostor.Server.Net
                     break;
                 }
                 
-                case RequestFlag.EndGame:
+                case MessageFlags.EndGame:
                 {
                     if (!IsPacketAllowed(message, true))
                     {
@@ -201,33 +204,36 @@ namespace Impostor.Server.Net
                     break;
                 }
 
-                case RequestFlag.AlterGame:
+                case MessageFlags.AlterGame:
                 {
                     if (!IsPacketAllowed(message, true))
                     {
                         return;
                     }
 
-                    if (message.ReadByte() != (byte) AlterGameTags.ChangePrivacy)
+                    Message10AlterGame.Deserialize(message, 
+                        out var gameTag, 
+                        out var value);
+                    
+                    if (gameTag != AlterGameTags.ChangePrivacy)
                     {
                         return;
                     }
 
-                    var isPublic = message.ReadByte() == 1;
-                    
-                    Player.Game.HandleAlterGame(message, Player, isPublic);
+                    Player.Game.HandleAlterGame(message, Player, value);
                     break;
                 }
 
-                case RequestFlag.KickPlayer:
+                case MessageFlags.KickPlayer:
                 {
                     if (!IsPacketAllowed(message, true))
                     {
                         return;
                     }
 
-                    var playerId = message.ReadPackedInt32();
-                    var isBan = message.ReadBoolean();
+                    Message11KickPlayer.Deserialize(message, 
+                        out var playerId, 
+                        out var isBan);
 
                     Player.Game.HandleKickPlayer(playerId, isBan);
                     break;
@@ -239,9 +245,9 @@ namespace Impostor.Server.Net
             }
             
 #if DEBUG
-            if (flag != RequestFlag.GameData &&
-                flag != RequestFlag.GameDataTo &&
-                flag != RequestFlag.EndGame &&
+            if (flag != MessageFlags.GameData &&
+                flag != MessageFlags.GameDataTo &&
+                flag != MessageFlags.EndGame &&
                 message.Position < message.Length)
             {
                 Logger.Warning("Server did not consume all bytes from {0} ({1} < {2}).",

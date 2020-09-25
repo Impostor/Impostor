@@ -1,4 +1,5 @@
 ﻿using Hazel;
+using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server.Net.Messages
 {
@@ -14,6 +15,12 @@ namespace Impostor.Server.Net.Messages
             writer.StartMessage(MessageFlags.HostGame);
             writer.Write(gameCode);
             writer.EndMessage();
+        }
+
+        public static void Deserialize(MessageReader reader, out AlterGameTags gameTag, out bool value)
+        {
+            gameTag = (AlterGameTags) reader.ReadByte();
+            value = reader.ReadBoolean();
         }
     }
 }

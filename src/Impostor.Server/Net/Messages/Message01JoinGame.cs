@@ -42,5 +42,11 @@ namespace Impostor.Server.Net.Messages
             
             writer.EndMessage();
         }
+
+        public static void Deserialize(MessageReader reader, out int gameCode, out byte unknown)
+        {
+            gameCode = reader.ReadInt32();
+            unknown = reader.ReadByte();
+        }
     }
 }

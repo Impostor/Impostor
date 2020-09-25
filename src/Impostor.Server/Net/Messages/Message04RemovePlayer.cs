@@ -21,5 +21,11 @@ namespace Impostor.Server.Net.Messages
             writer.Write((byte) reason);
             writer.EndMessage();
         }
+
+        public static void Deserialize(MessageReader reader, out int playerId, out byte reason)
+        {
+            playerId = reader.ReadPackedInt32();
+            reason = reader.ReadByte();
+        }
     }
 }

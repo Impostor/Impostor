@@ -17,5 +17,11 @@ namespace Impostor.Server.Net.Messages
             writer.Write(isBan);
             writer.EndMessage();
         }
+
+        public static void Deserialize(MessageReader reader, out int playerId, out bool isBan)
+        {
+            playerId = reader.ReadPackedInt32();
+            isBan = reader.ReadBoolean();
+        }
     }
 }
