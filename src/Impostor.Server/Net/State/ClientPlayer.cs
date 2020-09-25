@@ -1,19 +1,23 @@
 ﻿using Hazel;
+using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server.Net.State
 {
-    public class ClientPlayer
+    public partial class ClientPlayer
     {
-        public ClientPlayer(Client client)
+        private readonly GameManager _gameManager;
+
+        public ClientPlayer(Client client, GameManager gameManager)
         {
+            _gameManager = gameManager;
+            
             Client = client;
         }
         
         public Client Client { get; }
         public Game Game { get; set; }
-        public LimboStates LimboState { get; set; }
 
         public void SendDisconnectReason(DisconnectReason reason, string message = null)
         {

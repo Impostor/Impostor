@@ -26,7 +26,7 @@ namespace Impostor.Server.Net
             Connection = connection;
             Connection.DataReceived += OnDataReceived;
             Connection.Disconnected += OnDisconnected;
-            Player = new ClientPlayer(this);
+            Player = new ClientPlayer(this, _gameManager);
         }
 
         public int Id { get; }
@@ -103,7 +103,7 @@ namespace Impostor.Server.Net
                     var gameInfo = Message00HostGame.Deserialize(message);
                     
                     // Create game.
-                    var game = _gameManager.Create(this, gameInfo);
+                    var game = _gameManager.Create(gameInfo);
                     if (game == null)
                     {
                         Player.SendDisconnectReason(DisconnectReason.ServerFull);
@@ -236,6 +236,13 @@ namespace Impostor.Server.Net
                         out var isBan);
 
                     Player.Game.HandleKickPlayer(playerId, isBan);
+                    break;
+                }
+
+                case MessageFlags.GetGameListV2:
+                {
+                    Message16GetGameListV2.Deserialize(message, out var options);
+                    Player.OnRequestGameList(options);
                     break;
                 }
                 

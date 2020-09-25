@@ -20,25 +20,30 @@ namespace Impostor.Server.Net.State
         private readonly ConcurrentDictionary<int, ClientPlayer> _players;
         private readonly HashSet<IPAddress> _bannedIps;
 
-        public Game(GameManager gameManager, int code, GameOptionsData options)
+        public Game(GameManager gameManager, IPEndPoint publicIp, int code, GameOptionsData options)
         {
             _gameManager = gameManager;
             _players = new ConcurrentDictionary<int, ClientPlayer>();
             _bannedIps = new HashSet<IPAddress>();
-            
+
+            PublicIp = publicIp;
             Code = code;
             CodeStr = GameCode.IntToGameName(code);
             HostId = -1;
             GameState = GameStates.NotStarted;
             Options = options;
         }
-        
+
+        public IPEndPoint PublicIp { get; }
         public int Code { get; }
         public string CodeStr { get; }
         public bool IsPublic { get; private set; }
         public int HostId { get; private set; }
         public GameStates GameState { get; private set; }
         public GameOptionsData Options { get; }
+        
+        public int PlayerCount => _players.Count;
+        public ClientPlayer Host => _players[HostId];
 
         /// <summary>
         ///     Send a message to all players except one.
