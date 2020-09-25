@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -51,6 +51,7 @@ namespace Impostor.Server.Net.Manager
             
             // Find games that have not started yet.
             foreach (var (code, game) in _games.Where(x => 
+                x.Value.IsPublic &&
                 x.Value.GameState == GameStates.NotStarted && 
                 x.Value.PlayerCount < 10))
             {
