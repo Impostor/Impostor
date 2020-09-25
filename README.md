@@ -59,7 +59,7 @@ docker run -p 22023:22023/udp aeonlucid/impostor
 
 ## License
 
-This software is distributed under the **GNU GLPv3** License.
+This software is distributed under the **GNU GPLv3** License.
 
 ## Credits
 
