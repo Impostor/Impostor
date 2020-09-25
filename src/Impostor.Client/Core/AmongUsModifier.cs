@@ -88,7 +88,7 @@ namespace Impostor.Client.Core
                 var ip = ipAddress.ToString();
                 var region = new RegionInfo(RegionName, ip, new[]
                 {
-                    new ServerInfo($"{RegionName}-Master-1", ip, 22023)
+                    new ServerInfo($"{RegionName}-Master-1", ip, 31730)
                 });
                     
                 region.Serialize(writer);
