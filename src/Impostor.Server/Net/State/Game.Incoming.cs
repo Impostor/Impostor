@@ -158,11 +158,6 @@ namespace Impostor.Server.Net.State
                 HostId = sender.Client.Id;
             }
 
-            if (HostId == sender.Client.Id)
-            {
-                sender.LimboState = LimboStates.NotLimbo;
-            }
-
             using (var message = MessageWriter.Get(SendOption.Reliable))
             {
                 WriteJoinedGameMessage(message, false, sender);
@@ -210,9 +205,6 @@ namespace Impostor.Server.Net.State
             
             // Assign player to this game for future packets.
             sender.Game = this;
-            
-            // Limbo, yes.
-            sender.LimboState = LimboStates.WaitingForHost;
 
             using (var packet = MessageWriter.Get(SendOption.Reliable))
             {
