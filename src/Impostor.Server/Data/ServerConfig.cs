@@ -2,9 +2,9 @@
 {
     public class ServerConfig
     {
-        public string PublicIp { get; set; }
-        public ushort PublicPort { get; set; }
-        public string ListenIp { get; set; }
-        public ushort ListenPort { get; set; }
+        public string PublicIp { get; set; } = "127.0.0.1";
+        public ushort PublicPort { get; set; } = 22023;
+        public string ListenIp { get; set; } = "127.0.0.1";
+        public ushort ListenPort { get; set; } = 22023;
     }
 }

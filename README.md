@@ -15,7 +15,7 @@ Almost all standard features are implemented at this moment, except for public g
 - [x] Create game
 - [x] Join game
 - [x] Start game
-- [ ] Find game
+- [x] Find game
 - [x] V1 GameCodes (AAAA)
 - [x] V2 GameCodes (AAAAAA)
 - [x] Kick player
