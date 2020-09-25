@@ -1,80 +1,14 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using Hazel;
 using Impostor.Server.Data;
 using Impostor.Server.Exceptions;
-using Impostor.Server.Extensions;
-using Impostor.Server.Net.Response;
-using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
-using Serilog;
-using ILogger = Serilog.ILogger;
 
-namespace Impostor.Server.Net
+namespace Impostor.Server.Net.State
 {
-    public class Game
+    public partial class Game
     {
-        private static readonly ILogger Logger = Log.ForContext<Game>();
-        
-        private readonly GameManager _gameManager;
-        private readonly ConcurrentDictionary<int, ClientPlayer> _players;
-        private readonly HashSet<IPAddress> _bannedIps;
-
-        public Game(GameManager gameManager, int code, GameOptionsData options)
-        {
-            _gameManager = gameManager;
-            _players = new ConcurrentDictionary<int, ClientPlayer>();
-            _bannedIps = new HashSet<IPAddress>();
-            
-            Code = code;
-            CodeStr = GameCode.IntToGameName(code);
-            HostId = -1;
-            GameState = GameStates.NotStarted;
-            Options = options;
-        }
-        
-        public int Code { get; }
-        public string CodeStr { get; }
-        public bool IsPublic { get; private set; }
-        public int HostId { get; private set; }
-        public GameStates GameState { get; private set; }
-        public GameOptionsData Options { get; }
-
-        public void SendToAllExcept(MessageWriter message, ClientPlayer sender)
-        {
-            foreach (var (_, player) in _players.Where(x => x.Value != sender))
-            {
-                if (player.Client.Connection.State != ConnectionState.Connected)
-                {
-                    Logger.Warning("[{0}] Tried to sent data to a disconnected player ({1}).", sender?.Client.Id, player.Client.Id);
-                    continue;
-                }
-                
-                player.Client.Send(message);
-            }
-        }
-
-        public void SendTo(MessageWriter message, int playerId)
-        {
-            if (_players.TryGetValue(playerId, out var player))
-            {
-                if (player.Client.Connection.State != ConnectionState.Connected)
-                {
-                    Logger.Warning("[{0}] Sending data to {1} failed, player is not connected.", CodeStr, player.Client.Id);
-                    return;
-                }
-                
-                player.Client.Send(message);
-            }
-            else
-            {
-                Logger.Warning("[{0}] Sending data to {1} failed, player does not exist.", CodeStr, playerId);
-            }
-        }
-
         public void HandleStartGame(MessageReader message)
         {
             GameState = GameStates.Started;
@@ -90,7 +24,7 @@ namespace Impostor.Server.Net
         {
             if (_bannedIps.Contains(sender.Client.Connection.EndPoint.Address))
             {
-                sender.Client.Connection.Send(new Message1DisconnectReason(DisconnectReason.Banned));
+                sender.SendDisconnectReason(DisconnectReason.Banned);
                 return;
             }
             
@@ -103,10 +37,10 @@ namespace Impostor.Server.Net
                     HandleJoinGameNext(sender);
                     break;
                 case GameStates.Started:
-                    sender.Client.Connection.Send(new Message1DisconnectReason(DisconnectReason.GameStarted));
+                    sender.SendDisconnectReason(DisconnectReason.GameStarted);
                     return;
                 case GameStates.Destroyed:
-                    sender.Client.Connection.Send(new Message1DisconnectReason(DisconnectReason.Custom, DisconnectMessages.Destroyed));
+                    sender.SendDisconnectReason(DisconnectReason.Custom, DisconnectMessages.Destroyed);
                     return;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -264,7 +198,7 @@ namespace Impostor.Server.Net
 
             if (_players.Count >= 9)
             {
-                sender.Client.Connection.Send(new Message1DisconnectReason(DisconnectReason.GameFull));
+                sender.SendDisconnectReason(DisconnectReason.GameFull);
                 return;
             }
 
@@ -287,101 +221,6 @@ namespace Impostor.Server.Net
 
                 BroadcastJoinMessage(packet, true, sender);
             }
-        }
-
-        private void WriteRemovePlayerMessage(MessageWriter message, bool clear, int playerId, DisconnectReason reason)
-        {
-            // Only a subset of DisconnectReason shows an unique message.
-            // ExitGame, Banned and Kicked.
-            if (clear)
-            {
-                message.Clear(SendOption.Reliable);
-            }
-            
-            message.StartMessage((byte) RequestFlag.RemovePlayer);
-            message.Write(Code);
-            message.Write(playerId);
-            message.Write(HostId);
-            message.Write((byte) reason);
-            message.EndMessage();
-        }
-        
-        private void WriteJoinedGameMessage(MessageWriter message, bool clear, ClientPlayer player)
-        {
-            if (clear)
-            {
-                message.Clear(SendOption.Reliable);
-            }
-            
-            message.StartMessage((byte) RequestFlag.JoinedGame);
-            message.Write(Code);
-            message.Write(player.Client.Id);
-            message.Write(HostId);
-            message.WritePacked(_players.Count - 1);
-            
-            foreach (var (_, p) in _players.Where(x => x.Value != player))
-            {
-                message.WritePacked(p.Client.Id);
-            }
-            
-            message.EndMessage();
-        }
-
-        private void WriteAlterGameMessage(MessageWriter message, bool clear)
-        {
-            if (clear)
-            {
-                message.Clear(SendOption.Reliable);
-            }
-            
-            message.StartMessage((byte) RequestFlag.AlterGame);
-            message.Write(Code);
-            message.Write((byte) AlterGameTags.ChangePrivacy);
-            message.Write(IsPublic);
-            message.EndMessage();
-        }
-
-        private void WriteKickPlayerMessage(MessageWriter message, bool clear, int playerId, bool isBan)
-        {
-            if (clear)
-            {
-                message.Clear(SendOption.Reliable);
-            }
-            
-            message.StartMessage((byte) RequestFlag.KickPlayer);
-            message.Write(Code);
-            message.WritePacked(playerId);
-            message.Write(isBan);
-            message.EndMessage();
-        }
-        
-        private void WriteWaitForHostMessage(MessageWriter message, bool clear, ClientPlayer player)
-        {
-            if (clear)
-            {
-                message.Clear(SendOption.Reliable);
-            }
-            
-            message.StartMessage((byte) RequestFlag.WaitForHost);
-            message.Write(Code);
-            message.Write(player.Client.Id);
-            message.EndMessage();
-        }
-        
-        private void BroadcastJoinMessage(MessageWriter message, bool clear, ClientPlayer player)
-        {
-            if (clear)
-            {
-                message.Clear(SendOption.Reliable);
-            }
-            
-            message.StartMessage((byte) RequestFlag.JoinGame);
-            message.Write(Code);
-            message.Write(player.Client.Id);
-            message.Write(HostId);
-            message.EndMessage();
-            
-            SendToAllExcept(message, player);
         }
     }
 }

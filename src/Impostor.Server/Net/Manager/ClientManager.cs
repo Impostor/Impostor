@@ -2,7 +2,7 @@
 using Impostor.Server.Exceptions;
 using Serilog;
 
-namespace Impostor.Server.Net
+namespace Impostor.Server.Net.Manager
 {
     public class ClientManager
     {

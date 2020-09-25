@@ -1,9 +1,9 @@
 ﻿using System;
 using Hazel;
 using Impostor.Server.Data;
-using Impostor.Server.Extensions;
-using Impostor.Server.Net.Response;
-using Impostor.Shared.Innersloth;
+using Impostor.Server.Net.Manager;
+using Impostor.Server.Net.Messages;
+using Impostor.Server.Net.State;
 using Impostor.Shared.Innersloth.Data;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -85,7 +85,7 @@ namespace Impostor.Server.Net
             catch (Exception ex)
             {
                 Logger.Error(ex, "Exception caught in client data handler.");
-                Connection.Send(new Message1DisconnectReason(DisconnectReason.Custom, DisconnectMessages.Error));
+                Player.SendDisconnectReason(DisconnectReason.Custom, DisconnectMessages.Error);
             }
         }
 
@@ -100,23 +100,20 @@ namespace Impostor.Server.Net
                 case RequestFlag.HostGame:
                 {
                     // Read game settings.
-                    var gameInfoBytes = message.ReadBytesAndSize();
-                    var gameInfo = GameOptionsData.Deserialize(gameInfoBytes);
+                    var gameInfo = Message00HostGame.Deserialize(message);
                     
                     // Create game.
                     var game = _gameManager.Create(this, gameInfo);
                     if (game == null)
                     {
-                        Connection.Send(new Message1DisconnectReason(DisconnectReason.ServerFull));
+                        Player.SendDisconnectReason(DisconnectReason.ServerFull);
                         return;
                     }
 
                     // Code in the packet below will be used in JoinGame.
                     using (var writer = MessageWriter.Get(SendOption.Reliable))
                     {
-                        writer.StartMessage(0);
-                        writer.Write(game.Code);
-                        writer.EndMessage();
+                        Message00HostGame.Serialize(writer, game.Code);
                 
                         Connection.Send(writer);
                     }
@@ -130,7 +127,7 @@ namespace Impostor.Server.Net
                     var game = _gameManager.Find(gameCode);
                     if (game == null)
                     {
-                        Connection.Send(new Message1DisconnectReason(DisconnectReason.GameMissing));
+                        Player.SendDisconnectReason(DisconnectReason.GameMissing);
                         return;
                     }
 
@@ -240,17 +237,19 @@ namespace Impostor.Server.Net
                     Logger.Warning("Server received unknown flag {0}.", flag);
                     break;
             }
-
+            
+#if DEBUG
             if (flag != RequestFlag.GameData &&
                 flag != RequestFlag.GameDataTo &&
                 flag != RequestFlag.EndGame &&
                 message.Position < message.Length)
             {
-                Logger.Warning("Server did not consume all bytes from {0} ({1} < {2}).", 
-                    flag, 
-                    message.Position, 
+                Logger.Warning("Server did not consume all bytes from {0} ({1} < {2}).",
+                    flag,
+                    message.Position,
                     message.Length);
             }
+#endif
         }
         
         private void OnDisconnected(object sender, DisconnectedEventArgs e)

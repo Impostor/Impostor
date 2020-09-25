@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using Hazel;
 using Hazel.Udp;
-using Impostor.Server.Extensions;
-using Impostor.Server.Net.Response;
+using Impostor.Server.Net.Manager;
+using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth.Data;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -39,7 +39,11 @@ namespace Impostor.Server.Net
                 
             if (clientVersion != 50516550)
             {
-                e.Connection.Send(new Message1DisconnectReason(DisconnectReason.IncorrectVersion));
+                using (var packet = MessageWriter.Get(SendOption.Reliable))
+                {
+                    Message01JoinGame.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
+                    e.Connection.Send(packet);
+                }
                 return;
             }
             

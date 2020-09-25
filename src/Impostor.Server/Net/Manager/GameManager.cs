@@ -1,8 +1,9 @@
 ﻿using System.Collections.Concurrent;
+using Impostor.Server.Net.State;
 using Impostor.Shared.Innersloth;
 using Serilog;
 
-namespace Impostor.Server.Net
+namespace Impostor.Server.Net.Manager
 {
     public class GameManager
     {
@@ -22,7 +23,7 @@ namespace Impostor.Server.Net
 
             if (_games.TryAdd(gameCode, game))
             {
-                Logger.Debug("Created game with code {0} ({1}).", GameCode.IntToGameName(gameCode), gameCode);        
+                Logger.Debug("Created game with code {0} ({1}).", game.CodeStr, gameCode);        
                 return game;
             }
 
