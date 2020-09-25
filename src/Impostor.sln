@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Impostor.Agent", "Impostor.Agent\Impostor.Agent.vcxproj", "{097BE795-88E9-4E7B-92F3-F6DDDBE3F012}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Server", "Impostor.Server\Impostor.Server.csproj", "{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client", "Impostor.Client\Impostor.Client.csproj", "{24F07173-D4A7-41C6-BA51-4516AB68343C}"
@@ -29,12 +27,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{097BE795-88E9-4E7B-92F3-F6DDDBE3F012}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{097BE795-88E9-4E7B-92F3-F6DDDBE3F012}.Debug|x86.ActiveCfg = Debug|Win32
-		{097BE795-88E9-4E7B-92F3-F6DDDBE3F012}.Debug|x86.Build.0 = Debug|Win32
-		{097BE795-88E9-4E7B-92F3-F6DDDBE3F012}.Release|Any CPU.ActiveCfg = Release|Win32
-		{097BE795-88E9-4E7B-92F3-F6DDDBE3F012}.Release|x86.ActiveCfg = Release|Win32
-		{097BE795-88E9-4E7B-92F3-F6DDDBE3F012}.Release|x86.Build.0 = Release|Win32
 		{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}.Debug|x86.ActiveCfg = Debug|Any CPU
