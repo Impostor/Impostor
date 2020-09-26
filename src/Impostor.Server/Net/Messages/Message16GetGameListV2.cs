@@ -33,7 +33,7 @@ namespace Impostor.Server.Net.Messages
                 writer.Write((ushort) game.PublicIp.Port);
                 writer.Write(game.Code);
                 writer.Write(game.Host.Client.Name);
-                writer.Write(game.PlayerCount);
+                writer.Write((byte) game.PlayerCount);
                 writer.WritePacked(1); // TODO: What does Age do?
                 writer.Write((byte) game.Options.MapId);
                 writer.Write((byte) game.Options.NumImpostors);

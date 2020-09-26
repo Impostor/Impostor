@@ -9,6 +9,7 @@ using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace Impostor.Server.Net.Manager
 {
@@ -53,7 +54,7 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        public IEnumerable<Game> FindListings(byte mapId, int impostorCount, GameKeywords language, int count = 10)
+        public IEnumerable<Game> FindListings(MapFlags map, int impostorCount, GameKeywords language, int count = 10)
         {
             var results = 0;
             
@@ -61,13 +62,20 @@ namespace Impostor.Server.Net.Manager
             foreach (var (code, game) in _games.Where(x => 
                 x.Value.IsPublic &&
                 x.Value.GameState == GameStates.NotStarted && 
-                x.Value.PlayerCount < 10)) // TODO: Do "< x.Value.Options.MaxPlayers" when GameData packets are done.
+                x.Value.PlayerCount < x.Value.Options.MaxPlayers))
             {
                 // Check for options.
-                // TODO: Re-enable map filter when GameData packets are done.
-                if (/* game.Options.MapId != mapId || */ 
-                    game.Options.Keywords != language ||
-                    (impostorCount != 0 && game.Options.NumImpostors != impostorCount))
+                if (!map.HasFlag((MapFlags) (1 << game.Options.MapId)))
+                {
+                    continue;
+                }
+
+                if (!language.HasFlag(game.Options.Keywords))
+                {
+                    continue;
+                }
+                
+                if (impostorCount != 0 && game.Options.NumImpostors != impostorCount)
                 {
                     continue;
                 }
