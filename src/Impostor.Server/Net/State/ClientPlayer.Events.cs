@@ -1,6 +1,7 @@
 ﻿using Hazel;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;
+using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server.Net.State
 {
@@ -17,7 +18,7 @@ namespace Impostor.Server.Net.State
         {
             using (var message = MessageWriter.Get(SendOption.Reliable))
             {
-                var games = _gameManager.FindListings(options.MapId, options.NumImpostors, options.Keywords);
+                var games = _gameManager.FindListings((MapFlags) options.MapId, options.NumImpostors, options.Keywords);
                 
                 Message16GetGameListV2.Serialize(message, games);
                 
