@@ -37,7 +37,7 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: NodePort
+  type: LoadBalancer
   port: 22023
 
 ingress:
@@ -77,3 +77,5 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+configSecretName: impostor-master-config

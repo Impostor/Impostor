@@ -1,0 +1,23 @@
+apiVersion: "agones.dev/v1"
+kind: Fleet
+metadata:
+  name: {{ include "impostor.fullname" . }}-nodes
+spec:
+  replicas: 2
+  template:
+    spec:
+      ports:
+      - name: default
+        containerPort: 22023
+      template:
+        spec:
+          containers:
+          - name: {{ include "impostor.fullname" . }}-node
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+            resources:
+              requests:
+                memory: "64Mi"
+                cpu: "20m"
+              limits:
+                memory: "64Mi"
+                cpu: "20m"
