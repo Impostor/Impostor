@@ -15,14 +15,14 @@ namespace Impostor.Server.Net.Manager
     internal class GameManager
     {
         private readonly ILogger<GameManager> _logger;
-        private readonly INodeProvider _nodeProvider;
+        private readonly INodeLocator _nodeLocator;
         private readonly IPEndPoint _publicIp;
         private readonly ConcurrentDictionary<int, Game> _games;
 
-        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, INodeProvider nodeProvider)
+        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, INodeLocator nodeLocator)
         {
             _logger = logger;
-            _nodeProvider = nodeProvider;
+            _nodeLocator = nodeLocator;
             _publicIp = new IPEndPoint(IPAddress.Parse(config.Value.PublicIp), config.Value.PublicPort);
             _games = new ConcurrentDictionary<int, Game>();
         }
@@ -33,12 +33,12 @@ namespace Impostor.Server.Net.Manager
             
             var gameCode = GameCode.GenerateCode(6);
             var gameCodeStr = GameCode.IntToGameName(gameCode);
-            var game = new Game(this, _nodeProvider, _publicIp, gameCode, options);
+            var game = new Game(this, _nodeLocator, _publicIp, gameCode, options);
 
-            if (_nodeProvider.Find(gameCodeStr) == null && 
+            if (_nodeLocator.Find(gameCodeStr) == null && 
                 _games.TryAdd(gameCode, game))
             {
-                _nodeProvider.Save(gameCodeStr, _publicIp);
+                _nodeLocator.Save(gameCodeStr, _publicIp);
                 _logger.LogDebug("Created game with code {0} ({1}).", game.CodeStr, gameCode);        
                 return game;
             }
@@ -86,7 +86,7 @@ namespace Impostor.Server.Net.Manager
         public void Remove(int gameCode)
         {
             _logger.LogDebug("Remove game with code {0} ({1}).", GameCode.IntToGameName(gameCode), gameCode);
-            _nodeProvider.Remove(GameCode.IntToGameName(gameCode));
+            _nodeLocator.Remove(GameCode.IntToGameName(gameCode));
             _games.TryRemove(gameCode, out _);
         }
     }

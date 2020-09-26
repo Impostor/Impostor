@@ -17,8 +17,9 @@ namespace Impostor.Server.Net.Redirector
         private readonly Connection _connection;
         private readonly ClientManagerRedirector _clientManager;
         private readonly INodeProvider _nodeProvider;
+        private readonly INodeLocator _nodeLocator;
 
-        public ClientRedirector(string name, Connection connection, ClientManagerRedirector clientManager, INodeProvider nodeProvider)
+        public ClientRedirector(string name, Connection connection, ClientManagerRedirector clientManager, INodeProvider nodeProvider, INodeLocator nodeLocator)
         {
             _name = name;
             _connection = connection;
@@ -26,6 +27,7 @@ namespace Impostor.Server.Net.Redirector
             _connection.Disconnected += OnDisconnected;
             _clientManager = clientManager;
             _nodeProvider = nodeProvider;
+            _nodeLocator = nodeLocator;
         }
 
         private void OnDataReceived(DataReceivedEventArgs e)
@@ -74,7 +76,7 @@ namespace Impostor.Server.Net.Redirector
 
                     using (var packet = MessageWriter.Get(SendOption.Reliable))
                     {
-                        var endpoint = _nodeProvider.Find(GameCode.IntToGameName(gameCode));
+                        var endpoint = _nodeLocator.Find(GameCode.IntToGameName(gameCode));
                         if (endpoint == null)
                         {
                             Message01JoinGame.SerializeError(packet, false, DisconnectReason.GameMissing);
