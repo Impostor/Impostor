@@ -4,7 +4,7 @@ using Impostor.Shared.Innersloth;
 
 namespace Impostor.Server.Net.State
 {
-    public partial class ClientPlayer
+    internal partial class ClientPlayer
     {
         /// <summary>
         ///     Triggered when the connected client requests the game listing.

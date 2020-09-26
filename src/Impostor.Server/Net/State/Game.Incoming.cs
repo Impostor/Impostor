@@ -7,7 +7,7 @@ using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server.Net.State
 {
-    public partial class Game
+    internal partial class Game
     {
         public void HandleStartGame(MessageReader message)
         {

@@ -1,26 +1,29 @@
 ﻿using System.Collections.Concurrent;
+using Hazel;
 using Impostor.Server.Exceptions;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Manager
 {
-    public class ClientManager
+    internal class ClientManager : IClientManager
     {
-        private static readonly ILogger Logger = Log.ForContext<ClientManager>();
-        
+        private readonly ILogger<ClientManager> _clientManager;
+        private readonly GameManager _gameManager;
         private readonly ConcurrentDictionary<int, Client> _clients;
         private readonly object _idLock;
         private int _idLast;
         
-        public ClientManager()
+        public ClientManager(ILogger<ClientManager> clientManager, GameManager gameManager)
         {
+            _clientManager = clientManager;
+            _gameManager = gameManager;
             _clients = new ConcurrentDictionary<int, Client>();
             _idLock = new object();
             _idLast = 0;
         }
 
         // No idea what a good way for this is.
-        public int NextId()
+        private int NextId()
         {
             lock (_idLock)
             {
@@ -35,7 +38,7 @@ namespace Impostor.Server.Net.Manager
                         _idLast = 0;
                     }
 
-                    if (_clients.ContainsKey(_idLast))
+                    if (_clients.ContainsKey(result))
                     {
                         continue;
                     }
@@ -47,17 +50,17 @@ namespace Impostor.Server.Net.Manager
             }
         }
         
-        public void Add(Client client)
+        public void Create(string name, Connection connection)
         {
-            Logger.Information("Client connected.");
-
-            _clients.TryAdd(client.Id, client);
+            var clientId = NextId();
+            
+            _clientManager.LogInformation("Client connected.");
+            _clients.TryAdd(clientId, new Client(this, _gameManager, clientId, name, connection));
         }
 
         public void Remove(Client client)
         {
-            Logger.Information("Client disconnected.");
-
+            _clientManager.LogInformation("Client disconnected.");
             _clients.TryRemove(client.Id, out _);
         }
     }

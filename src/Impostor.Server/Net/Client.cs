@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Hazel;
 using Impostor.Server.Data;
 using Impostor.Server.Net.Manager;
@@ -10,7 +10,7 @@ using ILogger = Serilog.ILogger;
 
 namespace Impostor.Server.Net
 {
-    public class Client
+    internal class Client
     {
         private static readonly ILogger Logger = Log.ForContext<Client>();
         

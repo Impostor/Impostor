@@ -5,6 +5,7 @@ using System.Net;
 using Hazel;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
+using Impostor.Server.Net.Redirector;
 using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
 using Serilog;
@@ -12,17 +13,19 @@ using ILogger = Serilog.ILogger;
 
 namespace Impostor.Server.Net.State
 {
-    public partial class Game
+    internal partial class Game
     {
         private static readonly ILogger Logger = Log.ForContext<Game>();
         
         private readonly GameManager _gameManager;
+        private readonly INodeProvider _nodeProvider;
         private readonly ConcurrentDictionary<int, ClientPlayer> _players;
         private readonly HashSet<IPAddress> _bannedIps;
 
-        public Game(GameManager gameManager, IPEndPoint publicIp, int code, GameOptionsData options)
+        public Game(GameManager gameManager, INodeProvider nodeProvider, IPEndPoint publicIp, int code, GameOptionsData options)
         {
             _gameManager = gameManager;
+            _nodeProvider = nodeProvider;
             _players = new ConcurrentDictionary<int, ClientPlayer>();
             _bannedIps = new HashSet<IPAddress>();
 

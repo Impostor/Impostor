@@ -10,21 +10,22 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net
 {
-    public class Matchmaker
+    internal class Matchmaker
     {
         private readonly ILogger<Matchmaker> _logger;
-        private readonly ServerConfig _config;
-        private readonly GameManager _gameManager;
-        private readonly ClientManager _clientManager;
+        private readonly ServerConfig _serverConfig;
+        private readonly IClientManager _clientManager;
         private readonly UdpConnectionListener _connection;
         
-        public Matchmaker(ILogger<Matchmaker> logger, IOptions<ServerConfig> configOptions, GameManager gameManager)
+        public Matchmaker(
+            ILogger<Matchmaker> logger, 
+            IOptions<ServerConfig> serverConfig, 
+            IClientManager clientManager)
         {
             _logger = logger;
-            _config = configOptions.Value;
-            _gameManager = gameManager;
-            _clientManager = new ClientManager();
-            _connection = new UdpConnectionListener(new IPEndPoint(IPAddress.Parse(_config.ListenIp), _config.ListenPort), IPMode.IPv4, s =>
+            _serverConfig = serverConfig.Value;
+            _clientManager = clientManager;
+            _connection = new UdpConnectionListener(new IPEndPoint(IPAddress.Parse(_serverConfig.ListenIp), _serverConfig.ListenPort), IPMode.IPv4, s =>
             {
                 _logger.LogWarning("Log from Hazel: {0}", s);
             });
@@ -52,8 +53,8 @@ namespace Impostor.Server.Net
                 return;
             }
             
-            // Register client.
-            _clientManager.Add(new Client(_clientManager, _gameManager, _clientManager.NextId(), clientName, e.Connection));
+            // Create client.
+            _clientManager.Create(clientName, e.Connection);
         }
 
         public void Start()
