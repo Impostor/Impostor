@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impostor | Among Us Private Server</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="row flex-column justify-content-center align-items-center p-0 m-0">
+    <div class="container text-light d-flex flex-column justify-content-center p-4 p-md-3" style="flex: 1;">
+        <section class="container mb-4">
+            <div class="row justify-content-center">
+                <h1 class="site-title text-center">Impostor</h1>
+            </div>
+            <div class="row justify-content-center">
+                <h2 class="site-subtitle text-center">Among Us Private Server</h2>
+            </div>
+        </section>
+        <section class="container">
+            <div class="mb-4 mb-md-3">
+                <h3 class="text-center text-md-left mb-4 mb-md-3 w-100">Connect to a Server</h3>
+                <p class="text-justify text-sm-center text-md-left support-text desktop-support">To play on a private server, type the server IP and overwrite the <b>regionInfo.dat</b> file in <b>C:\Users\YOUR USER\AppData\LocalLow\Innersloth\Among Us</b>.</p>
+                <p class="text-justify text-sm-center text-md-left support-text android-support">To play on a private server, type the server IP and overwrite the <b>regionInfo.dat</b> file in <b>Internal Storage/Android/data/com.innersloth.spacemafia/files</b>.</p>
+                <p class="text-justify text-sm-center text-md-left support-text ios-support">Your iPhone must be jailbroken to overwrite the <b>regionInfo.dat</b> in the game folder.</p>
+            </div>
+            <form id="serverFileForm" class="container p-0">
+                <div class="row justify-content-center mb-5 mb-md-4">
+                    <div class="row justify-content-center flex-nowrap" stlye="max-width: 350px">
+                        <input class="form-control form-control-lg bg-transparent text-light text-center mr-2"
+                            type="text" placeholder="Server IP" id="ip" name="ip" required
+                            pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                            data-mask=099.099.099.099 data-mask-selectonfocus="true">
+                        <input class="form-control form-control-lg bg-transparent text-light" style="max-width: 110px"
+                            type="number" placeholder="Port" id="port" name="port" min="1" max="65535" required>
+                    </div>
+                </div>
+               <div class="row justify-content-center">
+                    <button class="btn btn-primary btn-lg">Download server file</button>
+                </div>
+            </form>
+        </section>
+
+
+      </div>
+
+      <footer class="container text-light text-center">
+            <p>To create a server, see the instructions in <a href="https://github.com/AeonLucid/Impostor">Github</a> project page.</p>
+        </footer>
+
+      <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" type="text/javascript"></script>
+      <script src="script.js"></script>
+</body>
+</html>
