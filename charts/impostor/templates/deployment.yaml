@@ -35,8 +35,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
-              protocol: TCP
+              containerPort: 22023
+              protocol: UDP
           livenessProbe:
           #   httpGet:
           #     path: /
@@ -47,6 +47,14 @@ spec:
           #     port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config.json
+              subPath: config.json
+      volumes:
+        - name: config-volume
+          secret:
+            secretName: {{ .Values.configSecretName }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

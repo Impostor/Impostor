@@ -1,0 +1,4 @@
+configSecretName: impostor-master-config
+service:
+  type: LoadBalancer
+  port: 22023

@@ -1,0 +1,5 @@
+configSecretName: impostor-node-config
+
+service:
+  type: NodePort
+  port: 22023
