@@ -37,3 +37,22 @@ body {
     display: none;
     word-break: break-all;
 }
+
+.key {
+    display: inline-block;
+    padding: 5px;
+    border-radius: 5px;
+    border: solid 1px white;
+    min-width: 1.75rem;
+    text-align: center;
+    font-size: 0.8rem;
+    margin: 0.15rem 0;
+}
+
+.key svg {
+    height: 1.25em;
+}
+
+code {
+    white-space: nowrap;
+}
