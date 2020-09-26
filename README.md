@@ -20,7 +20,7 @@ Almost all standard features are implemented at this moment, except for public g
 - [x] V2 GameCodes (AAAAAA)
 - [x] Kick player
 - [x] Ban player
-- [ ] Server redirection
+- [x] Server redirection
 - [ ] Server reselect
 
 ## Installation

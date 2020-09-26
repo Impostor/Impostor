@@ -20,9 +20,12 @@ namespace Impostor.Server.Net.Redirector
             _nodes = new List<IPEndPoint>();
             _lock = new object();
 
-            foreach (var node in redirectorConfig.Value.Nodes)
+            if (redirectorConfig.Value.Nodes != null)
             {
-                _nodes.Add(new IPEndPoint(IPAddress.Parse(node.Ip), node.Port));
+                foreach (var node in redirectorConfig.Value.Nodes)
+                {
+                    _nodes.Add(new IPEndPoint(IPAddress.Parse(node.Ip), node.Port));
+                }
             }
         }
 
