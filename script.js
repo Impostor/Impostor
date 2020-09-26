@@ -8,8 +8,9 @@ $(document).ready(function(){
     
     $("#serverFileForm").submit(function(e){
         e.preventDefault();
-        let ipAddress = $("#ip").val();
-        let serverFileBytes = generateServerFile(REGION_NAME, ipAddress, SERVER_PORT);
+        let serverIp = $("#ip").val();
+        let serverPort = $("#port").val();
+        let serverFileBytes = generateServerFile(REGION_NAME, serverIp, serverPort);
         let blob = new Blob([serverFileBytes.buffer]);
         saveFile(blob, "regionInfo.dat");
     });
@@ -17,11 +18,16 @@ $(document).ready(function(){
 });
 
 function fillIPAdressUsingLocationHash() {
-    let urlIP = document.location.hash.substr(1);
+    let urlServerAddress = document.location.hash.substr(1).split(":");
+    let serverIp = urlServerAddress[0];
+    let serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : SERVER_PORT.toString();
     const ipPattern = $("#ip").attr("pattern");
     
-    if (new RegExp(ipPattern).test(urlIP)) {
-        $("#ip").val(urlIP);
+    if (new RegExp(ipPattern).test(serverIp)) {
+        $("#ip").val(serverIp);
+    }
+    if (new RegExp("^[0-9]+$", "g").test(serverPort)) {
+        $("#port").val(serverPort);
     }
 }
 
@@ -75,13 +81,13 @@ function stringToBytes(str) {
 }
 
 function int16(int) {
-    //Convert integer number to Big-endian 16-bits int representation
+    //Convert integer number to little-endian 16-bits int representation
     return [(int & 0xFF), 
             (int & 0xFF00) >> 8];
 }
 
 function int32(int) {
-    //Convert integer number to Big-endian 32-bits int representation
+    //Convert integer number to little-endian 32-bits int representation
     return [(int & 0xFF), 
             (int & 0xFF00) >> 8, 
             (int & 0xFF0000) >> 16, 
