@@ -1,0 +1,33 @@
+@font-face {
+    font-family: AloneOnEarth;
+    font-style: normal;
+    font-weight: normal;
+    src: local('AloneOnEarth'), url('AloneOnEarthRegular.ttf') format('truetype');
+}
+
+html, body {
+    min-height: 100vh;
+    margin: 0;
+}
+
+body {
+    background-color: #252525;
+}
+
+.container {
+    max-width: 800px;
+}
+
+.site-title {
+    font-family: AloneOnEarth;
+    font-size: 6rem;
+    margin-bottom: -1.5rem;
+}
+
+.site-subtitle {
+    font-size: 1.6rem;
+}
+
+.support-text {
+    display: none;
+}
