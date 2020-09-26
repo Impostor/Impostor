@@ -1,15 +1,9 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 
 namespace Impostor.Server.Net.Redirector
 {
-    public class NodeProviderNoOp : INodeProvider
+    public class NodeLocatorNoOp : INodeLocator
     {
-        public IPEndPoint Get()
-        {
-            throw new NotImplementedException();
-        }
-
         public IPEndPoint Find(string gameCode)
         {
             // Do nothing.

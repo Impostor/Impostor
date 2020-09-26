@@ -18,14 +18,14 @@ namespace Impostor.Server.Net.State
         private static readonly ILogger Logger = Log.ForContext<Game>();
         
         private readonly GameManager _gameManager;
-        private readonly INodeProvider _nodeProvider;
+        private readonly INodeLocator _nodeLocator;
         private readonly ConcurrentDictionary<int, ClientPlayer> _players;
         private readonly HashSet<IPAddress> _bannedIps;
 
-        public Game(GameManager gameManager, INodeProvider nodeProvider, IPEndPoint publicIp, int code, GameOptionsData options)
+        public Game(GameManager gameManager, INodeLocator nodeLocator, IPEndPoint publicIp, int code, GameOptionsData options)
         {
             _gameManager = gameManager;
-            _nodeProvider = nodeProvider;
+            _nodeLocator = nodeLocator;
             _players = new ConcurrentDictionary<int, ClientPlayer>();
             _bannedIps = new HashSet<IPAddress>();
 

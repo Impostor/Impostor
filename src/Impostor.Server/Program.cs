@@ -64,7 +64,15 @@ namespace Impostor.Server
 
                     if (redirector.Enabled)
                     {
-                        services.AddSingleton<INodeProvider, NodeProviderRedis>();
+                        // When joining a game, it retrieves the game server ip from redis.
+                        // When a game has been created on this node, it stores the game code with its ip in redis.
+                        services.AddSingleton<INodeLocator, NodeLocatorRedis>();
+                        
+                        // Use the configuration as source for the list of nodes to provide
+                        // when creating a game.
+                        services.AddSingleton<INodeProvider, NodeProviderConfig>();
+                        
+                        // Dependency for the NodeLocatorRedis.
                         services.AddStackExchangeRedisCache(options =>
                         {
                             options.Configuration = redirector.Redis;
@@ -73,12 +81,15 @@ namespace Impostor.Server
                     }
                     else
                     {
-                        services.AddSingleton<INodeProvider, NodeProviderNoOp>();
+                        // Redirector is not enabled but the dependency is still required.
+                        // So we provide one that ignores all calls.
+                        services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
                     }
                     
                     if (redirector.Enabled && redirector.Master)
                     {
                         services.AddSingleton<IClientManager, ClientManagerRedirector>();
+                        // For a master server, we don't need a GameManager.
                     }
                     else
                     {
