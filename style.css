@@ -18,6 +18,11 @@ body {
     max-width: 800px;
 }
 
+.row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
 .site-title {
     font-family: AloneOnEarth;
     font-size: 6rem;
@@ -30,4 +35,5 @@ body {
 
 .support-text {
     display: none;
+    word-break: break-all;
 }
