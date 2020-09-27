@@ -13,10 +13,10 @@ RUN dotnet restore -r linux-arm ./src/Impostor.Server/Impostor.Server.csproj && 
 # Copy everything else.
 COPY submodules/. ./submodules/
 COPY src/. ./src/
-RUN dotnet publish -c release -o /app -f netcoreapp3.1 -r linux-arm --self-contained false --no-restore ./src/Impostor.Server/Impostor.Server.csproj
+RUN dotnet publish -c release -o /app -r linux-arm --no-restore ./src/Impostor.Server/Impostor.Server.csproj
 
 # Final image.
-FROM mcr.microsoft.com/dotnet/core/aspnet:latest
+FROM mcr.microsoft.com/dotnet/core/runtime-deps:latest
 WORKDIR /app
 COPY --from=build /app ./
 EXPOSE 22023/udp
