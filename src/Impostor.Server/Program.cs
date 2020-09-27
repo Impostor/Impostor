@@ -73,7 +73,7 @@ namespace Impostor.Server
                         // Use the configuration as source for the list of nodes to provide
                         // when creating a game.
                         services.AddSingleton<INodeProvider, NodeProviderAgones>();
-                        Console.WriteLine(redirector.Redis);
+
                         // Dependency for the NodeLocatorRedis.
                         services.AddStackExchangeRedisCache(options =>
                         {
@@ -87,6 +87,7 @@ namespace Impostor.Server
                         // So we provide one that ignores all calls.
                         services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
                     }
+
                     var agones = new AgonesSDK();
 
                     if (redirector.Enabled && redirector.Master)
@@ -111,7 +112,9 @@ namespace Impostor.Server
                         });
                         services.AddHostedService<AgonesHealthCheck>();
                     }
+
                     services.AddSingleton(agones);
+
                     services.AddSingleton<Matchmaker>();
                     services.AddHostedService<MatchmakerService>();
                 })
