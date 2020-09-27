@@ -8,7 +8,7 @@ namespace Impostor.Server.Net.Redirector
     public class NodeLocatorAgones : INodeLocator
     {
         private readonly AgonesSDK _agones;
-        
+
         public NodeLocatorAgones(AgonesSDK agones)
         {
             _agones = agones;
