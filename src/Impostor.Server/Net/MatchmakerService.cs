@@ -56,6 +56,7 @@ namespace Impostor.Server.Net
                     ? "Server redirection is enabled as master, this instance will redirect clients to other nodes."
                     : "Server redirection is enabled as node, this instance will accept clients.");
             }
+
             return Task.CompletedTask;
         }
 
