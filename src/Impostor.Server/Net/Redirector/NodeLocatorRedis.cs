@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using Agones;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace Impostor.Server.Net.Redirector
@@ -7,10 +8,12 @@ namespace Impostor.Server.Net.Redirector
     public class NodeLocatorRedis : INodeLocator
     {
         private readonly IDistributedCache _cache;
+        private readonly AgonesSDK _agones;
         
-        public NodeLocatorRedis(IDistributedCache cache)
+        public NodeLocatorRedis(IDistributedCache cache, AgonesSDK agones)
         {
             _cache = cache;
+            _agones = agones;
         }
 
         public IPEndPoint Find(string gameCode)
@@ -35,6 +38,8 @@ namespace Impostor.Server.Net.Redirector
         public void Remove(string gameCode)
         {
             _cache.Remove(gameCode);
+            var shutdown = _agones.ShutDownAsync().Result;
+            Console.WriteLine("Shutdown Result " + shutdown);
         }
     }
 }

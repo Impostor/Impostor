@@ -1,9 +1,12 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Agones;
+using Grpc.Core;
 using Impostor.Server.Data;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace Impostor.Server.Net
 {
@@ -13,22 +16,33 @@ namespace Impostor.Server.Net
         private readonly ServerConfig _serverConfig;
         private readonly ServerRedirectorConfig _redirectorConfig;
         private readonly Matchmaker _matchmaker;
+        private readonly AgonesSDK _agones;
 
         public MatchmakerService(
             ILogger<MatchmakerService> logger, 
             IOptions<ServerConfig> serverConfig, 
             IOptions<ServerRedirectorConfig> redirectorConfig,
-            Matchmaker matchmaker)
+            Matchmaker matchmaker,
+            AgonesSDK agones)
         {
             _logger = logger;
             _serverConfig = serverConfig.Value;
             _redirectorConfig = redirectorConfig.Value;
             _matchmaker = matchmaker;
+            _agones = agones;
         }
         
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _matchmaker.Start();
+            if (_redirectorConfig.Enabled && _redirectorConfig.Master == false)
+            {
+                var result = _agones.ReadyAsync().Result;
+                if (result.StatusCode != StatusCode.OK)
+                {
+                    Log.Fatal("failed to set agones ready state");
+                }
+            }
             
             _logger.LogInformation("Matchmaker is listening on {0}:{1}, the public server ip is {2}:{3}.", 
                 _matchmaker.EndPoint.Address, 
@@ -42,7 +56,6 @@ namespace Impostor.Server.Net
                     ? "Server redirection is enabled as master, this instance will redirect clients to other nodes."
                     : "Server redirection is enabled as node, this instance will accept clients.");
             }
-            
             return Task.CompletedTask;
         }
 

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq;
+using Agones;
+using Grpc.Core;
 using Impostor.Server.Data;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Manager;
@@ -58,7 +61,6 @@ namespace Impostor.Server
                     var redirector = host.Configuration
                         .GetSection(ServerRedirectorConfig.Section)
                         .Get<ServerRedirectorConfig>();
-                    
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                     services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));
 
@@ -70,8 +72,8 @@ namespace Impostor.Server
                         
                         // Use the configuration as source for the list of nodes to provide
                         // when creating a game.
-                        services.AddSingleton<INodeProvider, NodeProviderConfig>();
-                        
+                        services.AddSingleton<INodeProvider, NodeProviderAgones>();
+                        Console.WriteLine(redirector.Redis);
                         // Dependency for the NodeLocatorRedis.
                         services.AddStackExchangeRedisCache(options =>
                         {
@@ -85,7 +87,8 @@ namespace Impostor.Server
                         // So we provide one that ignores all calls.
                         services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
                     }
-                    
+                    var agones = new AgonesSDK();
+
                     if (redirector.Enabled && redirector.Master)
                     {
                         services.AddSingleton<IClientManager, ClientManagerRedirector>();
@@ -95,10 +98,21 @@ namespace Impostor.Server
                     {
                         services.AddSingleton<IClientManager, ClientManager>();
                         services.AddSingleton<GameManager>();
+                        bool ok = agones.ConnectAsync().Result;
+                        if (!ok)
+                        {
+                            Log.Fatal("failed to setup agones");
+                        }
+                        var gameServer = agones.GetGameServerAsync().Result;
+                        services.Configure<ServerConfig>(myOptions =>
+                        {
+                            myOptions.PublicIp = gameServer.Status.Address;
+                            myOptions.PublicPort = Convert.ToUInt16(gameServer.Status.Ports.First().Port_);
+                        });
+                        services.AddHostedService<AgonesHealthCheck>();
                     }
-                    
+                    services.AddSingleton(agones);
                     services.AddSingleton<Matchmaker>();
-                    
                     services.AddHostedService<MatchmakerService>();
                 })
                 .UseSerilog();

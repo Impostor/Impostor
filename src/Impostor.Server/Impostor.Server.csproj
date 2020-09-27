@@ -18,6 +18,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AgonesSDK" Version="1.8.0" />
+      <PackageReference Include="KubernetesClient" Version="2.0.32" />
       <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="3.1.8" />
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.8" />
       <PackageReference Include="Serilog.Extensions.Hosting" Version="3.1.0" />
