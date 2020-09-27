@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using Hazel;
 using Hazel.Udp;
 using Impostor.Server.Data;
@@ -37,24 +38,31 @@ namespace Impostor.Server.Net
 
         private void OnNewConnection(NewConnectionEventArgs e)
         {
-            // Handshake.
-            var clientVersion = e.HandshakeData.ReadInt32();
-            var clientName = e.HandshakeData.ReadString();
-
-            e.HandshakeData.Recycle();
-                
-            if (clientVersion != 50516550)
+            try
             {
-                using (var packet = MessageWriter.Get(SendOption.Reliable))
+                // Handshake.
+                var clientVersion = e.HandshakeData.ReadInt32();
+                var clientName = e.HandshakeData.ReadString();
+
+                e.HandshakeData.Recycle();
+                
+                if (clientVersion != 50516550)
                 {
-                    Message01JoinGame.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
-                    e.Connection.Send(packet);
+                    using (var packet = MessageWriter.Get(SendOption.Reliable))
+                    {
+                        Message01JoinGame.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
+                        e.Connection.Send(packet);
+                    }
+                    return;
                 }
-                return;
-            }
             
-            // Create client.
-            _clientManager.Create(clientName, e.Connection);
+                // Create client.
+                _clientManager.Create(clientName, e.Connection);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in new connection.");
+            }
         }
 
         public void Start()

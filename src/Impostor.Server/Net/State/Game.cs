@@ -62,7 +62,7 @@ namespace Impostor.Server.Net.State
             {
                 if (player.Client.Connection.State != ConnectionState.Connected)
                 {
-                    Logger.Warning("[{0}] Tried to sent data to a disconnected player ({1}).", sender?.Client.Id, player.Client.Id);
+                    Logger.Warning("[{0}] Tried to send data to a disconnected player ({1}).", sender?.Client.Id, player.Client.Id);
                     continue;
                 }
                 
