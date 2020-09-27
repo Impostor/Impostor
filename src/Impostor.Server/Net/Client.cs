@@ -87,6 +87,10 @@ namespace Impostor.Server.Net
                 Logger.Error(ex, "Exception caught in client data handler.");
                 Player.SendDisconnectReason(DisconnectReason.Custom, DisconnectMessages.Error);
             }
+            finally
+            {
+                e.Message.Recycle();
+            }
         }
 
         private void OnMessageReceived(MessageReader message, SendOption sendOption)
