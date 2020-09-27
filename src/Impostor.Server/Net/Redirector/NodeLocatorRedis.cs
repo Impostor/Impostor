@@ -38,7 +38,7 @@ namespace Impostor.Server.Net.Redirector
         public void Remove(string gameCode)
         {
             _cache.Remove(gameCode);
-            var shutdown = _agones.ShutDownAsync().Result;
+            var shutdown = _agones.ReadyAsync().Result;
             Console.WriteLine("Shutdown Result " + shutdown);
         }
     }
