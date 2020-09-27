@@ -1,23 +1,38 @@
 apiVersion: "agones.dev/v1"
 kind: Fleet
 metadata:
-  name: {{ include "impostor.fullname" . }}-nodes
+  name: simple-udp
 spec:
-  replicas: 2
+  replicas: 10
   template:
+    # GameServer metadata
+    # metadata:
+      # annotations:
+      #   agones.dev/dev-address: "192.168.178.46"
     spec:
+      health:
+        disabled: true
       ports:
       - name: default
         containerPort: 22023
+        protocol: UDP
       template:
         spec:
           containers:
-          - name: {{ include "impostor.fullname" . }}-node
+          - name: simple-udp
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
             resources:
               requests:
                 memory: "64Mi"
                 cpu: "20m"
-              limits:
-                memory: "64Mi"
-                cpu: "20m"
+{{/*              limits:*/}}
+{{/*                memory: "64Mi"*/}}
+{{/*                cpu: "20m"*/}}
+            volumeMounts:
+                - name: config-volume
+                  mountPath: /app/config.json
+                  subPath: config.json
+          volumes:
+            - name: config-volume
+              secret:
+                secretName: impostor-node-config
