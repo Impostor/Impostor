@@ -25,7 +25,7 @@ namespace Impostor.Server.Net.Redirector
 
         private Dictionary<string, AvailableNode> AvailableNodes;
 
-        internal NodeLocatorUDPSockets(IOptions<ServerRedirectorConfig> config)
+        public NodeLocatorUDPSockets(IOptions<ServerRedirectorConfig> config)
         {
             if (!Uri.TryCreate(config.Value.UDPMasterEndpoint, UriKind.Absolute, out Uri ServerAddress) || ServerAddress.Scheme.ToLower() != "udp")
             {

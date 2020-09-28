@@ -2,7 +2,7 @@
 
 namespace Impostor.Server.Data
 {
-    internal class ServerRedirectorConfig
+    public class ServerRedirectorConfig
     {
         public const string Section = "ServerRedirector";
         
