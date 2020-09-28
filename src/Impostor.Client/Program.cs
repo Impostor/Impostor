@@ -15,7 +15,7 @@ namespace Impostor.Client
         {
             var firstArg = Environment.GetCommandLineArgs().FirstOrDefault();
 
-            if (firstArg != null && Uri.TryCreate(firstArg, UriKind.Absolute, out var uri) && uri.Scheme.ToLower() == "imposter")
+            if (firstArg != null && Uri.TryCreate(firstArg, UriKind.Absolute, out var uri) && uri.Scheme.ToLower() == "impostor")
             {
                 HandleUri(uri).GetAwaiter().GetResult();
                 return;
