@@ -66,18 +66,25 @@ namespace Impostor.Server
                     {
                         // When joining a game, it retrieves the game server ip from redis.
                         // When a game has been created on this node, it stores the game code with its ip in redis.
-                        services.AddSingleton<INodeLocator, NodeLocatorRedis>();
+                        if (redirector.UseRedis)
+                        {
+                            services.AddSingleton<INodeLocator, NodeLocatorRedis>();
+
+                            // Dependency for the NodeLocatorRedis.
+                            services.AddStackExchangeRedisCache(options =>
+                            {
+                                options.Configuration = redirector.Redis;
+                                options.InstanceName = "ImpostorRedis";
+                            });
+                        }
+                        else
+                        {
+                            services.AddSingleton<INodeLocator, NodeLocatorUDPSockets>();
+                        }
                         
                         // Use the configuration as source for the list of nodes to provide
                         // when creating a game.
                         services.AddSingleton<INodeProvider, NodeProviderConfig>();
-                        
-                        // Dependency for the NodeLocatorRedis.
-                        services.AddStackExchangeRedisCache(options =>
-                        {
-                            options.Configuration = redirector.Redis;
-                            options.InstanceName = "ImpostorRedis";
-                        });
                     }
                     else
                     {
