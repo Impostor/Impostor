@@ -19,7 +19,7 @@ namespace Impostor.Client.Core
         
         public AmongUsModifier()
         {
-            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "..\\LocalLow");
+            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "..", "LocalLow");
             var amongUsDir = Path.Combine(appData, "Innersloth", "Among Us");
 
             _amongUsDir = amongUsDir;
