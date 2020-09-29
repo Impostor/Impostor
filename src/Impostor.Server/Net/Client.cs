@@ -191,7 +191,7 @@ namespace Impostor.Server.Net
                         else
                         {
                             writer.CopyFrom(message);
-                            Player.Game.SendToAllExcept(writer, Player);
+                            Player.Game.SendToAllExcept(writer, Player.Client.Id);
                         }
                     }
                     break;

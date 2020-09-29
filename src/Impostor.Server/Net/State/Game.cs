@@ -47,22 +47,24 @@ namespace Impostor.Server.Net.State
         
         public int PlayerCount => _players.Count;
         public ClientPlayer Host => _players[HostId];
-
+        
         /// <summary>
         ///     Send a message to all players except one.
         /// </summary>
         /// <param name="message">The message to send.</param>
-        /// <param name="sender">
+        /// <param name="senderId">
         ///     The player to exclude from sending the message.
         ///     Set to null to send a message to everyone.
         /// </param>
-        public void SendToAllExcept(MessageWriter message, ClientPlayer sender)
+        public void SendToAllExcept(MessageWriter message, int? senderId)
         {
-            foreach (var (_, player) in _players.Where(x => x.Value != sender))
+            foreach (var (_, player) in _players.Where(x => 
+                x.Value.Limbo == LimboStates.NotLimbo && 
+                x.Value.Client.Id != senderId))
             {
                 if (player.Client.Connection.State != ConnectionState.Connected)
                 {
-                    Logger.Warning("[{0}] Tried to send data to a disconnected player ({1}).", sender?.Client.Id, player.Client.Id);
+                    Logger.Warning("[{0}] Tried to send data to a disconnected player ({1}).", senderId, player.Client.Id);
                     continue;
                 }
                 
@@ -97,7 +99,7 @@ namespace Impostor.Server.Net.State
         {
             Message01JoinGame.SerializeJoin(message, clear, Code, player.Client.Id, HostId);
             
-            SendToAllExcept(message, player);
+            SendToAllExcept(message, player.Client.Id);
         }
     }
 }

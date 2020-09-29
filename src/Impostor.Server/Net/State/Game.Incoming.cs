@@ -22,9 +22,26 @@ namespace Impostor.Server.Net.State
 
         public void HandleJoinGame(ClientPlayer sender)
         {
+            // Check if the IP of the player is banned.
             if (_bannedIps.Contains(sender.Client.Connection.EndPoint.Address))
             {
                 sender.SendDisconnectReason(DisconnectReason.Banned);
+                return;
+            }
+            
+            // Check if;
+            // - The player is already in this game.
+            // - The game is full.
+            if (sender.Game != this && _players.Count >= Options.MaxPlayers)
+            {
+                sender.SendDisconnectReason(DisconnectReason.GameFull);
+                return;
+            }
+            
+            // Check current player state.
+            if (sender.Limbo == LimboStates.NotLimbo)
+            {
+                sender.SendDisconnectReason(DisconnectReason.Custom, "Invalid limbo state while joining.");
                 return;
             }
             
@@ -58,13 +75,11 @@ namespace Impostor.Server.Net.State
                 SendToAllExcept(packet, null);
             }
             
-            // Remove all players from this game.
+            // Put all players in the correct limbo state.
             foreach (var player in _players)
             {
-                player.Value.Game = null;
+                player.Value.Limbo = LimboStates.PreSpawn;
             }
-            
-            _players.Clear();
         }
 
         public void HandleAlterGame(MessageReader message, ClientPlayer sender, bool isPublic)
@@ -74,68 +89,47 @@ namespace Impostor.Server.Net.State
             using (var packet = MessageWriter.Get(SendOption.Reliable))
             {
                 packet.CopyFrom(message);
-                SendToAllExcept(packet, sender);
+                SendToAllExcept(packet, sender.Client.Id);
             }
         }
         
         public void HandleRemovePlayer(int playerId, DisconnectReason reason)
         {
-            if (_players.TryRemove(playerId, out var player))
-            {
-                player.Game = null;
-            }
-            
-            Logger.Information("{0} - Player {1} ({2}) has left.", CodeStr, player?.Client.Name, playerId);
+            PlayerRemove(playerId, out _);
 
-            // Game is empty, remove it.
-            if (_players.Count == 0)
+            // It's possible that the last player was removed, so check if the game is still around.
+            if (GameState == GameStates.Destroyed)
             {
-                GameState = GameStates.Destroyed;
-
-                // Remove instance reference.
-                _gameManager.Remove(Code);
                 return;
             }
-
-            // Host migration.
-            if (HostId == playerId)
-            {
-                var newHost = _players.First().Value;
-                HostId = newHost.Client.Id;
-                Logger.Information("{0} - Assigned {1} ({2}) as new host.", CodeStr, newHost.Client.Name, newHost.Client.Id);
-            }
-
+            
             using (var packet = MessageWriter.Get(SendOption.Reliable))
             {
                 WriteRemovePlayerMessage(packet, false, playerId, reason);
-                SendToAllExcept(packet, player);
+                SendToAllExcept(packet, playerId);
             }
         }
 
         public void HandleKickPlayer(int playerId, bool isBan)
         {
-            _players.TryGetValue(playerId, out var p);
-            Logger.Information("{0} - Player {1} ({2}) has left.", CodeStr, p?.Client.Name, playerId);
+            Logger.Information("{0} - Player {1} has left.", CodeStr, playerId);
             
             using (var message = MessageWriter.Get(SendOption.Reliable))
             {
+                // Send message to everyone that this player was kicked.
                 WriteKickPlayerMessage(message, false, playerId, isBan);
                 SendToAllExcept(message, null);
                 
-                if (_players.TryRemove(playerId, out var player))
+                if (PlayerRemove(playerId, out var player) && isBan)
                 {
-                    player.Game = null;
-
-                    if (isBan)
-                    {
-                        _bannedIps.Add(player.Client.Connection.EndPoint.Address);
-                    }
+                    _bannedIps.Add(player.Client.Connection.EndPoint.Address);
                 }
                 
+                // Rmeove the player from everyone's game.
                 WriteRemovePlayerMessage(message, true, playerId, isBan 
                     ? DisconnectReason.Banned 
                     : DisconnectReason.Kicked);
-                SendToAllExcept(message, player);
+                SendToAllExcept(message, player?.Client.Id);
             }
         }
         
@@ -143,19 +137,10 @@ namespace Impostor.Server.Net.State
         {
             Logger.Information("{0} - Player {1} ({2}) is joining.", CodeStr, sender.Client.Name, sender.Client.Id);
             
-            // Store player.
-            if (!_players.TryAdd(sender.Client.Id, sender))
+            // Add player to the game.
+            if (sender.Game == null)
             {
-                throw new AmongUsException("Failed to add player to game.");
-            }
-            
-            // Assign player to this game for future packets.
-            sender.Game = this;
-
-            // Assign hostId if none is set.
-            if (HostId == -1)
-            {
-                HostId = sender.Client.Id;
+                PlayerAdd(sender);
             }
 
             using (var message = MessageWriter.Get(SendOption.Reliable))
@@ -163,6 +148,7 @@ namespace Impostor.Server.Net.State
                 WriteJoinedGameMessage(message, false, sender);
                 WriteAlterGameMessage(message, false);
                 
+                sender.Limbo = LimboStates.NotLimbo;
                 sender.Client.Send(message);
 
                 BroadcastJoinMessage(message, true, sender);
@@ -173,38 +159,26 @@ namespace Impostor.Server.Net.State
         {
             Logger.Information("{0} - Player {1} ({2}) is rejoining.", CodeStr, sender.Client.Name, sender.Client.Id);
             
+            // Add player to the game.
+            if (sender.Game == null)
+            {
+                PlayerAdd(sender);
+            }
+            
+            // Check if the host joined and let everyone join.
             if (sender.Client.Id == HostId)
             {
                 GameState = GameStates.NotStarted;
-                HandleJoinGameNew(sender);
-
-                using (var message = MessageWriter.Get(SendOption.Reliable))
-                {
-                    foreach (var (_, player) in _players.Where(x => x.Value != sender))
-                    {
-                        WriteJoinedGameMessage(message, true, player);
-                        WriteAlterGameMessage(message, false);
-                        player.Client.Send(message);
-                    }
-                }
                 
+                // Spawn the host.
+                HandleJoinGameNew(sender);
+                
+                // Pull players out of limbo.
+                CheckLimboPlayers();
                 return;
             }
 
-            if (_players.Count >= 9)
-            {
-                sender.SendDisconnectReason(DisconnectReason.GameFull);
-                return;
-            }
-
-            // Store player.
-            if (!_players.TryAdd(sender.Client.Id, sender))
-            {
-                throw new AmongUsException("Failed to add player to game.");
-            }
-            
-            // Assign player to this game for future packets.
-            sender.Game = this;
+            sender.Limbo = LimboStates.WaitingForHost;
 
             using (var packet = MessageWriter.Get(SendOption.Reliable))
             {

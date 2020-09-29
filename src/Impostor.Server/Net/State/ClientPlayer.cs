@@ -14,10 +14,12 @@ namespace Impostor.Server.Net.State
             _gameManager = gameManager;
             
             Client = client;
+            Limbo = LimboStates.PreSpawn;
         }
         
         public Client Client { get; }
         public Game Game { get; set; }
+        public LimboStates Limbo { get; set; }
 
         public void SendDisconnectReason(DisconnectReason reason, string message = null)
         {
