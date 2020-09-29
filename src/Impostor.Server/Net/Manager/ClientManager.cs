@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Threading;
 using Hazel;
 using Impostor.Server.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -22,32 +23,19 @@ namespace Impostor.Server.Net.Manager
             _idLast = 0;
         }
 
-        // No idea what a good way for this is.
         private int NextId()
         {
-            lock (_idLock)
+            var clientId = Interlocked.Increment(ref _idLast);
+            if (clientId < 1)
             {
-                // 3 Attempts.
-                for (var i = 0; i < 3; i++)
-                {
-                    // It is important that ids start from 1, a 0 id causes issues.
-                    var result = ++_idLast;
-
-                    if (_idLast == int.MaxValue)
-                    {
-                        _idLast = 0;
-                    }
-
-                    if (_clients.ContainsKey(result))
-                    {
-                        continue;
-                    }
-            
-                    return result;
-                }
+                // Super rare but reset the _idLast because of overflow.
+                _idLast = 0;
                 
-                throw new AmongUsException("Unable to generate a client id.");
+                // And get a new id.
+                clientId = Interlocked.Increment(ref _idLast);
             }
+
+            return clientId;
         }
         
         public void Create(string name, Connection connection)
