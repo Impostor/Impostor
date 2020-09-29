@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Impostor.Client.Core;
@@ -11,8 +10,8 @@ namespace Impostor.Client.Forms
 {
     public partial class FrmMain : Form
     {
+        private readonly Configuration _config;
         private readonly AmongUsModifier _modifier;
-        private const string IpListConfigPath = @"iplist.cfg";
 
         public FrmMain()
         {
@@ -20,23 +19,10 @@ namespace Impostor.Client.Forms
 
             AcceptButton = buttonLaunch;
 
+            _config = new Configuration();
             _modifier = new AmongUsModifier();
             _modifier.Error += ModifierOnError;
             _modifier.Saved += ModifierOnSaved;
-        }
-
-        private void LoadSavedIpsFromCfg()
-        {
-            comboIp.Items.Clear();
-            if (File.Exists(IpListConfigPath))
-            {
-                comboIp.Items.AddRange(File.ReadAllLines(IpListConfigPath).Reverse().ToArray());
-            }
-        }
-
-        private void SaveIpToCfg(string ip)
-        {
-            File.AppendAllLines(IpListConfigPath, new[] { ip });
         }
 
         private void ModifierOnError(object sender, ErrorEventArgs e)
@@ -61,11 +47,19 @@ namespace Impostor.Client.Forms
             comboIp.Text = e.IpAddress;
             comboIp.Enabled = true;
             buttonLaunch.Enabled = true;
+
+            _config.AddIp(e.IpAddress);
+            _config.Save();
+
+            RefreshComboIps();
         }
 
         private void FrmMain_Load(object sender, EventArgs e)
         {
-            LoadSavedIpsFromCfg();
+            _config.Load();
+
+            RefreshComboIps();
+
             if (_modifier.TryLoadIp(out var ipAddress))
             {
                 comboIp.Text = ipAddress;
@@ -79,7 +73,11 @@ namespace Impostor.Client.Forms
 
         private void textIp_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode != Keys.Enter) return;
+            if (e.KeyCode != Keys.Enter)
+            {
+                return;
+            }
+
             e.Handled = true;
 
             buttonLaunch_Click(this, EventArgs.Empty);
@@ -91,20 +89,24 @@ namespace Impostor.Client.Forms
             buttonLaunch.Enabled = false;
 
             await _modifier.SaveIp(comboIp.Text);
-            SaveIpToCfg(comboIp.Text);
-            LoadSavedIpsFromCfg();
-        }
-
-        private void clearSaved_Click(object sender, EventArgs e)
-        {
-            File.WriteAllText(IpListConfigPath, string.Empty);
-            comboIp.Items.Clear();
-            LoadSavedIpsFromCfg();
         }
 
         private void lblUrl_Click(object sender, EventArgs e)
         {
             Process.Start("https://github.com/AeonLucid/Impostor");
+        }
+
+        private void RefreshComboIps()
+        {
+            comboIp.Items.Clear();
+
+            if (_config.RecentIps.Count > 0)
+            {
+                foreach (var ip in _config.RecentIps)
+                {
+                    comboIp.Items.Add(ip);
+                }
+            }
         }
     }
 }

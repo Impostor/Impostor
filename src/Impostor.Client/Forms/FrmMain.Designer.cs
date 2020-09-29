@@ -36,7 +36,6 @@
             this.lblUrl = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.comboIp = new System.Windows.Forms.ComboBox();
-            this.clearSaved = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -105,23 +104,11 @@
             this.comboIp.TabIndex = 2;
             this.comboIp.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textIp_KeyDown);
             // 
-            // clearSaved
-            // 
-            this.clearSaved.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.clearSaved.Location = new System.Drawing.Point(31, 182);
-            this.clearSaved.Name = "clearSaved";
-            this.clearSaved.Size = new System.Drawing.Size(91, 21);
-            this.clearSaved.TabIndex = 4;
-            this.clearSaved.Text = "Clear saved IPs";
-            this.clearSaved.UseVisualStyleBackColor = true;
-            this.clearSaved.Click += new System.EventHandler(this.clearSaved_Click);
-            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(283, 262);
-            this.Controls.Add(this.clearSaved);
             this.Controls.Add(this.comboIp);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.lblUrl);
@@ -150,6 +137,5 @@
         private System.Windows.Forms.Label lblUrl;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox comboIp;
-        private System.Windows.Forms.Button clearSaved;
     }
 }
