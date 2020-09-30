@@ -7,6 +7,8 @@ on:
       - 'src/Impostor.Server/**'
       - 'src/Impostor.Shared/**'
       - '.gitmodules'
+      - '.github/workflows/docker.yml'
+      - 'Dockerfile'
     tags:
       - 'v*.*.*'
   pull_request:
@@ -14,6 +16,8 @@ on:
       - 'src/Impostor.Server/**'
       - 'src/Impostor.Shared/**'
       - '.gitmodules'
+      - '.github/workflows/docker.yml'
+      - 'Dockerfile'
 
 jobs:
   push_to_registry:
@@ -63,6 +67,6 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.prep.outputs.tags }}

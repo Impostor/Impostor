@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net452;netcoreapp3.1</TargetFrameworks>
+      <TargetFrameworks>net452;net5.0</TargetFrameworks>
+      <DebugType Condition=" '$(Configuration)' == 'Release' ">None</DebugType>
     </PropertyGroup>
 
     <ItemGroup>

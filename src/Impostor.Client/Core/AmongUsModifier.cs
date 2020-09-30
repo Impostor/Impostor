@@ -13,23 +13,40 @@ namespace Impostor.Client.Core
     public class AmongUsModifier
     {
         private const string RegionName = "Impostor";
+        public const ushort DefaultPort = 22023;
         
         private readonly string _amongUsDir;
         private readonly string _regionFile;
         
         public AmongUsModifier()
         {
-            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "..\\LocalLow");
+            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "..", "LocalLow");
             var amongUsDir = Path.Combine(appData, "Innersloth", "Among Us");
 
             _amongUsDir = amongUsDir;
             _regionFile = Path.Combine(amongUsDir, "regionInfo.dat");
         }
         
-        public async Task SaveIp(string ip)
+        public async Task SaveIp(string input)
         {
             // Filter out whitespace.
-            ip = ip.Trim();
+            input = input.Trim();
+            
+            // Split port from ip.
+            // Only IPv4 is supported so just do it simple.
+            var ip = string.Empty;
+            var port = DefaultPort;
+            
+            var parts = input.Split(':');
+            if (parts.Length >= 1)
+            {
+                ip = parts[0];
+            }
+
+            if (parts.Length >= 2)
+            {
+                ushort.TryParse(parts[1], out port);
+            }
             
             // Check if a valid IP address was entered.
             if (!IPAddress.TryParse(ip, out var ipAddress))
@@ -61,14 +78,15 @@ namespace Impostor.Client.Core
                 return;
             }
 
-            WriteIp(ipAddress);
+            WriteIp(ipAddress, port);
         }
 
         /// <summary>
         ///     Writes an IP Address to the Among Us region file.
         /// </summary>
         /// <param name="ipAddress">The IPv4 address to write.</param>
-        private void WriteIp(IPAddress ipAddress)
+        /// <param name="port"></param>
+        private void WriteIp(IPAddress ipAddress, ushort port)
         {
             if (ipAddress == null || 
                 ipAddress.AddressFamily != AddressFamily.InterNetwork)
@@ -88,12 +106,12 @@ namespace Impostor.Client.Core
                 var ip = ipAddress.ToString();
                 var region = new RegionInfo(RegionName, ip, new[]
                 {
-                    new ServerInfo($"{RegionName}-Master-1", ip, 22023)
+                    new ServerInfo($"{RegionName}-Master-1", ip, port)
                 });
                     
                 region.Serialize(writer);
 
-                OnSaved(ip);
+                OnSaved(ip, port);
             }
         }
 
@@ -129,9 +147,9 @@ namespace Impostor.Client.Core
             Error?.Invoke(this, new ErrorEventArgs(message));
         }
 
-        private void OnSaved(string ipAddress)
+        private void OnSaved(string ipAddress, ushort port)
         {
-            Saved?.Invoke(this, new SavedEventArgs(ipAddress));
+            Saved?.Invoke(this, new SavedEventArgs(ipAddress, port));
         }
             
         public event EventHandler<ErrorEventArgs> Error;

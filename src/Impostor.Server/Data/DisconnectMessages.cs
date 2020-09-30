@@ -8,5 +8,8 @@
 
         public const string Destroyed = "The game you tried to join is being destroyed. " +
                                         "Please create a new game.";
+
+        public const string NotImplemented = "Game listing has not been implemented in Impostor yet for servers " +
+                                             "running in server redirection mode.";
     }
 }

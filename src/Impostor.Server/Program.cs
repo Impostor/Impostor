@@ -1,41 +1,128 @@
 ﻿using System;
-using System.Net;
-using System.Threading;
+using System.IO;
+using Impostor.Server.Data;
 using Impostor.Server.Net;
+using Impostor.Server.Net.Manager;
+using Impostor.Server.Net.Redirector;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Events;
 
 namespace Impostor.Server
 {
     internal static class Program
     {
-        private static readonly ManualResetEvent QuitEvent = new ManualResetEvent(false);
-        
-        private static void Main(string[] args)
+        private static int Main(string[] args)
         {
-            // Listen for CTRL+C.
-            Console.CancelKeyPress += (sender, e) =>
-            {
-                e.Cancel = true;
-                QuitEvent.Set();
-            };
-            
-            // Configure logger.
             Log.Logger = new LoggerConfiguration()
 #if DEBUG
                 .MinimumLevel.Verbose()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
 #else
                 .MinimumLevel.Information()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 #endif
+                .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .CreateLogger();
 
-            // Initialize matchmaker.
-            var matchMaker = new Matchmaker(IPAddress.Any, 22023);
-            matchMaker.Start();
-            Log.Logger.Information("Matchmaker is running on *:22023.");
-            QuitEvent.WaitOne();
-            Log.Logger.Warning("Matchmaker is shutting down!");
-            matchMaker.Stop();
+            try
+            {
+                Log.Information("Starting Impostor");
+                CreateHostBuilder(args).Build().Run();
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Impostor terminated unexpectedly");
+                return 1;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
+        
+        private static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+#if DEBUG
+                .UseEnvironment(Environment.GetEnvironmentVariable("IMPOSTOR_ENV") ?? "Development")
+#else
+                .UseEnvironment("Production")
+#endif
+                .ConfigureAppConfiguration(builder =>
+                {
+                    builder.AddJsonFile("config.json", true);
+                    builder.AddJsonFile("config.Development.json", true);
+                    builder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
+                    builder.AddCommandLine(args);
+                })
+                .ConfigureServices((host, services) =>
+                {
+                    var redirector = host.Configuration
+                        .GetSection(ServerRedirectorConfig.Section)
+                        .Get<ServerRedirectorConfig>() ?? new ServerRedirectorConfig();
+                    
+                    services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
+                    services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));
+
+                    if (redirector.Enabled)
+                    {
+                        if (!string.IsNullOrEmpty(redirector.Locator.Redis))
+                        {
+                            // When joining a game, it retrieves the game server ip from redis.
+                            // When a game has been created on this node, it stores the game code with its ip in redis.
+                            services.AddSingleton<INodeLocator, NodeLocatorRedis>();
+
+                            // Dependency for the NodeLocatorRedis.
+                            services.AddStackExchangeRedisCache(options =>
+                            {
+                                options.Configuration = redirector.Locator.Redis;
+                                options.InstanceName = "ImpostorRedis";
+                            });
+                        }
+                        else if (!string.IsNullOrEmpty(redirector.Locator.UdpMasterEndpoint))
+                        {
+                            services.AddSingleton<INodeLocator, NodeLocatorUDP>();
+
+                            if (redirector.Master)
+                            {
+                                services.AddHostedService<NodeLocatorUDPService>();
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("Missing a valid NodeLocator config.");
+                        }
+                        
+                        // Use the configuration as source for the list of nodes to provide
+                        // when creating a game.
+                        services.AddSingleton<INodeProvider, NodeProviderConfig>();
+                    }
+                    else
+                    {
+                        // Redirector is not enabled but the dependency is still required.
+                        // So we provide one that ignores all calls.
+                        services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
+                    }
+                    
+                    if (redirector.Enabled && redirector.Master)
+                    {
+                        services.AddSingleton<IClientManager, ClientManagerRedirector>();
+                        // For a master server, we don't need a GameManager.
+                    }
+                    else
+                    {
+                        services.AddSingleton<IClientManager, ClientManager>();
+                        services.AddSingleton<GameManager>();
+                    }
+                    
+                    services.AddSingleton<Matchmaker>();
+                    services.AddHostedService<MatchmakerService>();
+                })
+                .UseConsoleLifetime()
+                .UseSerilog();
     }
 }
