@@ -14,7 +14,7 @@ namespace Impostor.Server.Data
         public class NodeLocator
         {
             public string Redis { get; set; }
-            public string UDPMasterEndpoint { get; set; }
+            public string UdpMasterEndpoint { get; set; }
         }
     }
 }

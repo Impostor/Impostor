@@ -30,9 +30,9 @@ namespace Impostor.Server.Net.Redirector
             {
                 _isMaster = false;
                 
-                if (!IPEndPoint.TryParse(config.Value.Locator.UDPMasterEndpoint, out var endpoint))
+                if (!IPEndPoint.TryParse(config.Value.Locator.UdpMasterEndpoint, out var endpoint))
                 {
-                    throw new ArgumentException("UDPMasterEndpoint should be in the ip:port format.");
+                    throw new ArgumentException("UdpMasterEndpoint should be in the ip:port format.");
                 }
                 
                 _logger.LogWarning("Node server will send updates to {0}.", endpoint);

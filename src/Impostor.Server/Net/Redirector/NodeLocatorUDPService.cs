@@ -25,9 +25,9 @@ namespace Impostor.Server.Net.Redirector
             _nodeLocator = (NodeLocatorUDP) nodeLocator;
             _logger = logger;
 
-            if (!IPEndPoint.TryParse(options.Value.Locator.UDPMasterEndpoint, out var endpoint))
+            if (!IPEndPoint.TryParse(options.Value.Locator.UdpMasterEndpoint, out var endpoint))
             {
-                throw new ArgumentException("UDPMasterEndpoint should be in the ip:port format.");
+                throw new ArgumentException("UdpMasterEndpoint should be in the ip:port format.");
             }
 
             _client = new UdpClient(endpoint)

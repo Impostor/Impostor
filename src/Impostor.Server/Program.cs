@@ -77,7 +77,7 @@ namespace Impostor.Server
                                 options.InstanceName = "ImpostorRedis";
                             });
                         }
-                        else if (!string.IsNullOrEmpty(redirector.Locator.UDPMasterEndpoint))
+                        else if (!string.IsNullOrEmpty(redirector.Locator.UdpMasterEndpoint))
                         {
                             services.AddSingleton<INodeLocator, NodeLocatorUDP>();
 
