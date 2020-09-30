@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Impostor.Server.Data;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Manager;
@@ -57,7 +58,7 @@ namespace Impostor.Server
                 {
                     var redirector = host.Configuration
                         .GetSection(ServerRedirectorConfig.Section)
-                        .Get<ServerRedirectorConfig>();
+                        .Get<ServerRedirectorConfig>() ?? new ServerRedirectorConfig();
                     
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                     services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));

@@ -5,7 +5,7 @@ namespace Impostor.Server.Data
     public class ServerRedirectorConfig
     {
         public const string Section = "ServerRedirector";
-        
+
         public bool Enabled { get; set; }
         public bool Master { get; set; }
         public NodeLocator Locator { get; set; }
