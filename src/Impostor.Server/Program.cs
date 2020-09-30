@@ -47,6 +47,11 @@ namespace Impostor.Server
         
         private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+#if DEBUG
+                .UseEnvironment(Environment.GetEnvironmentVariable("IMPOSTOR_ENV") ?? "Development")
+#else
+                .UseEnvironment("Production")
+#endif
                 .ConfigureAppConfiguration(builder =>
                 {
                     builder.AddJsonFile("config.json", true);
