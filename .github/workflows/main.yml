@@ -16,6 +16,8 @@ on:
 
 jobs:
   build-client:
+  runs-on: windows-latest
+  steps:
     name: Build Client
       - name: Checkout
         uses: actions/checkout@v2
