@@ -16,9 +16,9 @@ on:
 
 jobs:
   build-client:
-  runs-on: windows-latest
-  steps:
     name: Build Client
+    runs-on: windows-latest
+    steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup MSBuild.exe
