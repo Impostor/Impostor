@@ -28,11 +28,16 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 5.0.100-rc.1.20452.10
+          dotnet-version: 3.1.402
       - name: Install dependencies
         run: dotnet restore ./src
       - name: Build Impostor.Client
         run: msbuild ./src/Impostor.Client/Impostor.Client.csproj /p:Configuration=Release
+      - 
+        name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.100-rc.1.20452.10
       - name: Build Impostor.Server
         run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Server/Impostor.Server.csproj /p:PublishTrimmed=false
       - name: Test
