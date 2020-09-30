@@ -8,7 +8,10 @@
   "ServerRedirector": {
     "Enabled": false,
     "Master": true,
-    "Redis": "127.0.0.1:6379",
+    "Locator": {
+      "Redis": "127.0.0.1.6379",
+      "UDPMasterEndpoint": "127.0.0.1:32320"
+    },
     "Nodes": [
       {
         "Ip": "127.0.0.1",
