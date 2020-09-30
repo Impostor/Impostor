@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Redirector
 {
@@ -8,8 +9,9 @@ namespace Impostor.Server.Net.Redirector
     {
         private readonly IDistributedCache _cache;
         
-        public NodeLocatorRedis(IDistributedCache cache)
+        public NodeLocatorRedis(ILogger<NodeLocatorRedis> logger, IDistributedCache cache)
         {
+            logger.LogWarning("Using the redis NodeLocator.");
             _cache = cache;
         }
 

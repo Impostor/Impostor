@@ -64,22 +64,31 @@ namespace Impostor.Server
 
                     if (redirector.Enabled)
                     {
-                        // When joining a game, it retrieves the game server ip from redis.
-                        // When a game has been created on this node, it stores the game code with its ip in redis.
-                        if (redirector.UseRedis)
+                        if (!string.IsNullOrEmpty(redirector.Locator.Redis))
                         {
+                            // When joining a game, it retrieves the game server ip from redis.
+                            // When a game has been created on this node, it stores the game code with its ip in redis.
                             services.AddSingleton<INodeLocator, NodeLocatorRedis>();
 
                             // Dependency for the NodeLocatorRedis.
                             services.AddStackExchangeRedisCache(options =>
                             {
-                                options.Configuration = redirector.Redis;
+                                options.Configuration = redirector.Locator.Redis;
                                 options.InstanceName = "ImpostorRedis";
                             });
                         }
+                        else if (!string.IsNullOrEmpty(redirector.Locator.UDPMasterEndpoint))
+                        {
+                            services.AddSingleton<INodeLocator, NodeLocatorUDP>();
+
+                            if (redirector.Master)
+                            {
+                                services.AddHostedService<NodeLocatorUDPService>();
+                            }
+                        }
                         else
                         {
-                            services.AddSingleton<INodeLocator, NodeLocatorUDPSockets>();
+                            throw new Exception("Missing a valid NodeLocator config.");
                         }
                         
                         // Use the configuration as source for the list of nodes to provide
@@ -105,9 +114,9 @@ namespace Impostor.Server
                     }
                     
                     services.AddSingleton<Matchmaker>();
-                    
                     services.AddHostedService<MatchmakerService>();
                 })
+                .UseConsoleLifetime()
                 .UseSerilog();
     }
 }

@@ -1,6 +1,1 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
-/.vscode/tasks.json
-/.vscode/launch.json
+﻿/.vscode

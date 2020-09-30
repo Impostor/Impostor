@@ -8,9 +8,13 @@ namespace Impostor.Server.Data
         
         public bool Enabled { get; set; }
         public bool Master { get; set; }
-        public bool UseRedis { get; set; }
-        public string Redis { get; set; }
-        public string UDPMasterEndpoint { get; set; }
+        public NodeLocator Locator { get; set; }
         public List<ServerRedirectorNode> Nodes { get; set; }
+
+        public class NodeLocator
+        {
+            public string Redis { get; set; }
+            public string UDPMasterEndpoint { get; set; }
+        }
     }
 }
