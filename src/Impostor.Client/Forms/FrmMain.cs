@@ -44,11 +44,15 @@ namespace Impostor.Client.Forms
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
 
-            comboIp.Text = e.IpAddress;
+            var ipText = e.Port == AmongUsModifier.DefaultPort
+                ? e.IpAddress
+                : $"{e.IpAddress}:{e.Port}";
+
+            comboIp.Text = ipText;
             comboIp.Enabled = true;
             buttonLaunch.Enabled = true;
 
-            _config.AddIp(e.IpAddress);
+            _config.AddIp(ipText);
             _config.Save();
 
             RefreshComboIps();
