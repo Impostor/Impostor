@@ -15,14 +15,10 @@ on:
       - '.github/workflows/main.yml'
 
 jobs:
-  build:
-    name: Build
-    runs-on: windows-latest
-    steps:
+  build-client:
+    name: Build Client
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          submodules: true
       - name: Setup MSBuild.exe
         uses: microsoft/setup-msbuild@v1.0.1
       - name: Setup .NET Core
@@ -33,12 +29,21 @@ jobs:
         run: dotnet restore ./src
       - name: Build Impostor.Client
         run: msbuild ./src/Impostor.Client/Impostor.Client.csproj /p:Configuration=Release
-      - 
-        name: Setup .NET Core
+  build-server:
+    name: Build Server
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.100-rc.1.20452.10
+      - name: Install dependencies
+        run: dotnet restore ./src
       - name: Build Impostor.Server
-        run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Server/Impostor.Server.csproj /p:PublishTrimmed=false
+        run: dotnet build --no-restore -c Release -f net5.0 ./src/Impostor.Server/Impostor.Server.csproj /p:PublishTrimmed=false
       - name: Test
-        run: dotnet test --no-restore -v normal -f netcoreapp3.1 ./src
+        run: dotnet test --no-restore -v normal -f net5.0 ./src
