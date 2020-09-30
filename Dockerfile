@@ -33,7 +33,7 @@ RUN case "$TARGETARCH" in \
   dotnet publish -c release -o /app -r "$NETCORE_PLATFORM" --no-restore ./src/Impostor.Server/Impostor.Server.csproj
 
 # Final image.
-FROM mcr.microsoft.com/dotnet/core/runtime-deps:3.1
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/core/runtime-deps:3.1
 WORKDIR /app
 COPY --from=build /app ./
 EXPOSE 22023/udp
