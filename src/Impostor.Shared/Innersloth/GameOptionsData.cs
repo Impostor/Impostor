@@ -30,7 +30,33 @@ namespace Impostor.Shared.Innersloth
         
         public void Serialize(BinaryWriter writer, byte version)
         {
-            throw new NotImplementedException();
+            writer.Write((byte) version);
+            writer.Write((byte) MaxPlayers);
+            writer.Write((uint) Keywords);
+            writer.Write((byte) MapId);
+            writer.Write((float) PlayerSpeedMod);
+            writer.Write((float) CrewLightMod);
+            writer.Write((float) ImpostorLightMod);
+            writer.Write((float) KillCooldown);
+            writer.Write((byte) NumCommonTasks);
+            writer.Write((byte) NumLongTasks);
+            writer.Write((byte) NumShortTasks);
+            writer.Write((int) NumEmergencyMeetings);
+            writer.Write((byte) NumImpostors);
+            writer.Write((byte) KillDistance);
+            writer.Write((uint) DiscussionTime);
+            writer.Write((uint) VotingTime);
+            writer.Write((bool) IsDefaults);
+            if (version > 1)
+            {
+                writer.Write((byte) EmergencyCooldown);
+            }
+
+            if (version > 2)
+            {
+                writer.Write((bool) ConfirmImpostor);
+                writer.Write((bool) VisualTasks);
+            }
         }
 
         public static GameOptionsData Deserialize(byte[] bytes)
