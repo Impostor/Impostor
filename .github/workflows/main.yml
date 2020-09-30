@@ -6,11 +6,13 @@ on:
     paths:
       - 'src/**'
       - '.gitmodules'
+      - '.github/workflows/main.yml'
   pull_request:
     branches: [ master, dev ]
     paths:
       - 'src/**'
       - '.gitmodules'
+      - '.github/workflows/main.yml'
 
 jobs:
   build:
