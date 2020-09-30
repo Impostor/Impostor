@@ -10,7 +10,7 @@ There are no special features at this moment, the goal is aiming to be as close 
 
 ## Features
 
-All Among Us features are implemented. It is a full replacement for the official server.
+All Among Us features are implemented. It is a full replacement for the official server. You will definitely have fun with this.
 
 - [x] Create game
 - [x] Join game
