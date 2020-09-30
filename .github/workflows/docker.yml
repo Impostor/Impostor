@@ -7,6 +7,7 @@ on:
       - 'src/Impostor.Server/**'
       - 'src/Impostor.Shared/**'
       - '.gitmodules'
+      - '.github/workflows/docker.yml'
       - 'Dockerfile'
     tags:
       - 'v*.*.*'
@@ -15,6 +16,7 @@ on:
       - 'src/Impostor.Server/**'
       - 'src/Impostor.Shared/**'
       - '.gitmodules'
+      - '.github/workflows/docker.yml'
       - 'Dockerfile'
 
 jobs:
