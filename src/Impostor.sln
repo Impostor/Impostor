@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Server", "Impostor.Server\Impostor.Server.csproj", "{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client", "Impostor.Client\Impostor.Client.csproj", "{24F07173-D4A7-41C6-BA51-4516AB68343C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Shared", "Impostor.Shared\Impostor.Shared.csproj", "{1D109A96-FADF-41B9-A845-457A7A5C0C5A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "submodules", "submodules", "{DFA3CC6A-A27C-4713-876D-A55912C78C45}"
@@ -18,6 +16,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{56DD9707-D811-4056-9E2C-8A9CC2479B07}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Tools.Proxy", "Impostor.Tools.Proxy\Impostor.Tools.Proxy.csproj", "{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client", "Impostor.Client\Impostor.Client.csproj", "{804CF172-0C87-4423-9688-BD97D549891E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,14 +35,6 @@ Global
 		{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}.Release|x86.ActiveCfg = Release|Any CPU
 		{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}.Release|x86.Build.0 = Release|Any CPU
-		{24F07173-D4A7-41C6-BA51-4516AB68343C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{24F07173-D4A7-41C6-BA51-4516AB68343C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{24F07173-D4A7-41C6-BA51-4516AB68343C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{24F07173-D4A7-41C6-BA51-4516AB68343C}.Debug|x86.Build.0 = Debug|Any CPU
-		{24F07173-D4A7-41C6-BA51-4516AB68343C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{24F07173-D4A7-41C6-BA51-4516AB68343C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{24F07173-D4A7-41C6-BA51-4516AB68343C}.Release|x86.ActiveCfg = Release|Any CPU
-		{24F07173-D4A7-41C6-BA51-4516AB68343C}.Release|x86.Build.0 = Release|Any CPU
 		{1D109A96-FADF-41B9-A845-457A7A5C0C5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1D109A96-FADF-41B9-A845-457A7A5C0C5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D109A96-FADF-41B9-A845-457A7A5C0C5A}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -75,6 +67,14 @@ Global
 		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Release|x86.ActiveCfg = Release|Any CPU
 		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Release|x86.Build.0 = Release|Any CPU
+		{804CF172-0C87-4423-9688-BD97D549891E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{804CF172-0C87-4423-9688-BD97D549891E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{804CF172-0C87-4423-9688-BD97D549891E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{804CF172-0C87-4423-9688-BD97D549891E}.Debug|x86.Build.0 = Debug|Any CPU
+		{804CF172-0C87-4423-9688-BD97D549891E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{804CF172-0C87-4423-9688-BD97D549891E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{804CF172-0C87-4423-9688-BD97D549891E}.Release|x86.ActiveCfg = Release|Any CPU
+		{804CF172-0C87-4423-9688-BD97D549891E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,7 +15,7 @@ jobs:
         with:
           submodules: true
       - name: Setup MSBuild.exe
-        uses: warrenbuckley/Setup-MSBuild@v1
+        uses: microsoft/setup-msbuild@v1.0.1
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: dotnet restore ./src
       - name: Build Impostor.Client
-        run: msbuild ./src/Impostor.Client/Impostor.Client.csproj /p:Configuration=Release
+        run: msbuild ./src/Impostor.Client/Impostor.Client.csproj /p:Configuration=Release /p:DebugSymbols=false /p:DebugType=None
       - name: Build Impostor.Server
         run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Server/Impostor.Server.csproj
       - name: Test

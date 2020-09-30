@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: dotnet restore ./src
       - name: Build Impostor.Client
-        run: dotnet msbuild ./src/Impostor.Client/Impostor.Client.csproj /p:Configuration=Release
+        run: msbuild ./src/Impostor.Client/Impostor.Client.csproj /p:Configuration=Release
       - name: Build Impostor.Server
         run: dotnet build --no-restore -c Release -f netcoreapp3.1 ./src/Impostor.Server/Impostor.Server.csproj /p:PublishTrimmed=false
       - name: Test
