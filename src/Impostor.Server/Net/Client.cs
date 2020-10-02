@@ -3,6 +3,7 @@ using Hazel;
 using Impostor.Server.Data;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
+using Impostor.Server.Net.Messages.Rpc;
 using Impostor.Server.Net.State;
 using Impostor.Shared.Innersloth.Data;
 using Serilog;
@@ -184,12 +185,44 @@ namespace Impostor.Server.Net
                     {
                         if (flag == MessageFlags.GameDataTo)
                         {
+                            Logger.Information("GameDataTo");
                             var target = message.ReadPackedInt32();
                             writer.CopyFrom(message);
                             Player.Game.SendTo(writer, target);
                         }
                         else
                         {
+                            Message06GameData.Deserialize(message, out var contentSize, out var unknown, out var gameDataType);
+                            Logger.Information("GameData - unknown: " + unknown);
+                            switch (gameDataType)
+                            {
+                                case GameDataType.Rpc:
+                                {
+                                    var rpcTargetId = message.ReadByte();
+                                    var rpcMessageFlag = message.ReadPackedInt32();
+                                    Logger.Information("GameData - rpcTargetId: " + rpcTargetId);
+                                    switch (rpcMessageFlag)
+                                    {
+                                        case RpcMessageFlags.SendChat:
+                                        {
+                                            RpcMessage13SendChat.Deserialize(message, out var rpcChatLength, out var rpcChatMessage);
+                                            Logger.Information("Chat message: {0} - {1}.", Player.Client.Name, System.Text.Encoding.UTF8.GetString(rpcChatMessage).TrimEnd('\0'));
+                                            break;
+                                        }
+                                        default:
+                                        {
+                                            Logger.Warning("Server received unhandled rpcMessageFlag flag {0}.", rpcMessageFlag);
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                                default:
+                                {
+                                    Logger.Warning("Server received unhandled gameDataType flag {0}.", gameDataType);
+                                    break;
+                                }
+                            }
                             writer.CopyFrom(message);
                             Player.Game.SendToAllExcept(writer, Player.Client.Id);
                         }
