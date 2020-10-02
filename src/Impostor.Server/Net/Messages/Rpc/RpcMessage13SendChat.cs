@@ -1,5 +1,4 @@
 ﻿using Hazel;
-using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server.Net.Messages.Rpc
 {
