@@ -2,7 +2,7 @@
 
 namespace Impostor.Server.Net.Messages.Rpc
 {
-    internal static class RpcMessage6SetName
+    internal static class RpcMessage06SetName
     {
 
         public static void Deserialize(MessageReader reader, out string name)

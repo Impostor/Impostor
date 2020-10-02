@@ -5,10 +5,10 @@ namespace Impostor.Server.Net.Messages.Rpc
     internal static class RpcMessage16SendChatNote
     {
 
-        public static void Deserialize(MessageReader reader, out int playerId, out int chatNoteType)
+        public static void Deserialize(MessageReader reader, out byte playerId, out byte chatNoteType)
         {
-            playerId = reader.ReadPackedInt32();
-            chatNoteType = reader.ReadPackedInt32();
+            playerId = reader.ReadByte();
+            chatNoteType = reader.ReadByte();
         }
     }
 }

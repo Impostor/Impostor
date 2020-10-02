@@ -5,10 +5,10 @@ namespace Impostor.Server.Net.Messages.Rpc
     internal static class RpcMessage28RepairSystem
     {
 
-        public static void Deserialize(MessageReader reader, out int systemType, out int amount)
+        public static void Deserialize(MessageReader reader, out byte systemType, out byte amount)
         {
-            systemType = reader.ReadPackedInt32();
-            amount = reader.ReadPackedInt32();
+            systemType = reader.ReadByte();
+            amount = reader.ReadByte();
         }
     }
 }

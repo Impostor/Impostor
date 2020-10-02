@@ -202,22 +202,22 @@ namespace Impostor.Server.Net
                                     {
                                         case RpcMessageFlags.PlayAnimation:
                                         {
-                                            RpcMessage0PlayAnimation.Deserialize(message, out var animationType);
+                                            RpcMessage00PlayAnimation.Deserialize(message, out var animationType);
                                             //Logger.Information("Play animation"); // This fires a ton
                                             break;
                                         }
                                         case RpcMessageFlags.CompleteTask:
                                         {
-                                            RpcMessage1CompleteTask.Deserialize(message, out var taskId);
+                                            RpcMessage01CompleteTask.Deserialize(message, out var taskId);
                                             Logger.Information("Task completion: {0} completed task {1}", Player.Client.Name, taskId);
                                             break;
                                         }
-                                        case RpcMessageFlags.SyncSettings:
+                                        case RpcMessageFlags.SyncSettings: // Not used?
                                         {
                                             Logger.Information("Sync Settings");
                                             break;
                                         }
-                                        case RpcMessageFlags.SetInfected:
+                                        case RpcMessageFlags.SetInfected: // Not used?
                                         {
                                             Logger.Information("Set Infected");
                                             break;
@@ -227,31 +227,33 @@ namespace Impostor.Server.Net
                                             Logger.Information("Exiled");
                                             break;
                                         }
-                                        case RpcMessageFlags.CheckName:
+                                        case RpcMessageFlags.CheckName: // Not used?
                                         {
-                                            Logger.Information("Check Name");
+                                            RpcMessage05CheckName.Deserialize(message, out var name);
+                                            Logger.Information("Check Name: {0} checked the name {1}", Player.Client.Name, name);
                                             break;
                                         }
                                         case RpcMessageFlags.SetName:
                                         {
-                                            RpcMessage6SetName.Deserialize(message, out var name);
+                                            RpcMessage06SetName.Deserialize(message, out var name);
                                             Logger.Information("Set Name: {0} set their name to {1}", Player.Client.Name, name);
                                             break;
                                         }
-                                        case RpcMessageFlags.CheckColor:
+                                        case RpcMessageFlags.CheckColor: // Not used?
                                         {
-                                            Logger.Information("Check Color");
+                                            RpcMessage07CheckColor.Deserialize(message, out var colorId);
+                                            Logger.Information("Check Color: {0} checked the color {1}", Player.Client.Name, colorId);
                                             break;
                                         }
                                         case RpcMessageFlags.SetColor:
                                         {
-                                            RpcMessage8SetColor.Deserialize(message, out var colorId);
+                                            RpcMessage08SetColor.Deserialize(message, out var colorId);
                                             Logger.Information("Set Color: {0} set their color id to {1}", Player.Client.Name, colorId);
                                             break;
                                         }
                                         case RpcMessageFlags.SetHat:
                                         {
-                                            RpcMessage8SetColor.Deserialize(message, out var colorId);
+                                            RpcMessage08SetColor.Deserialize(message, out var colorId);
                                             Logger.Information("Set Hat: {0} set their hat id to {1}", Player.Client.Name, colorId);
                                             break;
                                         }
@@ -267,9 +269,10 @@ namespace Impostor.Server.Net
                                             Logger.Information("Report Dead Body: {0} reported dead body {1}", Player.Client.Name, playerId);
                                             break;
                                         }
-                                        case RpcMessageFlags.MurderPlayer:
+                                        case RpcMessageFlags.MurderPlayer: // id 13?
                                         {
-                                            Logger.Information("Murder Player");
+                                            RpcMessage12MurderPlayer.Deserialize(message, out var playerId);
+                                            Logger.Information("Murder Player: {0} murdered player id {1}", Player.Client.Name, playerId);
                                             break;
                                         }
                                         case RpcMessageFlags.SendChat:
@@ -278,15 +281,16 @@ namespace Impostor.Server.Net
                                             Logger.Information("Chat message: {0} says {1}", Player.Client.Name, rpcChatMessage);
                                             break;
                                         }
-                                        case RpcMessageFlags.StartMeeting:
+                                        case RpcMessageFlags.StartMeeting: // byte?
                                         {
                                             RpcMessage14StartMeeting.Deserialize(message, out var playerId);
                                             Logger.Information("Start Meeting: {0} started a meeting", playerId);
                                             break;
                                         }
-                                        case RpcMessageFlags.SetScanner:
+                                        case RpcMessageFlags.SetScanner: // Not used?
                                         {
-                                            Logger.Information("Set Scanner");
+                                            RpcMessage15SetScanner.Deserialize(message, out var enabled);
+                                            Logger.Information("Set Scanner: {0} has set the scanner to {1}", Player.Client.Name, enabled);
                                             break;
                                         }
                                         case RpcMessageFlags.SendChatNote:
@@ -325,48 +329,48 @@ namespace Impostor.Server.Net
                                             Logger.Information("Snap To: {0} has snapped to {1}, {2}", Player.Client.Name, x, y);
                                             break;
                                         }
-                                        case RpcMessageFlags.Close:
+                                        case RpcMessageFlags.Close: // TOOD
                                         {
                                             Logger.Information("Close");
                                             break;
                                         }
-                                        case RpcMessageFlags.VotingComplete:
+                                        case RpcMessageFlags.VotingComplete: // TODO
                                         {
                                             Logger.Information("Voting Complete");
                                             break;
                                         }
-                                        case RpcMessageFlags.CastVote:
+                                        case RpcMessageFlags.CastVote: // Not used?
                                         {
                                             Logger.Information("Cast Vote");
                                             break;
                                         }
-                                        case RpcMessageFlags.ClearVote:
+                                        case RpcMessageFlags.ClearVote: // Not used?
                                         {
                                             Logger.Information("Clear Vote");
                                             break;
                                         }
-                                        case RpcMessageFlags.AddVote:
+                                        case RpcMessageFlags.AddVote: // Not used?
                                         {
                                             Logger.Information("Add Vote");
                                             break;
                                         }
-                                        case RpcMessageFlags.CloseDoorsOfType:
+                                        case RpcMessageFlags.CloseDoorsOfType: // Not used?
                                         {
                                             Logger.Information("Close Doors Of Type");
                                             break;
                                         }
-                                        case RpcMessageFlags.RepairSystem:
+                                        case RpcMessageFlags.RepairSystem: // Not used?
                                         {
-                                            RpcMessage28RepairSystem.Deserialize(message, out int systemType, out int amount);
+                                            RpcMessage28RepairSystem.Deserialize(message, out var systemType, out var amount);
                                             Logger.Information("Repair System: {0} repaired system type {1} with the amount {2}", Player.Client.Name, systemType, amount);
                                             break;
                                         }
-                                        case RpcMessageFlags.SetTasks:
+                                        case RpcMessageFlags.SetTasks: // Not used?
                                         {
                                             Logger.Information("Set Tasks");
                                             break;
                                         }
-                                        case RpcMessageFlags.UpdateGameData:
+                                        case RpcMessageFlags.UpdateGameData: // Not used?
                                         {
                                             Logger.Information("Update Game Data");
                                             break;

@@ -5,9 +5,9 @@ namespace Impostor.Server.Net.Messages.Rpc
     internal static class RpcMessage17SetPet
     {
 
-        public static void Deserialize(MessageReader reader, out int petId)
+        public static void Deserialize(MessageReader reader, out byte petId)
         {
-            petId = reader.ReadPackedInt32();
+            petId = reader.ReadByte();
         }
     }
 }
