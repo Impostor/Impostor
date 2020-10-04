@@ -21,6 +21,7 @@
         <ProjectReference Include="..\Impostor.Shared\Impostor.Shared.csproj" />
         <PackageReference Include="Gameloop.Vdf" Version="0.6.1" />
 
+        <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
         <PackageReference Include="System.Resources.Extensions" Version="4.7.1" />
         <Reference Include="System.Windows.Forms" />
     </ItemGroup>
