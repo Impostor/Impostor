@@ -19,8 +19,12 @@ namespace Impostor.Server.Net.State
             using (var message = MessageWriter.Get(SendOption.Reliable))
             {
                 var games = _gameManager.FindListings((MapFlags) options.MapId, options.NumImpostors, options.Keywords);
-                
-                Message16GetGameListV2.Serialize(message, games);
+
+                var skeldGameCount = _gameManager.GetGameCount(MapFlags.Skeld);
+                var miraHqGameCount = _gameManager.GetGameCount(MapFlags.MiraHQ);
+                var polusGameCount = _gameManager.GetGameCount(MapFlags.Polus);
+
+                Message16GetGameListV2.Serialize(message, skeldGameCount, miraHqGameCount, polusGameCount, games);
                 
                 Client.Send(message);
             }
