@@ -91,6 +91,20 @@ namespace Impostor.Server.Net.Manager
             }
         }
 
+        public int GetGameCount(MapFlags map)
+        {
+            var count = 0;
+
+            foreach (var (code, game) in _games) {
+                if (!map.HasFlag((MapFlags)(1 << game.Options.MapId)))
+                {
+                    continue;
+                }
+                count++;
+            }
+            return count;
+        }
+
         public void Remove(int gameCode)
         {
             _logger.LogDebug("Remove game with code {0} ({1}).", GameCode.IntToGameName(gameCode), gameCode);

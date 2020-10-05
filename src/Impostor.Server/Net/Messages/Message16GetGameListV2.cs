@@ -13,15 +13,15 @@ namespace Impostor.Server.Net.Messages
             options = GameOptionsData.Deserialize(reader.ReadBytesAndSize());
         }
 
-        public static void Serialize(MessageWriter writer, IEnumerable<Game> games)
+        public static void Serialize(MessageWriter writer, int skeldGameCount, int miraHqGameCount, int polusGameCount, IEnumerable<Game> games)
         {
             writer.StartMessage(MessageFlags.GetGameListV2);
                 
             // Count
             writer.StartMessage(1);
-            writer.Write(123); // The Skeld
-            writer.Write(456); // Mira HQ
-            writer.Write(789); // Polus
+            writer.Write(skeldGameCount); // The Skeld
+            writer.Write(miraHqGameCount); // Mira HQ
+            writer.Write(polusGameCount); // Polus
             writer.EndMessage();
                 
             // Listing
