@@ -54,8 +54,8 @@ namespace Impostor.Server
 #endif
                 .ConfigureAppConfiguration(builder =>
                 {
-                    builder.AddJsonFile("config.json", true);
-                    builder.AddJsonFile("config.Development.json", true);
+                    builder.AddJsonFile("config.json", true, true);
+                    builder.AddJsonFile("config.Development.json", true, true);
                     builder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
                     builder.AddCommandLine(args);
                 })
