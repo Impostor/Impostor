@@ -1,4 +1,4 @@
-﻿using Hazel;
+﻿using System.Threading.Tasks;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
@@ -14,9 +14,9 @@ namespace Impostor.Server.Net.State
         ///     All options given.
         ///     At this moment, the client can only specify the map, impostor count and chat language.
         /// </param>
-        public void OnRequestGameList(GameOptionsData options)
+        public async ValueTask OnRequestGameList(GameOptionsData options)
         {
-            using (var message = MessageWriter.Get(SendOption.Reliable))
+            using (var message = Client.Connection.CreateMessage(MessageType.Reliable))
             {
                 var games = _gameManager.FindListings((MapFlags) options.MapId, options.NumImpostors, options.Keywords);
 
@@ -25,8 +25,8 @@ namespace Impostor.Server.Net.State
                 var polusGameCount = _gameManager.GetGameCount(MapFlags.Polus);
 
                 Message16GetGameListV2.Serialize(message, skeldGameCount, miraHqGameCount, polusGameCount, games);
-                
-                Client.Send(message);
+
+                await message.SendAsync();
             }
         }
     }

@@ -16,7 +16,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\submodules\Hazel-Networking\Hazel\Hazel.csproj" />
+      <ProjectReference Include="..\Impostor.Server.Api\Impostor.Server.Api.csproj" />
+      <ProjectReference Include="..\Impostor.Server.Hazel\Impostor.Server.Hazel.csproj" />
       <ProjectReference Include="..\Impostor.Shared\Impostor.Shared.csproj" />
     </ItemGroup>
 
@@ -43,6 +44,10 @@
         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Net\Hazel" />
     </ItemGroup>
 
 </Project>

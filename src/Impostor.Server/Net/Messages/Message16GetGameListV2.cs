@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Hazel;
 using Impostor.Server.Net.State;
 using Impostor.Shared.Innersloth;
 
@@ -7,13 +6,13 @@ namespace Impostor.Server.Net.Messages
 {
     internal static class Message16GetGameListV2
     {
-        public static void Deserialize(MessageReader reader, out GameOptionsData options)
+        public static void Deserialize(IMessageReader reader, out GameOptionsData options)
         {
             reader.ReadPackedInt32(); // Hardcoded 0.
             options = GameOptionsData.Deserialize(reader.ReadBytesAndSize());
         }
 
-        public static void Serialize(MessageWriter writer, int skeldGameCount, int miraHqGameCount, int polusGameCount, IEnumerable<Game> games)
+        public static void Serialize(IMessageWriter writer, int skeldGameCount, int miraHqGameCount, int polusGameCount, IEnumerable<Game> games)
         {
             writer.StartMessage(MessageFlags.GetGameListV2);
                 
@@ -29,7 +28,7 @@ namespace Impostor.Server.Net.Messages
             foreach (var game in games)
             {
                 writer.StartMessage(0);
-                writer.Write(game.PublicIp.Address.GetAddressBytes());
+                writer.Write(game.PublicIp.Address);
                 writer.Write((ushort) game.PublicIp.Port);
                 writer.Write(game.Code);
                 writer.Write(game.Host.Client.Name);

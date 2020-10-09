@@ -1,54 +1,47 @@
-﻿using System.Collections.Concurrent;
-using System.Threading;
-using Hazel;
-using Impostor.Server.Exceptions;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
+using Impostor.Server.Net.Factories;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Manager
 {
     internal class ClientManager : IClientManager
     {
-        private readonly ILogger<ClientManager> _clientManager;
-        private readonly GameManager _gameManager;
-        private readonly ConcurrentDictionary<int, Client> _clients;
-        private readonly object _idLock;
-        private int _idLast;
+        private readonly ILogger<ClientManager> _logger;
+        private readonly ConcurrentDictionary<int, IClient> _clients;
+        private readonly IClientFactory _clientFactory;
         
-        public ClientManager(ILogger<ClientManager> clientManager, GameManager gameManager)
+        public ClientManager(ILogger<ClientManager> logger, IClientFactory clientFactory)
         {
-            _clientManager = clientManager;
-            _gameManager = gameManager;
-            _clients = new ConcurrentDictionary<int, Client>();
-            _idLock = new object();
-            _idLast = 0;
+            _logger = logger;
+            _clientFactory = clientFactory;
+            _clients = new ConcurrentDictionary<int, IClient>();
         }
 
-        private int NextId()
+        public async ValueTask RegisterConnectionAsync(IConnection connection, string name, int clientVersion)
         {
-            var clientId = Interlocked.Increment(ref _idLast);
-            if (clientId < 1)
+            try
             {
-                // Super rare but reset the _idLast because of overflow.
-                _idLast = 0;
+                var client = await _clientFactory.CreateAsync(connection, name, clientVersion);
                 
-                // And get a new id.
-                clientId = Interlocked.Increment(ref _idLast);
+                Register(client);
             }
-
-            return clientId;
-        }
-        
-        public void Create(string name, Connection connection)
-        {
-            var clientId = NextId();
-            
-            _clientManager.LogInformation("Client connected.");
-            _clients.TryAdd(clientId, new Client(this, _gameManager, clientId, name, connection));
+            catch (ClientVersionUnsupportedException ex)
+            {
+                _logger.LogTrace("Closed connection because client version {Version} is not supported.", ex.Version);
+            }
         }
 
-        public void Remove(Client client)
+        public void Register(IClient client)
         {
-            _clientManager.LogInformation("Client disconnected.");
+            _logger.LogInformation("Client connected.");
+            _clients.TryAdd(client.Id, client);
+        }
+
+        public void Remove(IClient client)
+        {
+            _logger.LogInformation("Client disconnected.");
             _clients.TryRemove(client.Id, out _);
         }
     }

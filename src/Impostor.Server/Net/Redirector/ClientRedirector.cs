@@ -1,6 +1,6 @@
-﻿using System;
-using Hazel;
+﻿using System.Threading.Tasks;
 using Impostor.Server.Data;
+using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
@@ -9,50 +9,26 @@ using ILogger = Serilog.ILogger;
 
 namespace Impostor.Server.Net.Redirector
 {
-    internal class ClientRedirector
+    internal class ClientRedirector : ClientBase
     {
         private static readonly ILogger Logger = Log.ForContext<ClientRedirector>();
 
-        private readonly string _name;
-        private readonly Connection _connection;
-        private readonly ClientManagerRedirector _clientManager;
+        private readonly IClientManager _clientManager;
         private readonly INodeProvider _nodeProvider;
         private readonly INodeLocator _nodeLocator;
 
-        public ClientRedirector(string name, Connection connection, ClientManagerRedirector clientManager, INodeProvider nodeProvider, INodeLocator nodeLocator)
+        public ClientRedirector(int id, string name, IConnection connection, IClientManager clientManager, INodeProvider nodeProvider, INodeLocator nodeLocator)
+            : base(id, name, connection)
         {
-            _name = name;
-            _connection = connection;
-            _connection.DataReceived += OnDataReceived;
-            _connection.Disconnected += OnDisconnected;
             _clientManager = clientManager;
             _nodeProvider = nodeProvider;
             _nodeLocator = nodeLocator;
         }
 
-        private void OnDataReceived(DataReceivedEventArgs e)
+        protected override async ValueTask OnMessageReceived(IMessage message)
         {
-            try
-            {
-                while (true)
-                {
-                    if (e.Message.Position >= e.Message.Length)
-                    {
-                        break;
-                    }
-
-                    OnMessageReceived(e.Message.ReadMessage());
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Exception caught in client data handler.");
-            }
-        }
-
-        private void OnMessageReceived(MessageReader message)
-        {
-            var flag = message.Tag;
+            var reader = message.CreateReader();
+            var flag = reader.Tag;
             
             Logger.Verbose("Server got {0}.", flag);
 
@@ -60,23 +36,21 @@ namespace Impostor.Server.Net.Redirector
             {
                 case MessageFlags.HostGame:
                 {
-                    using (var packet = MessageWriter.Get(SendOption.Reliable))
-                    {
-                        Message13Redirect.Serialize(packet, false, _nodeProvider.Get());
-                        _connection.Send(packet);
-                    }
+                    using var packet = Connection.CreateMessage(MessageType.Reliable);
+                    Message13Redirect.Serialize(packet, false, _nodeProvider.Get());
+                    await packet.SendAsync();
                     break;
                 }
 
                 case MessageFlags.JoinGame:
                 {
-                    Message01JoinGame.Deserialize(message, 
+                    Message01JoinGame.Deserialize(reader, 
                         out var gameCode, 
                         out var unknown);
 
-                    using (var packet = MessageWriter.Get(SendOption.Reliable))
+                    using (var packet = Connection.CreateMessage(MessageType.Reliable))
                     {
-                        var endpoint = _nodeLocator.Find(GameCode.IntToGameName(gameCode));
+                        var endpoint = _nodeLocator.Find(GameCodeParser.IntToGameName(gameCode));
                         if (endpoint == null)
                         {
                             Message01JoinGame.SerializeError(packet, false, DisconnectReason.GameMissing);
@@ -85,8 +59,8 @@ namespace Impostor.Server.Net.Redirector
                         {
                             Message13Redirect.Serialize(packet, false, endpoint);
                         }
-                        
-                        _connection.Send(packet);
+
+                        await packet.SendAsync();
                     }
                     break;
                 }
@@ -94,10 +68,10 @@ namespace Impostor.Server.Net.Redirector
                 case MessageFlags.GetGameListV2:
                 {
                     // TODO: Implement.
-                    using (var packet = MessageWriter.Get(SendOption.Reliable))
+                    using (var packet = Connection.CreateMessage(MessageType.Reliable))
                     {
                         Message01JoinGame.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.NotImplemented);
-                        _connection.Send(packet);
+                        await packet.SendAsync();
                     }
                     break;
                 }
@@ -110,9 +84,10 @@ namespace Impostor.Server.Net.Redirector
             }
         }
 
-        private void OnDisconnected(object sender, DisconnectedEventArgs e)
+        protected override ValueTask OnDisconnected()
         {
             _clientManager.Remove(this);
+            return default;
         }
     }
 }

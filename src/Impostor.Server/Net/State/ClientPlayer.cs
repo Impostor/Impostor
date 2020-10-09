@@ -1,11 +1,11 @@
-﻿using Hazel;
+﻿using System.Threading.Tasks;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server.Net.State
 {
-    internal partial class ClientPlayer
+    internal partial class ClientPlayer : IClientPlayer
     {
         private readonly GameManager _gameManager;
 
@@ -21,13 +21,17 @@ namespace Impostor.Server.Net.State
         public Game Game { get; set; }
         public LimboStates Limbo { get; set; }
 
-        public void SendDisconnectReason(DisconnectReason reason, string message = null)
+        public async ValueTask SendDisconnectReason(DisconnectReason reason, string message = null)
         {
-            using (var packet = MessageWriter.Get(SendOption.Reliable))
+            using (var packet = Client.Connection.CreateMessage(MessageType.Reliable))
             {
                 Message01JoinGame.SerializeError(packet, false, reason, message);
-                Client.Connection.Send(packet);
+                await packet.SendAsync();
             }
         }
+
+        IClient IClientPlayer.Client => Client;
+
+        IGame IClientPlayer.Game => Game;
     }
 }

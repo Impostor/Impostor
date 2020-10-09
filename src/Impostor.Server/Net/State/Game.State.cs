@@ -1,5 +1,6 @@
-﻿using System.Linq;
-using Hazel;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Impostor.Server.Exceptions;
 using Impostor.Shared.Innersloth.Data;
 
@@ -25,9 +26,9 @@ namespace Impostor.Server.Net.State
             }
         }
 
-        private bool PlayerRemove(int playerId, out ClientPlayer player)
+        private async ValueTask<bool> PlayerRemove(int playerId, bool isBan = false)
         {
-            if (!_players.TryRemove(playerId, out player))
+            if (!_players.TryRemove(playerId, out var player))
             {
                 return false;
             }
@@ -35,7 +36,7 @@ namespace Impostor.Server.Net.State
             player.Limbo = LimboStates.PreSpawn;
             player.Game = null;
             
-            Logger.Information("{0} - Player {1} ({2}) has left.", CodeStr, player.Client.Name, playerId);
+            Logger.Information("{0} - Player {1} ({2}) has left.", Code, player.Client.Name, playerId);
             
             // Game is empty, remove it.
             if (_players.Count == 0)
@@ -50,19 +51,24 @@ namespace Impostor.Server.Net.State
             // Host migration.
             if (HostId == playerId)
             {
-                MigrateHost();
+                await MigrateHost();
+            }
+
+            if (isBan)
+            {
+                _bannedIps.Add(player.Client.Connection.EndPoint.Address);
             }
 
             return true;
         }
 
-        private void MigrateHost()
+        private async ValueTask MigrateHost()
         {
             // Pick the first player as new host.
             var host = _players.First().Value;
             
             HostId = host.Client.Id;
-            Logger.Information("{0} - Assigned {1} ({2}) as new host.", CodeStr, host.Client.Name, host.Client.Id);
+            Logger.Information("{0} - Assigned {1} ({2}) as new host.", Code, host.Client.Name, host.Client.Id);
             
             // Check our current game state.
             if (GameState == GameStates.Ended && host.Limbo == LimboStates.WaitingForHost)
@@ -70,25 +76,24 @@ namespace Impostor.Server.Net.State
                 GameState = GameStates.NotStarted;
                 
                 // Spawn the host.
-                HandleJoinGameNew(host);
+                await HandleJoinGameNew(host);
                 
                 // Pull players out of limbo.
-                CheckLimboPlayers();
+                await CheckLimboPlayers();
             }
         }
 
-        private void CheckLimboPlayers()
+        private async ValueTask CheckLimboPlayers()
         {
-            using (var message = MessageWriter.Get(SendOption.Reliable))
+            using var message = CreateMessage(MessageType.Reliable);
+            
+            foreach (var (_, player) in _players.Where(x => x.Value.Limbo == LimboStates.WaitingForHost))
             {
-                foreach (var (_, player) in _players.Where(x => x.Value.Limbo == LimboStates.WaitingForHost))
-                {
-                    WriteJoinedGameMessage(message, true, player);
-                    WriteAlterGameMessage(message, false);
+                WriteJoinedGameMessage(message, true, player);
+                WriteAlterGameMessage(message, false);
                         
-                    player.Limbo = LimboStates.NotLimbo;
-                    player.Client.Send(message);
-                }
+                player.Limbo = LimboStates.NotLimbo;
+                await message.SendToAsync(player.Client);
             }
         }
     }

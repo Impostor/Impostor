@@ -59,9 +59,11 @@ namespace Impostor.Shared.Innersloth
             }
         }
 
-        public static GameOptionsData Deserialize(byte[] bytes)
+        public static GameOptionsData Deserialize(ReadOnlyMemory<byte> bytes)
         {
-            using (var stream = new MemoryStream(bytes))
+            // TODO: Remove memory allocation.
+
+            using (var stream = new MemoryStream(bytes.ToArray()))
             using (var reader = new BinaryReader(stream))
             {
                 var result = new GameOptionsData();

@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -7,9 +8,9 @@ using Impostor.Server.Net.Redirector;
 using Impostor.Server.Net.State;
 using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Serilog;
 
 namespace Impostor.Server.Net.Manager
 {
@@ -19,11 +20,13 @@ namespace Impostor.Server.Net.Manager
         private readonly INodeLocator _nodeLocator;
         private readonly IPEndPoint _publicIp;
         private readonly ConcurrentDictionary<int, Game> _games;
+        private readonly IServiceProvider _serviceProvider;
 
-        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, INodeLocator nodeLocator)
+        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, INodeLocator nodeLocator, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _nodeLocator = nodeLocator;
+            _serviceProvider = serviceProvider;
             _publicIp = new IPEndPoint(IPAddress.Parse(config.Value.PublicIp), config.Value.PublicPort);
             _games = new ConcurrentDictionary<int, Game>();
         }
@@ -32,15 +35,15 @@ namespace Impostor.Server.Net.Manager
         {
             // TODO: Prevent duplicates when using server redirector using INodeProvider.
             
-            var gameCode = GameCode.GenerateCode(6);
-            var gameCodeStr = GameCode.IntToGameName(gameCode);
-            var game = new Game(this, _nodeLocator, _publicIp, gameCode, options);
+            var gameCode = GameCode.Create();
+            var gameCodeStr = gameCode.Code;
+            var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options);
 
             if (_nodeLocator.Find(gameCodeStr) == null && 
                 _games.TryAdd(gameCode, game))
             {
                 _nodeLocator.Save(gameCodeStr, _publicIp);
-                _logger.LogDebug("Created game with code {0} ({1}).", game.CodeStr, gameCode);        
+                _logger.LogDebug("Created game with code {0} ({1}).", game.Code, gameCode);        
                 return game;
             }
 
@@ -107,8 +110,8 @@ namespace Impostor.Server.Net.Manager
 
         public void Remove(int gameCode)
         {
-            _logger.LogDebug("Remove game with code {0} ({1}).", GameCode.IntToGameName(gameCode), gameCode);
-            _nodeLocator.Remove(GameCode.IntToGameName(gameCode));
+            _logger.LogDebug("Remove game with code {0} ({1}).", GameCodeParser.IntToGameName(gameCode), gameCode);
+            _nodeLocator.Remove(GameCodeParser.IntToGameName(gameCode));
             _games.TryRemove(gameCode, out _);
         }
     }

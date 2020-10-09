@@ -1,14 +1,12 @@
-﻿using Hazel;
-
-namespace Impostor.Server.Net.Messages
+﻿namespace Impostor.Server.Net.Messages
 {
     internal static class Message12WaitForHost
     {
-        public static void Serialize(MessageWriter writer, bool clear, int gameCode, int playerId)
+        public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId)
         {
             if (clear)
             {
-                writer.Clear(SendOption.Reliable);
+                writer.Clear(MessageType.Reliable);
             }
             
             writer.StartMessage(MessageFlags.WaitForHost);

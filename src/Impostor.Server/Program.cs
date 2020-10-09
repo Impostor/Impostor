@@ -1,7 +1,8 @@
 ﻿using System;
-using System.IO;
 using Impostor.Server.Data;
+using Impostor.Server.Hazel;
 using Impostor.Server.Net;
+using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Redirector;
 using Microsoft.Extensions.Configuration;
@@ -108,18 +109,20 @@ namespace Impostor.Server
                         services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
                     }
                     
+                    services.AddSingleton<IClientManager, ClientManager>();
+                    
                     if (redirector.Enabled && redirector.Master)
                     {
-                        services.AddSingleton<IClientManager, ClientManagerRedirector>();
+                        services.AddSingleton<IClientFactory, ClientFactory<ClientRedirector>>();
                         // For a master server, we don't need a GameManager.
                     }
                     else
                     {
-                        services.AddSingleton<IClientManager, ClientManager>();
+                        services.AddSingleton<IClientFactory, ClientFactory<Client>>();
                         services.AddSingleton<GameManager>();
                     }
-                    
-                    services.AddSingleton<Matchmaker>();
+
+                    services.UseHazelMatchmaking();
                     services.AddHostedService<MatchmakerService>();
                 })
                 .UseConsoleLifetime()
