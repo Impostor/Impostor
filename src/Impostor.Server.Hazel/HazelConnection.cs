@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Hazel;
 using Impostor.Server.Net;
+using Impostor.Server.Net.Messages;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Hazel

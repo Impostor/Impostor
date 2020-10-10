@@ -1,4 +1,4 @@
-﻿namespace Impostor.Server.Net
+﻿namespace Impostor.Server.Net.Messages
 {
     /// <summary>
     ///     Specifies how a message should be sent between connections.

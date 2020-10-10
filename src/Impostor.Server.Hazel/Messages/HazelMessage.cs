@@ -1,6 +1,7 @@
 ﻿using System;
 using Hazel;
 using Impostor.Server.Net;
+using Impostor.Server.Net.Messages;
 
 namespace Impostor.Server.Hazel
 {

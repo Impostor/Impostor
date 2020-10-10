@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Impostor.Shared.Innersloth.Data
+namespace Impostor.Server.Net
 {
     [Flags]
     public enum LimboStates

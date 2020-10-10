@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
 
-namespace Impostor.Server
+namespace Impostor.Server.Games.Managers
 {
     public interface IGameManager
     {

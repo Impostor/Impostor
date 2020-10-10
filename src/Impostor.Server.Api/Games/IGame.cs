@@ -3,10 +3,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading.Tasks;
 using Impostor.Server.Net;
+using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
 
-namespace Impostor.Server
+namespace Impostor.Server.Games
 {
     public interface IGame
     {

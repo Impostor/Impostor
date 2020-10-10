@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Impostor.Server
+namespace Impostor.Server.Plugins
 {
     public class PluginBase : IPlugin
     {

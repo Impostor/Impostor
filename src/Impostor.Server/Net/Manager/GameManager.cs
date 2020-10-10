@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Impostor.Server.Data;
 using Impostor.Server.Events;
 using Impostor.Server.Events.Managers;
+using Impostor.Server.Games;
+using Impostor.Server.Games.Managers;
 using Impostor.Server.Net.Redirector;
 using Impostor.Server.Net.State;
 using Impostor.Shared.Innersloth;

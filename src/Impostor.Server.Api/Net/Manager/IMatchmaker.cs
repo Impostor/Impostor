@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using Impostor.Server.Games;
+using Impostor.Server.Net.Messages;
 
 namespace Impostor.Server.Net.Manager
 {

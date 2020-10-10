@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Impostor.Shared.Innersloth.Data;
+using Impostor.Server.Games;
 
-namespace Impostor.Server.Net
+namespace Impostor.Server.Net.Messages
 {
     /// <summary>
     ///     Represents the message writer for <see cref="IGame"/>.

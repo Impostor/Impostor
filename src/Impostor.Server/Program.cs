@@ -2,6 +2,7 @@
 using Impostor.Server.Data;
 using Impostor.Server.Events;
 using Impostor.Server.Events.Managers;
+using Impostor.Server.Games.Managers;
 using Impostor.Server.Hazel;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Factories;

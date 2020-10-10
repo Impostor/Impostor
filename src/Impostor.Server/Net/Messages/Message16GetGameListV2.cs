@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Impostor.Server.Games;
 using Impostor.Shared.Innersloth;
 
 namespace Impostor.Server.Net.Messages

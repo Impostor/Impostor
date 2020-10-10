@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Server.Exceptions;
+using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server.Net.State

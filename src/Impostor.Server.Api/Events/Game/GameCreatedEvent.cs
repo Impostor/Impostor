@@ -1,4 +1,6 @@
-﻿namespace Impostor.Server.Events
+﻿using Impostor.Server.Games;
+
+namespace Impostor.Server.Events
 {
     /// <summary>
     ///     Called whenever a new <see cref="IGame"/> is created.

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Impostor.Server.Games.Managers;
 using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server
