@@ -10,14 +10,14 @@ namespace Impostor.Server.Net.State
         {
             Message04RemovePlayer.Serialize(message, clear, Code, playerId, HostId, reason);
         }
-        
-        private void WriteJoinedGameMessage(IMessageWriter message, bool clear, ClientPlayer player)
+
+        private void WriteJoinedGameMessage(IMessageWriter message, bool clear, IClientPlayer player)
         {
             var playerIds = _players
                 .Where(x => x.Value != player)
                 .Select(x => x.Key)
                 .ToArray();
-            
+
             Message07JoinedGame.Serialize(message, clear, Code, player.Client.Id, HostId, playerIds);
         }
 
@@ -30,8 +30,8 @@ namespace Impostor.Server.Net.State
         {
             Message11KickPlayer.Serialize(message, clear, Code, playerId, isBan);
         }
-        
-        private void WriteWaitForHostMessage(IMessageWriter message, bool clear, ClientPlayer player)
+
+        private void WriteWaitForHostMessage(IMessageWriter message, bool clear, IClientPlayer player)
         {
             Message12WaitForHost.Serialize(message, clear, Code, player.Client.Id);
         }

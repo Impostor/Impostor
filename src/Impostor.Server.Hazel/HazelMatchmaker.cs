@@ -42,9 +42,9 @@ namespace Impostor.Server.Hazel
             });
 
             _connection.NewConnection += OnNewConnection;
-            
+
             _connection.Start();
-            
+
             return default;
         }
 
@@ -62,26 +62,23 @@ namespace Impostor.Server.Hazel
 
         private async Task HandleNewConnection(NewConnectionEventArgs e)
         {
-            int clientVersion;
-            string name;
             try
             {
                 // Handshake.
-                clientVersion = e.HandshakeData.ReadInt32();
-                name = e.HandshakeData.ReadString();
+                var clientVersion = e.HandshakeData.ReadInt32();
+                var name = e.HandshakeData.ReadString();
 
                 e.HandshakeData.Recycle();
+
+                var connection = new HazelConnection(e.Connection, _connectionLogger);
+
+                // Register client
+                await _clientManager.RegisterConnectionAsync(connection, name, clientVersion);
             }
             catch (Exception ex)
             {
                 _logger.LogTrace(ex, "Error in new connection.");
-                return;
             }
-
-            var connection = new HazelConnection(e.Connection, _connectionLogger);
-
-            // Register client
-            await _clientManager.RegisterConnectionAsync(connection, name, clientVersion);
         }
 
         public IGameMessageWriter CreateGameMessageWriter(IGame game, MessageType messageType)

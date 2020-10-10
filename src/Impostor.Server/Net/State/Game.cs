@@ -16,24 +16,24 @@ namespace Impostor.Server.Net.State
     internal partial class Game : IGame
     {
         private static readonly ILogger Logger = Log.ForContext<Game>();
-        
-        private readonly GameManager _gameManager;
-        private readonly INodeLocator _nodeLocator;
-        private readonly IMatchmaker matchmaker;
-        private readonly ConcurrentDictionary<int, ClientPlayer> _players;
+
+        private readonly IGameManager _gameManager;
+        private readonly IClientManager _clientManager;
+        private readonly IMatchmaker _matchmaker;
+        private readonly ConcurrentDictionary<int, IClientPlayer> _players;
         private readonly HashSet<IPAddress> _bannedIps;
 
         public Game(
-            GameManager gameManager,
+            IGameManager gameManager,
             INodeLocator nodeLocator,
             IPEndPoint publicIp,
             GameCode code,
             GameOptionsData options,
-            IMatchmaker matchmaker)
+            IMatchmaker matchmaker,
+            IClientManager clientManager)
         {
             _gameManager = gameManager;
-            _nodeLocator = nodeLocator;
-            _players = new ConcurrentDictionary<int, ClientPlayer>();
+            _players = new ConcurrentDictionary<int, IClientPlayer>();
             _bannedIps = new HashSet<IPAddress>();
 
             PublicIp = publicIp;
@@ -41,34 +41,34 @@ namespace Impostor.Server.Net.State
             HostId = -1;
             GameState = GameStates.NotStarted;
             Options = options;
-            this.matchmaker = matchmaker;
+            _matchmaker = matchmaker;
+            _clientManager = clientManager;
             Items = new ConcurrentDictionary<object, object>();
         }
 
         public IPEndPoint PublicIp { get; }
+
         public GameCode Code { get; }
+
         public bool IsPublic { get; private set; }
+
         public int HostId { get; private set; }
+
         public GameStates GameState { get; private set; }
+
         public GameOptionsData Options { get; }
+
         public IDictionary<object, object> Items { get; }
-        
+
         public int PlayerCount => _players.Count;
-        
+
         public IClientPlayer Host => _players[HostId];
-        
-        private ValueTask BroadcastJoinMessage(IGameMessageWriter message, bool clear, ClientPlayer player)
-        {
-            Message01JoinGame.SerializeJoin(message, clear, Code, player.Client.Id, HostId);
-            
-            return message.SendToAllExceptAsync(LimboStates.NotLimbo, player.Client.Id);
-        }
 
         public IEnumerable<IClientPlayer> Players => _players.Select(p => p.Value);
 
         public IGameMessageWriter CreateMessage(MessageType type)
         {
-            return matchmaker.CreateGameMessageWriter(this, type);
+            return _matchmaker.CreateGameMessageWriter(this, type);
         }
 
         public bool TryGetPlayer(int id, out IClientPlayer player)
@@ -81,6 +81,18 @@ namespace Impostor.Server.Net.State
 
             player = default;
             return false;
+        }
+
+        public ValueTask EndAsync()
+        {
+            return _gameManager.RemoveAsync(Code);
+        }
+
+        private ValueTask BroadcastJoinMessage(IGameMessageWriter message, bool clear, IClientPlayer player)
+        {
+            Message01JoinGame.SerializeJoin(message, clear, Code, player.Client.Id, HostId);
+
+            return message.SendToAllExceptAsync(player.Client.Id);
         }
     }
 }

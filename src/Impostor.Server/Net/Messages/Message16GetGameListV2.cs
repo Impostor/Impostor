@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Impostor.Server.Net.State;
 using Impostor.Shared.Innersloth;
 
 namespace Impostor.Server.Net.Messages
@@ -12,19 +11,20 @@ namespace Impostor.Server.Net.Messages
             options = GameOptionsData.Deserialize(reader.ReadBytesAndSize());
         }
 
-        public static void Serialize(IMessageWriter writer, int skeldGameCount, int miraHqGameCount, int polusGameCount, IEnumerable<Game> games)
+        public static void Serialize(IMessageWriter writer, int skeldGameCount, int miraHqGameCount, int polusGameCount, IEnumerable<IGame> games)
         {
             writer.StartMessage(MessageFlags.GetGameListV2);
-                
+
             // Count
             writer.StartMessage(1);
             writer.Write(skeldGameCount); // The Skeld
             writer.Write(miraHqGameCount); // Mira HQ
             writer.Write(polusGameCount); // Polus
             writer.EndMessage();
-                
+
             // Listing
             writer.StartMessage(0);
+
             foreach (var game in games)
             {
                 writer.StartMessage(0);
@@ -39,8 +39,8 @@ namespace Impostor.Server.Net.Messages
                 writer.Write((byte) game.Options.MaxPlayers);
                 writer.EndMessage();
             }
+
             writer.EndMessage();
-                
             writer.EndMessage();
         }
     }

@@ -8,7 +8,7 @@
             {
                 writer.Clear(MessageType.Reliable);
             }
-            
+
             writer.StartMessage(MessageFlags.WaitForHost);
             writer.Write(gameCode);
             writer.Write(playerId);

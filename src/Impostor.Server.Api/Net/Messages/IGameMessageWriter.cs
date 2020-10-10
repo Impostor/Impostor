@@ -3,25 +3,31 @@ using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server.Net
 {
+    /// <summary>
+    ///     Represents the message writer for <see cref="IGame"/>.
+    /// </summary>
     public interface IGameMessageWriter : IMessageWriter
     {
         /// <summary>
         ///     Send the message to all players.
         /// </summary>
-        /// <param name="states"></param>
-        ValueTask SendToAllAsync(LimboStates states);
+        /// <param name="states">Required limbo state of the player.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        ValueTask SendToAllAsync(LimboStates states = LimboStates.NotLimbo);
 
         /// <summary>
         ///     Send the message to all players except one.
         /// </summary>
-        /// <param name="states"></param>
         /// <param name="senderId">The player to exclude from sending the message.</param>
-        ValueTask SendToAllExceptAsync(LimboStates states, int senderId);
-        
+        /// <param name="states">Required limbo state of the player.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        ValueTask SendToAllExceptAsync(int senderId, LimboStates states = LimboStates.NotLimbo);
+
         /// <summary>
         ///     Send a message to a specific player.
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">ID of the client.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
         ValueTask SendToAsync(int id);
     }
 }

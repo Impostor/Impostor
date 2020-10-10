@@ -16,9 +16,9 @@ namespace Impostor.Server
             Value = GameCodeParser.GameNameToInt(code);
             Code = code;
         }
-        
+
         public string Code { get; }
-        
+
         public int Value { get; }
 
         public static implicit operator string(GameCode code) => code.Code;
@@ -28,21 +28,6 @@ namespace Impostor.Server
         public static implicit operator GameCode(string code) => From(code);
 
         public static implicit operator GameCode(int value) => From(value);
-
-        public bool Equals(GameCode other)
-        {
-            return Code == other.Code && Value == other.Value;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is GameCode other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Code, Value);
-        }
 
         public static bool operator ==(GameCode left, GameCode right)
         {
@@ -54,18 +39,36 @@ namespace Impostor.Server
             return !left.Equals(right);
         }
 
-        public override string ToString()
+        public static GameCode Create()
         {
-            return Code;
+            return new GameCode(GameCodeParser.GenerateCode(6));
         }
 
         public static GameCode From(int value) => new GameCode(value);
 
         public static GameCode From(string value) => new GameCode(value);
 
-        public static GameCode Create()
+        /// <inheritdoc/>
+        public bool Equals(GameCode other)
         {
-            return new GameCode(GameCodeParser.GenerateCode(6));
+            return Code == other.Code && Value == other.Value;
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object? obj)
+        {
+            return obj is GameCode other && Equals(other);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Code, Value);
+        }
+
+        public override string ToString()
+        {
+            return Code;
         }
     }
 }

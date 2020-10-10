@@ -11,7 +11,7 @@ namespace Impostor.Server.Hazel
     internal class HazelGameMessageWriter : HazelMessageWriter, IGameMessageWriter
     {
         private readonly IGame _game;
-        
+
         public HazelGameMessageWriter(MessageType type, IGame game)
             : base(type)
         {
@@ -33,14 +33,14 @@ namespace Impostor.Server.Hazel
             {
                 connection.Send(Writer);
             }
-            
+
             return default;
         }
 
-        public ValueTask SendToAllExceptAsync(LimboStates states, int senderId)
+        public ValueTask SendToAllExceptAsync(int senderId, LimboStates states)
         {
-            foreach (var connection in GetConnections(x => 
-                x.Limbo.HasFlag(states) && 
+            foreach (var connection in GetConnections(x =>
+                x.Limbo.HasFlag(states) &&
                 x.Client.Id != senderId))
             {
                 connection.Send(Writer);
@@ -50,11 +50,12 @@ namespace Impostor.Server.Hazel
 
         public ValueTask SendToAsync(int id)
         {
-            if (_game.TryGetPlayer(id, out var player))
+            if (_game.TryGetPlayer(id, out var player)
+                && player.Client.Connection is HazelConnection hazelConnection)
             {
-                ((HazelConnection)player.Client.Connection).InnerConnection.Send(Writer);
+                hazelConnection.InnerConnection.Send(Writer);
             }
-            
+
             return default;
         }
     }

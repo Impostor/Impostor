@@ -1,8 +1,9 @@
 using System;
 using System.Threading.Tasks;
+using Impostor.Server.Data;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
-using Impostor.Server.Net.State;
+using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -12,97 +13,90 @@ namespace Impostor.Server.Net
     internal class Client : ClientBase
     {
         private static readonly ILogger Logger = Log.ForContext<Client>();
-        
-        private readonly IClientManager _clientManager;
-        private readonly GameManager _gameManager;
 
-        public Client(IClientManager clientManager, GameManager gameManager, int id, string name, IConnection connection)
-            : base(id, name, connection)
+        private readonly IClientManager _clientManager;
+        private readonly IGameManager _gameManager;
+
+        public Client(IClientManager clientManager, IGameManager gameManager, string name, IConnection connection)
+            : base(name, connection)
         {
             _clientManager = clientManager;
             _gameManager = gameManager;
-            Player = new ClientPlayer(this, _gameManager);
         }
 
-        public ClientPlayer Player { get; }
-        
-        private bool IsPacketAllowed(IMessageReader message, bool hostOnly)
-        {
-            var game = Player.Game;
-            if (game == null)
-            {
-                return false;
-            }
-
-            // GameCode must match code of the current game assigned to the player.
-            if (message.ReadInt32() != game.Code)
-            {
-                return false;
-            }
-            
-            // Some packets should only be sent by the host of the game.
-            if (hostOnly)
-            {
-                if (game.HostId == Id)
-                {
-                    return true;
-                }
-                
-                Logger.Warning("[{0}] Client sent packet only allowed by the host ({1}).", Id, game.HostId);
-                return false;
-            }
-
-            return true;
-        }
-
-        
-        protected override async ValueTask OnMessageReceived(IMessage message)
+        public override async ValueTask HandleMessageAsync(IMessage message)
         {
             var reader = message.CreateReader();
-            
+
             var flag = reader.Tag;
-            
+
             Logger.Verbose("[{0}] Server got {1}.", Id, flag);
-            
+
             switch (flag)
             {
                 case MessageFlags.HostGame:
                 {
                     // Read game settings.
                     var gameInfo = Message00HostGame.Deserialize(reader);
-                    
+
                     // Create game.
-                    var game = _gameManager.Create(gameInfo);
-                    if (game == null)
-                    {
-                        await Player.SendDisconnectReason(DisconnectReason.ServerFull);
-                        return;
-                    }
+                    var game = await _gameManager.CreateAsync(gameInfo);
 
                     // Code in the packet below will be used in JoinGame.
-                    using (var writer = Connection.CreateMessage(MessageType.Reliable))
-                    {
-                        Message00HostGame.Serialize(writer, game.Code);
-                
-                        await writer.SendAsync();
-                    }
+                    using var writer = Connection.CreateMessage(MessageType.Reliable);
+                    Message00HostGame.Serialize(writer, game.Code);
+
+                    await writer.SendAsync();
+
                     break;
                 }
-                
+
                 case MessageFlags.JoinGame:
                 {
-                    Message01JoinGame.Deserialize(reader, 
-                        out var gameCode, 
-                        out var unknown);
-                    
+                    Message01JoinGame.Deserialize(
+                        reader,
+                        out var gameCode,
+                        out _);
+
                     var game = _gameManager.Find(gameCode);
                     if (game == null)
                     {
-                        await Player.SendDisconnectReason(DisconnectReason.GameMissing);
+                        await SendDisconnectReason(DisconnectReason.GameMissing);
                         return;
                     }
 
-                    await game.HandleJoinGame(Player);
+                    var result = await game.AddClientAsync(this);
+
+                    switch (result.Error)
+                    {
+                        case GameJoinError.None:
+                            break;
+                        case GameJoinError.InvalidClient:
+                            await SendDisconnectReason(DisconnectReason.Custom, "Client is in an invalid state.");
+                            break;
+                        case GameJoinError.Banned:
+                            await SendDisconnectReason(DisconnectReason.Banned);
+                            break;
+                        case GameJoinError.GameFull:
+                            await SendDisconnectReason(DisconnectReason.GameFull);
+                            break;
+                        case GameJoinError.InvalidLimbo:
+                            await SendDisconnectReason(DisconnectReason.Custom, "Invalid limbo state while joining.");
+                            break;
+                        case GameJoinError.GameStarted:
+                            await SendDisconnectReason(DisconnectReason.GameStarted);
+                            break;
+                        case GameJoinError.GameDestroyed:
+                            await SendDisconnectReason(DisconnectReason.Custom, DisconnectMessages.Destroyed);
+                            break;
+                        case GameJoinError.Custom:
+                            await SendDisconnectReason(DisconnectReason.Custom, result.Message);
+                            break;
+                        default:
+                            await SendDisconnectReason(DisconnectReason.Custom, "Unknown error.");
+                            break;
+                    }
+
                     break;
                 }
 
@@ -116,26 +110,27 @@ namespace Impostor.Server.Net
                     await Player.Game.HandleStartGame(reader);
                     break;
                 }
-                
+
                 // No idea how this flag is triggered.
                 case MessageFlags.RemoveGame:
                     break;
-                
+
                 case MessageFlags.RemovePlayer:
                 {
                     if (!IsPacketAllowed(reader, true))
                     {
                         return;
                     }
-                    
-                    Message04RemovePlayer.Deserialize(reader, 
-                        out var playerId, 
+
+                    Message04RemovePlayer.Deserialize(
+                        reader,
+                        out var playerId,
                         out var reason);
 
-                    await Player.Game.HandleRemovePlayer(playerId, (DisconnectReason) reason);
+                    await Player.Game.HandleRemovePlayer(playerId, (DisconnectReason)reason);
                     break;
                 }
-                
+
                 case MessageFlags.GameData:
                 case MessageFlags.GameDataTo:
                 {
@@ -146,7 +141,7 @@ namespace Impostor.Server.Net
 
                     // Broadcast packet to all other players.
                     using var writer = Player.Game.CreateMessage(message.Type);
-                    
+
                     if (flag == MessageFlags.GameDataTo)
                     {
                         var target = reader.ReadPackedInt32();
@@ -156,12 +151,12 @@ namespace Impostor.Server.Net
                     else
                     {
                         reader.CopyTo(writer);
-                        await writer.SendToAllExceptAsync(LimboStates.NotLimbo, Player.Client.Id);
+                        await writer.SendToAllExceptAsync(Id);
                     }
 
                     break;
                 }
-                
+
                 case MessageFlags.EndGame:
                 {
                     if (!IsPacketAllowed(reader, true))
@@ -180,10 +175,11 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    Message10AlterGame.Deserialize(reader, 
-                        out var gameTag, 
+                    Message10AlterGame.Deserialize(
+                        reader,
+                        out var gameTag,
                         out var value);
-                    
+
                     if (gameTag != AlterGameTags.ChangePrivacy)
                     {
                         return;
@@ -200,8 +196,9 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    Message11KickPlayer.Deserialize(reader, 
-                        out var playerId, 
+                    Message11KickPlayer.Deserialize(
+                        reader,
+                        out var playerId,
                         out var isBan);
 
                     await Player.Game.HandleKickPlayer(playerId, isBan);
@@ -211,34 +208,35 @@ namespace Impostor.Server.Net
                 case MessageFlags.GetGameListV2:
                 {
                     Message16GetGameListV2.Deserialize(reader, out var options);
-                    await Player.OnRequestGameList(options);
+                    await OnRequestGameList(options);
                     break;
                 }
-                
+
                 default:
                     Logger.Warning("Server received unknown flag {0}.", flag);
                     break;
             }
-            
+
 #if DEBUG
             if (flag != MessageFlags.GameData &&
                 flag != MessageFlags.GameDataTo &&
                 flag != MessageFlags.EndGame &&
                 reader.Position < reader.Length)
             {
-                Logger.Warning("Server did not consume all bytes from {0} ({1} < {2}).",
+                Logger.Warning(
+                    "Server did not consume all bytes from {0} ({1} < {2}).",
                     flag,
                     reader.Position,
                     reader.Length);
             }
 #endif
         }
-        
-        protected override async ValueTask OnDisconnected()
+
+        public override async ValueTask HandleDisconnectAsync()
         {
             try
             {
-                if (Player.Game != null)
+                if (Player != null)
                 {
                     await Player.Game.HandleRemovePlayer(Id, DisconnectReason.ExitGame);
                 }
@@ -249,6 +247,69 @@ namespace Impostor.Server.Net
             }
 
             _clientManager.Remove(this);
+        }
+
+        private bool IsPacketAllowed(IMessageReader message, bool hostOnly)
+        {
+            if (Player == null)
+            {
+                return false;
+            }
+
+            var game = Player.Game;
+
+            // GameCode must match code of the current game assigned to the player.
+            if (message.ReadInt32() != game.Code)
+            {
+                return false;
+            }
+
+            // Some packets should only be sent by the host of the game.
+            if (hostOnly)
+            {
+                if (game.HostId == Id)
+                {
+                    return true;
+                }
+
+                Logger.Warning("[{0}] Client sent packet only allowed by the host ({1}).", Id, game.HostId);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        ///     Triggered when the connected client requests the game listing.
+        /// </summary>
+        /// <param name="options">
+        ///     All options given.
+        ///     At this moment, the client can only specify the map, impostor count and chat language.
+        /// </param>
+        private async ValueTask OnRequestGameList(GameOptionsData options)
+        {
+            using var message = Connection.CreateMessage(MessageType.Reliable);
+            var games = _gameManager.FindListings((MapFlags)options.MapId, options.NumImpostors, options.Keywords);
+
+            var skeldGameCount = _gameManager.GetGameCount(MapFlags.Skeld);
+            var miraHqGameCount = _gameManager.GetGameCount(MapFlags.MiraHQ);
+            var polusGameCount = _gameManager.GetGameCount(MapFlags.Polus);
+
+            Message16GetGameListV2.Serialize(message, skeldGameCount, miraHqGameCount, polusGameCount, games);
+
+            await message.SendAsync();
+        }
+
+        private async ValueTask SendDisconnectReason(DisconnectReason reason, string message = null)
+        {
+            if (Connection == null)
+            {
+                return;
+            }
+
+            using var packet = Connection.CreateMessage(MessageType.Reliable);
+            Message01JoinGame.SerializeError(packet, false, reason, message);
+            await packet.SendAsync();
         }
     }
 }

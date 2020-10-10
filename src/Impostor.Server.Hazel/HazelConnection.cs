@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Net;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Hazel;
 using Impostor.Server.Net;
@@ -11,27 +11,31 @@ namespace Impostor.Server.Hazel
     internal class HazelConnection : IConnection
     {
         private readonly ILogger<HazelConnection> _logger;
-        private readonly ConcurrentSimpleAsyncSubject<IMessage> _messageReceived = new ConcurrentSimpleAsyncSubject<IMessage>();
+        private readonly ConcurrentStack<DataReceivedEventArgs> _pendingMessages;
 
         public HazelConnection(Connection innerConnection, ILogger<HazelConnection> logger)
         {
             _logger = logger;
+            _pendingMessages = new ConcurrentStack<DataReceivedEventArgs>();
             InnerConnection = innerConnection;
             innerConnection.DataReceived += ConnectionOnDataReceived;
             innerConnection.Disconnected += ConnectionOnDisconnected;
         }
-        
-        public Connection InnerConnection { get; }
 
-        public IAsyncObservable<IMessage> MessageReceived => _messageReceived;
+        public Connection InnerConnection { get; }
 
         public IPEndPoint EndPoint => InnerConnection.EndPoint;
 
         public bool IsConnected => InnerConnection.State == ConnectionState.Connected;
 
+        public IClient Client { get; set; }
+
         private void ConnectionOnDisconnected(object sender, DisconnectedEventArgs e)
         {
-            Task.Run(_messageReceived.OnCompletedAsync);
+            if (Client != null)
+            {
+                Task.Run(Client.HandleDisconnectAsync);
+            }
         }
 
         private void ConnectionOnDataReceived(DataReceivedEventArgs e)
@@ -41,6 +45,12 @@ namespace Impostor.Server.Hazel
 
         private async Task HandleData(DataReceivedEventArgs e)
         {
+            if (Client == null)
+            {
+                _pendingMessages.Push(e);
+                return;
+            }
+
             try
             {
                 while (true)
@@ -60,7 +70,7 @@ namespace Impostor.Server.Hazel
 
                     using var message = new HazelMessage(reader, type);
 
-                    await _messageReceived.OnNextAsync(message);
+                    await Client.HandleMessageAsync(message);
                 }
             }
             catch (Exception ex)
@@ -73,9 +83,17 @@ namespace Impostor.Server.Hazel
             }
         }
 
-        public IConnectionMessageWriter CreateMessage(MessageType type)
+        public IConnectionMessageWriter CreateMessage(MessageType messageType)
         {
-            return new HazelConnectionMessageWriter(type, InnerConnection);
+            return new HazelConnectionMessageWriter(messageType, this);
+        }
+
+        public async ValueTask ListenAsync()
+        {
+            while (_pendingMessages.TryPop(out var eventArgs))
+            {
+                await HandleData(eventArgs);
+            }
         }
     }
 }

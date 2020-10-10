@@ -1,22 +1,23 @@
 ﻿using System.Threading.Tasks;
-using Hazel;
 using Impostor.Server.Net;
 
 namespace Impostor.Server.Hazel
 {
     internal class HazelConnectionMessageWriter : HazelMessageWriter, IConnectionMessageWriter
     {
-        private readonly Connection _connection;
+        private readonly HazelConnection _connection;
 
-        public HazelConnectionMessageWriter(MessageType type, Connection connection)
+        public HazelConnectionMessageWriter(MessageType type, HazelConnection connection)
             : base(type)
         {
             _connection = connection;
         }
-        
+
+        public IConnection Connection => _connection;
+
         public ValueTask SendAsync()
         {
-            _connection.Send(Writer);
+            _connection.InnerConnection.Send(Writer);
             return default;
         }
     }

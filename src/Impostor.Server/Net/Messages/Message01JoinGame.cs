@@ -11,21 +11,21 @@ namespace Impostor.Server.Net.Messages
             {
                 writer.Clear(MessageType.Reliable);
             }
-            
+
             writer.StartMessage(MessageFlags.JoinGame);
             writer.Write(gameCode);
             writer.Write(playerId);
             writer.Write(hostId);
             writer.EndMessage();
         }
-        
+
         public static void SerializeError(IMessageWriter writer, bool clear, DisconnectReason reason, string message = null)
         {
             if (clear)
             {
                 writer.Clear(MessageType.Reliable);
             }
-            
+
             writer.StartMessage(MessageFlags.JoinGame);
             writer.Write((int) reason);
 
@@ -35,10 +35,10 @@ namespace Impostor.Server.Net.Messages
                 {
                     throw new ArgumentNullException(nameof(message));
                 }
-                
+
                 writer.Write(message);
             }
-            
+
             writer.EndMessage();
         }
 

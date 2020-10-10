@@ -8,7 +8,7 @@
             {
                 writer.Clear(MessageType.Reliable);
             }
-            
+
             writer.StartMessage(MessageFlags.JoinedGame);
             writer.Write(gameCode);
             writer.Write(playerId);
@@ -19,7 +19,7 @@
             {
                 writer.WritePacked(id);
             }
-            
+
             writer.EndMessage();
         }
     }

@@ -13,6 +13,7 @@
       <Version>1.1.0</Version>
       <ApplicationIcon>icon.ico</ApplicationIcon>
       <DebugType Condition=" '$(Configuration)' == 'Release' ">None</DebugType>
+      <CodeAnalysisRuleSet>ProjectRules.ruleset</CodeAnalysisRuleSet>
     </PropertyGroup>
 
     <ItemGroup>
@@ -26,6 +27,10 @@
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0-rc.1.20451.14" />
       <PackageReference Include="Serilog.Extensions.Hosting" Version="3.1.0" />
       <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+      <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
@@ -44,10 +49,6 @@
         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Net\Hazel" />
     </ItemGroup>
 
 </Project>

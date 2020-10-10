@@ -17,19 +17,24 @@ namespace Impostor.Server.Net.Redirector
         private readonly INodeProvider _nodeProvider;
         private readonly INodeLocator _nodeLocator;
 
-        public ClientRedirector(int id, string name, IConnection connection, IClientManager clientManager, INodeProvider nodeProvider, INodeLocator nodeLocator)
-            : base(id, name, connection)
+        public ClientRedirector(
+            string name,
+            IConnection connection,
+            IClientManager clientManager,
+            INodeProvider nodeProvider,
+            INodeLocator nodeLocator)
+            : base(name, connection)
         {
             _clientManager = clientManager;
             _nodeProvider = nodeProvider;
             _nodeLocator = nodeLocator;
         }
 
-        protected override async ValueTask OnMessageReceived(IMessage message)
+        public override async ValueTask HandleMessageAsync(IMessage message)
         {
             var reader = message.CreateReader();
             var flag = reader.Tag;
-            
+
             Logger.Verbose("Server got {0}.", flag);
 
             switch (flag)
@@ -44,35 +49,32 @@ namespace Impostor.Server.Net.Redirector
 
                 case MessageFlags.JoinGame:
                 {
-                    Message01JoinGame.Deserialize(reader, 
-                        out var gameCode, 
-                        out var unknown);
+                    Message01JoinGame.Deserialize(
+                        reader,
+                        out var gameCode,
+                        out _);
 
-                    using (var packet = Connection.CreateMessage(MessageType.Reliable))
+                    using var packet = Connection.CreateMessage(MessageType.Reliable);
+                    var endpoint = _nodeLocator.Find(GameCodeParser.IntToGameName(gameCode));
+                    if (endpoint == null)
                     {
-                        var endpoint = _nodeLocator.Find(GameCodeParser.IntToGameName(gameCode));
-                        if (endpoint == null)
-                        {
-                            Message01JoinGame.SerializeError(packet, false, DisconnectReason.GameMissing);
-                        }
-                        else
-                        {
-                            Message13Redirect.Serialize(packet, false, endpoint);
-                        }
-
-                        await packet.SendAsync();
+                        Message01JoinGame.SerializeError(packet, false, DisconnectReason.GameMissing);
                     }
+                    else
+                    {
+                        Message13Redirect.Serialize(packet, false, endpoint);
+                    }
+
+                    await packet.SendAsync();
                     break;
                 }
 
                 case MessageFlags.GetGameListV2:
                 {
                     // TODO: Implement.
-                    using (var packet = Connection.CreateMessage(MessageType.Reliable))
-                    {
-                        Message01JoinGame.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.NotImplemented);
-                        await packet.SendAsync();
-                    }
+                    using var packet = Connection.CreateMessage(MessageType.Reliable);
+                    Message01JoinGame.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.NotImplemented);
+                    await packet.SendAsync();
                     break;
                 }
 
@@ -84,7 +86,7 @@ namespace Impostor.Server.Net.Redirector
             }
         }
 
-        protected override ValueTask OnDisconnected()
+        public override ValueTask HandleDisconnectAsync()
         {
             _clientManager.Remove(this);
             return default;

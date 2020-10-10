@@ -12,12 +12,12 @@ namespace Impostor.Server.Net.Messages
             {
                 writer.Clear(MessageType.Reliable);
             }
-            
+
             writer.StartMessage(MessageFlags.RemovePlayer);
             writer.Write(gameCode);
             writer.Write(playerId);
             writer.Write(hostId);
-            writer.Write((byte) reason);
+            writer.Write((byte)reason);
             writer.EndMessage();
         }
 

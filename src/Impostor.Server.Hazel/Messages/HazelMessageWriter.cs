@@ -83,9 +83,9 @@ namespace Impostor.Server.Hazel
             Writer.Write(value);
         }
 
-        public void Write(IPAddress ipAddress)
+        public void Write(IPAddress value)
         {
-            Writer.Write(ipAddress.GetAddressBytes());
+            Writer.Write(value.GetAddressBytes());
         }
 
         public void WritePacked(int value)
@@ -103,9 +103,9 @@ namespace Impostor.Server.Hazel
             Writer.StartMessage(typeFlag);
         }
 
-        public void Write(GameCode code)
+        public void Write(GameCode value)
         {
-            Write(code.Value);
+            Write(value.Value);
         }
 
         public void EndMessage()

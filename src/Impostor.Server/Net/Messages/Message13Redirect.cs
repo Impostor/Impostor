@@ -10,10 +10,10 @@ namespace Impostor.Server.Net.Messages
             {
                 writer.Clear(MessageType.Reliable);
             }
-            
+
             writer.StartMessage(MessageFlags.Redirect);
             writer.Write(ipEndPoint.Address);
-            writer.Write((ushort) ipEndPoint.Port);
+            writer.Write((ushort)ipEndPoint.Port);
             writer.EndMessage();
         }
     }

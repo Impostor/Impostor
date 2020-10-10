@@ -10,7 +10,7 @@ namespace Impostor.Server.Net.Messages
             {
                 writer.Clear(MessageType.Reliable);
             }
-            
+
             writer.StartMessage(MessageFlags.HostGame);
             writer.Write(gameCode);
             writer.EndMessage();

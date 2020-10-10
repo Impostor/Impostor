@@ -8,7 +8,7 @@
             {
                 writer.Clear(MessageType.Reliable);
             }
-            
+
             writer.StartMessage(MessageFlags.KickPlayer);
             writer.Write(gameCode);
             writer.WritePacked(playerId);
