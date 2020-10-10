@@ -8,6 +8,8 @@ WORKDIR /source
 
 # Copy csproj and restore.
 COPY src/Impostor.Server/Impostor.Server.csproj ./src/Impostor.Server/Impostor.Server.csproj
+COPY src/Impostor.Server.Api/Impostor.Server.Api.csproj ./src/Impostor.Server.Api/Impostor.Server.Api.csproj
+COPY src/Impostor.Server.Hazel/Impostor.Server.Hazel.csproj ./src/Impostor.Server.Hazel/Impostor.Server.Hazel.csproj
 COPY src/Impostor.Shared/Impostor.Shared.csproj ./src/Impostor.Shared/Impostor.Shared.csproj
 COPY submodules/Hazel-Networking/Hazel/Hazel.csproj ./submodules/Hazel-Networking/Hazel/Hazel.csproj
 
@@ -18,6 +20,8 @@ RUN case "$TARGETARCH" in \
     *) echo "unsupported architecture"; exit 1 ;; \
   esac && \
   dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Server/Impostor.Server.csproj && \
+  dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Server.Api/Impostor.Server.Api.csproj && \
+  dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Server.Hazel/Impostor.Server.Hazel.csproj && \
   dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Shared/Impostor.Shared.csproj && \
   dotnet restore -r "$NETCORE_PLATFORM" ./submodules/Hazel-Networking/Hazel/Hazel.csproj
 
