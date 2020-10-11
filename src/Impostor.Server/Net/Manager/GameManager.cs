@@ -1,71 +1,83 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Impostor.Server.Data;
+using Impostor.Server.Events;
+using Impostor.Server.Events.Managers;
+using Impostor.Server.Games;
+using Impostor.Server.Games.Managers;
 using Impostor.Server.Net.Redirector;
 using Impostor.Server.Net.State;
 using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Serilog;
 
 namespace Impostor.Server.Net.Manager
 {
-    internal class GameManager
+    internal class GameManager : IGameManager
     {
         private readonly ILogger<GameManager> _logger;
         private readonly INodeLocator _nodeLocator;
         private readonly IPEndPoint _publicIp;
         private readonly ConcurrentDictionary<int, Game> _games;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IEventManager _eventManager;
 
-        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, INodeLocator nodeLocator)
+        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, INodeLocator nodeLocator, IServiceProvider serviceProvider, IEventManager eventManager)
         {
             _logger = logger;
             _nodeLocator = nodeLocator;
+            _serviceProvider = serviceProvider;
+            _eventManager = eventManager;
             _publicIp = new IPEndPoint(IPAddress.Parse(config.Value.PublicIp), config.Value.PublicPort);
             _games = new ConcurrentDictionary<int, Game>();
         }
-        
-        public Game Create(GameOptionsData options)
+
+        public IEnumerable<IGame> Games => _games.Select(kv => kv.Value);
+
+        public async ValueTask<IGame> CreateAsync(GameOptionsData options)
         {
             // TODO: Prevent duplicates when using server redirector using INodeProvider.
-            
-            var gameCode = GameCode.GenerateCode(6);
-            var gameCodeStr = GameCode.IntToGameName(gameCode);
-            var game = new Game(this, _nodeLocator, _publicIp, gameCode, options);
+            var gameCode = GameCode.Create();
+            var gameCodeStr = gameCode.Code;
+            var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options);
 
-            if (_nodeLocator.Find(gameCodeStr) == null && 
-                _games.TryAdd(gameCode, game))
+            if (_nodeLocator.Find(gameCodeStr) != null || !_games.TryAdd(gameCode, game))
             {
-                _nodeLocator.Save(gameCodeStr, _publicIp);
-                _logger.LogDebug("Created game with code {0} ({1}).", game.CodeStr, gameCode);        
-                return game;
+                throw new ImpostorException("Could not create new game"); // TODO: Fix generic exception.
             }
 
-            _logger.LogWarning("Failed to create game.");
-            return null;
-        }
+            _nodeLocator.Save(gameCodeStr, _publicIp);
+            _logger.LogDebug("Created game with code {0} ({1}).", game.Code, gameCode);
 
-        public Game Find(int gameCode)
-        {
-            _games.TryGetValue(gameCode, out var game);
+            await _eventManager.CallAsync(new GameCreatedEvent(game));
+
             return game;
         }
 
-        public IEnumerable<Game> FindListings(MapFlags map, int impostorCount, GameKeywords language, int count = 10)
+        public IGame Find(GameCode code)
+        {
+            _games.TryGetValue(code, out var game);
+            return game;
+        }
+
+        public IEnumerable<IGame> FindListings(MapFlags map, int impostorCount, GameKeywords language, int count = 10)
         {
             var results = 0;
-            
+
             // Find games that have not started yet.
-            foreach (var (code, game) in _games.Where(x => 
+            foreach (var (_, game) in _games.Where(x =>
                 x.Value.IsPublic &&
-                x.Value.GameState == GameStates.NotStarted && 
+                x.Value.GameState == GameStates.NotStarted &&
                 x.Value.PlayerCount < x.Value.Options.MaxPlayers))
             {
                 // Check for options.
-                if (!map.HasFlag((MapFlags) (1 << game.Options.MapId)))
+                if (!map.HasFlag((MapFlags)(1 << game.Options.MapId)))
                 {
                     continue;
                 }
@@ -74,12 +86,12 @@ namespace Impostor.Server.Net.Manager
                 {
                     continue;
                 }
-                
+
                 if (impostorCount != 0 && game.Options.NumImpostors != impostorCount)
                 {
                     continue;
                 }
-                
+
                 // Add to result.
                 yield return game;
 
@@ -91,25 +103,25 @@ namespace Impostor.Server.Net.Manager
             }
         }
 
-        public int GetGameCount(MapFlags map)
+        public async ValueTask RemoveAsync(GameCode gameCode)
         {
-            var count = 0;
-
-            foreach (var (code, game) in _games) {
-                if (!map.HasFlag((MapFlags)(1 << game.Options.MapId)))
+            if (_games.TryGetValue(gameCode, out var game) && game.PlayerCount > 0)
+            {
+                foreach (var player in game.Players)
                 {
-                    continue;
+                    await player.KickAsync();
                 }
-                count++;
-            }
-            return count;
-        }
 
-        public void Remove(int gameCode)
-        {
-            _logger.LogDebug("Remove game with code {0} ({1}).", GameCode.IntToGameName(gameCode), gameCode);
-            _nodeLocator.Remove(GameCode.IntToGameName(gameCode));
-            _games.TryRemove(gameCode, out _);
+                return;
+            }
+
+            if (!_games.TryRemove(gameCode, out _))
+            {
+                return;
+            }
+
+            _logger.LogDebug("Remove game with code {0} ({1}).", GameCodeParser.IntToGameName(gameCode), gameCode);
+            _nodeLocator.Remove(GameCodeParser.IntToGameName(gameCode));
         }
     }
 }

@@ -11,8 +11,8 @@ namespace Impostor.Tests
             const string code = "ABCD";
             const int codeInt = 0x44434241;
             
-            Assert.Equal(code, GameCode.IntToGameName(codeInt));
-            Assert.Equal(codeInt, GameCode.GameNameToInt(code));
+            Assert.Equal(code, GameCodeParser.IntToGameName(codeInt));
+            Assert.Equal(codeInt, GameCodeParser.GameNameToInt(code));
         }
         
         [Fact]
@@ -21,8 +21,8 @@ namespace Impostor.Tests
             const string code = "ABCDEF";
             const int codeInt = -1943683525;
             
-            Assert.Equal(code, GameCode.IntToGameName(codeInt));
-            Assert.Equal(codeInt, GameCode.GameNameToInt(code));
+            Assert.Equal(code, GameCodeParser.IntToGameName(codeInt));
+            Assert.Equal(codeInt, GameCodeParser.GameNameToInt(code));
         }
     }
 }

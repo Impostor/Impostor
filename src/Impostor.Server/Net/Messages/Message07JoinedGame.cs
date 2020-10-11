@@ -1,16 +1,14 @@
-﻿using Hazel;
-
-namespace Impostor.Server.Net.Messages
+﻿namespace Impostor.Server.Net.Messages
 {
     internal static class Message07JoinedGame
     {
-        public static void Serialize(MessageWriter writer, bool clear, int gameCode, int playerId, int hostId, int[] otherPlayerIds)
+        public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId, int[] otherPlayerIds)
         {
             if (clear)
             {
-                writer.Clear(SendOption.Reliable);
+                writer.Clear(MessageType.Reliable);
             }
-            
+
             writer.StartMessage(MessageFlags.JoinedGame);
             writer.Write(gameCode);
             writer.Write(playerId);
@@ -21,7 +19,7 @@ namespace Impostor.Server.Net.Messages
             {
                 writer.WritePacked(id);
             }
-            
+
             writer.EndMessage();
         }
     }

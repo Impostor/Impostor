@@ -10,7 +10,7 @@ namespace Impostor.Server.Net.Redirector
         private readonly List<IPEndPoint> _nodes;
         private readonly object _lock;
         private int _currentIndex;
-        
+
         public NodeProviderConfig(IOptions<ServerRedirectorConfig> redirectorConfig)
         {
             _nodes = new List<IPEndPoint>();
@@ -35,7 +35,7 @@ namespace Impostor.Server.Net.Redirector
                 {
                     _currentIndex = 0;
                 }
-                
+
                 return node;
             }
         }

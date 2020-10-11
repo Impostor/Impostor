@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Impostor.Shared.Innersloth
 {
-    public static class GameCode
+    public static class GameCodeParser
     {
         private const string V2 = "QWXRTYLPESDFGHUJKZOCVBINMA";
         private static readonly int[] V2Map = {

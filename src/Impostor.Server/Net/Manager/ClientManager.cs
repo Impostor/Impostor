@@ -1,55 +1,80 @@
 ﻿using System.Collections.Concurrent;
 using System.Threading;
-using Hazel;
-using Impostor.Server.Exceptions;
+using System.Threading.Tasks;
+using Impostor.Server.Net.Factories;
+using Impostor.Server.Net.Messages;
+using Impostor.Shared.Innersloth.Data;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Manager
 {
     internal class ClientManager : IClientManager
     {
-        private readonly ILogger<ClientManager> _clientManager;
-        private readonly GameManager _gameManager;
-        private readonly ConcurrentDictionary<int, Client> _clients;
-        private readonly object _idLock;
+        private readonly ILogger<ClientManager> _logger;
+        private readonly ConcurrentDictionary<int, IClient> _clients;
+        private readonly IClientFactory _clientFactory;
         private int _idLast;
-        
-        public ClientManager(ILogger<ClientManager> clientManager, GameManager gameManager)
+
+        public ClientManager(ILogger<ClientManager> logger, IClientFactory clientFactory)
         {
-            _clientManager = clientManager;
-            _gameManager = gameManager;
-            _clients = new ConcurrentDictionary<int, Client>();
-            _idLock = new object();
-            _idLast = 0;
+            _logger = logger;
+            _clientFactory = clientFactory;
+            _clients = new ConcurrentDictionary<int, IClient>();
         }
 
-        private int NextId()
+        public int NextId()
         {
             var clientId = Interlocked.Increment(ref _idLast);
+
             if (clientId < 1)
             {
                 // Super rare but reset the _idLast because of overflow.
                 _idLast = 0;
-                
+
                 // And get a new id.
                 clientId = Interlocked.Increment(ref _idLast);
             }
 
             return clientId;
         }
-        
-        public void Create(string name, Connection connection)
+
+        public async ValueTask RegisterConnectionAsync(IConnection connection, string name, int clientVersion)
         {
-            var clientId = NextId();
-            
-            _clientManager.LogInformation("Client connected.");
-            _clients.TryAdd(clientId, new Client(this, _gameManager, clientId, name, connection));
+            if (clientVersion != 50516550)
+            {
+                using var packet = connection.CreateMessage(MessageType.Reliable);
+                Message01JoinGame.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
+                await packet.SendAsync();
+                return;
+            }
+
+            var client = _clientFactory.Create(connection, name, clientVersion);
+
+            Register(client);
+
+            await connection.ListenAsync();
         }
 
-        public void Remove(Client client)
+        public void Register(IClient client)
         {
-            _clientManager.LogInformation("Client disconnected.");
+            var id = NextId();
+
+            client.Id = id;
+            _logger.LogInformation("Client connected.");
+            _clients.TryAdd(id, client);
+        }
+
+        public void Remove(IClient client)
+        {
+            _logger.LogInformation("Client disconnected.");
             _clients.TryRemove(client.Id, out _);
+        }
+
+        public bool Validate(IClient client)
+        {
+            return client.Id != 0
+                   && _clients.TryGetValue(client.Id, out var registeredClient)
+                   && ReferenceEquals(client, registeredClient);
         }
     }
 }

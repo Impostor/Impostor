@@ -9,15 +9,18 @@ namespace Impostor.Server.Exceptions
         {
         }
 
-        protected AmongUsException(SerializationInfo info, StreamingContext context) : base(info, context)
+        public AmongUsException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
 
-        public AmongUsException(string message) : base(message)
+        public AmongUsException(string message)
+            : base(message)
         {
         }
 
-        public AmongUsException(string message, Exception innerException) : base(message, innerException)
+        protected AmongUsException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }

@@ -1,7 +1,11 @@
 ﻿using System;
-using System.IO;
 using Impostor.Server.Data;
+using Impostor.Server.Events;
+using Impostor.Server.Events.Managers;
+using Impostor.Server.Games.Managers;
+using Impostor.Server.Hazel;
 using Impostor.Server.Net;
+using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Redirector;
 using Microsoft.Extensions.Configuration;
@@ -44,7 +48,7 @@ namespace Impostor.Server
                 Log.CloseAndFlush();
             }
         }
-        
+
         private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
 #if DEBUG
@@ -64,7 +68,7 @@ namespace Impostor.Server
                     var redirector = host.Configuration
                         .GetSection(ServerRedirectorConfig.Section)
                         .Get<ServerRedirectorConfig>() ?? new ServerRedirectorConfig();
-                    
+
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                     services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));
 
@@ -85,18 +89,18 @@ namespace Impostor.Server
                         }
                         else if (!string.IsNullOrEmpty(redirector.Locator.UdpMasterEndpoint))
                         {
-                            services.AddSingleton<INodeLocator, NodeLocatorUDP>();
+                            services.AddSingleton<INodeLocator, NodeLocatorUdp>();
 
                             if (redirector.Master)
                             {
-                                services.AddHostedService<NodeLocatorUDPService>();
+                                services.AddHostedService<NodeLocatorUdpService>();
                             }
                         }
                         else
                         {
                             throw new Exception("Missing a valid NodeLocator config.");
                         }
-                        
+
                         // Use the configuration as source for the list of nodes to provide
                         // when creating a game.
                         services.AddSingleton<INodeProvider, NodeProviderConfig>();
@@ -107,19 +111,23 @@ namespace Impostor.Server
                         // So we provide one that ignores all calls.
                         services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
                     }
-                    
+
+                    services.AddSingleton<IClientManager, ClientManager>();
+
                     if (redirector.Enabled && redirector.Master)
                     {
-                        services.AddSingleton<IClientManager, ClientManagerRedirector>();
+                        services.AddSingleton<IClientFactory, ClientFactory<ClientRedirector>>();
+
                         // For a master server, we don't need a GameManager.
                     }
                     else
                     {
-                        services.AddSingleton<IClientManager, ClientManager>();
-                        services.AddSingleton<GameManager>();
+                        services.AddSingleton<IClientFactory, ClientFactory<Client>>();
+                        services.AddSingleton<IGameManager, GameManager>();
                     }
-                    
-                    services.AddSingleton<Matchmaker>();
+
+                    services.AddSingleton<IEventManager, EventManager>();
+                    services.UseHazelMatchmaking();
                     services.AddHostedService<MatchmakerService>();
                 })
                 .UseConsoleLifetime()

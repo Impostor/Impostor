@@ -11,18 +11,18 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Redirector
 {
-    public class NodeLocatorUDPService : BackgroundService
+    public class NodeLocatorUdpService : BackgroundService
     {
-        private readonly NodeLocatorUDP _nodeLocator;
-        private readonly ILogger<NodeLocatorUDPService> _logger;
+        private readonly NodeLocatorUdp _nodeLocator;
+        private readonly ILogger<NodeLocatorUdpService> _logger;
         private readonly UdpClient _client;
 
-        public NodeLocatorUDPService(
-            INodeLocator nodeLocator, 
-            ILogger<NodeLocatorUDPService> logger, 
+        public NodeLocatorUdpService(
+            INodeLocator nodeLocator,
+            ILogger<NodeLocatorUdpService> logger,
             IOptions<ServerRedirectorConfig> options)
         {
-            _nodeLocator = (NodeLocatorUDP) nodeLocator;
+            _nodeLocator = (NodeLocatorUdp)nodeLocator;
             _logger = logger;
 
             if (!IPEndPoint.TryParse(options.Value.Locator.UdpMasterEndpoint, out var endpoint))
@@ -32,14 +32,14 @@ namespace Impostor.Server.Net.Redirector
 
             _client = new UdpClient(endpoint)
             {
-                DontFragment = true
+                DontFragment = true,
             };
         }
-        
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogWarning("Master server is listening for node updates on {0}.", _client.Client.LocalEndPoint);
-            
+
             stoppingToken.Register(() =>
             {
                 _client.Close();
@@ -52,7 +52,7 @@ namespace Impostor.Server.Net.Redirector
                 {
                     // Receive data from a node.
                     UdpReceiveResult data;
-                    
+
                     try
                     {
                         data = await _client.ReceiveAsync();
@@ -61,7 +61,7 @@ namespace Impostor.Server.Net.Redirector
                     {
                         break;
                     }
-                    
+
                     // Check if data is valid.
                     if (data.Buffer.Length == 0)
                     {
@@ -89,7 +89,7 @@ namespace Impostor.Server.Net.Redirector
             {
                 _logger.LogError(e, "Error in NodeLocatorUDPService.");
             }
-            
+
             _logger.LogWarning("Master server node update listener is stopping.");
         }
     }

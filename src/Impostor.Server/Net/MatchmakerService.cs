@@ -1,6 +1,8 @@
-﻿using System.Threading;
+﻿using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Server.Data;
+using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,13 +14,13 @@ namespace Impostor.Server.Net
         private readonly ILogger<MatchmakerService> _logger;
         private readonly ServerConfig _serverConfig;
         private readonly ServerRedirectorConfig _redirectorConfig;
-        private readonly Matchmaker _matchmaker;
+        private readonly IMatchmaker _matchmaker;
 
         public MatchmakerService(
             ILogger<MatchmakerService> logger, 
             IOptions<ServerConfig> serverConfig, 
             IOptions<ServerRedirectorConfig> redirectorConfig,
-            Matchmaker matchmaker)
+            IMatchmaker matchmaker)
         {
             _logger = logger;
             _serverConfig = serverConfig.Value;
@@ -26,13 +28,15 @@ namespace Impostor.Server.Net
             _matchmaker = matchmaker;
         }
         
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _matchmaker.Start();
+            var endpoint = new IPEndPoint(IPAddress.Parse(_serverConfig.ListenIp), _serverConfig.ListenPort);
+            
+            await _matchmaker.StartAsync(endpoint);
             
             _logger.LogInformation("Matchmaker is listening on {0}:{1}, the public server ip is {2}:{3}.", 
-                _matchmaker.EndPoint.Address, 
-                _matchmaker.EndPoint.Port,
+                endpoint.Address, 
+                endpoint.Port,
                 _serverConfig.PublicIp, 
                 _serverConfig.PublicPort);
 
@@ -42,16 +46,12 @@ namespace Impostor.Server.Net
                     ? "Server redirection is enabled as master, this instance will redirect clients to other nodes."
                     : "Server redirection is enabled as node, this instance will accept clients.");
             }
-            
-            return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogWarning("Matchmaker is shutting down!");
-            _matchmaker.Stop();
-            
-            return Task.CompletedTask;
+            await _matchmaker.StopAsync();
         }
     }
 }

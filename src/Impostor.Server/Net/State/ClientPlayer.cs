@@ -1,33 +1,41 @@
-﻿using Hazel;
-using Impostor.Server.Net.Manager;
-using Impostor.Server.Net.Messages;
+﻿using System.Threading.Tasks;
+using Impostor.Server.Games;
 using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server.Net.State
 {
-    internal partial class ClientPlayer
+    internal class ClientPlayer : IClientPlayer
     {
-        private readonly GameManager _gameManager;
-
-        public ClientPlayer(Client client, GameManager gameManager)
+        public ClientPlayer(IClient client, Game game)
         {
-            _gameManager = gameManager;
-            
+            Game = game;
             Client = client;
             Limbo = LimboStates.PreSpawn;
         }
-        
-        public Client Client { get; }
-        public Game Game { get; set; }
+
+        public IClient Client { get; }
+
+        public Game Game { get; }
+
+        /// <inheritdoc />
         public LimboStates Limbo { get; set; }
 
-        public void SendDisconnectReason(DisconnectReason reason, string message = null)
+        /// <inheritdoc />
+        IClient IClientPlayer.Client => Client;
+
+        /// <inheritdoc />
+        IGame IClientPlayer.Game => Game;
+
+        /// <inheritdoc />
+        public ValueTask KickAsync()
         {
-            using (var packet = MessageWriter.Get(SendOption.Reliable))
-            {
-                Message01JoinGame.SerializeError(packet, false, reason, message);
-                Client.Connection.Send(packet);
-            }
+            return Game.HandleKickPlayer(Client.Id, false);
+        }
+
+        /// <inheritdoc />
+        public ValueTask BanAsync()
+        {
+            return Game.HandleKickPlayer(Client.Id, true);
         }
     }
 }
