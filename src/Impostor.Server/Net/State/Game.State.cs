@@ -94,7 +94,7 @@ namespace Impostor.Server.Net.State
             foreach (var (_, player) in _players.Where(x => x.Value.Limbo == LimboStates.WaitingForHost))
             {
                 WriteJoinedGameMessage(message, true, player);
-                WriteAlterGameMessage(message, false);
+                WriteAlterGameMessage(message, false, IsPublic);
 
                 player.Limbo = LimboStates.NotLimbo;
                 await message.SendToAsync(player.Client);

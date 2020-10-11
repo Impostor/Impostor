@@ -152,7 +152,7 @@ namespace Impostor.Server.Net.State
             using (var message = CreateMessage(MessageType.Reliable))
             {
                 WriteJoinedGameMessage(message, false, sender);
-                WriteAlterGameMessage(message, false);
+                WriteAlterGameMessage(message, false, IsPublic);
 
                 sender.Limbo = LimboStates.NotLimbo;
                 await message.SendToAsync(sender);

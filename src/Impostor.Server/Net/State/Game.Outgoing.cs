@@ -21,9 +21,9 @@ namespace Impostor.Server.Net.State
             Message07JoinedGame.Serialize(message, clear, Code, player.Client.Id, HostId, playerIds);
         }
 
-        private void WriteAlterGameMessage(IMessageWriter message, bool clear)
+        private void WriteAlterGameMessage(IMessageWriter message, bool clear, bool isPublic)
         {
-            Message10AlterGame.Serialize(message, clear, Code);
+            Message10AlterGame.Serialize(message, clear, Code, isPublic);
         }
 
         private void WriteKickPlayerMessage(IMessageWriter message, bool clear, int playerId, bool isBan)
