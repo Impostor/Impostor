@@ -8,20 +8,22 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Gameloop.Vdf;
 using Gameloop.Vdf.Linq;
-using Impostor.Client.Core.Events;
+using Impostor.Client.Shared.Events;
 using Impostor.Shared.Innersloth;
-using ErrorEventArgs = Impostor.Client.Core.Events.ErrorEventArgs;
+using ErrorEventArgs = Impostor.Client.Shared.Events.ErrorEventArgs;
 
-namespace Impostor.Client.Core
+namespace Impostor.Client.Shared
 {
     public class AmongUsModifier
     {
         private const uint AppId = 945360;
-        private const string RegionName = "Impostor";
+        public const string DefaultRegionName = "Impostor";
         public const ushort DefaultPort = 22023;
 
         private readonly string _amongUsDir;
         private readonly string _regionFile;
+
+        public string RegionName { get; set; } = DefaultRegionName;
 
         public AmongUsModifier()
         {
@@ -90,7 +92,7 @@ namespace Impostor.Client.Core
             return null;
         }
 
-        public async Task SaveIp(string input)
+        public async Task<bool> SaveIpAsync(string input)
         {
             // Filter out whitespace.
             input = input.Trim();
@@ -121,7 +123,7 @@ namespace Impostor.Client.Core
                     if (hostAddresses.Length == 0)
                     {
                         OnError("Invalid IP Address entered");
-                        return;
+                        return false;
                     }
 
                     // Use first IPv4 result.
@@ -130,7 +132,7 @@ namespace Impostor.Client.Core
                 catch (SocketException)
                 {
                     OnError("Failed to resolve hostname.");
-                    return;
+                    return false;
                 }
             }
 
@@ -138,10 +140,10 @@ namespace Impostor.Client.Core
             if (ipAddress.AddressFamily == AddressFamily.InterNetworkV6)
             {
                 OnError("Invalid IP Address entered, only IPv4 is allowed.");
-                return;
+                return false;
             }
 
-            WriteIp(ipAddress, port);
+            return WriteIp(ipAddress, port);
         }
 
         /// <summary>
@@ -149,7 +151,7 @@ namespace Impostor.Client.Core
         /// </summary>
         /// <param name="ipAddress">The IPv4 address to write.</param>
         /// <param name="port"></param>
-        private void WriteIp(IPAddress ipAddress, ushort port)
+        private bool WriteIp(IPAddress ipAddress, ushort port)
         {
             if (ipAddress == null ||
                 ipAddress.AddressFamily != AddressFamily.InterNetwork)
@@ -160,7 +162,7 @@ namespace Impostor.Client.Core
             if (!Directory.Exists(_amongUsDir))
             {
                 OnError("Among Us directory was not found, is it installed? Try running it once.");
-                return;
+                return false;
             }
 
             using (var file = File.Open(_regionFile, FileMode.Create, FileAccess.Write))
@@ -175,6 +177,35 @@ namespace Impostor.Client.Core
                 region.Serialize(writer);
 
                 OnSaved(ip, port);
+                return true;
+            }
+        }
+
+        /// <summary>
+        ///     Loads the existing region info from the Among Us.
+        /// </summary>
+        public bool TryLoadRegionInfo(out RegionInfo regionInfo)
+        {
+            regionInfo = null;
+
+            if (!File.Exists(_regionFile))
+            {
+                return false;
+            }
+
+            using (var file = File.Open(_regionFile, FileMode.Open, FileAccess.Read))
+            using (var reader = new BinaryReader(file))
+            {
+                try
+                {
+                    regionInfo = RegionInfo.Deserialize(reader);
+                    return true;
+                }
+                catch (Exception exception)
+                {
+                    OnError("Couldn't parse region info\n" + exception);
+                    return false;
+                }
             }
         }
 
@@ -186,20 +217,15 @@ namespace Impostor.Client.Core
         {
             ipAddress = null;
 
-            if (!File.Exists(_regionFile))
+            if (!TryLoadRegionInfo(out var regionInfo))
             {
                 return false;
             }
 
-            using (var file = File.Open(_regionFile, FileMode.Open, FileAccess.Read))
-            using (var reader = new BinaryReader(file))
+            if ((regionInfo.Name == RegionName || regionInfo.Name == DefaultRegionName) && regionInfo.Servers.Count >= 1)
             {
-                var region = RegionInfo.Deserialize(reader);
-                if (region.Name == RegionName && region.Servers.Count >= 1)
-                {
-                    ipAddress = region.Servers.ElementAt(0).Ip;
-                    return true;
-                }
+                ipAddress = regionInfo.Servers.ElementAt(0).Ip;
+                return true;
             }
 
             return false;

@@ -2,11 +2,11 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-        <DebugType Condition=" '$(Configuration)' == 'Release' ">None</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Memory" Version="4.5.4" />
+        <ProjectReference Include="..\..\Impostor.Shared\Impostor.Shared.csproj" />
+        <PackageReference Include="Gameloop.Vdf" Version="0.6.1" />
     </ItemGroup>
-
+    
 </Project>

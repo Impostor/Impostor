@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: dotnet restore ./src
       - name: Build Impostor.Client
-        run: msbuild ./src/Impostor.Client/Impostor.Client.csproj /p:Configuration=Release
+        run: msbuild ./src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj /p:Configuration=Release
   build-server:
     name: Build Server
     runs-on: windows-latest

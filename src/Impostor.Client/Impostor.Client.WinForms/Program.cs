@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
-using Impostor.Client.Forms;
+using Impostor.Client.WinForms.Forms;
 
-namespace Impostor.Client
+namespace Impostor.Client.WinForms
 {
     internal static class Program
     {
