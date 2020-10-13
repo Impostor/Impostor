@@ -19,7 +19,7 @@ if you're using https.
 cd Impostor/src/Impostor.Server/
 dotnet build
 ```
-To setup the configs and run it, please look at [Running the server](https://github.com/AeonLucid/Impostor/docs/Running-the-server)
+To setup the configs and run it, please look at [Running the server](Running-the-server)
 
 ## Building the client
 ### Dependencies
