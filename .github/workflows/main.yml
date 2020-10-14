@@ -29,10 +29,8 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.402
-      - name: Install dependencies
-        run: dotnet restore ./src
       - name: Build Impostor.Client
-        run: msbuild ./src/Impostor.Client/Impostor.Client.csproj /p:Configuration=Release
+        run: dotnet build ./src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj -c Release
   build-server:
     name: Build Server
     runs-on: windows-latest

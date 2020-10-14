@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Impostor.Client.Core
+namespace Impostor.Client.Shared
 {
-    internal class Configuration
+    public class Configuration
     {
         private const string FileRecentIps = @"recent_ips.txt";
         private const int MaxRecentIps = 5;

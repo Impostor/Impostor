@@ -1,4 +1,4 @@
-﻿namespace Impostor.Client.Forms
+﻿namespace Impostor.Client.WinForms.Forms
 {
     partial class FrmMain
     {

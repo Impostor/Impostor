@@ -3,25 +3,33 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Server", "Impostor.Server\Impostor.Server.csproj", "{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Shared", "Impostor.Shared\Impostor.Shared.csproj", "{1D109A96-FADF-41B9-A845-457A7A5C0C5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Tests", "Impostor.Tests\Impostor.Tests.csproj", "{C1385C67-A7DD-46D2-80F6-FA428B85FB22}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "submodules", "submodules", "{DFA3CC6A-A27C-4713-876D-A55912C78C45}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hazel", "..\submodules\Hazel-Networking\Hazel\Hazel.csproj", "{02CFBD30-D77D-400F-94B2-700F60EFDD7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Tests", "Impostor.Tests\Impostor.Tests.csproj", "{C1385C67-A7DD-46D2-80F6-FA428B85FB22}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{56DD9707-D811-4056-9E2C-8A9CC2479B07}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Tools.Proxy", "Impostor.Tools.Proxy\Impostor.Tools.Proxy.csproj", "{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client", "Impostor.Client\Impostor.Client.csproj", "{804CF172-0C87-4423-9688-BD97D549891E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "server", "server", "{F2B205ED-4250-412E-9992-B11B7D6CE136}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Server", "Impostor.Server\Impostor.Server.csproj", "{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Server.Api", "Impostor.Server.Api\Impostor.Server.Api.csproj", "{E096A7D7-D693-4A13-A526-38CC574D84F8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Server.Hazel", "Impostor.Server.Hazel\Impostor.Server.Hazel.csproj", "{C9E8E1E2-BFE3-41AD-8CB9-82F0F52E2306}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{94FAED42-15BB-40CF-BE64-5D5C3B4ABC8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client.Shared", "Impostor.Client\Impostor.Client.Shared\Impostor.Client.Shared.csproj", "{7C3EB599-2292-4532-B280-D5BED1094DD4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client.WinForms", "Impostor.Client\Impostor.Client.WinForms\Impostor.Client.WinForms.csproj", "{804CF172-0C87-4423-9688-BD97D549891E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client.Cli", "Impostor.Client\Impostor.Client.Cli\Impostor.Client.Cli.csproj", "{82B36C4C-4EBD-49B7-A2DB-0B3308FBEF69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,13 +80,9 @@ Global
 		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Release|x86.ActiveCfg = Release|Any CPU
 		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}.Release|x86.Build.0 = Release|Any CPU
 		{804CF172-0C87-4423-9688-BD97D549891E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{804CF172-0C87-4423-9688-BD97D549891E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{804CF172-0C87-4423-9688-BD97D549891E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{804CF172-0C87-4423-9688-BD97D549891E}.Debug|x86.Build.0 = Debug|Any CPU
 		{804CF172-0C87-4423-9688-BD97D549891E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{804CF172-0C87-4423-9688-BD97D549891E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{804CF172-0C87-4423-9688-BD97D549891E}.Release|x86.ActiveCfg = Release|Any CPU
-		{804CF172-0C87-4423-9688-BD97D549891E}.Release|x86.Build.0 = Release|Any CPU
 		{E096A7D7-D693-4A13-A526-38CC574D84F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E096A7D7-D693-4A13-A526-38CC574D84F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E096A7D7-D693-4A13-A526-38CC574D84F8}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -95,6 +99,22 @@ Global
 		{C9E8E1E2-BFE3-41AD-8CB9-82F0F52E2306}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C9E8E1E2-BFE3-41AD-8CB9-82F0F52E2306}.Release|x86.ActiveCfg = Release|Any CPU
 		{C9E8E1E2-BFE3-41AD-8CB9-82F0F52E2306}.Release|x86.Build.0 = Release|Any CPU
+		{7C3EB599-2292-4532-B280-D5BED1094DD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C3EB599-2292-4532-B280-D5BED1094DD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C3EB599-2292-4532-B280-D5BED1094DD4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7C3EB599-2292-4532-B280-D5BED1094DD4}.Debug|x86.Build.0 = Debug|Any CPU
+		{7C3EB599-2292-4532-B280-D5BED1094DD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C3EB599-2292-4532-B280-D5BED1094DD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C3EB599-2292-4532-B280-D5BED1094DD4}.Release|x86.ActiveCfg = Release|Any CPU
+		{7C3EB599-2292-4532-B280-D5BED1094DD4}.Release|x86.Build.0 = Release|Any CPU
+		{82B36C4C-4EBD-49B7-A2DB-0B3308FBEF69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82B36C4C-4EBD-49B7-A2DB-0B3308FBEF69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82B36C4C-4EBD-49B7-A2DB-0B3308FBEF69}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{82B36C4C-4EBD-49B7-A2DB-0B3308FBEF69}.Debug|x86.Build.0 = Debug|Any CPU
+		{82B36C4C-4EBD-49B7-A2DB-0B3308FBEF69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82B36C4C-4EBD-49B7-A2DB-0B3308FBEF69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82B36C4C-4EBD-49B7-A2DB-0B3308FBEF69}.Release|x86.ActiveCfg = Release|Any CPU
+		{82B36C4C-4EBD-49B7-A2DB-0B3308FBEF69}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,5 +125,11 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{02CFBD30-D77D-400F-94B2-700F60EFDD7F} = {DFA3CC6A-A27C-4713-876D-A55912C78C45}
 		{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D} = {56DD9707-D811-4056-9E2C-8A9CC2479B07}
+		{804CF172-0C87-4423-9688-BD97D549891E} = {94FAED42-15BB-40CF-BE64-5D5C3B4ABC8F}
+		{1B0390AF-A4F3-4FE4-B093-708B0135C0B3} = {F2B205ED-4250-412E-9992-B11B7D6CE136}
+		{E096A7D7-D693-4A13-A526-38CC574D84F8} = {F2B205ED-4250-412E-9992-B11B7D6CE136}
+		{C9E8E1E2-BFE3-41AD-8CB9-82F0F52E2306} = {F2B205ED-4250-412E-9992-B11B7D6CE136}
+		{7C3EB599-2292-4532-B280-D5BED1094DD4} = {94FAED42-15BB-40CF-BE64-5D5C3B4ABC8F}
+		{82B36C4C-4EBD-49B7-A2DB-0B3308FBEF69} = {94FAED42-15BB-40CF-BE64-5D5C3B4ABC8F}
 	EndGlobalSection
 EndGlobal
