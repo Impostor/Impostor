@@ -1,8 +1,10 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Messages;
+using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
 using Microsoft.Extensions.Logging;
 
@@ -10,6 +12,12 @@ namespace Impostor.Server.Net.Manager
 {
     internal class ClientManager : IClientManager
     {
+        public static HashSet<int> SupportedVersions { get; } = new HashSet<int>
+        {
+            GameVersion.GetVersion(2020, 09, 07), // 2020.09.07 - 2020.09.22
+            GameVersion.GetVersion(2020, 10, 08), // 2020.10.08
+        };
+
         private readonly ILogger<ClientManager> _logger;
         private readonly ConcurrentDictionary<int, IClient> _clients;
         private readonly IClientFactory _clientFactory;
@@ -40,9 +48,7 @@ namespace Impostor.Server.Net.Manager
 
         public async ValueTask RegisterConnectionAsync(IConnection connection, string name, int clientVersion)
         {
-            // 50516550 = 2020.09.22
-            // 50518400 = 2020.10.08
-            if (clientVersion != 50516550 && clientVersion != 50518400)
+            if (!SupportedVersions.Contains(clientVersion))
             {
                 using var packet = connection.CreateMessage(MessageType.Reliable);
                 Message01JoinGame.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
