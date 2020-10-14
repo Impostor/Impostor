@@ -40,7 +40,7 @@ build_script:
 
 test:
   assemblies:
-    - 'src/**/*.Tests.dll'
+    - 'src\**\*.Tests.dll'
   
 only_commits:
   files:
