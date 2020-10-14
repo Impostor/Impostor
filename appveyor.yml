@@ -27,6 +27,9 @@ configuration: Release
 environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
+install:
+  - git submodule update --init --recursive
+
 before_build:
   - dotnet restore "src/Impostor.sln" -v Minimal
 
