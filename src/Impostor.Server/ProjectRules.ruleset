@@ -14,4 +14,7 @@
     <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.NamingRules">
         <Rule Id="SA1309" Action="None" />
     </Rules>
+    <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.SpacingRules">
+        <Rule Id="SA1009" Action="None" />
+    </Rules>
 </RuleSet>

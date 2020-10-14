@@ -42,7 +42,7 @@ build_script:
   - dotnet publish -c release -o ./build/win-x64 -f net5.0 -r win-x64 --self-contained --no-restore ./src/Impostor.Server/Impostor.Server.csproj /p:PublishSingleFile=true
 
 test_script:
-  - dotnet test --logger:Appveyor --no-build --no-restore -v normal -f net5.0 -c Release "src/Impostor.Tests"
+  - dotnet test --no-build --no-restore -v normal -f net5.0 -c Release "src/Impostor.Tests"
 
 only_commits:
   files:
