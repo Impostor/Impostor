@@ -28,34 +28,21 @@ environment:
 
 install:
   - git submodule update --init --recursive
-
-before_build:
-  - dotnet restore "src/Impostor.sln" -v Minimal
+  - ps: .\build\dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet\'
+  - ps: dotnet tool restore
 
 build_script:
-  # Tests
-  - dotnet build "src/Impostor.Tests/Impostor.Tests.csproj" -c Release
-  # Client
-  - dotnet build "src/Impostor.Client/Impostor.Client.Cli/Impostor.Client.Cli.csproj" --no-restore -c Release -f net5.0
-  - dotnet build "src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj" /p:Configuration=Release /p:DebugSymbols=false /p:DebugType=None
-  # Server win-x64
-  - dotnet publish -c release -o build/win-x64 -f net5.0 -r win-x64 --self-contained --no-restore ./src/Impostor.Server/Impostor.Server.csproj /p:PublishSingleFile=true
-  - ps: 7z a -r build/Impostor-Server-win-x64-$(APPVEYOR_BUILD_VERSION).zip %APPVEYOR_BUILD_FOLDER%/build/win-x64/*
-  # Server linux-x64
-  - dotnet publish -c release -o ./build/linux-x64 -f net5.0 -r linux-x64 --self-contained --no-restore ./src/Impostor.Server/Impostor.Server.csproj /p:PublishSingleFile=true
-  - ps: z a -r build/Impostor-Server-linux-x64-$(APPVEYOR_BUILD_VERSION).zip %APPVEYOR_BUILD_FOLDER%/build/linux-x64/*
+  - ps: dotnet cake build.cake --bootstrap
+  - ps: dotnet cake build.cake --pack
 
-test_script:
-  - dotnet test --no-build --no-restore -v normal -f net5.0 -c Release "src/Impostor.Tests"
+test: off
 
 artifacts:
-  - path: build/Impostor-Server-win-x64-$(APPVEYOR_BUILD_VERSION).zip
-    name: Impostor-Server-win-x64-$(APPVEYOR_BUILD_VERSION).zip
-  - path: build/Impostor-Server-linux-x64-$(APPVEYOR_BUILD_VERSION).zip
-    name: Impostor-Server-linux-x64-$(APPVEYOR_BUILD_VERSION).zip
+  - path: ./build/*.zip
 
 only_commits:
   files:
-    - appveyor.yml
-    - src/**/*
+    - ./appveyor.yml
+    - ./build.cake
+    - ./src/**/*
     - .gitmodules
