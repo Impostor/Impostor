@@ -3,16 +3,20 @@
     <PropertyGroup>
         <ProjectGuid>{804CF172-0C87-4423-9688-BD97D549891E}</ProjectGuid>
         <OutputType>WinExe</OutputType>
-        <AssemblyName>Impostor</AssemblyName>
         <TargetFramework>net462</TargetFramework>
         <UseWindowsForms>true</UseWindowsForms>
+        <Copyright>Copyright © AeonLucid 2020</Copyright>
+        <ApplicationIcon>icon.ico</ApplicationIcon>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <AssemblyName>Impostor</AssemblyName>
         <AssemblyTitle>Impostor</AssemblyTitle>
         <Product>Impostor</Product>
         <Copyright>Copyright © AeonLucid 2020</Copyright>
-        <ApplicationIcon>icon.ico</ApplicationIcon>
-
-        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-        <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+        <Version>1.0.0</Version>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
