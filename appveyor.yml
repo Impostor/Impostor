@@ -35,7 +35,7 @@ before_build:
 build_script:
   # Tests
   - dotnet build "src/Impostor.Tests/Impostor.Tests.csproj" -c Release
-  - xunit.console src\Impostor.Tests\bin\Release\net5.0\Impostor.Tests.dll /appveyor
+  - %xunit20%\xunit.console "src/Impostor.Tests/bin/Debug/net5.0/Impostor.Tests.dll" -appveyor
   # Client
   - dotnet build "src/Impostor.Client/Impostor.Client.Cli/Impostor.Client.Cli.csproj" --no-restore -c Release -f net5.0
   - dotnet build "src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj" /p:Configuration=Release /p:DebugSymbols=false /p:DebugType=None
