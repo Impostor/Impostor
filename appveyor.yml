@@ -40,19 +40,19 @@ build_script:
   - dotnet build "src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj" /p:Configuration=Release /p:DebugSymbols=false /p:DebugType=None
   # Server win-x64
   - dotnet publish -c release -o build/win-x64 -f net5.0 -r win-x64 --self-contained --no-restore ./src/Impostor.Server/Impostor.Server.csproj /p:PublishSingleFile=true
-  - 7z a -r build/win-x64.zip %APPVEYOR_BUILD_FOLDER%/build/win-x64/*
+  - ps: 7z a -r build/Impostor-Server-win-x64-$(APPVEYOR_BUILD_VERSION).zip %APPVEYOR_BUILD_FOLDER%/build/win-x64/*
   # Server linux-x64
   - dotnet publish -c release -o ./build/linux-x64 -f net5.0 -r linux-x64 --self-contained --no-restore ./src/Impostor.Server/Impostor.Server.csproj /p:PublishSingleFile=true
-  - 7z a -r build/linux-x64.zip %APPVEYOR_BUILD_FOLDER%/build/linux-x64/*
+  - ps: z a -r build/Impostor-Server-linux-x64-$(APPVEYOR_BUILD_VERSION).zip %APPVEYOR_BUILD_FOLDER%/build/linux-x64/*
 
 test_script:
   - dotnet test --no-build --no-restore -v normal -f net5.0 -c Release "src/Impostor.Tests"
 
 artifacts:
-  - path: build/win-x64.zip
-    name: Impostor-Server-win-x64.zip
-  - path: build/linux-x64.zip
-    name: Impostor-Server-linux-x64.zip
+  - path: build/Impostor-Server-win-x64-$(APPVEYOR_BUILD_VERSION).zip
+    name: Impostor-Server-win-x64-$(APPVEYOR_BUILD_VERSION).zip
+  - path: build/Impostor-Server-linux-x64-$(APPVEYOR_BUILD_VERSION).zip
+    name: Impostor-Server-linux-x64-$(APPVEYOR_BUILD_VERSION).zip
 
 only_commits:
   files:
