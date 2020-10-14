@@ -40,7 +40,9 @@ namespace Impostor.Server.Net.Manager
 
         public async ValueTask RegisterConnectionAsync(IConnection connection, string name, int clientVersion)
         {
-            if (clientVersion != 50516550)
+            // 50516550 = 2020.09.22
+            // 50518400 = 2020.10.08
+            if (clientVersion != 50516550 && clientVersion != 50518400)
             {
                 using var packet = connection.CreateMessage(MessageType.Reliable);
                 Message01JoinGame.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
