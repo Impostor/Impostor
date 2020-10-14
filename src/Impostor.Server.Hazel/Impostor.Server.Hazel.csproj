@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <DebugType Condition=" '$(Configuration)' == 'Release' ">None</DebugType>
     </PropertyGroup>
 
     <ItemGroup>

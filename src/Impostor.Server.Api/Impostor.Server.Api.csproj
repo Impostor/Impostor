@@ -4,6 +4,7 @@
         <TargetFramework>net5.0</TargetFramework>
         <RootNamespace>Impostor.Server</RootNamespace>
         <Nullable>enable</Nullable>
+        <DebugType Condition=" '$(Configuration)' == 'Release' ">None</DebugType>
         <CodeAnalysisRuleSet>ProjectRules.ruleset</CodeAnalysisRuleSet>
     </PropertyGroup>
 

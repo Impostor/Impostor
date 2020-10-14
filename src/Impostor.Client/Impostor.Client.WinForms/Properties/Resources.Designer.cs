@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Impostor.Client.Properties
+namespace Impostor.Client.WinForms.Properties
 {
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
@@ -45,7 +45,7 @@ namespace Impostor.Client.Properties
                 if ((resourceMan == null))
                 {
                     global::System.Resources.ResourceManager temp =
-                        new global::System.Resources.ResourceManager("Impostor.Client.Properties.Resources",
+                        new global::System.Resources.ResourceManager("Impostor.Client.WinForms.Properties.Resources",
                             typeof(Resources).Assembly);
                     resourceMan = temp;
                 }

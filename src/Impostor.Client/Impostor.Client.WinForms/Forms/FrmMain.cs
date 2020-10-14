@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows.Forms;
-using Impostor.Client.Core;
-using Impostor.Client.Core.Events;
-using ErrorEventArgs = Impostor.Client.Core.Events.ErrorEventArgs;
+using Impostor.Client.Shared;
+using Impostor.Client.Shared.Events;
 
-namespace Impostor.Client.Forms
+namespace Impostor.Client.WinForms.Forms
 {
     public partial class FrmMain : Form
     {
@@ -92,7 +90,7 @@ namespace Impostor.Client.Forms
             comboIp.Enabled = false;
             buttonLaunch.Enabled = false;
 
-            await _modifier.SaveIp(comboIp.Text);
+            await _modifier.SaveIpAsync(comboIp.Text);
         }
 
         private void lblUrl_Click(object sender, EventArgs e)

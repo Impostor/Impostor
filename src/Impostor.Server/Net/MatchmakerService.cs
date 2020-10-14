@@ -17,8 +17,8 @@ namespace Impostor.Server.Net
         private readonly IMatchmaker _matchmaker;
 
         public MatchmakerService(
-            ILogger<MatchmakerService> logger, 
-            IOptions<ServerConfig> serverConfig, 
+            ILogger<MatchmakerService> logger,
+            IOptions<ServerConfig> serverConfig,
             IOptions<ServerRedirectorConfig> redirectorConfig,
             IMatchmaker matchmaker)
         {
@@ -27,17 +27,18 @@ namespace Impostor.Server.Net
             _redirectorConfig = redirectorConfig.Value;
             _matchmaker = matchmaker;
         }
-        
+
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             var endpoint = new IPEndPoint(IPAddress.Parse(_serverConfig.ListenIp), _serverConfig.ListenPort);
-            
+
             await _matchmaker.StartAsync(endpoint);
-            
-            _logger.LogInformation("Matchmaker is listening on {0}:{1}, the public server ip is {2}:{3}.", 
-                endpoint.Address, 
+
+            _logger.LogInformation(
+                "Matchmaker is listening on {0}:{1}, the public server ip is {2}:{3}.", 
+                endpoint.Address,
                 endpoint.Port,
-                _serverConfig.PublicIp, 
+                _serverConfig.PublicIp,
                 _serverConfig.PublicPort);
 
             if (_redirectorConfig.Enabled)

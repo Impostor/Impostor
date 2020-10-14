@@ -1,0 +1,47 @@
+version: '1.1.{build}'
+
+branches:
+  only:
+  - master
+  - dev
+  - appveyor
+
+pull_requests:
+  do_not_increment_build_number: true
+
+assembly_info:
+  patch: false
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj;**\*.props'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+
+image: Visual Studio 2019 Preview
+
+environment:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+install:
+  - git submodule update --init --recursive
+  - ps: dotnet tool restore
+
+build_script:
+  - ps: dotnet cake build.cake --bootstrap
+  - ps: dotnet cake build.cake --pack
+
+test: off
+
+artifacts:
+  - path: ./build/*.zip
+
+only_commits:
+  files:
+    - appveyor.yml
+    - build.cake
+    - src/**/*
+    - .gitmodules

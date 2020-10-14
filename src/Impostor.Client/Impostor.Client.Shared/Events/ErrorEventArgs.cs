@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Impostor.Client.Core.Events
+namespace Impostor.Client.Shared.Events
 {
     public class ErrorEventArgs : EventArgs
     {
@@ -8,7 +8,7 @@ namespace Impostor.Client.Core.Events
         {
             Message = message;
         }
-        
+
         public string Message { get; }
     }
 }

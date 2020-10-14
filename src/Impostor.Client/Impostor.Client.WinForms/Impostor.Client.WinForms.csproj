@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+    
+    <PropertyGroup>
+        <AssemblyName>Impostor</AssemblyName>
+        <ProjectGuid>{804CF172-0C87-4423-9688-BD97D549891E}</ProjectGuid>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net472</TargetFramework>
+        <UseWindowsForms>true</UseWindowsForms>
+        <Copyright>Copyright © AeonLucid 2020</Copyright>
+        <ApplicationIcon>icon.ico</ApplicationIcon>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <DebugType>none</DebugType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Impostor.Client.Shared\Impostor.Client.Shared.csproj" />
+        <PackageReference Include="System.Resources.Extensions" Version="5.0.0-rc.2.20475.5" />
+        <Reference Include="System.Runtime.InteropServices.RuntimeInformation" />
+        <Reference Include="System.Windows.Forms" />
+    </ItemGroup>
+
+</Project>

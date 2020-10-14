@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Impostor.Client.Core.Events
+namespace Impostor.Client.Shared.Events
 {
     public class SavedEventArgs : EventArgs
     {
@@ -9,7 +9,7 @@ namespace Impostor.Client.Core.Events
             IpAddress = ipAddress;
             Port = port;
         }
-        
+
         public string IpAddress { get; }
         public ushort Port { get; }
     }
