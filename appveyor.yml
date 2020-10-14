@@ -1,0 +1,43 @@
+version: '1.1.{build}'
+
+branches:
+  only:
+  - master
+  - dev
+  - appveyor
+
+pull_requests:
+  do_not_increment_build_number: true
+
+assembly_info:
+  patch: false
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+
+image: Visual Studio 2019 Preview
+configuration: Release
+
+environment:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+before_build:
+  - dotnet restore -v Minimal
+  - dotnet restore "src/Impostor.sln" -v Minimal
+
+build_script:
+  - dotnet build "src/Impostor.Client/Impostor.Client.Cli/Impostor.Client.Cli.csproj" -c Release
+  - dotnet build "src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj" -c Release
+  - dotnet build "src/Impostor.Server/Impostor.Server.csproj" -c Release
+  
+only_commits:
+  files:
+    - appveyor.yml
+    - src/**/*
+    - .gitmodules
