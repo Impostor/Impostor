@@ -1,6 +1,5 @@
 <Project>
     <PropertyGroup>
-        <AssemblyName>Impostor</AssemblyName>
         <AssemblyTitle>Impostor</AssemblyTitle>
         <Product>Impostor</Product>
         <Copyright>Copyright © AeonLucid 2020</Copyright>

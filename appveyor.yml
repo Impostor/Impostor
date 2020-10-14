@@ -22,7 +22,6 @@ dotnet_csproj:
   informational_version: '{version}'
 
 image: Visual Studio 2019 Preview
-configuration: Release
 
 environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -34,9 +33,14 @@ before_build:
   - dotnet restore "src/Impostor.sln" -v Minimal
 
 build_script:
-  - dotnet build "src/Impostor.Client/Impostor.Client.Cli/Impostor.Client.Cli.csproj" -c Release
-  - dotnet build "src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj" -c Release
-  - dotnet build "src/Impostor.Server/Impostor.Server.csproj" -c Release
+  - dotnet build "src/Impostor.Tests/Impostor.Tests.csproj" -c Release
+  - dotnet build "src/Impostor.Server/Impostor.Server.csproj" --no-restore -c Release -f net5.0
+  - dotnet build "src/Impostor.Client/Impostor.Client.Cli/Impostor.Client.Cli.csproj" --no-restore -c Release -f net5.0
+  - dotnet build "src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj" /p:Configuration=Release /p:DebugSymbols=false /p:DebugType=None
+
+test:
+  assemblies:
+    - 'src/**/*.Tests.dll'
   
 only_commits:
   files:
