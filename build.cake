@@ -57,6 +57,7 @@ Task("Clean")
 Task("Restore")
     .Does(() => {
         DotNetCoreRestore("./src/Impostor.sln");
+        DotNetCoreRestore("./src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj");
     });
 
 Task("Build")
