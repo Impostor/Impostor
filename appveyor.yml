@@ -28,7 +28,6 @@ environment:
 
 install:
   - git submodule update --init --recursive
-  - ps: .\build\dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet\'
   - ps: dotnet tool restore
 
 build_script:
