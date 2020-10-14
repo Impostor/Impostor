@@ -34,7 +34,7 @@ public void ImpostorPublishNF(string name, string project) {
     DotNetCorePublish(project, new DotNetCorePublishSettings {
         Configuration = configuration,
         NoRestore = true,
-        Framework = "net462",
+        Framework = "net472",
         OutputDirectory = projBuildDir
     });
 

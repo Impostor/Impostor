@@ -42,7 +42,7 @@ artifacts:
 
 only_commits:
   files:
-    - ./appveyor.yml
-    - ./build.cake
-    - ./src/**/*
+    - appveyor.yml
+    - build.cake
+    - src/**/*
     - .gitmodules

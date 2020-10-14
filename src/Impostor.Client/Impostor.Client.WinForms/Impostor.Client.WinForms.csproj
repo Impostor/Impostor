@@ -4,7 +4,7 @@
         <AssemblyName>Impostor</AssemblyName>
         <ProjectGuid>{804CF172-0C87-4423-9688-BD97D549891E}</ProjectGuid>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net462</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <UseWindowsForms>true</UseWindowsForms>
         <Copyright>Copyright © AeonLucid 2020</Copyright>
         <ApplicationIcon>icon.ico</ApplicationIcon>
