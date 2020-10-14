@@ -1,3 +1,5 @@
+# Running the server
+
 There are currently two modes to run the Impostor server in. The first way is the simplest one and is the one you should probably use. The other way will distribute players across other servers and is a more advanced configuration.
 
 ## Single server

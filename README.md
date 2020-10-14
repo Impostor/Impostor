@@ -39,7 +39,7 @@ If you just want to play on a server hosted by someone else, you need to follow 
 
 ### Server
 
-See the [docs](https://github.com/AeonLucid/Impostor/docs/Running-the-server) for instructions on how to set it up.
+See the [docs](docs/Running-the-server) for instructions on how to set it up.
 
 ## Contributing
 
