@@ -57,5 +57,7 @@ namespace Impostor.Server.Games
         ValueTask HandleRemovePlayer(int playerId, DisconnectReason reason);
 
         ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic);
+
+        ValueTask HandleGameData(IMessageReader parent, IClientPlayer sender, bool toPlayer);
     }
 }
