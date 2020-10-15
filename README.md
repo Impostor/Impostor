@@ -45,6 +45,16 @@ See the [wiki](https://github.com/AeonLucid/Impostor/wiki/Running-the-server) fo
 
 If you want to contribute to Impostor, make sure you work on and target the `dev` branch. That is where the latest changes will be. 
 
+To start contributing, you should clone this repository and check out to the `dev` branch, like so:
+
+```bash
+git clone https://github.com/AeonLucid/Impostor.git && \
+  cd Impostor && \
+  git submodule update --init --recursive && \
+  git submodule update --recursive --remote && \
+  git pull --recurse-submodules
+```
+
 ## License
 
 This software is distributed under the **GNU GPLv3** License.
