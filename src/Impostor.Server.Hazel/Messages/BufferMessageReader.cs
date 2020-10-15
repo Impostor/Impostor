@@ -1,41 +1,32 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Impostor.Server.Net;
 using Impostor.Server.Net.Messages;
 
-namespace Impostor.Server.Hazel
+namespace Impostor.Server.Hazel.Messages
 {
     public class BufferMessageReader : IMessageReader
     {
-        // TODO: Remove _offset, we can slice the buffer.
-        private readonly int _offset;
-        private int _position;
-        private int readHead;
-        
-        public ReadOnlyMemory<byte> Buffer { get; }
-        
         public byte Tag { get; }
+        public ReadOnlyMemory<byte> Buffer { get; }
+        public int Position { get; set; }
+        public int Length => Buffer.Length;
 
-        public int Length { get; }
-
-        public int Position
-        {
-            get { return _position; }
-            set
-            {
-                _position = value;
-                readHead = value + _offset;
-            }
-        }
-
-        public BufferMessageReader(byte tag, ReadOnlyMemory<byte> buffer, int offset, int length)
+        public BufferMessageReader(byte tag, ReadOnlyMemory<byte> buffer)
         {
             Tag = tag;
             Buffer = buffer;
-            Length = length;
-            _offset = offset;
-            readHead = offset;
+        }
+
+        public IMessageReader ReadMessage()
+        {
+            var length = ReadUInt16();
+            var tag = ReadByte();
+            var pos = Position;
+
+            Position += length;
+
+            return new BufferMessageReader(tag, Buffer.Slice(pos, length));
         }
 
         public bool ReadBoolean()
@@ -102,7 +93,7 @@ namespace Impostor.Server.Hazel
             // TODO: Refactor to System.Buffers.Binary.BinaryPrimitives
             
             float output = 0;
-            fixed (byte* bufPtr = &Buffer.Span[readHead])
+            fixed (byte* bufPtr = &Buffer.Span[Position])
             {
                 byte* outPtr = (byte*)&output;
 
@@ -119,7 +110,7 @@ namespace Impostor.Server.Hazel
         public string ReadString()
         {
             var len = ReadPackedInt32();
-            var output = Encoding.UTF8.GetString(Buffer.Span.Slice(readHead, len));
+            var output = Encoding.UTF8.GetString(Buffer.Span.Slice(Position, len));
             Position += len;
             return output;
         }
@@ -132,7 +123,7 @@ namespace Impostor.Server.Hazel
 
         public ReadOnlyMemory<byte> ReadBytes(int length)
         {
-            var output = Buffer.Slice(readHead, length);
+            var output = Buffer.Slice(Position, length);
             Position += length;
             return output;
         }
@@ -170,26 +161,25 @@ namespace Impostor.Server.Hazel
 
         public void CopyTo(IMessageWriter writer)
         {
-            int offset, length;
-            if (Tag == byte.MaxValue)
-            {
-                offset = _offset;
-                length = Length;
-            }
-            else
-            {
-                offset = _offset - 3;
-                length = Length + 3;
-            }
+            writer.Write((ushort) Length);
+            writer.Write((byte) Tag);
+            writer.Write(Buffer);
+        }
 
-            writer.Write(Buffer.Slice(offset, length));
+        public IMessageReader Slice(int start)
+        {
+            return new BufferMessageReader(Tag, Buffer.Slice(start));
+        }
+
+        public IMessageReader Slice(int start, int length)
+        {
+            return new BufferMessageReader(Tag, Buffer.Slice(start, length));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private byte FastByte()
         {
-            _position++;
-            return Buffer.Span[readHead++];
+            return Buffer.Span[Position++];
         }
     }
 }

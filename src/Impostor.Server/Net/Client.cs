@@ -1,8 +1,10 @@
 using System;
 using System.Threading.Tasks;
+using Hazel;
 using Impostor.Server.Data;
 using Impostor.Server.Games;
 using Impostor.Server.Games.Managers;
+using Impostor.Server.Hazel.Messages;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;

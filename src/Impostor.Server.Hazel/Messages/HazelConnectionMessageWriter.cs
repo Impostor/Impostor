@@ -2,7 +2,7 @@
 using Impostor.Server.Net;
 using Impostor.Server.Net.Messages;
 
-namespace Impostor.Server.Hazel
+namespace Impostor.Server.Hazel.Messages
 {
     internal class HazelConnectionMessageWriter : HazelMessageWriter, IConnectionMessageWriter
     {

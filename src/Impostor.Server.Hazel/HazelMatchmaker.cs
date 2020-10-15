@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hazel;
 using Hazel.Udp;
 using Impostor.Server.Games;
+using Impostor.Server.Hazel.Messages;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;

@@ -1,9 +1,8 @@
 ﻿using System;
 using Hazel;
-using Impostor.Server.Net;
 using Impostor.Server.Net.Messages;
 
-namespace Impostor.Server.Hazel
+namespace Impostor.Server.Hazel.Messages
 {
     internal class HazelMessage : IMessage, IDisposable
     {
@@ -25,7 +24,7 @@ namespace Impostor.Server.Hazel
                 throw new ObjectDisposedException(nameof(_reader));
             }
 
-            return new BufferMessageReader(_reader.Tag, _reader.Buffer, _reader.Offset, _reader.Length);
+            return new BufferMessageReader(_reader.Tag, _reader.Buffer.AsMemory(_reader.Offset, _reader.Length));
         }
 
         private void Dispose(bool disposing)

@@ -5,9 +5,9 @@ namespace Impostor.Server.Net.Messages
     public interface IMessageReader
     {
         /// <summary>
-        ///     Gets the current position of the reader.
+        ///     Gets the tag of the message.
         /// </summary>
-        int Position { get; }
+        byte Tag { get; }
 
         /// <summary>
         ///     Gets the buffer of the message.
@@ -15,14 +15,16 @@ namespace Impostor.Server.Net.Messages
         ReadOnlyMemory<byte> Buffer { get; }
 
         /// <summary>
-        ///     Gets the tag of the message.
+        ///     Gets the current position of the reader.
         /// </summary>
-        byte Tag { get; }
+        int Position { get; }
 
         /// <summary>
         ///     Gets the length of the buffer.
         /// </summary>
         int Length { get; }
+
+        IMessageReader ReadMessage();
 
         bool ReadBoolean();
 
@@ -51,5 +53,9 @@ namespace Impostor.Server.Net.Messages
         uint ReadPackedUInt32();
 
         void CopyTo(IMessageWriter writer);
+
+        IMessageReader Slice(int start);
+
+        IMessageReader Slice(int start, int length);
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Threading.Tasks;
 using Hazel;
+using Impostor.Server.Hazel.Messages;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Messages;
 using Microsoft.Extensions.Logging;
