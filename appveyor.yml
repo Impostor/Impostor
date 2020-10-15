@@ -1,10 +1,8 @@
 version: '1.1.{build}'
 
 branches:
-  only:
-  - master
-  - dev
-  - appveyor
+  except:
+  - gh-pages
 
 pull_requests:
   do_not_increment_build_number: true
