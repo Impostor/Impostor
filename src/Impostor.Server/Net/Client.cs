@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Hazel;
 using Impostor.Server.Data;
@@ -144,10 +145,16 @@ namespace Impostor.Server.Net
                         return;
                     }
 
+                    var toPlayer = flag == MessageFlags.GameDataTo;
+
+                    // Handle packet.
+                    var readerCopy = reader.Slice(reader.Position);
+                    await Player.Game.HandleGameData(readerCopy, Player, toPlayer);
+
                     // Broadcast packet to all other players.
                     using var writer = Player.Game.CreateMessage(message.Type);
 
-                    if (flag == MessageFlags.GameDataTo)
+                    if (toPlayer)
                     {
                         var target = reader.ReadPackedInt32();
                         reader.CopyTo(writer);
