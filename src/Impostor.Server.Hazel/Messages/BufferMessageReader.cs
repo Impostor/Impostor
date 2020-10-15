@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Impostor.Server.Net.Messages;
@@ -47,63 +48,36 @@ namespace Impostor.Server.Hazel.Messages
 
         public ushort ReadUInt16()
         {
-            // TODO: Refactor to System.Buffers.Binary.BinaryPrimitives
-            
-            ushort output =
-                (ushort)(FastByte()
-                         | FastByte() << 8);
+            var output = BinaryPrimitives.ReadUInt16LittleEndian(Buffer.Span.Slice(Position));
+            Position += sizeof(ushort);
             return output;
         }
 
         public short ReadInt16()
         {
-            // TODO: Refactor to System.Buffers.Binary.BinaryPrimitives
-            
-            short output =
-                (short)(FastByte() | FastByte() << 8);
+            var output = BinaryPrimitives.ReadInt16LittleEndian(Buffer.Span.Slice(Position));
+            Position += sizeof(short);
             return output;
         }
 
         public uint ReadUInt32()
         {
-            // TODO: Refactor to System.Buffers.Binary.BinaryPrimitives
-            
-            uint output = FastByte()
-                          | (uint)FastByte() << 8
-                          | (uint)FastByte() << 16
-                          | (uint)FastByte() << 24;
-
+            var output = BinaryPrimitives.ReadUInt32LittleEndian(Buffer.Span.Slice(Position));
+            Position += sizeof(uint);
             return output;
         }
 
         public int ReadInt32()
         {
-            // TODO: Refactor to System.Buffers.Binary.BinaryPrimitives
-            
-            int output = FastByte()
-                         | FastByte() << 8
-                         | FastByte() << 16
-                         | FastByte() << 24;
-
+            var output = BinaryPrimitives.ReadInt32LittleEndian(Buffer.Span.Slice(Position));
+            Position += sizeof(int);
             return output;
         }
 
         public unsafe float ReadSingle()
         {
-            // TODO: Refactor to System.Buffers.Binary.BinaryPrimitives
-            
-            float output = 0;
-            fixed (byte* bufPtr = &Buffer.Span[Position])
-            {
-                byte* outPtr = (byte*)&output;
-
-                *outPtr = *bufPtr;
-                *(outPtr + 1) = *(bufPtr + 1);
-                *(outPtr + 2) = *(bufPtr + 2);
-                *(outPtr + 3) = *(bufPtr + 3);
-            }
-
-            Position += 4;
+            var output = BinaryPrimitives.ReadSingleLittleEndian(Buffer.Span.Slice(Position));
+            Position += sizeof(float);
             return output;
         }
 
