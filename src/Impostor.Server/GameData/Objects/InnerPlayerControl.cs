@@ -2,6 +2,7 @@
 using Impostor.Server.GameData.Objects.Components;
 using Impostor.Server.Games;
 using Impostor.Server.Net.Messages;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Impostor.Server.GameData.Objects
 {
@@ -9,13 +10,13 @@ namespace Impostor.Server.GameData.Objects
     {
         private readonly IGame _game;
 
-        public InnerPlayerControl(IGame game)
+        public InnerPlayerControl(IGame game, IServiceProvider serviceProvider)
         {
             _game = game;
 
             Components.Add(this);
-            Components.Add(new InnerPlayerPhysics());
-            Components.Add(new InnerCustomNetworkTransform());
+            Components.Add(ActivatorUtilities.CreateInstance<InnerPlayerPhysics>(serviceProvider));
+            Components.Add(ActivatorUtilities.CreateInstance<InnerCustomNetworkTransform>(serviceProvider));
 
             PlayerId = byte.MaxValue;
         }

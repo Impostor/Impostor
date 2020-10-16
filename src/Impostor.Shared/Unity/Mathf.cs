@@ -3,6 +3,24 @@
     public static class Mathf
     {
         /// <summary>
+        ///   <para>Clamps the given value between the given minimum float and maximum float values.  Returns the given value if it is within the min and max range.</para>
+        /// </summary>
+        /// <param name="value">The floating point value to restrict inside the range defined by the min and max values.</param>
+        /// <param name="min">The minimum floating point value to compare against.</param>
+        /// <param name="max">The maximum floating point value to compare against.</param>
+        /// <returns>
+        ///   <para>The float result between the min and max values.</para>
+        /// </returns>
+        public static float Clamp(float value, float min, float max)
+        {
+            if ((double) value < (double) min)
+                value = min;
+            else if ((double) value > (double) max)
+                value = max;
+            return value;
+        }
+
+        /// <summary>
         ///   <para>Clamps value between 0 and 1 and returns value.</para>
         /// </summary>
         /// <param name="value"></param>
