@@ -11,7 +11,7 @@ namespace Impostor.Server.Net.Messages
                 writer.Clear(MessageType.Reliable);
             }
 
-            writer.StartMessage(MessageFlags.HostGame);
+            writer.StartMessage(MessageFlags.AlterGame);
             writer.Write(gameCode);
             writer.Write((byte)AlterGameTags.ChangePrivacy);
             writer.Write(isPublic);
