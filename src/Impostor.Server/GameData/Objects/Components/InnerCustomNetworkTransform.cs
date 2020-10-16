@@ -63,13 +63,10 @@ namespace Impostor.Server.GameData.Objects.Components
 
         public static Vector2 ReadVector2(IMessageReader reader)
         {
-            var v = (float) (int) reader.ReadUInt16() / 65535f;
-            var v2 = (float) (int) reader.ReadUInt16() / 65535f;
+            var v1 = (float) reader.ReadUInt16() / (float) ushort.MaxValue;
+            var v2 = (float) reader.ReadUInt16() / (float) ushort.MaxValue;
 
-            var v3 = XRange.Lerp(v);
-            var v4 = YRange.Lerp(v2);
-
-            return new Vector2(v3, v4);
+            return new Vector2(XRange.Lerp(v1), YRange.Lerp(v2));
         }
     }
 }
