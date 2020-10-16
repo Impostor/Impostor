@@ -21,6 +21,8 @@ namespace Impostor.Server.GameData.Objects
 
             public uint HatId { get; private set; }
 
+            public uint PetId { get; private set; }
+
             public uint SkinId { get; private set; }
 
             public bool Disconnected { get; private set; }
@@ -41,6 +43,7 @@ namespace Impostor.Server.GameData.Objects
                 PlayerName = reader.ReadString();
                 ColorId = reader.ReadByte();
                 HatId = reader.ReadPackedUInt32();
+                PetId = reader.ReadPackedUInt32();
                 SkinId = reader.ReadPackedUInt32();
                 var flag = reader.ReadByte();
                 Disconnected = (flag & 1) > 0;

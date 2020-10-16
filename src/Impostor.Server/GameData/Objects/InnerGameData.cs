@@ -47,8 +47,6 @@ namespace Impostor.Server.GameData.Objects
         {
             if (initialState)
             {
-                var gameGuid = reader.ReadBytesAndSize();
-                // var gameGuid = new Guid(reader.ReadBytesAndSize().Span);
                 var num = reader.ReadPackedInt32();
 
                 for (var i = 0; i < num; i++)
@@ -60,23 +58,25 @@ namespace Impostor.Server.GameData.Objects
             }
             else
             {
-                var num = reader.ReadByte();
+                throw new NotImplementedException("This shouldn't happen, according to Among Us assembly..");
 
-                for (var i = 0; i < num; i++)
-                {
-                    var id = reader.ReadByte();
-                    var player = GetPlayerById(id);
-                    if (player != null)
-                    {
-                        player.Deserialize(reader);
-                    }
-                    else
-                    {
-                        var playerInfo = new PlayerInfo(id);
-                        playerInfo.Deserialize(reader);
-                        _allPlayers.Add(playerInfo);
-                    }
-                }
+                // var num = reader.ReadByte();
+                //
+                // for (var i = 0; i < num; i++)
+                // {
+                //     var id = reader.ReadByte();
+                //     var player = GetPlayerById(id);
+                //     if (player != null)
+                //     {
+                //         player.Deserialize(reader);
+                //     }
+                //     else
+                //     {
+                //         var playerInfo = new PlayerInfo(id);
+                //         playerInfo.Deserialize(reader);
+                //         _allPlayers.Add(playerInfo);
+                //     }
+                // }
             }
         }
     }
