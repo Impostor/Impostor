@@ -94,6 +94,11 @@ namespace Impostor.Server.Hazel.Messages
             Writer.WritePacked(value);
         }
 
+        public void WritePacked(uint value)
+        {
+            Writer.WritePacked(value);
+        }
+
         public void Write(ReadOnlyMemory<byte> data)
         {
             Writer.Write(data.ToArray()); // TODO: Fix memory allocation.
