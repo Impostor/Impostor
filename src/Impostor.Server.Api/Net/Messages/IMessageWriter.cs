@@ -76,6 +76,12 @@ namespace Impostor.Server.Net.Messages
         void WritePacked(int value);
 
         /// <summary>
+        ///     Writes an packed uint to the message.
+        /// </summary>
+        /// <param name="value">Value to write.</param>
+        void WritePacked(uint value);
+
+        /// <summary>
         ///     Writes raw bytes to the message.
         /// </summary>
         /// <param name="data">Bytes to write.</param>
