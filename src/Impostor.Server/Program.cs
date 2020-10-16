@@ -69,6 +69,9 @@ namespace Impostor.Server
                         .GetSection(ServerRedirectorConfig.Section)
                         .Get<ServerRedirectorConfig>() ?? new ServerRedirectorConfig();
 
+#if DEBUG
+                    services.Configure<DebugConfig>(host.Configuration.GetSection(DebugConfig.Section));
+#endif
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                     services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));
 
