@@ -50,16 +50,21 @@ namespace Impostor.Server.Net.State
                 {
                     case GameDataTag.DataFlag:
                     {
-                        var objectNetId = reader.ReadPackedUInt32();
-                        Logger.Verbose("> Update {0}", objectNetId);
+                        if (_allObjectsFast.TryGetValue(reader.ReadPackedUInt32(), out var obj))
+                        {
+                            obj.Deserialize(reader, false);
+                        }
+
                         break;
                     }
 
                     case GameDataTag.RpcFlag:
                     {
-                        var objectNetId = reader.ReadPackedUInt32();
-                        var callId = reader.ReadByte();
-                        Logger.Verbose("> RPC {0} {1}", objectNetId, callId);
+                        if (_allObjectsFast.TryGetValue(reader.ReadPackedUInt32(), out var obj))
+                        {
+                            // obj.HandleRpc(reader.ReadByte(), reader);
+                        }
+
                         break;
                     }
 
