@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Impostor.Server.Games;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth.Data;
@@ -194,81 +193,6 @@ namespace Impostor.Server.Net.State
             await packet.SendToAsync(sender.Client);
 
             await BroadcastJoinMessage(packet, true, sender);
-        }
-
-        public async ValueTask HandleGameData(IMessageReader parent, IClientPlayer sender, bool toPlayer)
-        {
-            // Find target player.
-            IClientPlayer target = null;
-
-            if (toPlayer)
-            {
-                var targetId = parent.ReadPackedInt32();
-                if (!TryGetPlayer(targetId, out target))
-                {
-                    // Invalid target.
-                    return;
-                }
-            }
-
-            // Parse GameData messages.
-            while (parent.Position < parent.Length)
-            {
-                var reader = parent.ReadMessage();
-
-                switch (reader.Tag)
-                {
-                    case GameDataTag.DataFlag:
-                    {
-                        var objectNetId = reader.ReadPackedUInt32();
-                        Logger.Verbose("> Update {0}", objectNetId);
-                        break;
-                    }
-
-                    case GameDataTag.RpcFlag:
-                    {
-                        var objectNetId = reader.ReadPackedUInt32();
-                        var callId = reader.ReadByte();
-                        Logger.Verbose("> RPC {0} {1}", objectNetId, callId);
-                        break;
-                    }
-
-                    case GameDataTag.SpawnFlag:
-                    {
-                        var objectId = reader.ReadPackedUInt32();
-                        Logger.Verbose("> Spawn {0}", objectId);
-                        break;
-                    }
-
-                    case GameDataTag.DespawnFlag:
-                    {
-                        var objectNetId = reader.ReadPackedUInt32();
-                        Logger.Verbose("> Destroy {0}", objectNetId);
-                        break;
-                    }
-
-                    case GameDataTag.SceneChangeFlag:
-                    {
-                        var clientId = reader.ReadPackedInt32();
-                        var targetScene = reader.ReadString();
-                        Logger.Verbose("> Scene {0} to {1}", clientId, targetScene);
-                        break;
-                    }
-
-                    case GameDataTag.ReadyFlag:
-                    {
-                        var clientId = reader.ReadPackedInt32();
-                        Logger.Verbose("> IsReady {0}", clientId);
-                        break;
-                    }
-
-                    default:
-                    {
-                        Logger.Debug("Bad GameData tag {0}", reader.Tag);
-                        break;
-                    }
-                }
-            }
         }
     }
 }

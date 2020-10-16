@@ -1,11 +1,8 @@
 using System;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Hazel;
 using Impostor.Server.Data;
 using Impostor.Server.Games;
 using Impostor.Server.Games.Managers;
-using Impostor.Server.Hazel.Messages;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;
@@ -149,6 +146,8 @@ namespace Impostor.Server.Net
 
                     // Handle packet.
                     var readerCopy = reader.Slice(reader.Position);
+
+                    // TODO: Return value, either a bool (to cancel) or a writer (to cancel (null) or modify/overwrite).
                     await Player.Game.HandleGameData(readerCopy, Player, toPlayer);
 
                     // Broadcast packet to all other players.

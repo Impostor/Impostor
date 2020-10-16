@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -19,6 +20,7 @@ namespace Impostor.Server.Net.State
     {
         private static readonly ILogger Logger = Log.ForContext<Game>();
 
+        private readonly IServiceProvider _serviceProvider;
         private readonly IGameManager _gameManager;
         private readonly IClientManager _clientManager;
         private readonly IMatchmaker _matchmaker;
@@ -26,6 +28,7 @@ namespace Impostor.Server.Net.State
         private readonly HashSet<IPAddress> _bannedIps;
 
         public Game(
+            IServiceProvider serviceProvider,
             IGameManager gameManager,
             INodeLocator nodeLocator,
             IPEndPoint publicIp,
@@ -34,6 +37,7 @@ namespace Impostor.Server.Net.State
             IMatchmaker matchmaker,
             IClientManager clientManager)
         {
+            _serviceProvider = serviceProvider;
             _gameManager = gameManager;
             _players = new ConcurrentDictionary<int, IClientPlayer>();
             _bannedIps = new HashSet<IPAddress>();
