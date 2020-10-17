@@ -59,8 +59,6 @@ namespace Impostor.Server.Net.Manager
             var client = _clientFactory.Create(connection, name, clientVersion);
 
             Register(client);
-
-            await connection.ListenAsync();
         }
 
         public void Register(IClient client)

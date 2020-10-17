@@ -36,11 +36,5 @@ namespace Impostor.Server.Net
         /// <param name="messageType">Type of the message.</param>
         /// <returns>Message writer for the current connection.</returns>
         IConnectionMessageWriter CreateMessage(MessageType messageType);
-
-        /// <summary>
-        ///     Start listening to the client.
-        /// </summary>
-        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
-        ValueTask ListenAsync();
     }
 }

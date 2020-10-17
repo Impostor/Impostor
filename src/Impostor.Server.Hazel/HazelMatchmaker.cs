@@ -6,7 +6,6 @@ using Hazel;
 using Hazel.Udp;
 using Impostor.Server.Games;
 using Impostor.Server.Hazel.Messages;
-using Impostor.Server.Net;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Microsoft.Extensions.Logging;
@@ -30,7 +29,7 @@ namespace Impostor.Server.Hazel
             _connectionLogger = connectionLogger;
         }
 
-        public ValueTask StartAsync(IPEndPoint ipEndPoint)
+        public async ValueTask StartAsync(IPEndPoint ipEndPoint)
         {
             var mode = ipEndPoint.AddressFamily switch
             {
@@ -39,39 +38,24 @@ namespace Impostor.Server.Hazel
                 _ => throw new InvalidOperationException()
             };
 
-            _connection = new UdpConnectionListener(ipEndPoint, mode, s =>
-            {
-                _logger.LogWarning("Log from Hazel: {0}", s);
-            });
+            _connection = new UdpConnectionListener(ipEndPoint, mode);
+            _connection.NewConnection = OnNewConnection;
 
-            _connection.NewConnection += OnNewConnection;
-
-            _connection.Start();
-
-            return default;
+            await _connection.StartAsync();
         }
 
-        public ValueTask StopAsync()
+        public async ValueTask StopAsync()
         {
-            _connection.Dispose();
-
-            return default;
+            await _connection.DisposeAsync();
         }
 
-        private void OnNewConnection(NewConnectionEventArgs e)
-        {
-            Task.Run(() => HandleNewConnection(e));
-        }
-
-        private async Task HandleNewConnection(NewConnectionEventArgs e)
+        private async ValueTask OnNewConnection(NewConnectionEventArgs e)
         {
             try
             {
                 // Handshake.
                 var clientVersion = e.HandshakeData.ReadInt32();
                 var name = e.HandshakeData.ReadString();
-
-                e.HandshakeData.Recycle();
 
                 var connection = new HazelConnection(e.Connection, _connectionLogger);
 

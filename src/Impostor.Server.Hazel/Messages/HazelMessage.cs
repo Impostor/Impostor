@@ -24,7 +24,7 @@ namespace Impostor.Server.Hazel.Messages
                 throw new ObjectDisposedException(nameof(_reader));
             }
 
-            return new BufferMessageReader(_reader.Tag, _reader.Buffer.AsMemory(_reader.Offset, _reader.Length));
+            return new BufferMessageReader(_reader.Tag, _reader.Buffer);
         }
 
         private void Dispose(bool disposing)
