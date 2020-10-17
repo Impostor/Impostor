@@ -115,13 +115,15 @@ namespace Impostor.Server.Net.Manager
                 return;
             }
 
-            if (!_games.TryRemove(gameCode, out _))
+            if (!_games.TryRemove(gameCode, out game))
             {
                 return;
             }
 
             _logger.LogDebug("Remove game with code {0} ({1}).", GameCodeParser.IntToGameName(gameCode), gameCode);
             _nodeLocator.Remove(GameCodeParser.IntToGameName(gameCode));
+
+            await _eventManager.CallAsync(new GameDestroyedEvent(game));
         }
     }
 }

@@ -1,0 +1,37 @@
+﻿@page "/"
+@using Impostor.Server.Events
+@using Impostor.Server.Events.Managers
+@using Impostor.Server.Games.Managers
+@implements IDisposable
+@implements IEventListener
+@inject IEventManager EventManager
+@inject IGameManager GameManager
+
+<h2>Games</h2>
+<ul>
+    @foreach (var game in GameManager.Games)
+    {
+        <li>@game.Code</li>
+    }
+</ul>
+
+@code {
+    private IDisposable _disposable;
+
+    [EventListener(typeof(GameCreatedEvent))]
+    [EventListener(typeof(GameDestroyedEvent))]
+    public void OnGameCreated(IGameEvent e)
+    {
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        _disposable = EventManager.RegisterListener(this, InvokeAsync);
+    }
+
+    public void Dispose()
+    {
+        _disposable?.Dispose();
+    }
+}

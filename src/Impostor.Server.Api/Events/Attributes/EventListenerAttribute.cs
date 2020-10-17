@@ -2,19 +2,18 @@
 
 namespace Impostor.Server.Events
 {
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class EventListenerAttribute : Attribute
     {
         public EventListenerAttribute(EventPriority priority = EventPriority.Normal)
         {
             Priority = priority;
-            Events = new Type[0];
         }
 
         public EventListenerAttribute(Type @event, EventPriority priority = EventPriority.Normal)
         {
             Priority = priority;
-            Events = new[] { @event };
+            Event = @event;
         }
 
         /// <summary>
@@ -25,7 +24,7 @@ namespace Impostor.Server.Events
         /// <summary>
         ///     The events that the listener is listening to.
         /// </summary>
-        public Type[] Events { get; set; }
+        public Type? Event { get; set; }
 
         /// <summary>
         ///     If set to true, the listener will be called regardless of the <see cref="IEventCancelable.IsCancelled"/>.

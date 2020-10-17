@@ -63,7 +63,8 @@ namespace Impostor.Server.Events
             {
                 var methodArgument = methodArguments[i];
 
-                if (methodArgument.ParameterType == EventType)
+                if (typeof(IEvent).IsAssignableFrom(methodArgument.ParameterType)
+                    && methodArgument.ParameterType.IsAssignableFrom(EventType))
                 {
                     arguments[i] = @event;
                 }
@@ -85,17 +86,17 @@ namespace Impostor.Server.Events
                     invoke = Expression.Block(
                         Expression.IfThenElse(
                             Expression.Property(@event, nameof(IEventCancelable.IsCancelled)),
-                            Expression.Return(returnTarget, Expression.Constant(Task.CompletedTask)),
+                            Expression.Return(returnTarget, Expression.Default(typeof(ValueTask))),
                             Expression.Block(
                                 invoke,
-                                Expression.Return(returnTarget, Expression.Constant(Task.CompletedTask)))),
-                        Expression.Label(returnTarget, Expression.Constant(Task.CompletedTask)));
+                                Expression.Return(returnTarget, Expression.Default(typeof(ValueTask))))),
+                        Expression.Label(returnTarget, Expression.Default(typeof(ValueTask))));
                 }
                 else
                 {
                     invoke = Expression.Block(
                         invoke,
-                        Expression.Label(returnTarget, Expression.Constant(Task.CompletedTask)));
+                        Expression.Label(returnTarget, Expression.Default(typeof(ValueTask))));
                 }
             }
             else if (method.ReturnType == typeof(ValueTask))
@@ -105,9 +106,9 @@ namespace Impostor.Server.Events
                     invoke = Expression.Block(
                         Expression.IfThenElse(
                             Expression.Property(@event, nameof(IEventCancelable.IsCancelled)),
-                            Expression.Return(returnTarget, Expression.Constant(Task.CompletedTask)),
+                            Expression.Return(returnTarget, Expression.Default(typeof(ValueTask))),
                             Expression.Return(returnTarget, invoke)),
-                        Expression.Label(returnTarget, Expression.Constant(Task.CompletedTask)));
+                        Expression.Label(returnTarget, Expression.Default(typeof(ValueTask))));
                 }
             }
             else
@@ -119,12 +120,12 @@ namespace Impostor.Server.Events
                 .Compile();
         }
 
-        public static IEnumerable<RegisteredEventListener> FromType(Type type)
+        public static IReadOnlyList<RegisteredEventListener> FromType(Type type)
         {
             return Instances.GetOrAdd(type, t =>
             {
                 return t.GetMethods()
-                    .Where(m => !m.IsStatic && m.GetCustomAttribute(typeof(EventListenerAttribute), false) != null)
+                    .Where(m => !m.IsStatic && m.GetCustomAttributes(typeof(EventListenerAttribute), false).Any())
                     .SelectMany(m => FromMethod(t, m))
                     .ToArray();
             });
@@ -141,34 +142,21 @@ namespace Impostor.Server.Events
             }
 
             // Register the event.
-            var attribute = methodType.GetCustomAttribute<EventListenerAttribute>(false);
-
-            if (attribute == null)
+            foreach (var attribute in methodType.GetCustomAttributes<EventListenerAttribute>(false))
             {
-                yield break;
-            }
+                var eventType = attribute.Event;
 
-            Type[] eventTypes;
-
-            if (attribute.Events.Length == 0)
-            {
-                if (methodType.GetParameters().Length == 0 || !typeof(IEvent).IsAssignableFrom(methodType.GetParameters()[0].ParameterType))
+                if (eventType == null)
                 {
-                    throw new InvalidOperationException($"The first parameter of the method {methodType.GetFriendlyName()} should be the type {nameof(IEvent)}.");
+                    if (methodType.GetParameters().Length == 0 || !typeof(IEvent).IsAssignableFrom(methodType.GetParameters()[0].ParameterType))
+                    {
+                        throw new InvalidOperationException($"The first parameter of the method {methodType.GetFriendlyName()} should be the type {nameof(IEvent)}.");
+                    }
+
+                    eventType = methodType.GetParameters()[0].ParameterType;
                 }
 
-                eventTypes = new[] { methodType.GetParameters()[0].ParameterType };
-            }
-            else
-            {
-                eventTypes = attribute.Events;
-            }
-
-            foreach (var eventType in eventTypes)
-            {
-                var listener = new RegisteredEventListener(eventType, methodType, attribute, listenerType);
-
-                yield return listener;
+                yield return new RegisteredEventListener(eventType, methodType, attribute, listenerType);
             }
         }
     }

@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Impostor.Server.Plugins
 {
@@ -17,6 +19,14 @@ namespace Impostor.Server.Plugins
         public virtual ValueTask ReloadAsync()
         {
             return default;
+        }
+
+        public virtual void ConfigureHost(IHostBuilder host)
+        {
+        }
+
+        public virtual void ConfigureServices(IServiceCollection services)
+        {
         }
     }
 }
