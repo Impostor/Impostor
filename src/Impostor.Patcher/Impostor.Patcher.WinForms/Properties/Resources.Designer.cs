@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Impostor.Client.WinForms.Properties
+namespace Impostor.Patcher.WinForms.Properties
 {
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.

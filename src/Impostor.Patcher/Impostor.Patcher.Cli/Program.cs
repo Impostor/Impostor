@@ -1,32 +1,32 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Impostor.Client.Shared;
-using Impostor.Client.Shared.Events;
+using Impostor.Patcher.Shared;
+using Impostor.Patcher.Shared.Events;
 
-namespace Impostor.Client.Cli
+namespace Impostor.Patcher.Cli
 {
     internal static class Program
     {
-        private static readonly AmongUsModifier _modifier = new AmongUsModifier();
+        private static readonly AmongUsModifier Modifier = new AmongUsModifier();
 
         /// <param name="address">IP Address of the server, will prompt if not specified</param>
         /// <param name="name">Name for server region</param>
         private static Task Main(string address = null, string name = AmongUsModifier.DefaultRegionName)
         {
-            _modifier.RegionName = name;
-            _modifier.Error += ModifierOnError;
-            _modifier.Saved += ModifierOnSaved;
+            Modifier.RegionName = name;
+            Modifier.Error += ModifierOnError;
+            Modifier.Saved += ModifierOnSaved;
 
             Console.WriteLine("Welcome to Impostor");
 
-            if (_modifier.TryLoadRegionInfo(out var regionInfo))
+            if (Modifier.TryLoadRegionInfo(out var regionInfo))
             {
                 Console.WriteLine($"Currently selected region: {regionInfo.Name} ({regionInfo.Ping}, {regionInfo.Servers.Count} server(s))");
             }
 
             if (address != null)
             {
-                return _modifier.SaveIpAsync(address);
+                return Modifier.SaveIpAsync(address);
             }
 
             return PromptAsync();
@@ -60,7 +60,7 @@ namespace Impostor.Client.Cli
             {
                 Console.Write("> ");
 
-                if (await _modifier.SaveIpAsync(Console.ReadLine()))
+                if (await Modifier.SaveIpAsync(Console.ReadLine()))
                 {
                     return;
                 }

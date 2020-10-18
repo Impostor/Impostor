@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows.Forms;
-using Impostor.Client.Shared;
-using Impostor.Client.Shared.Events;
+using Impostor.Patcher.Shared;
+using Impostor.Patcher.Shared.Events;
 
-namespace Impostor.Client.WinForms.Forms
+namespace Impostor.Patcher.WinForms.Forms
 {
     public partial class FrmMain : Form
     {
