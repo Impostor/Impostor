@@ -9,6 +9,7 @@ using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -16,14 +17,14 @@ namespace Impostor.Server.Net
 {
     internal class Client : ClientBase
     {
-        private static readonly ILogger Logger = Log.ForContext<Client>();
-
+        private readonly ILogger<Client> _logger;
         private readonly IClientManager _clientManager;
         private readonly IGameManager _gameManager;
 
-        public Client(IClientManager clientManager, IGameManager gameManager, string name, IConnection connection)
+        public Client(ILogger<Client> logger, IClientManager clientManager, IGameManager gameManager, string name, IConnection connection)
             : base(name, connection)
         {
+            _logger = logger;
             _clientManager = clientManager;
             _gameManager = gameManager;
         }
@@ -34,7 +35,7 @@ namespace Impostor.Server.Net
 
             var flag = reader.Tag;
 
-            Logger.Verbose("[{0}] Server got {1}.", Id, flag);
+            _logger.LogTrace("[{0}] Server got {1}.", Id, flag);
 
             switch (flag)
             {
@@ -217,7 +218,7 @@ namespace Impostor.Server.Net
                 }
 
                 default:
-                    Logger.Warning("Server received unknown flag {0}.", flag);
+                    _logger.LogWarning("Server received unknown flag {0}.", flag);
                     break;
             }
 
@@ -227,7 +228,7 @@ namespace Impostor.Server.Net
                 flag != MessageFlags.EndGame &&
                 reader.Position < reader.Length)
             {
-                Logger.Warning(
+                _logger.LogWarning(
                     "Server did not consume all bytes from {0} ({1} < {2}).",
                     flag,
                     reader.Position,
@@ -236,7 +237,7 @@ namespace Impostor.Server.Net
 #endif
         }
 
-        public override async ValueTask HandleDisconnectAsync()
+        public override async ValueTask HandleDisconnectAsync(string reason)
         {
             try
             {
@@ -247,9 +248,10 @@ namespace Impostor.Server.Net
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Exception caught in client disconnection.");
+                _logger.LogError(ex, "Exception caught in client disconnection.");
             }
 
+            _logger.LogInformation("Client disconnecting, reason: {0}.", reason);
             _clientManager.Remove(this);
         }
 
@@ -276,7 +278,7 @@ namespace Impostor.Server.Net
                     return true;
                 }
 
-                Logger.Warning("[{0}] Client sent packet only allowed by the host ({1}).", Id, game.HostId);
+                _logger.LogWarning("[{0}] Client sent packet only allowed by the host ({1}).", Id, game.HostId);
                 return false;
             }
 

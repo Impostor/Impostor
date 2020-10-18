@@ -86,7 +86,7 @@ namespace Impostor.Server.Net.Redirector
             }
         }
 
-        public override ValueTask HandleDisconnectAsync()
+        public override ValueTask HandleDisconnectAsync(string reason)
         {
             _clientManager.Remove(this);
             return default;

@@ -33,37 +33,36 @@ namespace Impostor.Server.Hazel
         {
             if (Client != null)
             {
-                await Client.HandleDisconnectAsync();
+                await Client.HandleDisconnectAsync(e.Reason);
             }
         }
 
         private async ValueTask ConnectionOnDataReceived(DataReceivedEventArgs e)
         {
-            try
+            if (Client == null)
             {
-                while (true)
-                {
-                    if (e.Message.Position >= e.Message.Length)
-                    {
-                        break;
-                    }
-
-                    var reader = e.Message.ReadMessage();
-                    var type = e.SendOption switch
-                    {
-                        SendOption.None => MessageType.Unreliable,
-                        SendOption.Reliable => MessageType.Reliable,
-                        _ => throw new NotSupportedException()
-                    };
-
-                    using var message = new HazelMessage(reader, type);
-
-                    await Client.HandleMessageAsync(message);
-                }
+                _logger.LogWarning("Client was null.");
+                return;
             }
-            catch (Exception ex)
+
+            while (true)
             {
-                _logger.LogError(ex, "Exception caught in client data handler.");
+                if (e.Message.Position >= e.Message.Length)
+                {
+                    break;
+                }
+
+                var reader = e.Message.ReadMessage();
+                var type = e.SendOption switch
+                {
+                    SendOption.None => MessageType.Unreliable,
+                    SendOption.Reliable => MessageType.Reliable,
+                    _ => throw new NotSupportedException()
+                };
+
+                using var message = new HazelMessage(reader, type);
+
+                await Client.HandleMessageAsync(message);
             }
         }
 

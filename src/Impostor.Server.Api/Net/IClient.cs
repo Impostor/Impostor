@@ -61,6 +61,6 @@ namespace Impostor.Server.Net
 
         ValueTask HandleMessageAsync(IMessage message);
 
-        ValueTask HandleDisconnectAsync();
+        ValueTask HandleDisconnectAsync(string reason);
     }
 }

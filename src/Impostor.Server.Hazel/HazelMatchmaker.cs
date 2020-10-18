@@ -51,21 +51,14 @@ namespace Impostor.Server.Hazel
 
         private async ValueTask OnNewConnection(NewConnectionEventArgs e)
         {
-            try
-            {
-                // Handshake.
-                var clientVersion = e.HandshakeData.ReadInt32();
-                var name = e.HandshakeData.ReadString();
+            // Handshake.
+            var clientVersion = e.HandshakeData.ReadInt32();
+            var name = e.HandshakeData.ReadString();
 
-                var connection = new HazelConnection(e.Connection, _connectionLogger);
+            var connection = new HazelConnection(e.Connection, _connectionLogger);
 
-                // Register client
-                await _clientManager.RegisterConnectionAsync(connection, name, clientVersion);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogTrace(ex, "Error in new connection.");
-            }
+            // Register client
+            await _clientManager.RegisterConnectionAsync(connection, name, clientVersion);
         }
 
         public IGameMessageWriter CreateGameMessageWriter(IGame game, MessageType messageType)

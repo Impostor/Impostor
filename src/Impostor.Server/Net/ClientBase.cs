@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Hazel;
 using Impostor.Server.Net.Messages;
 
 namespace Impostor.Server.Net
@@ -28,6 +29,6 @@ namespace Impostor.Server.Net
 
         public abstract ValueTask HandleMessageAsync(IMessage message);
 
-        public abstract ValueTask HandleDisconnectAsync();
+        public abstract ValueTask HandleDisconnectAsync(string reason);
     }
 }
