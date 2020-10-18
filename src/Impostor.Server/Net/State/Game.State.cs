@@ -8,7 +8,7 @@ namespace Impostor.Server.Net.State
 {
     internal partial class Game
     {
-        private void PlayerAdd(IClientPlayer player)
+        private void PlayerAdd(ClientPlayer player)
         {
             // Store player.
             if (!_players.TryAdd(player.Client.Id, player))

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Hazel
 {
-    internal class HazelConnection : IConnection
+    internal partial class HazelConnection
     {
         private readonly ILogger<HazelConnection> _logger;
 
@@ -27,7 +27,7 @@ namespace Impostor.Server.Hazel
 
         public bool IsConnected => InnerConnection.State == ConnectionState.Connected;
 
-        public IClient Client { get; set; }
+        public ClientBase Client { get; set; }
 
         private async ValueTask ConnectionOnDisconnected(DisconnectedEventArgs e)
         {

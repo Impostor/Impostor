@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Impostor.Server.Data;
 using Impostor.Server.Games;
 using Impostor.Server.Games.Managers;
+using Impostor.Server.Hazel;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;
@@ -16,10 +17,10 @@ namespace Impostor.Server.Net
     internal class Client : ClientBase
     {
         private readonly ILogger<Client> _logger;
-        private readonly IClientManager _clientManager;
-        private readonly IGameManager _gameManager;
+        private readonly ClientManager _clientManager;
+        private readonly GameManager _gameManager;
 
-        public Client(ILogger<Client> logger, IClientManager clientManager, IGameManager gameManager, string name, IConnection connection)
+        public Client(ILogger<Client> logger, ClientManager clientManager, GameManager gameManager, string name, HazelConnection connection)
             : base(name, connection)
         {
             _logger = logger;

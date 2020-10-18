@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hazel;
+using Impostor.Server.Hazel;
 using Impostor.Server.Net.Messages;
+using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net
 {
-    public abstract class ClientBase : IClient
+    internal abstract partial class ClientBase
     {
-        protected ClientBase(string name, IConnection connection)
+        protected ClientBase(string name, HazelConnection connection)
         {
             Name = name;
             Connection = connection;
@@ -19,13 +21,13 @@ namespace Impostor.Server.Net
 
         public string Name { get; }
 
-        public IConnection Connection { get; }
+        public HazelConnection Connection { get; }
 
         public bool IsBot => false;
 
         public IDictionary<object, object> Items { get; }
 
-        public IClientPlayer Player { get; set; }
+        public ClientPlayer Player { get; set; }
 
         public abstract ValueTask HandleMessageAsync(IMessage message);
 

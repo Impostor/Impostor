@@ -34,30 +34,5 @@ namespace Impostor.Server.Games
         IGameMessageWriter CreateMessage(MessageType type);
 
         bool TryGetPlayer(int id, [NotNullWhen(true)] out IClientPlayer player);
-
-        /// <summary>
-        ///     Register a new client to the game.
-        /// </summary>
-        /// <param name="client">Client to register.</param>
-        /// <returns>Join result.</returns>
-        ValueTask<GameJoinResult> AddClientAsync(IClient client);
-
-        /// <summary>
-        ///     Kicks all the players from the game to end the game.
-        /// </summary>
-        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
-        ValueTask EndAsync();
-
-        ValueTask HandleStartGame(IMessageReader reader);
-
-        ValueTask HandleEndGame(IMessageReader reader);
-
-        ValueTask HandleKickPlayer(int playerId, bool isBan);
-
-        ValueTask HandleRemovePlayer(int playerId, DisconnectReason reason);
-
-        ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic);
-
-        ValueTask HandleGameData(IMessageReader parent, IClientPlayer sender, bool toPlayer);
     }
 }

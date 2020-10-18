@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Impostor.Server.Games;
 using Impostor.Server.Games.Managers;
+using Impostor.Server.Hazel;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Server.Net.Redirector;
@@ -16,30 +17,30 @@ using ILogger = Serilog.ILogger;
 
 namespace Impostor.Server.Net.State
 {
-    internal partial class Game : IGame
+    internal partial class Game
     {
         private static readonly ILogger Logger = Log.ForContext<Game>();
 
         private readonly IServiceProvider _serviceProvider;
-        private readonly IGameManager _gameManager;
-        private readonly IClientManager _clientManager;
-        private readonly IMatchmaker _matchmaker;
-        private readonly ConcurrentDictionary<int, IClientPlayer> _players;
+        private readonly GameManager _gameManager;
+        private readonly ClientManager _clientManager;
+        private readonly Matchmaker _matchmaker;
+        private readonly ConcurrentDictionary<int, ClientPlayer> _players;
         private readonly HashSet<IPAddress> _bannedIps;
 
         public Game(
             IServiceProvider serviceProvider,
-            IGameManager gameManager,
+            GameManager gameManager,
             INodeLocator nodeLocator,
             IPEndPoint publicIp,
             GameCode code,
             GameOptionsData options,
-            IMatchmaker matchmaker,
-            IClientManager clientManager)
+            Matchmaker matchmaker,
+            ClientManager clientManager)
         {
             _serviceProvider = serviceProvider;
             _gameManager = gameManager;
-            _players = new ConcurrentDictionary<int, IClientPlayer>();
+            _players = new ConcurrentDictionary<int, ClientPlayer>();
             _bannedIps = new HashSet<IPAddress>();
 
             PublicIp = publicIp;

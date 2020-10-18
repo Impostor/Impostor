@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Server.Data;
+using Impostor.Server.Hazel;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;
@@ -11,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Manager
 {
-    internal class ClientManager : IClientManager
+    internal partial class ClientManager
     {
         public static HashSet<int> SupportedVersions { get; } = new HashSet<int>
         {
@@ -20,7 +21,7 @@ namespace Impostor.Server.Net.Manager
         };
 
         private readonly ILogger<ClientManager> _logger;
-        private readonly ConcurrentDictionary<int, IClient> _clients;
+        private readonly ConcurrentDictionary<int, ClientBase> _clients;
         private readonly IClientFactory _clientFactory;
         private int _idLast;
 
@@ -28,8 +29,10 @@ namespace Impostor.Server.Net.Manager
         {
             _logger = logger;
             _clientFactory = clientFactory;
-            _clients = new ConcurrentDictionary<int, IClient>();
+            _clients = new ConcurrentDictionary<int, ClientBase>();
         }
+
+        public IEnumerable<ClientBase> Clients => _clients.Values;
 
         public int NextId()
         {
@@ -47,7 +50,7 @@ namespace Impostor.Server.Net.Manager
             return clientId;
         }
 
-        public async ValueTask RegisterConnectionAsync(IConnection connection, string name, int clientVersion)
+        public async ValueTask RegisterConnectionAsync(HazelConnection connection, string name, int clientVersion)
         {
             if (name.Length > 10)
             {
@@ -66,12 +69,6 @@ namespace Impostor.Server.Net.Manager
             }
 
             var client = _clientFactory.Create(connection, name, clientVersion);
-
-            Register(client);
-        }
-
-        public void Register(IClient client)
-        {
             var id = NextId();
 
             client.Id = id;

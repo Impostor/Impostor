@@ -131,7 +131,8 @@ namespace Impostor.Server
                         services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
                     }
 
-                    services.AddSingleton<IClientManager, ClientManager>();
+                    services.AddSingleton<ClientManager>();
+                    services.AddSingleton<IClientManager>(p => p.GetRequiredService<ClientManager>());
 
                     if (redirector.Enabled && redirector.Master)
                     {
@@ -142,11 +143,12 @@ namespace Impostor.Server
                     else
                     {
                         services.AddSingleton<IClientFactory, ClientFactory<Client>>();
-                        services.AddSingleton<IGameManager, GameManager>();
+                        services.AddSingleton<GameManager>();
+                        services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
                     }
 
                     services.AddSingleton<IEventManager, EventManager>();
-                    services.UseHazelMatchmaking();
+                    services.AddSingleton<Matchmaker>();
                     services.AddHostedService<MatchmakerService>();
                 })
                 .UsePluginLoader(pluginConfig)

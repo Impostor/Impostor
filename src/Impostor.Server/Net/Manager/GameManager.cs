@@ -19,7 +19,7 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Manager
 {
-    internal class GameManager : IGameManager
+    internal partial class GameManager
     {
         private readonly ILogger<GameManager> _logger;
         private readonly INodeLocator _nodeLocator;
@@ -38,9 +38,7 @@ namespace Impostor.Server.Net.Manager
             _games = new ConcurrentDictionary<int, Game>();
         }
 
-        public IEnumerable<IGame> Games => _games.Select(kv => kv.Value);
-
-        public async ValueTask<IGame> CreateAsync(GameOptionsData options)
+        public async ValueTask<Game> CreateAsync(GameOptionsData options)
         {
             // TODO: Prevent duplicates when using server redirector using INodeProvider.
             var gameCode = GameCode.Create();
@@ -60,13 +58,13 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        public IGame Find(GameCode code)
+        public Game Find(GameCode code)
         {
             _games.TryGetValue(code, out var game);
             return game;
         }
 
-        public IEnumerable<IGame> FindListings(MapFlags map, int impostorCount, GameKeywords language, int count = 10)
+        public IEnumerable<Game> FindListings(MapFlags map, int impostorCount, GameKeywords language, int count = 10)
         {
             var results = 0;
 
