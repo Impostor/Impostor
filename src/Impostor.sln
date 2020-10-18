@@ -23,13 +23,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Server.Api", "Impo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Server.Hazel", "Impostor.Server.Hazel\Impostor.Server.Hazel.csproj", "{C9E8E1E2-BFE3-41AD-8CB9-82F0F52E2306}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{94FAED42-15BB-40CF-BE64-5D5C3B4ABC8F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "patcher", "patcher", "{94FAED42-15BB-40CF-BE64-5D5C3B4ABC8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client.Shared", "Impostor.Client\Impostor.Client.Shared\Impostor.Client.Shared.csproj", "{7C3EB599-2292-4532-B280-D5BED1094DD4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Patcher.Shared", "Impostor.Patcher\Impostor.Patcher.Shared\Impostor.Patcher.Shared.csproj", "{7C3EB599-2292-4532-B280-D5BED1094DD4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client.WinForms", "Impostor.Client\Impostor.Client.WinForms\Impostor.Client.WinForms.csproj", "{804CF172-0C87-4423-9688-BD97D549891E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Patcher.WinForms", "Impostor.Patcher\Impostor.Patcher.WinForms\Impostor.Patcher.WinForms.csproj", "{804CF172-0C87-4423-9688-BD97D549891E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client.Cli", "Impostor.Client\Impostor.Client.Cli\Impostor.Client.Cli.csproj", "{82B36C4C-4EBD-49B7-A2DB-0B3308FBEF69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Patcher.Cli", "Impostor.Patcher\Impostor.Patcher.Cli\Impostor.Patcher.Cli.csproj", "{82B36C4C-4EBD-49B7-A2DB-0B3308FBEF69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
