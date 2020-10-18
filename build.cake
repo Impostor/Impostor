@@ -57,7 +57,7 @@ Task("Clean")
 Task("Restore")
     .Does(() => {
         DotNetCoreRestore("./src/Impostor.sln");
-        DotNetCoreRestore("./src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj");
+        DotNetCoreRestore("./src/Impostor.Patcher/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj");
     });
 
 Task("Build")
@@ -70,7 +70,7 @@ Task("Build")
         });
 
         // Client.
-        ImpostorPublishNF("Impostor-Client", "./src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj");
+        ImpostorPublishNF("Impostor-Patcher", "./src/Impostor.Client/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj");
         
         // Server.
         ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64");

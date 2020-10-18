@@ -11,7 +11,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Impostor.Client.Shared\Impostor.Client.Shared.csproj" />
+        <ProjectReference Include="..\Impostor.Patcher.Shared\Impostor.Patcher.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

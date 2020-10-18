@@ -68,25 +68,22 @@ namespace Impostor.Tools.Proxy
             // True if this is our own packet.
             using (var stream = udp.Payload.ToMemoryStream())
             {
-                var reader = MessageReader.Get(stream.ToArray());
-                if (reader.Buffer[0] == (byte) SendOption.Reliable)
+                var reader = new MessageReader(stream.ToArray());
+                var option = reader.Buffer.Span[0];
+                if (option == (byte) SendOption.Reliable)
                 {
-                    reader.Offset = 3;
-                    reader.Length = udp.Payload.Length - 3;
-                    reader.Position = 0;
+                    reader = reader.Slice(3);
                 }
-                else if (reader.Buffer[0] == (byte) UdpSendOption.Acknowledgement ||
-                         reader.Buffer[0] == (byte) UdpSendOption.Ping ||
-                         reader.Buffer[0] == (byte) UdpSendOption.Hello ||
-                         reader.Buffer[0] == (byte) UdpSendOption.Disconnect)
+                else if (option == (byte) UdpSendOption.Acknowledgement ||
+                         option == (byte) UdpSendOption.Ping ||
+                         option == (byte) UdpSendOption.Hello ||
+                         option == (byte) UdpSendOption.Disconnect)
                 {
                     return;
                 }
                 else
                 {
-                    reader.Offset = 1;
-                    reader.Length = udp.Payload.Length - 1;
-                    reader.Position = 0;
+                    reader = reader.Slice(1);
                 }
                 
                 var isSent = ipSrc.StartsWith("192.");
@@ -134,7 +131,7 @@ namespace Impostor.Tools.Proxy
                     break;
                 case 5:
                 case 6:
-                    Console.WriteLine(HexUtils.HexDump(packet.Buffer.Take(packet.Length).ToArray()));
+                    Console.WriteLine(HexUtils.HexDump(packet.Buffer.ToArray().Take(packet.Length).ToArray()));
                     packet.Position = packet.Length;
                     break;
                 case 7:
@@ -174,7 +171,7 @@ namespace Impostor.Tools.Proxy
                 case 5:
                 case 6:
                     Console.WriteLine("- GameCode        " + packet.ReadInt32());
-                    Console.WriteLine(HexUtils.HexDump(packet.Buffer.Take(packet.Length).ToArray()));
+                    Console.WriteLine(HexUtils.HexDump(packet.Buffer.ToArray().Take(packet.Length).ToArray()));
                     packet.Position = packet.Length;
                     break;
             }

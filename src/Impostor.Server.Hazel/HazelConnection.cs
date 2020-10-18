@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Net;
 using System.Threading.Tasks;
 using Hazel;
@@ -13,15 +12,13 @@ namespace Impostor.Server.Hazel
     internal class HazelConnection : IConnection
     {
         private readonly ILogger<HazelConnection> _logger;
-        private readonly ConcurrentStack<DataReceivedEventArgs> _pendingMessages;
 
         public HazelConnection(Connection innerConnection, ILogger<HazelConnection> logger)
         {
             _logger = logger;
-            _pendingMessages = new ConcurrentStack<DataReceivedEventArgs>();
             InnerConnection = innerConnection;
-            innerConnection.DataReceived += ConnectionOnDataReceived;
-            innerConnection.Disconnected += ConnectionOnDisconnected;
+            innerConnection.DataReceived = ConnectionOnDataReceived;
+            innerConnection.Disconnected = ConnectionOnDisconnected;
         }
 
         public Connection InnerConnection { get; }
@@ -32,70 +29,46 @@ namespace Impostor.Server.Hazel
 
         public IClient Client { get; set; }
 
-        private void ConnectionOnDisconnected(object sender, DisconnectedEventArgs e)
+        private async ValueTask ConnectionOnDisconnected(DisconnectedEventArgs e)
         {
             if (Client != null)
             {
-                Task.Run(Client.HandleDisconnectAsync);
+                await Client.HandleDisconnectAsync(e.Reason);
             }
         }
 
-        private void ConnectionOnDataReceived(DataReceivedEventArgs e)
-        {
-            Task.Run(() => HandleData(e));
-        }
-
-        private async Task HandleData(DataReceivedEventArgs e)
+        private async ValueTask ConnectionOnDataReceived(DataReceivedEventArgs e)
         {
             if (Client == null)
             {
-                _pendingMessages.Push(e);
+                _logger.LogWarning("Client was null.");
                 return;
             }
 
-            try
+            while (true)
             {
-                while (true)
+                if (e.Message.Position >= e.Message.Length)
                 {
-                    if (e.Message.Position >= e.Message.Length)
-                    {
-                        break;
-                    }
-
-                    var reader = e.Message.ReadMessage();
-                    var type = e.SendOption switch
-                    {
-                        SendOption.None => MessageType.Unreliable,
-                        SendOption.Reliable => MessageType.Reliable,
-                        _ => throw new NotSupportedException()
-                    };
-
-                    using var message = new HazelMessage(reader, type);
-
-                    await Client.HandleMessageAsync(message);
+                    break;
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception caught in client data handler.");
-            }
-            finally
-            {
-                e.Message.Recycle();
+
+                var reader = e.Message.ReadMessage();
+                var type = e.SendOption switch
+                {
+                    SendOption.None => MessageType.Unreliable,
+                    SendOption.Reliable => MessageType.Reliable,
+                    _ => throw new NotSupportedException()
+                };
+
+                using var message = new HazelMessage(reader, type);
+
+                await Client.HandleMessageAsync(message);
             }
         }
 
         public IConnectionMessageWriter CreateMessage(MessageType messageType)
         {
             return new HazelConnectionMessageWriter(messageType, this);
-        }
-
-        public async ValueTask ListenAsync()
-        {
-            while (_pendingMessages.TryPop(out var eventArgs))
-            {
-                await HandleData(eventArgs);
-            }
         }
     }
 }

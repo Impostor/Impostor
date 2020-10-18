@@ -74,7 +74,7 @@ namespace Impostor.Server.Hazel.Messages
             return output;
         }
 
-        public unsafe float ReadSingle()
+        public float ReadSingle()
         {
             var output = BinaryPrimitives.ReadSingleLittleEndian(Buffer.Span.Slice(Position));
             Position += sizeof(float);
@@ -136,7 +136,7 @@ namespace Impostor.Server.Hazel.Messages
         public void CopyTo(IMessageWriter writer)
         {
             writer.Write((ushort) Length);
-            writer.Write((byte) Tag);
+            writer.Write(Tag);
             writer.Write(Buffer);
         }
 

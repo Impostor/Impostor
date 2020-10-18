@@ -18,5 +18,8 @@
         "Port": 22024
       }
     ]
+  },
+  "Debug": {
+    "EnableGameRecorder": true
   }
 }

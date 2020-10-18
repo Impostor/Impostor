@@ -16,10 +16,9 @@ namespace Impostor.Server.Hazel.Messages
 
         public IConnection Connection => _connection;
 
-        public ValueTask SendAsync()
+        public async ValueTask SendAsync()
         {
-            _connection.InnerConnection.Send(Writer);
-            return default;
+            await _connection.InnerConnection.Send(Writer);
         }
     }
 }

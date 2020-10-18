@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Impostor.Client.Shared
+namespace Impostor.Patcher.Shared
 {
     public class Configuration
     {

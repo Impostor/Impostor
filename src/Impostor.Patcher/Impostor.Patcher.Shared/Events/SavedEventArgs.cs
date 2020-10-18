@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Impostor.Client.Shared.Events
+namespace Impostor.Patcher.Shared.Events
 {
     public class SavedEventArgs : EventArgs
     {

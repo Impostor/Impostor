@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Gameloop.Vdf;
 using Gameloop.Vdf.Linq;
-using Impostor.Client.Shared.Events;
+using Impostor.Patcher.Shared.Events;
 using Impostor.Shared.Innersloth;
-using ErrorEventArgs = Impostor.Client.Shared.Events.ErrorEventArgs;
+using ErrorEventArgs = Impostor.Patcher.Shared.Events.ErrorEventArgs;
 
-namespace Impostor.Client.Shared
+namespace Impostor.Patcher.Shared
 {
     public class AmongUsModifier
     {

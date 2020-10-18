@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Impostor.Server.Data;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;
@@ -48,6 +49,14 @@ namespace Impostor.Server.Net.Manager
 
         public async ValueTask RegisterConnectionAsync(IConnection connection, string name, int clientVersion)
         {
+            if (name.Length > 10)
+            {
+                using var packet = connection.CreateMessage(MessageType.Reliable);
+                Message01JoinGame.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameLength);
+                await packet.SendAsync();
+                return;
+            }
+
             if (!SupportedVersions.Contains(clientVersion))
             {
                 using var packet = connection.CreateMessage(MessageType.Reliable);
@@ -59,8 +68,6 @@ namespace Impostor.Server.Net.Manager
             var client = _clientFactory.Create(connection, name, clientVersion);
 
             Register(client);
-
-            await connection.ListenAsync();
         }
 
         public void Register(IClient client)
@@ -68,13 +75,13 @@ namespace Impostor.Server.Net.Manager
             var id = NextId();
 
             client.Id = id;
-            _logger.LogInformation("Client connected.");
+            _logger.LogTrace("Client connected.");
             _clients.TryAdd(id, client);
         }
 
         public void Remove(IClient client)
         {
-            _logger.LogInformation("Client disconnected.");
+            _logger.LogTrace("Client disconnected.");
             _clients.TryRemove(client.Id, out _);
         }
 
