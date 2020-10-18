@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Impostor.Server.Data;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;
@@ -48,6 +49,14 @@ namespace Impostor.Server.Net.Manager
 
         public async ValueTask RegisterConnectionAsync(IConnection connection, string name, int clientVersion)
         {
+            if (name.Length > 10)
+            {
+                using var packet = connection.CreateMessage(MessageType.Reliable);
+                Message01JoinGame.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameLength);
+                await packet.SendAsync();
+                return;
+            }
+
             if (!SupportedVersions.Contains(clientVersion))
             {
                 using var packet = connection.CreateMessage(MessageType.Reliable);

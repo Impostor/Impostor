@@ -3,7 +3,6 @@
     public enum DisconnectReason
     {
         ExitGame = 0,
-        Destroy = 16,
         // The game you tried to join is full.
         // Check with the host to see if you can join next round.
         GameFull = 1,
@@ -31,11 +30,10 @@
         // You can rejoin if the room hasn't started
         // You were kicked
         Kicked = 7,
-        // Server refused username: %USERNAME%
-        InvalidName = 9,
         // You were banned for hacking.
         // Please stop.
         Hacking = 10,
+        Destroy = 16,
         // You disconnected from the host.
         // If this happens often, check your WiFi strength.
         //

@@ -11,5 +11,7 @@
 
         public const string NotImplemented = "Game listing has not been implemented in Impostor yet for servers " +
                                              "running in server redirection mode.";
+
+        public const string UsernameLength = "Your username is too long, please make it shorter.";
     }
 }
