@@ -147,7 +147,7 @@ namespace Impostor.Server.Net.State
             // Add player to the game.
             if (isNew)
             {
-                PlayerAdd(sender);
+                await PlayerAdd(sender);
             }
 
             using (var message = CreateMessage(MessageType.Reliable))
@@ -169,7 +169,7 @@ namespace Impostor.Server.Net.State
             // Add player to the game.
             if (isNew)
             {
-                PlayerAdd(sender);
+                await PlayerAdd(sender);
             }
 
             // Check if the host joined and let everyone join.

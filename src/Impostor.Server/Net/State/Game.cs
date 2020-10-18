@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Impostor.Server.Events.Managers;
 using Impostor.Server.Games;
 using Impostor.Server.Games.Managers;
 using Impostor.Server.Hazel;
@@ -27,6 +28,7 @@ namespace Impostor.Server.Net.State
         private readonly Matchmaker _matchmaker;
         private readonly ConcurrentDictionary<int, ClientPlayer> _players;
         private readonly HashSet<IPAddress> _bannedIps;
+        private readonly IEventManager _eventManager;
 
         public Game(
             IServiceProvider serviceProvider,
@@ -36,7 +38,8 @@ namespace Impostor.Server.Net.State
             GameCode code,
             GameOptionsData options,
             Matchmaker matchmaker,
-            ClientManager clientManager)
+            ClientManager clientManager,
+            IEventManager eventManager)
         {
             _serviceProvider = serviceProvider;
             _gameManager = gameManager;
@@ -50,6 +53,7 @@ namespace Impostor.Server.Net.State
             Options = options;
             _matchmaker = matchmaker;
             _clientManager = clientManager;
+            _eventManager = eventManager;
             Items = new ConcurrentDictionary<object, object>();
         }
 
