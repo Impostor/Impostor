@@ -26,10 +26,10 @@ namespace Impostor.Server.Net.State
         private readonly List<InnerNetObject> _allObjects = new List<InnerNetObject>();
         private readonly Dictionary<uint, InnerNetObject> _allObjectsFast = new Dictionary<uint, InnerNetObject>();
 
-        public async ValueTask HandleGameData(IMessageReader parent, IClientPlayer sender, bool toPlayer)
+        public async ValueTask HandleGameData(IMessageReader parent, ClientPlayer sender, bool toPlayer)
         {
             // Find target player.
-            IClientPlayer target = null;
+            ClientPlayer target = null;
 
             if (toPlayer)
             {

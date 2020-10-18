@@ -32,7 +32,5 @@ namespace Impostor.Server.Games
         int HostId { get; }
 
         IGameMessageWriter CreateMessage(MessageType type);
-
-        bool TryGetPlayer(int id, [NotNullWhen(true)] out IClientPlayer player);
     }
 }

@@ -28,7 +28,7 @@ namespace Impostor.Tests.Hazel
             Assert.Equal(Test1, reader.ReadInt32());
             Assert.Equal(Test2, reader.ReadInt32());
         }
-        
+
         [Fact]
         public void ReadProperBool()
         {

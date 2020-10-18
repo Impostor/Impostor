@@ -8,6 +8,7 @@ using Impostor.Server.Events.Managers;
 using Impostor.Server.Games;
 using Impostor.Server.Games.Managers;
 using Impostor.Server.Hazel;
+using Impostor.Server.Hazel.Messages;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Server.Net.Redirector;
@@ -73,16 +74,16 @@ namespace Impostor.Server.Net.State
 
         public int PlayerCount => _players.Count;
 
-        public IClientPlayer Host => _players[HostId];
+        public ClientPlayer Host => _players[HostId];
 
         public IEnumerable<IClientPlayer> Players => _players.Select(p => p.Value);
 
         public IGameMessageWriter CreateMessage(MessageType type)
         {
-            return _matchmaker.CreateGameMessageWriter(this, type);
+            return new HazelGameMessageWriter(type, this);
         }
 
-        public bool TryGetPlayer(int id, out IClientPlayer player)
+        public bool TryGetPlayer(int id, out ClientPlayer player)
         {
             if (_players.TryGetValue(id, out var result))
             {
@@ -99,7 +100,7 @@ namespace Impostor.Server.Net.State
             return _gameManager.RemoveAsync(Code);
         }
 
-        private ValueTask BroadcastJoinMessage(IGameMessageWriter message, bool clear, IClientPlayer player)
+        private ValueTask BroadcastJoinMessage(IGameMessageWriter message, bool clear, ClientPlayer player)
         {
             Message01JoinGame.SerializeJoin(message, clear, Code, player.Client.Id, HostId);
 

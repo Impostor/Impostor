@@ -14,9 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\submodules\Hazel-Networking\Hazel\Hazel.csproj" />
-      <ProjectReference Include="..\Impostor.Server.Hazel\Impostor.Server.Hazel.csproj" />
-      <ProjectReference Include="..\Impostor.Shared\Impostor.Shared.csproj" />
+      <ProjectReference Include="..\Impostor.Server\Impostor.Server.csproj" />
     </ItemGroup>
 
 </Project>

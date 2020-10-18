@@ -6,14 +6,15 @@ using Hazel;
 using Impostor.Server.Games;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Messages;
+using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Hazel.Messages
 {
     internal class HazelGameMessageWriter : HazelMessageWriter, IGameMessageWriter
     {
-        private readonly IGame _game;
+        private readonly Game _game;
 
-        public HazelGameMessageWriter(MessageType type, IGame game)
+        public HazelGameMessageWriter(MessageType type, Game game)
             : base(type)
         {
             _game = game;
