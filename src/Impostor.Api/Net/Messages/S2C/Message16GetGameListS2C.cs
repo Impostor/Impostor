@@ -1,18 +1,10 @@
 ﻿using System.Collections.Generic;
 using Impostor.Api.Games;
-using Impostor.Api.Innersloth;
-using Impostor.Api.Net.Messages;
 
-namespace Impostor.Server.Net.Messages
+namespace Impostor.Api.Net.Messages.S2C
 {
-    internal static class Message16GetGameListV2
+    public class Message16GetGameListS2C
     {
-        public static void Deserialize(IMessageReader reader, out GameOptionsData options)
-        {
-            reader.ReadPackedInt32(); // Hardcoded 0.
-            options = GameOptionsData.Deserialize(reader.ReadBytesAndSize());
-        }
-
         public static void Serialize(IMessageWriter writer, int skeldGameCount, int miraHqGameCount, int polusGameCount, IEnumerable<IGame> games)
         {
             writer.StartMessage(MessageFlags.GetGameListV2);
@@ -31,19 +23,24 @@ namespace Impostor.Server.Net.Messages
             {
                 writer.StartMessage(0);
                 writer.Write(game.PublicIp.Address);
-                writer.Write((ushort) game.PublicIp.Port);
+                writer.Write((ushort)game.PublicIp.Port);
                 writer.Write(game.Code);
                 writer.Write(game.Host.Client.Name);
-                writer.Write((byte) game.PlayerCount);
+                writer.Write((byte)game.PlayerCount);
                 writer.WritePacked(1); // TODO: What does Age do?
-                writer.Write((byte) game.Options.MapId);
-                writer.Write((byte) game.Options.NumImpostors);
-                writer.Write((byte) game.Options.MaxPlayers);
+                writer.Write((byte)game.Options.MapId);
+                writer.Write((byte)game.Options.NumImpostors);
+                writer.Write((byte)game.Options.MaxPlayers);
                 writer.EndMessage();
             }
 
             writer.EndMessage();
             writer.EndMessage();
+        }
+
+        public static void Deserialize(IMessageReader reader)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

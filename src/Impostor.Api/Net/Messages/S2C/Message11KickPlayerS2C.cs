@@ -1,8 +1,6 @@
-﻿using Impostor.Api.Net.Messages;
-
-namespace Impostor.Server.Net.Messages
+﻿namespace Impostor.Api.Net.Messages.S2C
 {
-    internal static class Message11KickPlayer
+    public class Message11KickPlayerS2C
     {
         public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, bool isBan)
         {
@@ -18,10 +16,9 @@ namespace Impostor.Server.Net.Messages
             writer.EndMessage();
         }
 
-        public static void Deserialize(IMessageReader reader, out int playerId, out bool isBan)
+        public static void Deserialize(IMessageReader reader)
         {
-            playerId = reader.ReadPackedInt32();
-            isBan = reader.ReadBoolean();
+            throw new System.NotImplementedException();
         }
     }
 }

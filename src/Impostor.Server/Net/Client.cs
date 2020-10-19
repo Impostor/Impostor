@@ -5,10 +5,11 @@ using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.C2S;
+using Impostor.Api.Net.Messages.S2C;
 using Impostor.Server.Data;
 using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
-using Impostor.Server.Net.Messages;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net
@@ -38,7 +39,7 @@ namespace Impostor.Server.Net
                 case MessageFlags.HostGame:
                 {
                     // Read game settings.
-                    var gameInfo = Message00HostGame.Deserialize(reader);
+                    var gameInfo = Message00HostGameC2S.Deserialize(reader);
 
                     // Create game.
                     var game = await _gameManager.CreateAsync(gameInfo);
@@ -46,7 +47,7 @@ namespace Impostor.Server.Net
                     // Code in the packet below will be used in JoinGame.
                     using (var writer = MessageWriter.Get(MessageType.Reliable))
                     {
-                        Message00HostGame.Serialize(writer, game.Code);
+                        Message00HostGameS2C.Serialize(writer, game.Code);
                         await Connection.SendAsync(writer);
                     }
 
@@ -55,7 +56,7 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.JoinGame:
                 {
-                    Message01JoinGame.Deserialize(
+                    Message01JoinGameC2S.Deserialize(
                         reader,
                         out var gameCode,
                         out _);
@@ -124,7 +125,7 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    Message04RemovePlayer.Deserialize(
+                    Message04RemovePlayerC2S.Deserialize(
                         reader,
                         out var playerId,
                         out var reason);
@@ -186,7 +187,7 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    Message10AlterGame.Deserialize(
+                    Message10AlterGameC2S.Deserialize(
                         reader,
                         out var gameTag,
                         out var value);
@@ -207,7 +208,7 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    Message11KickPlayer.Deserialize(
+                    Message11KickPlayerC2S.Deserialize(
                         reader,
                         out var playerId,
                         out var isBan);
@@ -218,7 +219,7 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.GetGameListV2:
                 {
-                    Message16GetGameListV2.Deserialize(reader, out var options);
+                    Message16GetGameListC2S.Deserialize(reader, out var options);
                     await OnRequestGameList(options);
                     break;
                 }
@@ -308,7 +309,7 @@ namespace Impostor.Server.Net
             var miraHqGameCount = _gameManager.GetGameCount(MapFlags.MiraHQ);
             var polusGameCount = _gameManager.GetGameCount(MapFlags.Polus);
 
-            Message16GetGameListV2.Serialize(message, skeldGameCount, miraHqGameCount, polusGameCount, games);
+            Message16GetGameListS2C.Serialize(message, skeldGameCount, miraHqGameCount, polusGameCount, games);
 
             return Connection.SendAsync(message);
         }
@@ -321,7 +322,7 @@ namespace Impostor.Server.Net
             }
 
             using var packet = MessageWriter.Get(MessageType.Reliable);
-            Message01JoinGame.SerializeError(packet, false, reason, message);
+            Message01JoinGameS2C.SerializeError(packet, false, reason, message);
             return Connection.SendAsync(packet);
         }
     }

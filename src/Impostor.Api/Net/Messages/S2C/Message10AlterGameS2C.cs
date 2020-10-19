@@ -1,9 +1,8 @@
 ﻿using Impostor.Api.Innersloth.Data;
-using Impostor.Api.Net.Messages;
 
-namespace Impostor.Server.Net.Messages
+namespace Impostor.Api.Net.Messages.S2C
 {
-    internal static class Message10AlterGame
+    public static class Message10AlterGameS2C
     {
         public static void Serialize(IMessageWriter writer, bool clear, int gameCode, bool isPublic)
         {
@@ -19,10 +18,9 @@ namespace Impostor.Server.Net.Messages
             writer.EndMessage();
         }
 
-        public static void Deserialize(IMessageReader reader, out AlterGameTags gameTag, out bool isPublic)
+        public static void Deserialize(IMessageReader reader)
         {
-            gameTag = (AlterGameTags) reader.ReadByte();
-            isPublic = reader.ReadBoolean();
+            throw new System.NotImplementedException();
         }
     }
 }

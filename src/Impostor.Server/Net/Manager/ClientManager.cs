@@ -7,10 +7,10 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.S2C;
 using Impostor.Server.Data;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Hazel;
-using Impostor.Server.Net.Messages;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Manager
@@ -58,7 +58,7 @@ namespace Impostor.Server.Net.Manager
             if (name.Length > 10)
             {
                 using var packet = MessageWriter.Get(MessageType.Reliable);
-                Message01JoinGame.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameLength);
+                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameLength);
                 await connection.SendAsync(packet);
                 return;
             }
@@ -66,7 +66,7 @@ namespace Impostor.Server.Net.Manager
             if (!SupportedVersions.Contains(clientVersion))
             {
                 using var packet = MessageWriter.Get(MessageType.Reliable);
-                Message01JoinGame.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
+                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
                 await connection.SendAsync(packet);
                 return;
             }

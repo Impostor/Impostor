@@ -1,8 +1,6 @@
-﻿using Impostor.Api.Net.Messages;
-
-namespace Impostor.Server.Net.Messages
+﻿namespace Impostor.Api.Net.Messages.S2C
 {
-    internal static class Message07JoinedGame
+    public static class Message07JoinedGameS2C
     {
         public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId, int[] otherPlayerIds)
         {
@@ -23,6 +21,11 @@ namespace Impostor.Server.Net.Messages
             }
 
             writer.EndMessage();
+        }
+
+        public static void Deserialize(IMessageReader reader)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

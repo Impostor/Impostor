@@ -6,6 +6,8 @@ namespace Impostor.Api.Innersloth
 {
     public class GameOptionsData
     {
+        public const int LatestVersion = 2;
+
         public byte Version { get; set; }
         public byte MaxPlayers { get; set; }
         public GameKeywords Keywords { get; set; }

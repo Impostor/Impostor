@@ -1,10 +1,9 @@
 ﻿using System;
 using Impostor.Api.Innersloth.Data;
-using Impostor.Api.Net.Messages;
 
-namespace Impostor.Server.Net.Messages
+namespace Impostor.Api.Net.Messages.S2C
 {
-    internal static class Message01JoinGame
+    public class Message01JoinGameS2C
     {
         public static void SerializeJoin(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId)
         {
@@ -43,10 +42,9 @@ namespace Impostor.Server.Net.Messages
             writer.EndMessage();
         }
 
-        public static void Deserialize(IMessageReader reader, out int gameCode, out byte unknown)
+        public static void Deserialize(IMessageReader reader)
         {
-            gameCode = reader.ReadInt32();
-            unknown = reader.ReadByte();
+            throw new System.NotImplementedException();
         }
     }
 }

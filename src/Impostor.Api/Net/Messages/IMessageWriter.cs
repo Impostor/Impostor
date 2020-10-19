@@ -101,6 +101,12 @@ namespace Impostor.Api.Net.Messages
         /// <param name="value">Value to write.</param>
         void Write(GameCode value);
 
+        void WriteBytesAndSize(byte[] bytes);
+
+        void WriteBytesAndSize(byte[] bytes, int length);
+
+        void WriteBytesAndSize(byte[] bytes, int offset, int length);
+
         /// <summary>
         ///     Starts a new message.
         /// </summary>

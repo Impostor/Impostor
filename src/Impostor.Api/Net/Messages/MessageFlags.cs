@@ -1,6 +1,6 @@
-﻿namespace Impostor.Server.Net.Messages
+﻿namespace Impostor.Api.Net.Messages
 {
-    internal static class MessageFlags
+    public static class MessageFlags
     {
         public const byte HostGame = 0;
         public const byte JoinGame = 1;

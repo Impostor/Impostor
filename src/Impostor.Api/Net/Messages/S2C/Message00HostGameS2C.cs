@@ -1,9 +1,9 @@
-﻿using Impostor.Api.Innersloth;
-using Impostor.Api.Net.Messages;
+﻿using System;
+using Impostor.Api.Innersloth;
 
-namespace Impostor.Server.Net.Messages
+namespace Impostor.Api.Net.Messages.S2C
 {
-    internal static class Message00HostGame
+    public static class Message00HostGameS2C
     {
         public static void Serialize(IMessageWriter writer, int gameCode)
         {
@@ -14,7 +14,7 @@ namespace Impostor.Server.Net.Messages
 
         public static GameOptionsData Deserialize(IMessageReader reader)
         {
-            return GameOptionsData.Deserialize(reader.ReadBytesAndSize());
+            throw new NotImplementedException();
         }
     }
 }

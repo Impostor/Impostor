@@ -1,8 +1,6 @@
-﻿using Impostor.Api.Net.Messages;
-
-namespace Impostor.Server.Net.Messages
+﻿namespace Impostor.Api.Net.Messages.S2C
 {
-    internal static class Message12WaitForHost
+    public class Message12WaitForHostS2C
     {
         public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId)
         {
@@ -15,6 +13,11 @@ namespace Impostor.Server.Net.Messages
             writer.Write(gameCode);
             writer.Write(playerId);
             writer.EndMessage();
+        }
+
+        public static void Deserialize(IMessageReader reader)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

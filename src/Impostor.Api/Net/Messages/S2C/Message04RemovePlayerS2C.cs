@@ -1,9 +1,8 @@
 ﻿using Impostor.Api.Innersloth.Data;
-using Impostor.Api.Net.Messages;
 
-namespace Impostor.Server.Net.Messages
+namespace Impostor.Api.Net.Messages.S2C
 {
-    internal static class Message04RemovePlayer
+    public class Message04RemovePlayerS2C
     {
         public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId, DisconnectReason reason)
         {
@@ -22,10 +21,9 @@ namespace Impostor.Server.Net.Messages
             writer.EndMessage();
         }
 
-        public static void Deserialize(IMessageReader reader, out int playerId, out byte reason)
+        public static void Deserialize(IMessageReader reader)
         {
-            playerId = reader.ReadPackedInt32();
-            reason = reader.ReadByte();
+            throw new System.NotImplementedException();
         }
     }
 }

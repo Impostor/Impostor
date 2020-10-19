@@ -1,9 +1,8 @@
 ﻿using System.Net;
-using Impostor.Api.Net.Messages;
 
-namespace Impostor.Server.Net.Messages
+namespace Impostor.Api.Net.Messages.S2C
 {
-    internal static class Message13Redirect
+    public class Message13RedirectS2C
     {
         public static void Serialize(IMessageWriter writer, bool clear, IPEndPoint ipEndPoint)
         {
@@ -16,6 +15,11 @@ namespace Impostor.Server.Net.Messages
             writer.Write(ipEndPoint.Address);
             writer.Write((ushort)ipEndPoint.Port);
             writer.EndMessage();
+        }
+
+        public static void Deserialize(IMessageReader reader)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

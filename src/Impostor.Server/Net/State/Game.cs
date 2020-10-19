@@ -11,10 +11,10 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.S2C;
 using Impostor.Server.Hazel;
 using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
-using Impostor.Server.Net.Messages;
 using Impostor.Server.Net.Redirector;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -99,7 +99,7 @@ namespace Impostor.Server.Net.State
 
         private ValueTask BroadcastJoinMessage(IMessageWriter message, bool clear, ClientPlayer player)
         {
-            Message01JoinGame.SerializeJoin(message, clear, Code, player.Client.Id, HostId);
+            Message01JoinGameS2C.SerializeJoin(message, clear, Code, player.Client.Id, HostId);
 
             return SendToAllExceptAsync(message, player.Client.Id);
         }
