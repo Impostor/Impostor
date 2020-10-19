@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Impostor.Server.Net
+namespace Impostor.Api.Net
 {
     /// <summary>
     ///     Represents a connected game client.

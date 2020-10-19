@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net;
-using Impostor.Server.Games;
+using Impostor.Api.Games;
 
-namespace Impostor.Server.Net.Messages
+namespace Impostor.Api.Net.Messages
 {
     /// <summary>
     ///     Base message writer.

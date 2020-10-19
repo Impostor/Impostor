@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Impostor.Api.Net;
 
 namespace Impostor.Server.Net.State
 {

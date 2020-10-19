@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Messages
 {

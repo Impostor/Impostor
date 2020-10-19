@@ -1,4 +1,4 @@
-namespace Impostor.Shared.Innersloth
+namespace Impostor.Api.Innersloth
 {
     public class GameVersion
     {

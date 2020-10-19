@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using Impostor.Server.Games.Managers;
-using Impostor.Shared.Innersloth.Data;
+using Impostor.Api.Games.Managers;
+using Impostor.Api.Innersloth.Data;
 
-namespace Impostor.Server.Games
+namespace Impostor.Api.Games
 {
     public static class GameManagerExtensions
     {

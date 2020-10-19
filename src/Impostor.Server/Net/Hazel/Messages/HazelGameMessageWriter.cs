@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hazel;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Messages;
 using Impostor.Server.Net.State;

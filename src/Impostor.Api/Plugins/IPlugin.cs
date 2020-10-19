@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Impostor.Server.Events;
+using Impostor.Api.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Impostor.Server.Plugins
+namespace Impostor.Api.Plugins
 {
     public interface IPlugin : IEventListener
     {

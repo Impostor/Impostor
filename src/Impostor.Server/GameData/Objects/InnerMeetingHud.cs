@@ -1,4 +1,5 @@
-﻿using Impostor.Server.Games;
+﻿using Impostor.Api.Games;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.Messages;
 
 namespace Impostor.Server.GameData.Objects

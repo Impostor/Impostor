@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using Impostor.Shared.Innersloth.Data;
+using Impostor.Api.Innersloth.Data;
 
-namespace Impostor.Shared.Innersloth
+namespace Impostor.Api.Innersloth
 {
     public class GameOptionsData
     {

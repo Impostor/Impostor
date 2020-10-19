@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using Hazel;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Hazel.Messages;
 using Impostor.Server.Net.Hazel.Messages;
 using Impostor.Server.Net.Messages;

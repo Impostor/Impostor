@@ -1,4 +1,6 @@
-﻿namespace Impostor.Server.Net
+﻿using Impostor.Api.Net;
+
+namespace Impostor.Server.Net
 {
     internal abstract partial class ClientBase : IClient
     {

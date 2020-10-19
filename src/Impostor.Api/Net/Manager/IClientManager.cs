@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Impostor.Server.Net.Manager
+namespace Impostor.Api.Net.Manager
 {
     public interface IClientManager
     {

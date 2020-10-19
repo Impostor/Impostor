@@ -1,4 +1,4 @@
-﻿namespace Impostor.Server.Events
+﻿namespace Impostor.Api.Events
 {
     public interface IEventCancelable : IEvent
     {

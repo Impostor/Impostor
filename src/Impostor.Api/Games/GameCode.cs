@@ -1,7 +1,7 @@
 ﻿using System;
-using Impostor.Shared.Innersloth;
+using Impostor.Api.Innersloth;
 
-namespace Impostor.Server.Games
+namespace Impostor.Api.Games
 {
     public readonly struct GameCode : IEquatable<GameCode>
     {

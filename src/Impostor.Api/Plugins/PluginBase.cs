@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Impostor.Server.Plugins
+namespace Impostor.Api.Plugins
 {
     public class PluginBase : IPlugin
     {

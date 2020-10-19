@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Impostor.Server
+namespace Impostor.Api
 {
     public class ImpostorException : Exception
     {

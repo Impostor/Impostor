@@ -1,4 +1,6 @@
-﻿namespace Impostor.Server.Net.Messages
+﻿using Impostor.Api.Net.Messages;
+
+namespace Impostor.Server.Net.Messages
 {
     internal static class Message11KickPlayer
     {

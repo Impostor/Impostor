@@ -1,4 +1,4 @@
-﻿namespace Impostor.Server.Games
+﻿namespace Impostor.Api.Games
 {
     public enum GameJoinError
     {

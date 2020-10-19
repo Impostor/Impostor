@@ -1,9 +1,9 @@
 ﻿@page "/"
-@using Impostor.Server.Events
-@using Impostor.Server.Events.Managers
-@using Impostor.Server.Games.Managers
 @implements IDisposable
-@implements IEventListener
+@using Impostor.Api.Events.Managers
+@using Impostor.Api.Games.Managers
+@using Impostor.Api.Events
+@implements Impostor.Api.Events.IEventListener
 @inject IEventManager EventManager
 @inject IGameManager GameManager
 

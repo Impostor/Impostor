@@ -1,4 +1,5 @@
-﻿using Impostor.Server.Games;
+﻿using Impostor.Api.Games;
+using Impostor.Api.Net;
 
 namespace Impostor.Server.Net.State
 {

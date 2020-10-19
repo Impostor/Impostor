@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Impostor.Server.Net.Messages;
+using Impostor.Api.Net.Messages;
 
-namespace Impostor.Server.Net
+namespace Impostor.Api.Net
 {
     public static class GameMessageWriterExtensions
     {

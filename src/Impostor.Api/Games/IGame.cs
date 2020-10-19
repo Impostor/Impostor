@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Net;
-using Impostor.Server.Net;
-using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth;
-using Impostor.Shared.Innersloth.Data;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Data;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Messages;
 
-namespace Impostor.Server.Games
+namespace Impostor.Api.Games
 {
     public interface IGame
     {

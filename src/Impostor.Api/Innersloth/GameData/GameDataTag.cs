@@ -1,4 +1,4 @@
-﻿namespace Impostor.Shared.Innersloth.GameData
+﻿namespace Impostor.Api.Innersloth.GameData
 {
     public static class GameDataTag
     {

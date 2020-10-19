@@ -1,10 +1,11 @@
 ﻿using System.Threading.Tasks;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Data;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Data;
 using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth;
-using Impostor.Shared.Innersloth.Data;
 using Serilog;
 using ILogger = Serilog.ILogger;
 

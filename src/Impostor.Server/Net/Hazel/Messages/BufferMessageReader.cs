@@ -2,6 +2,7 @@
 using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.Messages;
 
 namespace Impostor.Server.Hazel.Messages

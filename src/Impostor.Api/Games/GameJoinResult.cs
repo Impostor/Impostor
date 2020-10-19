@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using Impostor.Server.Net;
+using Impostor.Api.Net;
 
-namespace Impostor.Server.Games
+namespace Impostor.Api.Games
 {
     public readonly struct GameJoinResult
     {

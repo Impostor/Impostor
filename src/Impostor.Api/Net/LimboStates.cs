@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Impostor.Server.Net
+namespace Impostor.Api.Net
 {
     [Flags]
     public enum LimboStates

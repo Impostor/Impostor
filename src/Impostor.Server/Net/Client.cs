@@ -1,12 +1,13 @@
 using System;
 using System.Threading.Tasks;
+using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Data;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Data;
-using Impostor.Server.Games;
 using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth;
-using Impostor.Shared.Innersloth.Data;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net

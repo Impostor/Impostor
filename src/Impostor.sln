@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Shared", "Impostor.Shared\Impostor.Shared.csproj", "{1D109A96-FADF-41B9-A845-457A7A5C0C5A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Tests", "Impostor.Tests\Impostor.Tests.csproj", "{C1385C67-A7DD-46D2-80F6-FA428B85FB22}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{56DD9707-D811-4056-9E2C-8A9CC2479B07}"
@@ -45,14 +43,6 @@ Global
 		{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}.Release|x86.ActiveCfg = Release|Any CPU
 		{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}.Release|x86.Build.0 = Release|Any CPU
-		{1D109A96-FADF-41B9-A845-457A7A5C0C5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1D109A96-FADF-41B9-A845-457A7A5C0C5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1D109A96-FADF-41B9-A845-457A7A5C0C5A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{1D109A96-FADF-41B9-A845-457A7A5C0C5A}.Debug|x86.Build.0 = Debug|Any CPU
-		{1D109A96-FADF-41B9-A845-457A7A5C0C5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1D109A96-FADF-41B9-A845-457A7A5C0C5A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1D109A96-FADF-41B9-A845-457A7A5C0C5A}.Release|x86.ActiveCfg = Release|Any CPU
-		{1D109A96-FADF-41B9-A845-457A7A5C0C5A}.Release|x86.Build.0 = Release|Any CPU
 		{C1385C67-A7DD-46D2-80F6-FA428B85FB22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C1385C67-A7DD-46D2-80F6-FA428B85FB22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1385C67-A7DD-46D2-80F6-FA428B85FB22}.Debug|x86.ActiveCfg = Debug|Any CPU

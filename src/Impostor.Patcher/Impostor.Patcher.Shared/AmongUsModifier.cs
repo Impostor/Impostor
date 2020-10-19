@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Gameloop.Vdf;
 using Gameloop.Vdf.Linq;
 using Impostor.Patcher.Shared.Events;
-using Impostor.Shared.Innersloth;
+using Impostor.Patcher.Shared.Innersloth;
 using ErrorEventArgs = Impostor.Patcher.Shared.Events.ErrorEventArgs;
 
 namespace Impostor.Patcher.Shared

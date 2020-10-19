@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Impostor.Server.Events.Managers;
+using Impostor.Api.Events;
+using Impostor.Api.Events.Managers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Impostor.Server.Events

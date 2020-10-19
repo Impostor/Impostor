@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Manager;
 
 namespace Impostor.Server.Net.Manager
 {

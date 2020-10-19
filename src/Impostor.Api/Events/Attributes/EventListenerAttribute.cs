@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Impostor.Server.Events
+namespace Impostor.Api.Events
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class EventListenerAttribute : Attribute

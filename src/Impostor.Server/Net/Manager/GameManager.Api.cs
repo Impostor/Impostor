@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Impostor.Server.Games;
-using Impostor.Server.Games.Managers;
+using Impostor.Api.Games;
+using Impostor.Api.Games.Managers;
 
 namespace Impostor.Server.Net.Manager
 {

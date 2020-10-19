@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Impostor.Server.Events.Managers
+namespace Impostor.Api.Events.Managers
 {
     public interface IEventManager
     {

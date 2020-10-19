@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Impostor.Server.Games;
+using Impostor.Api.Games;
 
-namespace Impostor.Server.Net.Messages
+namespace Impostor.Api.Net.Messages
 {
     /// <summary>
     ///     Represents the message writer for <see cref="IGame"/>.

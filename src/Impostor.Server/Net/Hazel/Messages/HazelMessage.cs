@@ -1,5 +1,6 @@
 ﻿using System;
 using Hazel;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Hazel.Messages;
 using Impostor.Server.Net.Messages;
 

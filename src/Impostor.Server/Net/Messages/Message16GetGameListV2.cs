@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using Impostor.Server.Games;
-using Impostor.Shared.Innersloth;
+using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Messages
 {

@@ -1,4 +1,4 @@
-﻿namespace Impostor.Shared.Innersloth.Data
+﻿namespace Impostor.Api.Innersloth.Data
 {
     public enum DisconnectReason
     {

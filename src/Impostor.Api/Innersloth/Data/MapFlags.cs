@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Impostor.Shared.Innersloth.Data
+namespace Impostor.Api.Innersloth.Data
 {
     [Flags]
     public enum MapFlags

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Messages;
 using Impostor.Server.Net.State;

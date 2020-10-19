@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Impostor.Shared.Innersloth
+namespace Impostor.Api.Innersloth
 {
     public static class GameCodeParser
     {

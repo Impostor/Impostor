@@ -1,6 +1,6 @@
-﻿using Impostor.Server.Games;
+﻿using Impostor.Api.Games;
 
-namespace Impostor.Server.Events
+namespace Impostor.Api.Events
 {
     /// <summary>
     ///     Called whenever a new <see cref="IGame"/> is created.

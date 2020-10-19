@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Net;
 
-namespace Impostor.Shared.Innersloth
+namespace Impostor.Patcher.Shared.Innersloth
 {
     public class ServerInfo
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.Messages;
 
 namespace Impostor.Server.GameData.Objects.Components

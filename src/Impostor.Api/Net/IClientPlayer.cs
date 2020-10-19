@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Impostor.Server.Games;
+using Impostor.Api.Games;
 
-namespace Impostor.Server.Net
+namespace Impostor.Api.Net
 {
     /// <summary>
     ///     Represents a player in <see cref="IGame"/>.

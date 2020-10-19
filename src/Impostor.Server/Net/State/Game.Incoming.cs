@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Impostor.Server.Games;
+using Impostor.Api.Games;
+using Impostor.Api.Innersloth.Data;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server.Net.State
 {

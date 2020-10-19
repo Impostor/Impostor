@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace Impostor.Shared.Innersloth
+namespace Impostor.Patcher.Shared.Innersloth
 {
     public class RegionInfo
     {

@@ -1,6 +1,7 @@
 ﻿using System;
+using Impostor.Api.Games;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.GameData.Objects.Components;
-using Impostor.Server.Games;
 using Impostor.Server.Net.Messages;
 using Microsoft.Extensions.DependencyInjection;
 

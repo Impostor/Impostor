@@ -6,7 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Impostor.Shared\Impostor.Shared.csproj" />
         <PackageReference Include="Gameloop.Vdf" Version="0.6.1" />
     </ItemGroup>
     

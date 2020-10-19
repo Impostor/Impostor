@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Impostor.Server.Net.Messages
+namespace Impostor.Api.Net.Messages
 {
     /// <summary>
     ///     Represents the message writer for <see cref="IConnection"/>.

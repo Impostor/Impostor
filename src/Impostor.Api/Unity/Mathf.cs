@@ -1,4 +1,4 @@
-﻿namespace Impostor.Shared.Unity
+﻿namespace Impostor.Api.Unity
 {
     public static class Mathf
     {

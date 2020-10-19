@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Messages;
 

@@ -1,8 +1,10 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Impostor.Server.Events;
-using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth.Data;
+using Impostor.Api;
+using Impostor.Api.Events;
+using Impostor.Api.Innersloth.Data;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.State
 {

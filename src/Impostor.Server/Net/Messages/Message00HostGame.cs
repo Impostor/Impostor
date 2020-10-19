@@ -1,4 +1,5 @@
-﻿using Impostor.Shared.Innersloth;
+﻿using Impostor.Api.Innersloth;
+using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Messages
 {

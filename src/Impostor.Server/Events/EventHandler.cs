@@ -1,4 +1,6 @@
-﻿namespace Impostor.Server.Events
+﻿using Impostor.Api.Events;
+
+namespace Impostor.Server.Events
 {
     internal readonly struct EventHandler
     {

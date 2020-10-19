@@ -1,4 +1,4 @@
-﻿namespace Impostor.Server.Net.Messages
+﻿namespace Impostor.Api.Net.Messages
 {
     public interface IMessage
     {

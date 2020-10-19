@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using Impostor.Api.Events;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Impostor.Server.Events

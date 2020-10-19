@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Impostor.Api.Innersloth.GameData;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.GameData;
 using Impostor.Server.GameData.Objects;
-using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth.GameData;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Impostor.Server.Net.State

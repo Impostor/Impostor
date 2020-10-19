@@ -1,8 +1,9 @@
 ﻿using System;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Games.Managers;
+using Impostor.Api.Net.Manager;
 using Impostor.Server.Data;
 using Impostor.Server.Events;
-using Impostor.Server.Events.Managers;
-using Impostor.Server.Games.Managers;
 using Impostor.Server.Hazel;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Factories;

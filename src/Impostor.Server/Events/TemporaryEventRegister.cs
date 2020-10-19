@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Impostor.Api.Events;
 
 namespace Impostor.Server.Events
 {

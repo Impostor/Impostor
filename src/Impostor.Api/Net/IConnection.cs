@@ -1,8 +1,8 @@
 ﻿using System.Net;
-using Impostor.Server.Games;
-using Impostor.Server.Net.Messages;
+using Impostor.Api.Games;
+using Impostor.Api.Net.Messages;
 
-namespace Impostor.Server.Net
+namespace Impostor.Api.Net
 {
     /// <summary>
     ///     Represents the connection of the client.

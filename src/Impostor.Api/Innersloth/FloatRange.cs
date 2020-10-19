@@ -1,6 +1,6 @@
-﻿using Impostor.Shared.Unity;
+﻿using Impostor.Api.Unity;
 
-namespace Impostor.Shared.Innersloth
+namespace Impostor.Api.Innersloth
 {
     public class FloatRange
     {

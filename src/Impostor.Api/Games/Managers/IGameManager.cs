@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Impostor.Server.Games.Managers
+namespace Impostor.Api.Games.Managers
 {
     public interface IGameManager
     {

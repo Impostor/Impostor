@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
-using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Net.Messages;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.GameData.Objects.Components
