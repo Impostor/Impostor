@@ -155,21 +155,13 @@ namespace Hazel
         ///     </para>
         /// </remarks>
         public abstract ValueTask SendBytes(byte[] bytes, MessageType messageType = MessageType.Unreliable);
-        
-        /// <summary>
-        ///     Connects the connection to a server and begins listening.
-        ///     This method blocks and may thrown if there is a problem connecting.
-        /// </summary>
-        /// <param name="bytes">The bytes of data to send in the handshake.</param>
-        /// <param name="timeout">The number of milliseconds to wait before giving up on the connect attempt.</param>
-        public abstract void Connect(byte[] bytes = null, int timeout = 5000);
 
         /// <summary>
         ///     Connects the connection to a server and begins listening.
         ///     This method does not block.
         /// </summary>
         /// <param name="bytes">The bytes of data to send in the handshake.</param>
-        public abstract void ConnectAsync(byte[] bytes = null);
+        public abstract ValueTask ConnectAsync(byte[] bytes = null);
 
         /// <summary>
         ///     Invokes the DataReceived event.

@@ -52,14 +52,14 @@ namespace Hazel
         /// <summary>
         ///     Sends a disconnect message to the end point.
         /// </summary>
-        protected abstract bool SendDisconnect(MessageWriter writer);
+        protected abstract ValueTask<bool> SendDisconnect(MessageWriter writer);
 
         /// <summary>
         ///     Called when the socket has been disconnected at the remote host.
         /// </summary>
         protected async ValueTask DisconnectRemote(string reason, IMessageReader reader)
         {
-            if (this.SendDisconnect(null))
+            if (await SendDisconnect(null))
             {
                 try
                 {
@@ -107,7 +107,7 @@ namespace Hazel
         /// </summary>
         public override async ValueTask Disconnect(string reason, MessageWriter writer = null)
         {
-            if (this.SendDisconnect(writer))
+            if (await SendDisconnect(writer))
             {
                 try
                 {

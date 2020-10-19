@@ -47,16 +47,7 @@ namespace Hazel.Udp
         /// <remarks>
         ///     This will always throw a HazelException.
         /// </remarks>
-        public override void Connect(byte[] bytes = null, int timeout = 5000)
-        {
-            throw new InvalidOperationException("Cannot manually connect a UdpServerConnection, did you mean to use UdpClientConnection?");
-        }
-
-        /// <inheritdoc />
-        /// <remarks>
-        ///     This will always throw a HazelException.
-        /// </remarks>
-        public override void ConnectAsync(byte[] bytes = null)
+        public override ValueTask ConnectAsync(byte[] bytes = null)
         {
             throw new InvalidOperationException("Cannot manually connect a UdpServerConnection, did you mean to use UdpClientConnection?");
         }
@@ -64,11 +55,11 @@ namespace Hazel.Udp
         /// <summary>
         ///     Sends a disconnect message to the end point.
         /// </summary>
-        protected override bool SendDisconnect(MessageWriter data = null)
+        protected override ValueTask<bool> SendDisconnect(MessageWriter data = null)
         {
             lock (this)
             {
-                if (this._state != ConnectionState.Connected) return false;
+                if (this._state != ConnectionState.Connected) return ValueTask.FromResult(false);
                 this._state = ConnectionState.NotConnected;
             }
             
@@ -87,7 +78,7 @@ namespace Hazel.Udp
             }
             catch { }
 
-            return true;
+            return ValueTask.FromResult(true);
         }
 
         protected override void Dispose(bool disposing)

@@ -187,7 +187,10 @@ namespace Hazel.Udp
                 _isFirst = false;
 
                 // Slice 4 bytes to get handshake data.
-                await _listener.InvokeNewConnection(message.Slice(4), this);
+                if (_listener != null)
+                {
+                    await _listener.InvokeNewConnection(message.Slice(4), this);
+                }
             }
 
             switch (message.Buffer.Span[0])
@@ -255,6 +258,28 @@ namespace Hazel.Udp
             await WriteBytesToConnection(bytes, bytes.Length);
 
             Statistics.LogUnreliableSend(length, bytes.Length);
+        }
+
+        /// <summary>
+        ///     Sends a hello packet to the remote endpoint.
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="acknowledgeCallback">The callback to invoke when the hello packet is acknowledged.</param>
+        protected ValueTask SendHello(byte[] bytes, Action acknowledgeCallback)
+        {
+            //First byte of handshake is version indicator so add data after
+            byte[] actualBytes;
+            if (bytes == null)
+            {
+                actualBytes = new byte[1];
+            }
+            else
+            {
+                actualBytes = new byte[bytes.Length + 1];
+                Buffer.BlockCopy(bytes, 0, actualBytes, 1, bytes.Length);
+            }
+
+            return HandleSend(actualBytes, (byte)UdpSendOption.Hello, acknowledgeCallback);
         }
                 
         /// <inheritdoc/>
