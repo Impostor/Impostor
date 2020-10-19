@@ -21,8 +21,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj" />
         <ProjectReference Include="..\Impostor.Hazel\Impostor.Hazel.csproj" />
-        <ProjectReference Include="..\Impostor.Server.Api\Impostor.Server.Api.csproj" />
         <ProjectReference Include="..\Impostor.Shared\Impostor.Shared.csproj" />
     </ItemGroup>
 
