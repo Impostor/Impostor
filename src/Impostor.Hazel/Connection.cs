@@ -139,7 +139,7 @@ namespace Impostor.Hazel
         ///         general any implementer should aim to always follow the user's request.
         ///     </para>
         /// </remarks>
-        public abstract ValueTask Send(IMessageWriter msg);
+        public abstract ValueTask SendAsync(IMessageWriter msg);
 
         /// <summary>
         ///     Sends a number of bytes to the end point of the connection using the specified <see cref="MessageType"/>.

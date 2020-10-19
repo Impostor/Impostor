@@ -14,7 +14,7 @@ namespace Impostor.Server.Net.State
         {
             foreach (var connection in GetConnections(x => x.Limbo.HasFlag(states)))
             {
-                connection.Send(writer);
+                connection.SendAsync(writer);
             }
 
             return default;
@@ -26,7 +26,7 @@ namespace Impostor.Server.Net.State
                 x.Limbo.HasFlag(states) &&
                 x.Client.Id != senderId))
             {
-                connection.Send(writer);
+                connection.SendAsync(writer);
             }
 
             return default;
@@ -36,7 +36,7 @@ namespace Impostor.Server.Net.State
         {
             if (TryGetPlayer(id, out var player) && player.Client.Connection is HazelConnection hazelConnection)
             {
-                hazelConnection.InnerConnection.Send(writer);
+                hazelConnection.InnerConnection.SendAsync(writer);
             }
 
             return default;

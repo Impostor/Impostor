@@ -111,7 +111,7 @@ namespace Impostor.Hazel.Udp
         protected abstract ValueTask WriteBytesToConnection(byte[] bytes, int length);
 
         /// <inheritdoc/>
-        public override async ValueTask Send(IMessageWriter msg)
+        public override async ValueTask SendAsync(IMessageWriter msg)
         {
             if (this._state != ConnectionState.Connected)
                 throw new InvalidOperationException("Could not send data as this Connection is not connected. Did you disconnect?");

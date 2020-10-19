@@ -47,8 +47,12 @@ namespace Impostor.Client.App
                 Log.Information("Connected.");
 
                 // Create a game.
-                await connection.Send(writeGameCreate);
+                await connection.SendAsync(writeGameCreate);
                 Log.Information("Requested game creation.");
+
+                // Recycle.
+                writeHandshake.Recycle();
+                writeGameCreate.Recycle();
 
                 e.WaitOne();
             }

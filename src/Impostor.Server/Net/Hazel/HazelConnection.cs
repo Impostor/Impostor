@@ -28,7 +28,7 @@ namespace Impostor.Server.Net.Hazel
 
         public ValueTask SendAsync(IMessageWriter writer)
         {
-            return InnerConnection.Send(writer);
+            return InnerConnection.SendAsync(writer);
         }
 
         private async ValueTask ConnectionOnDisconnected(DisconnectedEventArgs e)
