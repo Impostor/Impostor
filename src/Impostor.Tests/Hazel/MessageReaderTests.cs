@@ -21,9 +21,11 @@ namespace Impostor.Tests.Hazel
             Assert.Equal(msg.Length, msg.Position);
 
             var reader = new MessageReader(msg.Buffer);
-
-            Assert.Equal(Test1, reader.ReadInt32());
-            Assert.Equal(Test2, reader.ReadInt32());
+            Assert.Equal(byte.MaxValue, reader.Tag);
+            var message = reader.ReadMessage();
+            Assert.Equal(1, message.Tag);
+            Assert.Equal(Test1, message.ReadInt32());
+            Assert.Equal(Test2, message.ReadInt32());
         }
 
         [Fact]
@@ -42,10 +44,11 @@ namespace Impostor.Tests.Hazel
             Assert.Equal(msg.Length, msg.Position);
 
             var reader = new MessageReader(msg.Buffer);
-
-            Assert.Equal(Test1, reader.ReadBoolean());
-            Assert.Equal(Test2, reader.ReadBoolean());
-
+            Assert.Equal(byte.MaxValue, reader.Tag);
+            var message = reader.ReadMessage();
+            Assert.Equal(1, message.Tag);
+            Assert.Equal(Test1, message.ReadBoolean());
+            Assert.Equal(Test2, message.ReadBoolean());
         }
 
         [Fact]
@@ -63,11 +66,12 @@ namespace Impostor.Tests.Hazel
             Assert.Equal(msg.Length, msg.Position);
 
             var reader = new MessageReader(msg.Buffer);
-
-            Assert.Equal(Test1, reader.ReadString());
-            Assert.Equal(Test2, reader.ReadString());
-            Assert.Equal(string.Empty, reader.ReadString());
-
+            Assert.Equal(byte.MaxValue, reader.Tag);
+            var message = reader.ReadMessage();
+            Assert.Equal(1, message.Tag);
+            Assert.Equal(Test1, message.ReadString());
+            Assert.Equal(Test2, message.ReadString());
+            Assert.Equal(string.Empty, message.ReadString());
         }
 
         [Fact]
@@ -84,8 +88,10 @@ namespace Impostor.Tests.Hazel
             Assert.Equal(msg.Length, msg.Position);
 
             var reader = new MessageReader(msg.Buffer);
-
-            Assert.Equal(Test1, reader.ReadSingle());
+            Assert.Equal(byte.MaxValue, reader.Tag);
+            var message = reader.ReadMessage();
+            Assert.Equal(1, message.Tag);
+            Assert.Equal(Test1, message.ReadSingle());
         }
 
         [Fact]
@@ -104,7 +110,8 @@ namespace Impostor.Tests.Hazel
 
             msg.EndMessage();
 
-            var handleMessage = new MessageReader(msg.Buffer);
+            var handleReader = new MessageReader(msg.Buffer);
+            var handleMessage = handleReader.ReadMessage();
             Assert.Equal(1, handleMessage.Tag);
 
             var parentReader = handleMessage.Slice(handleMessage.Position);
@@ -135,15 +142,17 @@ namespace Impostor.Tests.Hazel
             Assert.Equal(msg.Length, msg.Position);
 
             var reader = new MessageReader(msg.Buffer);
-            Assert.Equal(1, reader.Tag);
-            Assert.Equal(65534, reader.ReadInt32()); // Content
+            Assert.Equal(byte.MaxValue, reader.Tag);
+            var message = reader.ReadMessage();
+            Assert.Equal(1, message.Tag);
+            Assert.Equal(65534, message.ReadInt32()); // Content
 
-            var sub = reader.ReadMessage();
+            var sub = message.ReadMessage();
             Assert.Equal(3, sub.Length);
             Assert.Equal(2, sub.Tag);
             Assert.Equal("HO", sub.ReadString());
 
-            sub = reader.ReadMessage();
+            sub = message.ReadMessage();
             Assert.Equal(3, sub.Length);
             Assert.Equal(2, sub.Tag);
             Assert.Equal("NO", sub.ReadString());
