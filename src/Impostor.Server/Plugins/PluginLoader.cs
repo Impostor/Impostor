@@ -30,8 +30,7 @@ namespace Impostor.Server.Plugins
 
             var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
             matcher.AddInclude("*.dll");
-            matcher.AddExclude("Impostor.Server.Api.dll");
-            matcher.AddExclude("Impostor.Shared.dll");
+            matcher.AddExclude("Impostor.Api.dll");
 
             RegisterAssemblies(pluginPaths, matcher, assemblyInfos, true);
             RegisterAssemblies(libraryPaths, matcher, assemblyInfos, false);
@@ -53,7 +52,7 @@ namespace Impostor.Server.Plugins
 
             var plugins = assemblies
                 .SelectMany(a => a.GetTypes())
-                .Where(typeof(IPlugin).IsAssignableFrom)
+                .Where(t => typeof(IPlugin).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
                 .Select(Activator.CreateInstance)
                 .Cast<IPlugin>()
                 .ToList();
