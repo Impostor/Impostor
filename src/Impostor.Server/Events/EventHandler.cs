@@ -1,10 +1,11 @@
 ﻿using Impostor.Api.Events;
+using Impostor.Server.Events.Register;
 
 namespace Impostor.Server.Events
 {
     internal readonly struct EventHandler
     {
-        public EventHandler(IEventListener o, RegisteredEventListener listener)
+        public EventHandler(IEventListener o, IRegisteredEventListener listener)
         {
             Object = o;
             Listener = listener;
@@ -12,9 +13,9 @@ namespace Impostor.Server.Events
 
         public IEventListener Object { get; }
 
-        public RegisteredEventListener Listener { get; }
+        public IRegisteredEventListener Listener { get; }
 
-        public void Deconstruct(out IEventListener o, out RegisteredEventListener listener)
+        public void Deconstruct(out IEventListener o, out IRegisteredEventListener listener)
         {
             o = Object;
             listener = Listener;
