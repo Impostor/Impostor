@@ -10,36 +10,30 @@ namespace Impostor.Server.Net.State
 {
     internal partial class Game
     {
-        public ValueTask SendToAllAsync(IMessageWriter writer, LimboStates states = LimboStates.NotLimbo)
+        public async ValueTask SendToAllAsync(IMessageWriter writer, LimboStates states = LimboStates.NotLimbo)
         {
             foreach (var connection in GetConnections(x => x.Limbo.HasFlag(states)))
             {
-                connection.SendAsync(writer);
+                await connection.SendAsync(writer);
             }
-
-            return default;
         }
 
-        public ValueTask SendToAllExceptAsync(IMessageWriter writer, int senderId, LimboStates states = LimboStates.NotLimbo)
+        public async ValueTask SendToAllExceptAsync(IMessageWriter writer, int senderId, LimboStates states = LimboStates.NotLimbo)
         {
             foreach (var connection in GetConnections(x =>
                 x.Limbo.HasFlag(states) &&
                 x.Client.Id != senderId))
             {
-                connection.SendAsync(writer);
+                await connection.SendAsync(writer);
             }
-
-            return default;
         }
 
-        public ValueTask SendToAsync(IMessageWriter writer, int id)
+        public async ValueTask SendToAsync(IMessageWriter writer, int id)
         {
             if (TryGetPlayer(id, out var player) && player.Client.Connection is HazelConnection hazelConnection)
             {
-                hazelConnection.InnerConnection.SendAsync(writer);
+                await hazelConnection.InnerConnection.SendAsync(writer);
             }
-
-            return default;
         }
 
         private void WriteRemovePlayerMessage(IMessageWriter message, bool clear, int playerId, DisconnectReason reason)

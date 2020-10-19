@@ -7,7 +7,7 @@ using Impostor.Hazel.Udp;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 
-namespace Impostor.Server.Hazel
+namespace Impostor.Server.Net
 {
     internal class Matchmaker
     {
