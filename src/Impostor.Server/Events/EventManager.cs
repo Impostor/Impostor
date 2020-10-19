@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Impostor.Server.Events.Managers;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,11 +11,49 @@ namespace Impostor.Server.Events
 {
     internal class EventManager : IEventManager
     {
+        private readonly ConcurrentDictionary<Type, object> _temporaryEventListeners;
         private readonly IServiceProvider _serviceProvider;
 
         public EventManager(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
+            _temporaryEventListeners = new ConcurrentDictionary<Type, object>();
+        }
+
+        /// <inheritdoc />
+        public IDisposable Register<TEvent>(Func<IServiceProvider, TEvent, ValueTask> callback)
+            where TEvent : IEvent
+        {
+            var register = (TemporaryEventRegister<TEvent>) _temporaryEventListeners.GetOrAdd(
+                typeof(TEvent),
+                _ => new TemporaryEventRegister<TEvent>());
+
+            return register.Add(callback);
+        }
+
+        /// <inheritdoc />
+        public IDisposable RegisterListener<TListener>(TListener listener, Func<Func<Task>, Task> invoker = null)
+            where TListener : IEventListener
+        {
+            if (listener == null)
+            {
+                throw new ArgumentNullException(nameof(listener));
+            }
+
+            var registerMethod = typeof(EventManager).GetMethod(nameof(RegisterListenerImpl), BindingFlags.Instance | BindingFlags.NonPublic);
+            var methods = RegisteredEventListener.FromType(listener.GetType());
+            var disposes = new IDisposable[methods.Count];
+
+            for (var i = 0; i < methods.Count; i++)
+            {
+                var method = methods[i];
+
+                disposes[i] = (IDisposable) registerMethod!
+                    .MakeGenericMethod(method.EventType)
+                    .Invoke(this, new object[] { listener, method, invoker });
+            }
+
+            return new MultiDisposable(disposes);
         }
 
         /// <inheritdoc />
@@ -36,6 +76,11 @@ namespace Impostor.Server.Events
                 foreach (var (handler, eventListener) in GetHandlers<T>(scope.ServiceProvider))
                 {
                     await eventListener.InvokeAsync(handler, @event, scope.ServiceProvider);
+                }
+
+                if (_temporaryEventListeners.TryGetValue(typeof(T), out var cb))
+                {
+                    await ((TemporaryEventRegister<T>) cb).CallAsync(scope.ServiceProvider, @event);
                 }
             }
             finally
@@ -66,6 +111,14 @@ namespace Impostor.Server.Events
                     yield return new EventHandler(handler, eventHandler);
                 }
             }
+        }
+
+        private IDisposable RegisterListenerImpl<TEvent>(object obj, RegisteredEventListener listener, Func<Func<Task>, Task> invoker = null)
+            where TEvent : IEvent
+        {
+            return invoker == null
+                ? Register<TEvent>((provider, @event) => listener.InvokeAsync(obj, @event, provider))
+                : Register<TEvent>((provider, @event) => new ValueTask(invoker(() => listener.InvokeAsync(obj, @event, provider).AsTask())));
         }
     }
 }

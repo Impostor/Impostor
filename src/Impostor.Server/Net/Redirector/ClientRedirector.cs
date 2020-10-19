@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Impostor.Server.Data;
+using Impostor.Server.Hazel;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;
@@ -13,14 +14,14 @@ namespace Impostor.Server.Net.Redirector
     {
         private static readonly ILogger Logger = Log.ForContext<ClientRedirector>();
 
-        private readonly IClientManager _clientManager;
+        private readonly ClientManager _clientManager;
         private readonly INodeProvider _nodeProvider;
         private readonly INodeLocator _nodeLocator;
 
         public ClientRedirector(
             string name,
-            IConnection connection,
-            IClientManager clientManager,
+            HazelConnection connection,
+            ClientManager clientManager,
             INodeProvider nodeProvider,
             INodeLocator nodeLocator)
             : base(name, connection)

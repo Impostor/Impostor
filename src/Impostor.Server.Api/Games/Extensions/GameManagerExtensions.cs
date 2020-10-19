@@ -2,7 +2,7 @@
 using Impostor.Server.Games.Managers;
 using Impostor.Shared.Innersloth.Data;
 
-namespace Impostor.Server
+namespace Impostor.Server.Games
 {
     public static class GameManagerExtensions
     {

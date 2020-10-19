@@ -4,27 +4,21 @@ using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server.Net.State
 {
-    internal class ClientPlayer : IClientPlayer
+    internal partial class ClientPlayer : IClientPlayer
     {
-        public ClientPlayer(IClient client, Game game)
+        public ClientPlayer(ClientBase client, Game game)
         {
             Game = game;
             Client = client;
             Limbo = LimboStates.PreSpawn;
         }
 
-        public IClient Client { get; }
+        public ClientBase Client { get; }
 
         public Game Game { get; }
 
         /// <inheritdoc />
         public LimboStates Limbo { get; set; }
-
-        /// <inheritdoc />
-        IClient IClientPlayer.Client => Client;
-
-        /// <inheritdoc />
-        IGame IClientPlayer.Game => Game;
 
         /// <inheritdoc />
         public ValueTask KickAsync()

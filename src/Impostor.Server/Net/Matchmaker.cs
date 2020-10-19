@@ -8,20 +8,21 @@ using Impostor.Server.Games;
 using Impostor.Server.Hazel.Messages;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
+using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Hazel
 {
-    internal class HazelMatchmaker : IMatchmaker
+    internal class Matchmaker
     {
-        private readonly IClientManager _clientManager;
-        private readonly ILogger<HazelMatchmaker> _logger;
+        private readonly ClientManager _clientManager;
+        private readonly ILogger<Matchmaker> _logger;
         private readonly ILogger<HazelConnection> _connectionLogger;
         private UdpConnectionListener _connection;
 
-        public HazelMatchmaker(
-            ILogger<HazelMatchmaker> logger,
-            IClientManager clientManager,
+        public Matchmaker(
+            ILogger<Matchmaker> logger,
+            ClientManager clientManager,
             ILogger<HazelConnection> connectionLogger)
         {
             _logger = logger;
@@ -59,11 +60,6 @@ namespace Impostor.Server.Hazel
 
             // Register client
             await _clientManager.RegisterConnectionAsync(connection, name, clientVersion);
-        }
-
-        public IGameMessageWriter CreateGameMessageWriter(IGame game, MessageType messageType)
-        {
-            return new HazelGameMessageWriter(messageType, game);
         }
     }
 }

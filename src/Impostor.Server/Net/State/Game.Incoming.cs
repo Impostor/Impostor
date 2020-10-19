@@ -17,7 +17,7 @@ namespace Impostor.Server.Net.State
             await packet.SendToAllAsync();
         }
 
-        public async ValueTask<GameJoinResult> AddClientAsync(IClient client)
+        public async ValueTask<GameJoinResult> AddClientAsync(ClientBase client)
         {
             // Check if the IP of the player is banned.
             if (client.Connection != null && _bannedIps.Contains(client.Connection.EndPoint.Address))
@@ -140,14 +140,14 @@ namespace Impostor.Server.Net.State
             await message.SendToAllExceptAsync(playerId);
         }
 
-        private async ValueTask HandleJoinGameNew(IClientPlayer sender, bool isNew)
+        private async ValueTask HandleJoinGameNew(ClientPlayer sender, bool isNew)
         {
             Logger.Information("{0} - Player {1} ({2}) is joining.", Code, sender.Client.Name, sender.Client.Id);
 
             // Add player to the game.
             if (isNew)
             {
-                PlayerAdd(sender);
+                await PlayerAdd(sender);
             }
 
             using (var message = CreateMessage(MessageType.Reliable))
@@ -162,14 +162,14 @@ namespace Impostor.Server.Net.State
             }
         }
 
-        private async ValueTask HandleJoinGameNext(IClientPlayer sender, bool isNew)
+        private async ValueTask HandleJoinGameNext(ClientPlayer sender, bool isNew)
         {
             Logger.Information("{0} - Player {1} ({2}) is rejoining.", Code, sender.Client.Name, sender.Client.Id);
 
             // Add player to the game.
             if (isNew)
             {
-                PlayerAdd(sender);
+                await PlayerAdd(sender);
             }
 
             // Check if the host joined and let everyone join.

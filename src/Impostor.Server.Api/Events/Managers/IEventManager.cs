@@ -1,9 +1,29 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Impostor.Server.Events.Managers
 {
     public interface IEventManager
     {
+        /// <summary>
+        ///     Register a temporary event listener.
+        /// </summary>
+        /// <param name="callback">Event callback.</param>
+        /// <returns>Disposable that unregisters the callback from the event manager.</returns>
+        /// <typeparam name="TEvent">Type of the event.</typeparam>
+        IDisposable Register<TEvent>(Func<IServiceProvider, TEvent, ValueTask> callback)
+            where TEvent : IEvent;
+
+        /// <summary>
+        ///     Register a temporary event listener.
+        /// </summary>
+        /// <param name="listener">Event listener.</param>
+        /// <param name="invoker">Middleware between the events, which can be used to swap to the correct thread dispatcher.</param>
+        /// <returns>Disposable that unregisters the callback from the event manager.</returns>
+        /// <typeparam name="TListener">Type of the event listener.</typeparam>
+        IDisposable RegisterListener<TListener>(TListener listener, Func<Func<Task>, Task>? invoker = null)
+            where TListener : IEventListener;
+
         /// <summary>
         ///     Returns true if an event with the type <see cref="TEvent"/> is registered.
         /// </summary>

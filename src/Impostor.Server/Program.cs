@@ -8,6 +8,7 @@ using Impostor.Server.Net;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Redirector;
+using Impostor.Server.Plugins;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -49,8 +50,25 @@ namespace Impostor.Server
             }
         }
 
-        private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        private static IConfiguration CreateConfiguration(string[] args)
+        {
+            var configurationBuilder = new ConfigurationBuilder();
+
+            configurationBuilder.AddJsonFile("config.json", true);
+            configurationBuilder.AddJsonFile("config.Development.json", true);
+            configurationBuilder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
+            configurationBuilder.AddCommandLine(args);
+
+            return configurationBuilder.Build();
+        }
+
+        private static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            var configuration = CreateConfiguration(args);
+            var pluginConfig = configuration.GetSection("PluginLoader")
+                .Get<PluginConfig>();
+
+            return Host.CreateDefaultBuilder(args)
 #if DEBUG
                 .UseEnvironment(Environment.GetEnvironmentVariable("IMPOSTOR_ENV") ?? "Development")
 #else
@@ -58,10 +76,7 @@ namespace Impostor.Server
 #endif
                 .ConfigureAppConfiguration(builder =>
                 {
-                    builder.AddJsonFile("config.json", true);
-                    builder.AddJsonFile("config.Development.json", true);
-                    builder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
-                    builder.AddCommandLine(args);
+                    builder.AddConfiguration(configuration);
                 })
                 .ConfigureServices((host, services) =>
                 {
@@ -73,7 +88,8 @@ namespace Impostor.Server
                     services.Configure<DebugConfig>(host.Configuration.GetSection(DebugConfig.Section));
 #endif
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
-                    services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));
+                    services.Configure<ServerRedirectorConfig>(
+                        host.Configuration.GetSection(ServerRedirectorConfig.Section));
 
                     if (redirector.Enabled)
                     {
@@ -115,7 +131,8 @@ namespace Impostor.Server
                         services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
                     }
 
-                    services.AddSingleton<IClientManager, ClientManager>();
+                    services.AddSingleton<ClientManager>();
+                    services.AddSingleton<IClientManager>(p => p.GetRequiredService<ClientManager>());
 
                     if (redirector.Enabled && redirector.Master)
                     {
@@ -126,14 +143,17 @@ namespace Impostor.Server
                     else
                     {
                         services.AddSingleton<IClientFactory, ClientFactory<Client>>();
-                        services.AddSingleton<IGameManager, GameManager>();
+                        services.AddSingleton<GameManager>();
+                        services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
                     }
 
                     services.AddSingleton<IEventManager, EventManager>();
-                    services.UseHazelMatchmaking();
+                    services.AddSingleton<Matchmaker>();
                     services.AddHostedService<MatchmakerService>();
                 })
+                .UsePluginLoader(pluginConfig)
                 .UseConsoleLifetime()
                 .UseSerilog();
+        }
     }
 }

@@ -22,9 +22,9 @@ namespace Impostor.Server.Net
         bool IsConnected { get; }
 
         /// <summary>
-        ///     Gets or sets the client of the connection.
+        ///     Gets the client of the connection.
         /// </summary>
-        IClient? Client { get; set; }
+        IClient? Client { get; }
 
         /// <summary>
         ///     Create a message writer that can be send to the connection.

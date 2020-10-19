@@ -57,10 +57,6 @@ namespace Impostor.Server.Net
         /// <summary>
         ///     Gets or sets the current game data of the <see cref="IClient"/>.
         /// </summary>
-        IClientPlayer? Player { get; set; }
-
-        ValueTask HandleMessageAsync(IMessage message);
-
-        ValueTask HandleDisconnectAsync(string reason);
+        IClientPlayer? Player { get; }
     }
 }

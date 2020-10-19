@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Impostor.Server.Events;
 using Impostor.Server.Exceptions;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth.Data;
@@ -8,7 +9,7 @@ namespace Impostor.Server.Net.State
 {
     internal partial class Game
     {
-        private void PlayerAdd(IClientPlayer player)
+        private async ValueTask PlayerAdd(ClientPlayer player)
         {
             // Store player.
             if (!_players.TryAdd(player.Client.Id, player))
@@ -21,6 +22,8 @@ namespace Impostor.Server.Net.State
             {
                 HostId = player.Client.Id;
             }
+
+            await _eventManager.CallAsync(new PlayerJoinedGameEvent(this, player));
         }
 
         private async ValueTask<bool> PlayerRemove(int playerId, bool isBan = false)
@@ -54,6 +57,8 @@ namespace Impostor.Server.Net.State
             {
                 _bannedIps.Add(player.Client.Connection.EndPoint.Address);
             }
+
+            await _eventManager.CallAsync(new PlayerLeftGameEvent(this, player, isBan));
 
             return true;
         }
