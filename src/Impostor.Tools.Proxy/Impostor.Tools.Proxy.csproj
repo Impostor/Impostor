@@ -10,7 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\submodules\Hazel-Networking\Hazel\Hazel.csproj" />
+      <ProjectReference Include="..\Impostor.Hazel\Impostor.Hazel.csproj" />
     </ItemGroup>
-
+    
 </Project>
