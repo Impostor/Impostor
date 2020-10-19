@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Buffers;
 
-namespace Hazel
+namespace Impostor.Hazel
 {
     public readonly struct MessageData
     {

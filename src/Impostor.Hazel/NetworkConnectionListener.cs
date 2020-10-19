@@ -1,7 +1,6 @@
 ﻿using System.Net;
 
-
-namespace Hazel
+namespace Impostor.Hazel
 {
     /// <summary>
     ///     Abstract base class for a <see cref="ConnectionListener"/> for network based connections.

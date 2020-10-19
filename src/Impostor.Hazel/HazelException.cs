@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Hazel
+namespace Impostor.Hazel
 {
     /// <summary>
     ///     Wrapper for exceptions thrown from Hazel.

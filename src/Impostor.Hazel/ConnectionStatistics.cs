@@ -2,7 +2,7 @@
 using System.Threading;
 
 [assembly: InternalsVisibleTo("Hazel.Tests")]
-namespace Hazel
+namespace Impostor.Hazel
 {
     /// <summary>
     ///     Holds statistics about the traffic through a <see cref="Connection"/>.

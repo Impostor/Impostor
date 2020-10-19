@@ -3,8 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Net.Messages;
 
-
-namespace Hazel
+namespace Impostor.Hazel
 {
     public enum HazelInternalErrors
     {

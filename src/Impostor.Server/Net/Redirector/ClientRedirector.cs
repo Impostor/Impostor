@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Hazel;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
+using Impostor.Hazel;
 using Impostor.Server.Data;
 using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;

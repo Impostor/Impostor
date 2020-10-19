@@ -4,8 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-
-namespace Hazel.Udp
+namespace Impostor.Hazel.Udp
 {
     partial class UdpConnection
     {

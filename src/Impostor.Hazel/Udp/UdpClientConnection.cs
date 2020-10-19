@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Impostor.Api.Net.Messages;
 using Serilog;
 
-namespace Hazel.Udp
+namespace Impostor.Hazel.Udp
 {
     /// <summary>
     ///     Represents a client's connection to a server that uses the UDP protocol.

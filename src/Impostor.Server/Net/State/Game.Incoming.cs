@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Hazel;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Impostor.Hazel;
 
 namespace Impostor.Server.Net.State
 {

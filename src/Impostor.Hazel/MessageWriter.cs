@@ -5,7 +5,7 @@ using System.Text;
 using Impostor.Api.Games;
 using Impostor.Api.Net.Messages;
 
-namespace Hazel
+namespace Impostor.Hazel
 {
     ///
     public class MessageWriter : IMessageWriter, IRecyclable, IDisposable

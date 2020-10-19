@@ -3,7 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Net.Messages;
 
-namespace Hazel.Udp
+namespace Impostor.Hazel.Udp
 {
     /// <summary>
     ///     Represents a servers's connection to a client that uses the UDP protocol.

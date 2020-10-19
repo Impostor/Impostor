@@ -1,6 +1,6 @@
 ﻿using Impostor.Api.Net.Messages;
 
-namespace Hazel
+namespace Impostor.Hazel
 {
     public struct NewConnectionEventArgs
     {

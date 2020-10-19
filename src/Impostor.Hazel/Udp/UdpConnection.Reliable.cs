@@ -6,8 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Net.Messages;
 
-
-namespace Hazel.Udp
+namespace Impostor.Hazel.Udp
 {
     partial class UdpConnection
     {

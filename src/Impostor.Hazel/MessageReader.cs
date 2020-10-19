@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Impostor.Api.Net.Messages;
 
-namespace Hazel
+namespace Impostor.Hazel
 {
     public class MessageReader : IMessageReader
     {

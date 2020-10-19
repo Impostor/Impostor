@@ -1,4 +1,4 @@
-﻿using Hazel;
+﻿using Impostor.Hazel;
 using Xunit;
 
 namespace Impostor.Tests.Hazel

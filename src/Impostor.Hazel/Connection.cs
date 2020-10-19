@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Impostor.Api.Net.Messages;
 using Serilog;
 
-namespace Hazel
+namespace Impostor.Hazel
 {
     /// <summary>
     ///     Base class for all connections.

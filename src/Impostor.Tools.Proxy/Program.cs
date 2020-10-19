@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hazel;
-using Hazel.Udp;
 using Impostor.Api.Net.Messages;
+using Impostor.Hazel;
+using Impostor.Hazel.Udp;
 using PcapDotNet.Core;
 using PcapDotNet.Packets;
 

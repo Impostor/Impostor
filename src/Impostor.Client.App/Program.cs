@@ -2,11 +2,11 @@
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Hazel;
-using Hazel.Udp;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
+using Impostor.Hazel;
+using Impostor.Hazel.Udp;
 using Serilog;
 
 namespace Impostor.Client.App

@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace Hazel.Udp
+namespace Impostor.Hazel.Udp
 {
     ///
     public class UdpBroadcaster : IDisposable

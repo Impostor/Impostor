@@ -2,8 +2,8 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Hazel;
-using Hazel.Udp;
+using Impostor.Hazel;
+using Impostor.Hazel.Udp;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 

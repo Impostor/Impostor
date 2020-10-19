@@ -1,7 +1,7 @@
 ﻿using System;
 using Impostor.Api.Net.Messages;
 
-namespace Hazel
+namespace Impostor.Hazel
 {
     public class DisconnectedEventArgs : EventArgs
     {

@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace Hazel
+namespace Impostor.Hazel
 {
     /// <summary>
     ///     A fairly simple object pool for items that will be created a lot.

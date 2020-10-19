@@ -1,4 +1,4 @@
-﻿namespace Hazel
+﻿namespace Impostor.Hazel
 {
     /// <summary>
     ///     Interface for all items that can be returned to an object pool.

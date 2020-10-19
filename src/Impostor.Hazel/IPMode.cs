@@ -1,4 +1,4 @@
-﻿namespace Hazel
+﻿namespace Impostor.Hazel
 {
     /// <summary>
     ///     Represents the IP version that a connection or listener will use.
