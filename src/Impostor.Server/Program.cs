@@ -66,7 +66,7 @@ namespace Impostor.Server
         {
             var configuration = CreateConfiguration(args);
             var pluginConfig = configuration.GetSection("PluginLoader")
-                .Get<PluginConfig>();
+                .Get<PluginConfig>() ?? new PluginConfig();
 
             return Host.CreateDefaultBuilder(args)
 #if DEBUG
