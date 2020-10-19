@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Impostor.Api.Net.Messages;
 
 namespace Hazel.Udp
 {
@@ -74,7 +75,7 @@ namespace Hazel.Udp
             var bytes = EmptyDisconnectBytes;
             if (data != null && data.Length > 0)
             {
-                if (data.SendOption != SendOption.None) throw new ArgumentException("Disconnect messages can only be unreliable.");
+                if (data.SendOption != MessageType.Unreliable) throw new ArgumentException("Disconnect messages can only be unreliable.");
 
                 bytes = data.ToByteArray(true);
                 bytes[0] = (byte)UdpSendOption.Disconnect;

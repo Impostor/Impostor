@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Hazel;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net.Messages;
@@ -32,9 +33,8 @@ namespace Impostor.Server.Net.Redirector
             _nodeLocator = nodeLocator;
         }
 
-        public override async ValueTask HandleMessageAsync(IMessage message)
+        public override async ValueTask HandleMessageAsync(IMessageReader reader, MessageType messageType)
         {
-            var reader = message.CreateReader();
             var flag = reader.Tag;
 
             Logger.Verbose("Server got {0}.", flag);
@@ -43,9 +43,9 @@ namespace Impostor.Server.Net.Redirector
             {
                 case MessageFlags.HostGame:
                 {
-                    using var packet = Connection.CreateMessage(MessageType.Reliable);
+                    using var packet = MessageWriter.Get(MessageType.Reliable);
                     Message13Redirect.Serialize(packet, false, _nodeProvider.Get());
-                    await packet.SendAsync();
+                    await Connection.SendAsync(packet);
                     break;
                 }
 
@@ -56,7 +56,7 @@ namespace Impostor.Server.Net.Redirector
                         out var gameCode,
                         out _);
 
-                    using var packet = Connection.CreateMessage(MessageType.Reliable);
+                    using var packet = MessageWriter.Get(MessageType.Reliable);
                     var endpoint = _nodeLocator.Find(GameCodeParser.IntToGameName(gameCode));
                     if (endpoint == null)
                     {
@@ -67,16 +67,16 @@ namespace Impostor.Server.Net.Redirector
                         Message13Redirect.Serialize(packet, false, endpoint);
                     }
 
-                    await packet.SendAsync();
+                    await Connection.SendAsync(packet);
                     break;
                 }
 
                 case MessageFlags.GetGameListV2:
                 {
                     // TODO: Implement.
-                    using var packet = Connection.CreateMessage(MessageType.Reliable);
+                    using var packet = MessageWriter.Get(MessageType.Reliable);
                     Message01JoinGame.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.NotImplemented);
-                    await packet.SendAsync();
+                    await Connection.SendAsync(packet);
                     break;
                 }
 

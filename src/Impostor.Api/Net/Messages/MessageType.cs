@@ -1,9 +1,12 @@
-﻿namespace Impostor.Api.Net.Messages
+﻿﻿using System;
+
+namespace Impostor.Api.Net.Messages
 {
     /// <summary>
     ///     Specifies how a message should be sent between connections.
     /// </summary>
-    public enum MessageType
+    [Flags]
+    public enum MessageType : byte
     {
         /// <summary>
         ///     Requests unreliable delivery with no fragmentation.

@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using Impostor.Api.Games;
+using System.Threading.Tasks;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Net
@@ -25,14 +25,10 @@ namespace Impostor.Api.Net
         IClient? Client { get; }
 
         /// <summary>
-        ///     Create a message writer that can be send to the connection.
+        ///     Sends a message writer to the connection.
         /// </summary>
-        /// <remarks>
-        ///     Be aware when implementing a custom connection handler that this method is not called when a message
-        ///     is being send in <see cref="IGame"/>.
-        /// </remarks>
-        /// <param name="messageType">Type of the message.</param>
-        /// <returns>Message writer for the current connection.</returns>
-        IConnectionMessageWriter CreateMessage(MessageType messageType);
+        /// <param name="writer">The message.</param>
+        /// <returns></returns>
+        ValueTask SendAsync(IMessageWriter writer);
     }
 }

@@ -11,4 +11,8 @@
         <PackageReference Include="Serilog" Version="2.10.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj" />
+    </ItemGroup>
+
 </Project>

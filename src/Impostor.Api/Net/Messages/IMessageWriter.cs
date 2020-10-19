@@ -9,6 +9,14 @@ namespace Impostor.Api.Net.Messages
     /// </summary>
     public interface IMessageWriter : IDisposable
     {
+        public byte[] Buffer { get; }
+
+        public int Length { get; set; }
+
+        public int Position { get; set; }
+
+        public MessageType SendOption { get; }
+
         /// <summary>
         ///     Writes a boolean to the message.
         /// </summary>

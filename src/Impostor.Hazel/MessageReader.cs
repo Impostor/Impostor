@@ -2,10 +2,11 @@
 using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Impostor.Api.Net.Messages;
 
 namespace Hazel
 {
-    public class MessageReader
+    public class MessageReader : IMessageReader
     {
         public byte Tag { get; }
         public ReadOnlyMemory<byte> Buffer { get; }
@@ -24,7 +25,7 @@ namespace Hazel
             Buffer = buffer;
         }
 
-        public MessageReader ReadMessage()
+        public IMessageReader ReadMessage()
         {
             var length = ReadUInt16();
             var tag = ReadByte();
@@ -138,19 +139,19 @@ namespace Hazel
             return output;
         }
 
-        public void CopyTo(MessageWriter writer)
+        public void CopyTo(IMessageWriter writer)
         {
             writer.Write((ushort) Length);
             writer.Write((byte) Tag);
             writer.Write(Buffer);
         }
 
-        public MessageReader Slice(int start)
+        public IMessageReader Slice(int start)
         {
             return new MessageReader(Tag, Buffer.Slice(start));
         }
 
-        public MessageReader Slice(int start, int length)
+        public IMessageReader Slice(int start, int length)
         {
             return new MessageReader(Tag, Buffer.Slice(start, length));
         }

@@ -1,20 +1,16 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Hazel;
 using Impostor.Api.Net.Messages;
-using Impostor.Server.Hazel.Messages;
-using Impostor.Server.Net.Hazel.Messages;
-using Impostor.Server.Net.Messages;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Hazel
 {
     internal partial class HazelConnection
     {
-        private readonly ILogger<Net.Hazel.HazelConnection> _logger;
+        private readonly ILogger<HazelConnection> _logger;
 
-        public HazelConnection(Connection innerConnection, ILogger<Net.Hazel.HazelConnection> logger)
+        public HazelConnection(Connection innerConnection, ILogger<HazelConnection> logger)
         {
             _logger = logger;
             InnerConnection = innerConnection;
@@ -29,6 +25,11 @@ namespace Impostor.Server.Net.Hazel
         public bool IsConnected => InnerConnection.State == ConnectionState.Connected;
 
         public ClientBase Client { get; set; }
+
+        public ValueTask SendAsync(IMessageWriter writer)
+        {
+            return InnerConnection.Send(writer);
+        }
 
         private async ValueTask ConnectionOnDisconnected(DisconnectedEventArgs e)
         {
@@ -53,23 +54,8 @@ namespace Impostor.Server.Net.Hazel
                     break;
                 }
 
-                var reader = e.Message.ReadMessage();
-                var type = e.SendOption switch
-                {
-                    SendOption.None => MessageType.Unreliable,
-                    SendOption.Reliable => MessageType.Reliable,
-                    _ => throw new NotSupportedException()
-                };
-
-                using var message = new HazelMessage(reader, type);
-
-                await Client.HandleMessageAsync(message);
+                await Client.HandleMessageAsync(e.Message.ReadMessage(), e.Type);
             }
-        }
-
-        public IConnectionMessageWriter CreateMessage(MessageType messageType)
-        {
-            return new HazelConnectionMessageWriter(messageType, this);
         }
     }
 }

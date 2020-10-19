@@ -1,7 +1,4 @@
 ﻿using Hazel;
-using Impostor.Api.Net.Messages;
-using Impostor.Server.Net.Hazel.Messages;
-using Impostor.Server.Net.Messages;
 using Xunit;
 
 namespace Impostor.Tests.Hazel
@@ -23,8 +20,7 @@ namespace Impostor.Tests.Hazel
             Assert.Equal(11, msg.Length);
             Assert.Equal(msg.Length, msg.Position);
 
-            var message = new HazelMessage(new MessageReader(msg.Buffer), MessageType.Reliable);
-            var reader = message.CreateReader();
+            var reader = new MessageReader(msg.Buffer);
 
             Assert.Equal(Test1, reader.ReadInt32());
             Assert.Equal(Test2, reader.ReadInt32());
@@ -45,8 +41,7 @@ namespace Impostor.Tests.Hazel
             Assert.Equal(5, msg.Length);
             Assert.Equal(msg.Length, msg.Position);
 
-            var message = new HazelMessage(new MessageReader(msg.Buffer), MessageType.Reliable);
-            var reader = message.CreateReader();
+            var reader = new MessageReader(msg.Buffer);
 
             Assert.Equal(Test1, reader.ReadBoolean());
             Assert.Equal(Test2, reader.ReadBoolean());
@@ -67,8 +62,7 @@ namespace Impostor.Tests.Hazel
 
             Assert.Equal(msg.Length, msg.Position);
 
-            var message = new HazelMessage(new MessageReader(msg.Buffer), MessageType.Reliable);
-            var reader = message.CreateReader();
+            var reader = new MessageReader(msg.Buffer);
 
             Assert.Equal(Test1, reader.ReadString());
             Assert.Equal(Test2, reader.ReadString());
@@ -89,8 +83,7 @@ namespace Impostor.Tests.Hazel
             Assert.Equal(7, msg.Length);
             Assert.Equal(msg.Length, msg.Position);
 
-            var message = new HazelMessage(new MessageReader(msg.Buffer), MessageType.Reliable);
-            var reader = message.CreateReader();
+            var reader = new MessageReader(msg.Buffer);
 
             Assert.Equal(Test1, reader.ReadSingle());
         }
@@ -111,8 +104,7 @@ namespace Impostor.Tests.Hazel
 
             msg.EndMessage();
 
-            var message = new HazelMessage(new MessageReader(msg.Buffer), MessageType.Reliable);
-            var handleMessage = message.CreateReader();
+            var handleMessage = new MessageReader(msg.Buffer);
             Assert.Equal(1, handleMessage.Tag);
 
             var parentReader = handleMessage.Slice(handleMessage.Position);
@@ -142,8 +134,7 @@ namespace Impostor.Tests.Hazel
 
             Assert.Equal(msg.Length, msg.Position);
 
-            var message = new HazelMessage(new MessageReader(msg.Buffer), MessageType.Reliable);
-            var reader = message.CreateReader();
+            var reader = new MessageReader(msg.Buffer);
             Assert.Equal(1, reader.Tag);
             Assert.Equal(65534, reader.ReadInt32()); // Content
 

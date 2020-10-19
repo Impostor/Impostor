@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Impostor.Api.Net.Messages;
 using Serilog;
 
 namespace Hazel
@@ -127,33 +128,33 @@ namespace Hazel
         }
 
         /// <summary>
-        ///     Sends a number of bytes to the end point of the connection using the specified <see cref="SendOption"/>.
+        ///     Sends a number of bytes to the end point of the connection using the specified <see cref="MessageType"/>.
         /// </summary>
         /// <param name="msg">The message to send.</param>
         /// <remarks>
         ///     <include file="DocInclude/common.xml" path="docs/item[@name='Connection_SendBytes_General']/*" />
         ///     <para>
-        ///         The sendOptions parameter is only a request to use those options and the actual method used to send the
+        ///         The messageType parameter is only a request to use those options and the actual method used to send the
         ///         data is up to the implementation. There are circumstances where this parameter may be ignored but in 
         ///         general any implementer should aim to always follow the user's request.
         ///     </para>
         /// </remarks>
-        public abstract ValueTask Send(MessageWriter msg);
+        public abstract ValueTask Send(IMessageWriter msg);
 
         /// <summary>
-        ///     Sends a number of bytes to the end point of the connection using the specified <see cref="SendOption"/>.
+        ///     Sends a number of bytes to the end point of the connection using the specified <see cref="MessageType"/>.
         /// </summary>
         /// <param name="bytes">The bytes of the message to send.</param>
-        /// <param name="sendOption">The option specifying how the message should be sent.</param>
+        /// <param name="messageType">The option specifying how the message should be sent.</param>
         /// <remarks>
         ///     <include file="DocInclude/common.xml" path="docs/item[@name='Connection_SendBytes_General']/*" />
         ///     <para>
-        ///         The sendOptions parameter is only a request to use those options and the actual method used to send the
+        ///         The messageType parameter is only a request to use those options and the actual method used to send the
         ///         data is up to the implementation. There are circumstances where this parameter may be ignored but in 
         ///         general any implementer should aim to always follow the user's request.
         ///     </para>
         /// </remarks>
-        public abstract ValueTask SendBytes(byte[] bytes, SendOption sendOption = SendOption.None);
+        public abstract ValueTask SendBytes(byte[] bytes, MessageType messageType = MessageType.Unreliable);
         
         /// <summary>
         ///     Connects the connection to a server and begins listening.
@@ -174,13 +175,13 @@ namespace Hazel
         ///     Invokes the DataReceived event.
         /// </summary>
         /// <param name="msg">The bytes received.</param>
-        /// <param name="sendOption">The <see cref="SendOption"/> the message was received with.</param>
+        /// <param name="messageType">The <see cref="MessageType"/> the message was received with.</param>
         /// <remarks>
         ///     Invokes the <see cref="DataReceived"/> event on this connection to alert subscribers a new message has been
         ///     received. The bytes and the send option that the message was sent with should be passed in to give to the
         ///     subscribers.
         /// </remarks>
-        protected async ValueTask InvokeDataReceived(MessageReader msg, SendOption sendOption)
+        protected async ValueTask InvokeDataReceived(IMessageReader msg, MessageType messageType)
         {
             // Make a copy to avoid race condition between null check and invocation
             var handler = DataReceived;
@@ -188,7 +189,7 @@ namespace Hazel
             {
                 try
                 {
-                    await handler(new DataReceivedEventArgs(this, msg, sendOption));
+                    await handler(new DataReceivedEventArgs(this, msg, messageType));
                 }
                 catch (Exception e)
                 {
@@ -208,7 +209,7 @@ namespace Hazel
         ///     by the end point or because an error occurred. If an error occurred the error should be passed in in order to 
         ///     pass to the subscribers, otherwise null can be passed in.
         /// </remarks>
-        protected async ValueTask InvokeDisconnected(string e, MessageReader reader)
+        protected async ValueTask InvokeDisconnected(string e, IMessageReader reader)
         {
             // Make a copy to avoid race condition between null check and invocation
             var handler = Disconnected;

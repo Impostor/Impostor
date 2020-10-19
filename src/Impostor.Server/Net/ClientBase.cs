@@ -29,7 +29,7 @@ namespace Impostor.Server.Net
 
         public ClientPlayer Player { get; set; }
 
-        public abstract ValueTask HandleMessageAsync(IMessage message);
+        public abstract ValueTask HandleMessageAsync(IMessageReader message, MessageType messageType);
 
         public abstract ValueTask HandleDisconnectAsync(string reason);
     }

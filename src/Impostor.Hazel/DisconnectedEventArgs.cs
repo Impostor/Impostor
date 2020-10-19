@@ -1,4 +1,5 @@
 ﻿using System;
+using Impostor.Api.Net.Messages;
 
 namespace Hazel
 {
@@ -13,9 +14,9 @@ namespace Hazel
         /// Optional data sent with a disconnect message. May be null. 
         /// You must not recycle this. If you need the message outside of a callback, you should copy it.
         /// </summary>
-        public readonly MessageReader Message;
+        public readonly IMessageReader Message;
 
-        public DisconnectedEventArgs(string reason, MessageReader message)
+        public DisconnectedEventArgs(string reason, IMessageReader message)
         {
             this.Reason = reason;
             this.Message = message;

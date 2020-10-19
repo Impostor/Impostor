@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Hazel;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
@@ -56,17 +57,17 @@ namespace Impostor.Server.Net.Manager
         {
             if (name.Length > 10)
             {
-                using var packet = connection.CreateMessage(MessageType.Reliable);
+                using var packet = MessageWriter.Get(MessageType.Reliable);
                 Message01JoinGame.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameLength);
-                await packet.SendAsync();
+                await connection.SendAsync(packet);
                 return;
             }
 
             if (!SupportedVersions.Contains(clientVersion))
             {
-                using var packet = connection.CreateMessage(MessageType.Reliable);
+                using var packet = MessageWriter.Get(MessageType.Reliable);
                 Message01JoinGame.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
-                await packet.SendAsync();
+                await connection.SendAsync(packet);
                 return;
             }
 

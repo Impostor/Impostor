@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Impostor.Api.Net.Messages;
 
 
 namespace Hazel.Udp
@@ -285,7 +286,7 @@ namespace Hazel.Udp
         {
             if (await ProcessReliableReceive(message.Buffer, 1))
             {
-                await InvokeDataReceived(message.Slice(3), SendOption.Reliable);
+                await InvokeDataReceived(message.Slice(3), MessageType.Reliable);
             }
 
             Statistics.LogReliableReceive(message.Length - 3, message.Length);

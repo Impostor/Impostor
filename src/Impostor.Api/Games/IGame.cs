@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
@@ -29,6 +30,29 @@ namespace Impostor.Api.Games
 
         int HostId { get; }
 
-        IGameMessageWriter CreateMessage(MessageType type);
+        /// <summary>
+        ///     Send the message to all players.
+        /// </summary>
+        /// <param name="writer">Message to send.</param>
+        /// <param name="states">Required limbo state of the player.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        ValueTask SendToAllAsync(IMessageWriter writer, LimboStates states = LimboStates.NotLimbo);
+
+        /// <summary>
+        ///     Send the message to all players except one.
+        /// </summary>
+        /// <param name="writer">Message to send.</param>
+        /// <param name="senderId">The player to exclude from sending the message.</param>
+        /// <param name="states">Required limbo state of the player.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        ValueTask SendToAllExceptAsync(IMessageWriter writer, int senderId, LimboStates states = LimboStates.NotLimbo);
+
+        /// <summary>
+        ///     Send a message to a specific player.
+        /// </summary>
+        /// <param name="writer">Message to send.</param>
+        /// <param name="id">ID of the client.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        ValueTask SendToAsync(IMessageWriter writer, int id);
     }
 }

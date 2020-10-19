@@ -1,4 +1,6 @@
-﻿namespace Hazel
+﻿using Impostor.Api.Net.Messages;
+
+namespace Hazel
 {
     public struct DataReceivedEventArgs
     {
@@ -7,18 +9,18 @@
         /// <summary>
         ///     The bytes received from the client.
         /// </summary>
-        public readonly MessageReader Message;
+        public readonly IMessageReader Message;
 
         /// <summary>
-        ///     The <see cref="SendOption"/> the data was sent with.
+        ///     The <see cref="Type"/> the data was sent with.
         /// </summary>
-        public readonly SendOption SendOption;
+        public readonly MessageType Type;
         
-        public DataReceivedEventArgs(Connection sender, MessageReader msg, SendOption sendOption)
+        public DataReceivedEventArgs(Connection sender, IMessageReader msg, MessageType type)
         {
             this.Sender = sender;
             this.Message = msg;
-            this.SendOption = sendOption;
+            this.Type = type;
         }
     }
 }

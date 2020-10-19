@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Impostor.Api.Net.Messages;
 using Serilog;
 
 namespace Hazel.Udp
@@ -110,7 +111,7 @@ namespace Hazel.Udp
         protected abstract ValueTask WriteBytesToConnection(byte[] bytes, int length);
 
         /// <inheritdoc/>
-        public override async ValueTask Send(MessageWriter msg)
+        public override async ValueTask Send(IMessageWriter msg)
         {
             if (this._state != ConnectionState.Connected)
                 throw new InvalidOperationException("Could not send data as this Connection is not connected. Did you disconnect?");
@@ -120,7 +121,7 @@ namespace Hazel.Udp
 
             switch (msg.SendOption)
             {
-                case SendOption.Reliable:
+                case MessageType.Reliable:
                     ResetKeepAliveTimer();
 
                     AttachReliableID(buffer, 1, buffer.Length);
@@ -144,7 +145,7 @@ namespace Hazel.Udp
         ///         <see cref="SendOption.None"/> until implemented.
         ///     </para>
         /// </remarks>
-        public override async ValueTask SendBytes(byte[] bytes, SendOption sendOption = SendOption.None)
+        public override async ValueTask SendBytes(byte[] bytes, MessageType sendOption = MessageType.Unreliable)
         {
             //Add header information and send
             await HandleSend(bytes, (byte)sendOption);
@@ -162,7 +163,7 @@ namespace Hazel.Udp
             switch (sendOption)
             {
                 case (byte)UdpSendOption.Ping:
-                case (byte)SendOption.Reliable:
+                case (byte)MessageType.Reliable:
                 case (byte)UdpSendOption.Hello:
                     await ReliableSend(sendOption, data, ackCallback);
                     break;
@@ -192,7 +193,7 @@ namespace Hazel.Udp
             switch (message.Buffer.Span[0])
             {
                 //Handle reliable receives
-                case (byte)SendOption.Reliable:
+                case (byte)MessageType.Reliable:
                     await ReliableMessageReceive(message);
                     break;
 
@@ -217,7 +218,7 @@ namespace Hazel.Udp
                     
                 //Treat everything else as unreliable
                 default:
-                    await InvokeDataReceived(message.Slice(1), SendOption.None);
+                    await InvokeDataReceived(message.Slice(1), MessageType.Unreliable);
                     Statistics.LogUnreliableReceive(message.Length - 1, message.Length);
                     break;
             }

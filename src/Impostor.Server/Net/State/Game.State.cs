@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Hazel;
 using Impostor.Api;
 using Impostor.Api.Events;
 using Impostor.Api.Innersloth.Data;
@@ -95,7 +96,7 @@ namespace Impostor.Server.Net.State
 
         private async ValueTask CheckLimboPlayers()
         {
-            using var message = CreateMessage(MessageType.Reliable);
+            using var message = MessageWriter.Get(MessageType.Reliable);
 
             foreach (var (_, player) in _players.Where(x => x.Value.Limbo == LimboStates.WaitingForHost))
             {
@@ -103,7 +104,8 @@ namespace Impostor.Server.Net.State
                 WriteAlterGameMessage(message, false, IsPublic);
 
                 player.Limbo = LimboStates.NotLimbo;
-                await message.SendToAsync(player.Client);
+
+                await SendToAsync(message, player.Client.Id);
             }
         }
     }

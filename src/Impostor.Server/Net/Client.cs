@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Hazel;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
@@ -26,10 +27,8 @@ namespace Impostor.Server.Net
             _gameManager = gameManager;
         }
 
-        public override async ValueTask HandleMessageAsync(IMessage message)
+        public override async ValueTask HandleMessageAsync(IMessageReader reader, MessageType messageType)
         {
-            var reader = message.CreateReader();
-
             var flag = reader.Tag;
 
             _logger.LogTrace("[{0}] Server got {1}.", Id, flag);
@@ -45,10 +44,11 @@ namespace Impostor.Server.Net
                     var game = await _gameManager.CreateAsync(gameInfo);
 
                     // Code in the packet below will be used in JoinGame.
-                    using var writer = Connection.CreateMessage(MessageType.Reliable);
-                    Message00HostGame.Serialize(writer, game.Code);
-
-                    await writer.SendAsync();
+                    using (var writer = MessageWriter.Get(MessageType.Reliable))
+                    {
+                        Message00HostGame.Serialize(writer, game.Code);
+                        await Connection.SendAsync(writer);
+                    }
 
                     break;
                 }
@@ -150,18 +150,19 @@ namespace Impostor.Server.Net
                     await Player.Game.HandleGameData(readerCopy, Player, toPlayer);
 
                     // Broadcast packet to all other players.
-                    using var writer = Player.Game.CreateMessage(message.Type);
-
-                    if (toPlayer)
+                    using (var writer = MessageWriter.Get(messageType))
                     {
-                        var target = reader.ReadPackedInt32();
-                        reader.CopyTo(writer);
-                        await writer.SendToAsync(target);
-                    }
-                    else
-                    {
-                        reader.CopyTo(writer);
-                        await writer.SendToAllExceptAsync(Id);
+                        if (toPlayer)
+                        {
+                            var target = reader.ReadPackedInt32();
+                            reader.CopyTo(writer);
+                            await Player.Game.SendToAsync(writer, target);
+                        }
+                        else
+                        {
+                            reader.CopyTo(writer);
+                            await Player.Game.SendToAllExceptAsync(writer, Id);
+                        }
                     }
 
                     break;
@@ -297,9 +298,10 @@ namespace Impostor.Server.Net
         ///     All options given.
         ///     At this moment, the client can only specify the map, impostor count and chat language.
         /// </param>
-        private async ValueTask OnRequestGameList(GameOptionsData options)
+        private ValueTask OnRequestGameList(GameOptionsData options)
         {
-            using var message = Connection.CreateMessage(MessageType.Reliable);
+            using var message = MessageWriter.Get(MessageType.Reliable);
+
             var games = _gameManager.FindListings((MapFlags)options.MapId, options.NumImpostors, options.Keywords);
 
             var skeldGameCount = _gameManager.GetGameCount(MapFlags.Skeld);
@@ -308,19 +310,19 @@ namespace Impostor.Server.Net
 
             Message16GetGameListV2.Serialize(message, skeldGameCount, miraHqGameCount, polusGameCount, games);
 
-            await message.SendAsync();
+            return Connection.SendAsync(message);
         }
 
-        private async ValueTask SendDisconnectReason(DisconnectReason reason, string message = null)
+        private ValueTask SendDisconnectReason(DisconnectReason reason, string message = null)
         {
             if (Connection == null)
             {
-                return;
+                return default;
             }
 
-            using var packet = Connection.CreateMessage(MessageType.Reliable);
+            using var packet = MessageWriter.Get(MessageType.Reliable);
             Message01JoinGame.SerializeError(packet, false, reason, message);
-            await packet.SendAsync();
+            return Connection.SendAsync(packet);
         }
     }
 }

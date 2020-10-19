@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Impostor.Api.Net.Messages;
 using Serilog;
 
 namespace Hazel
@@ -69,7 +70,7 @@ namespace Hazel
         ///     Implementers should call this to invoke the <see cref="NewConnection"/> event before data is received so that
         ///     subscribers do not miss any data that may have been sent immediately after connecting.
         /// </remarks>
-        internal async Task InvokeNewConnection(MessageReader msg, Connection connection)
+        internal async Task InvokeNewConnection(IMessageReader msg, Connection connection)
         {
             // Make a copy to avoid race condition between null check and invocation
             var handler = NewConnection;

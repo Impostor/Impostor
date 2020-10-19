@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Hazel;
 using Hazel.Udp;
+using Impostor.Api.Net.Messages;
 using PcapDotNet.Core;
 using PcapDotNet.Packets;
 
@@ -68,9 +69,9 @@ namespace Impostor.Tools.Proxy
             // True if this is our own packet.
             using (var stream = udp.Payload.ToMemoryStream())
             {
-                var reader = new MessageReader(stream.ToArray());
+                var reader = (IMessageReader) new MessageReader(stream.ToArray());
                 var option = reader.Buffer.Span[0];
-                if (option == (byte) SendOption.Reliable)
+                if (option == (byte) MessageType.Reliable)
                 {
                     reader = reader.Slice(3);
                 }
@@ -114,7 +115,7 @@ namespace Impostor.Tools.Proxy
             }
         }
 
-        private static void HandleToClient(string source, MessageReader packet)
+        private static void HandleToClient(string source, IMessageReader packet)
         {
             var tagName = TagMap.ContainsKey(packet.Tag) ? TagMap[packet.Tag] : "Unknown";
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -124,7 +125,7 @@ namespace Impostor.Tools.Proxy
             {
                 case 14:
                 case 13:
-                    packet.Position = packet.Length;
+                    // packet.Position = packet.Length;
                     break;
                 case 0:
                     Console.WriteLine("- GameCode        " + packet.ReadInt32());
@@ -132,7 +133,7 @@ namespace Impostor.Tools.Proxy
                 case 5:
                 case 6:
                     Console.WriteLine(HexUtils.HexDump(packet.Buffer.ToArray().Take(packet.Length).ToArray()));
-                    packet.Position = packet.Length;
+                    // packet.Position = packet.Length;
                     break;
                 case 7:
                     Console.WriteLine("- GameCode        " + packet.ReadInt32());
@@ -153,7 +154,7 @@ namespace Impostor.Tools.Proxy
             }
         }
 
-        private static void HandleToServer(string source, MessageReader packet)
+        private static void HandleToServer(string source, IMessageReader packet)
         {
             var tagName = TagMap.ContainsKey(packet.Tag) ? TagMap[packet.Tag] : "Unknown";
             Console.ForegroundColor = ConsoleColor.White;
@@ -172,7 +173,7 @@ namespace Impostor.Tools.Proxy
                 case 6:
                     Console.WriteLine("- GameCode        " + packet.ReadInt32());
                     Console.WriteLine(HexUtils.HexDump(packet.Buffer.ToArray().Take(packet.Length).ToArray()));
-                    packet.Position = packet.Length;
+                    // packet.Position = packet.Length;
                     break;
             }
         }

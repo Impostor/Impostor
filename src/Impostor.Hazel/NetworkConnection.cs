@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Impostor.Api.Net.Messages;
 
 
 namespace Hazel
@@ -56,7 +57,7 @@ namespace Hazel
         /// <summary>
         ///     Called when the socket has been disconnected at the remote host.
         /// </summary>
-        protected async ValueTask DisconnectRemote(string reason, MessageReader reader)
+        protected async ValueTask DisconnectRemote(string reason, IMessageReader reader)
         {
             if (this.SendDisconnect(null))
             {

@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
+using Impostor.Api.Games;
+using Impostor.Api.Net.Messages;
 
 namespace Hazel
 {
     ///
-    public class MessageWriter : IRecyclable, IDisposable
+    public class MessageWriter : IMessageWriter, IRecyclable, IDisposable
     {
         public static int BufferSize = 64000;
         public static readonly ObjectPool<MessageWriter> WriterPool = new ObjectPool<MessageWriter>(() => new MessageWriter(BufferSize));
 
-        public byte[] Buffer;
-        public int Length;
-        public int Position;
-
-        public SendOption SendOption { get; private set; }
+        public MessageType SendOption { get; private set; }
 
         private Stack<int> messageStarts = new Stack<int>();
         
@@ -24,11 +23,14 @@ namespace Hazel
             this.Length = this.Buffer.Length;
         }
 
-        ///
         public MessageWriter(int bufferSize)
         {
             this.Buffer = new byte[bufferSize];
         }
+
+        public byte[] Buffer { get; }
+        public int Length { get; set; }
+        public int Position { get; set; }
 
         public byte[] ToByteArray(bool includeHeader)
         {
@@ -42,13 +44,13 @@ namespace Hazel
             {
                 switch (this.SendOption)
                 {
-                    case SendOption.Reliable:
+                    case MessageType.Reliable:
                         {
                             byte[] output = new byte[this.Length - 3];
                             System.Buffer.BlockCopy(this.Buffer, 3, output, 0, this.Length - 3);
                             return output;
                         }
-                    case SendOption.None:
+                    case MessageType.Unreliable:
                         {
                             byte[] output = new byte[this.Length - 1];
                             System.Buffer.BlockCopy(this.Buffer, 1, output, 0, this.Length - 1);
@@ -62,7 +64,7 @@ namespace Hazel
 
         ///
         /// <param name="sendOption">The option specifying how the message should be sent.</param>
-        public static MessageWriter Get(SendOption sendOption = SendOption.None)
+        public static MessageWriter Get(MessageType sendOption = MessageType.Unreliable)
         {
             var output = WriterPool.GetObject();
             output.Clear(sendOption);
@@ -72,12 +74,17 @@ namespace Hazel
 
         public bool HasBytes(int expected)
         {
-            if (this.SendOption == SendOption.None)
+            if (this.SendOption == MessageType.Unreliable)
             {
                 return this.Length > 1 + expected;
             }
 
             return this.Length > 3 + expected;
+        }
+
+        public void Write(GameCode value)
+        {
+            this.Write(value.Value);
         }
 
         ///
@@ -104,7 +111,7 @@ namespace Hazel
             this.Length = this.Position;
         }
 
-        public void Clear(SendOption sendOption)
+        public void Clear(MessageType sendOption)
         {
             this.messageStarts.Clear();
             this.SendOption = sendOption;
@@ -112,10 +119,10 @@ namespace Hazel
             switch (sendOption)
             {
                 default:
-                case SendOption.None:
+                case MessageType.Unreliable:
                     this.Length = this.Position = 1;
                     break;
-                case SendOption.Reliable:
+                case MessageType.Reliable:
                     this.Length = this.Position = 3;
                     break;
             }
@@ -203,6 +210,11 @@ namespace Hazel
             this.Write(bytes);
         }
 
+        public void Write(IPAddress value)
+        {
+            this.Write(value.GetAddressBytes());
+        }
+
         public void WriteBytesAndSize(byte[] bytes)
         {
             this.WritePacked((uint)bytes.Length);
@@ -277,10 +289,10 @@ namespace Hazel
             {
                 switch (msg.SendOption)
                 {
-                    case SendOption.None:
+                    case MessageType.Unreliable:
                         offset = 1;
                         break;
-                    case SendOption.Reliable:
+                    case MessageType.Reliable:
                         offset = 3;
                         break;
                 }
