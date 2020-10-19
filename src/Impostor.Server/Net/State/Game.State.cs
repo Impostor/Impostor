@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Server.Events;
-using Impostor.Server.Exceptions;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth.Data;
 
@@ -14,7 +13,7 @@ namespace Impostor.Server.Net.State
             // Store player.
             if (!_players.TryAdd(player.Client.Id, player))
             {
-                throw new AmongUsException("Failed to add player to game.");
+                throw new ImpostorException("Failed to add player to game.");
             }
 
             // Assign hostId if none is set.
