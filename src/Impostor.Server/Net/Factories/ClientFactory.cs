@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Impostor.Server.Hazel;
+using Impostor.Server.Net.Hazel;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Impostor.Server.Net.Factories

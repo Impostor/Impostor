@@ -1,8 +1,9 @@
 ﻿using System;
 using Hazel;
+using Impostor.Server.Hazel.Messages;
 using Impostor.Server.Net.Messages;
 
-namespace Impostor.Server.Hazel.Messages
+namespace Impostor.Server.Net.Hazel.Messages
 {
     internal class HazelMessage : IMessage, IDisposable
     {

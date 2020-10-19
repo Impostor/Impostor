@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Server.Data;
 using Impostor.Server.Hazel;
-using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Impostor.Server.Data;
-using Impostor.Server.Hazel;
+using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;

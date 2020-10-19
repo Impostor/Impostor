@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Impostor.Server.Net.Messages;
 
 namespace Impostor.Server.Net
 {

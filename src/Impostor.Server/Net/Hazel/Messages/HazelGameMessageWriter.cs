@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hazel;
-using Impostor.Server.Games;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Messages;
 using Impostor.Server.Net.State;
@@ -25,7 +24,7 @@ namespace Impostor.Server.Hazel.Messages
             return _game.Players
                 .Where(filter)
                 .Select(p => p.Client.Connection)
-                .OfType<HazelConnection>()
+                .OfType<Net.Hazel.HazelConnection>()
                 .Select(c => c.InnerConnection);
         }
 
@@ -53,7 +52,7 @@ namespace Impostor.Server.Hazel.Messages
         public ValueTask SendToAsync(int id)
         {
             if (_game.TryGetPlayer(id, out var player)
-                && player.Client.Connection is HazelConnection hazelConnection)
+                && player.Client.Connection is Net.Hazel.HazelConnection hazelConnection)
             {
                 hazelConnection.InnerConnection.Send(Writer);
             }

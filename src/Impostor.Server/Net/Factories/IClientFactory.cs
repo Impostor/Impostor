@@ -1,4 +1,4 @@
-﻿using Impostor.Server.Hazel;
+﻿using Impostor.Server.Net.Hazel;
 
 namespace Impostor.Server.Net.Factories
 {

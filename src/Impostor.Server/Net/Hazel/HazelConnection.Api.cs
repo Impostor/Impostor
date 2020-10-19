@@ -1,7 +1,4 @@
-﻿using Impostor.Server.Net;
-
-// ReSharper disable once CheckNamespace
-namespace Impostor.Server.Hazel
+﻿namespace Impostor.Server.Net.Hazel
 {
     internal partial class HazelConnection : IConnection
     {

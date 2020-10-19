@@ -6,7 +6,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Impostor.Server.Events.Managers;
 using Impostor.Server.Games;
-using Impostor.Server.Games.Managers;
 using Impostor.Server.Hazel;
 using Impostor.Server.Hazel.Messages;
 using Impostor.Server.Net.Manager;

@@ -1,5 +1,4 @@
-﻿using System;
-using Impostor.Server.Plugins;
+﻿using Impostor.Server.Plugins;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;

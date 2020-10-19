@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth.Data;
 
 namespace Impostor.Server.Net
 {

@@ -6,9 +6,9 @@ namespace Impostor.Server.Hazel.Messages
 {
     internal class HazelConnectionMessageWriter : HazelMessageWriter, IConnectionMessageWriter
     {
-        private readonly HazelConnection _connection;
+        private readonly Net.Hazel.HazelConnection _connection;
 
-        public HazelConnectionMessageWriter(MessageType type, HazelConnection connection)
+        public HazelConnectionMessageWriter(MessageType type, Net.Hazel.HazelConnection connection)
             : base(type)
         {
             _connection = connection;

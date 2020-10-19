@@ -2,7 +2,6 @@
 using Impostor.Server.Games;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth.Data;
-using Impostor.Shared.Innersloth.GameData;
 
 namespace Impostor.Server.Net.State
 {

@@ -1,8 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Hazel;
-using Impostor.Server.Hazel;
+using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Messages;
 using Impostor.Server.Net.State;
 

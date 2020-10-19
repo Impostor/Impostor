@@ -2,15 +2,12 @@ using System;
 using System.Threading.Tasks;
 using Impostor.Server.Data;
 using Impostor.Server.Games;
-using Impostor.Server.Games.Managers;
-using Impostor.Server.Hazel;
+using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Shared.Innersloth;
 using Impostor.Shared.Innersloth.Data;
 using Microsoft.Extensions.Logging;
-using Serilog;
-using ILogger = Serilog.ILogger;
 
 namespace Impostor.Server.Net
 {

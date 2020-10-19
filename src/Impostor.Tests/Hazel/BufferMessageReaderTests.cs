@@ -1,5 +1,5 @@
 ﻿using Hazel;
-using Impostor.Server.Hazel.Messages;
+using Impostor.Server.Net.Hazel.Messages;
 using Impostor.Server.Net.Messages;
 using Xunit;
 

@@ -1,5 +1,4 @@
-﻿// ReSharper disable once CheckNamespace
-namespace Impostor.Server.Net
+﻿namespace Impostor.Server.Net
 {
     internal abstract partial class ClientBase : IClient
     {

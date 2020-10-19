@@ -3,7 +3,6 @@ using System.Linq;
 using Impostor.Server.Games;
 using Impostor.Server.Games.Managers;
 
-// ReSharper disable once CheckNamespace
 namespace Impostor.Server.Net.Manager
 {
     internal partial class GameManager : IGameManager
