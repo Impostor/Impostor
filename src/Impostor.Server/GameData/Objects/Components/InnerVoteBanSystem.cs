@@ -25,6 +25,7 @@ namespace Impostor.Server.GameData.Objects.Components
 
         public override void Deserialize(IMessageReader reader, bool initialState)
         {
+            var votes = _votes;
             var unknown = reader.ReadBoolean();
             if (unknown)
             {
@@ -32,10 +33,10 @@ namespace Impostor.Server.GameData.Objects.Components
                 {
                     var v4 = reader.ReadInt32();
 
-                    if (!_votes.TryGetValue(v4, out var v12))
+                    if (!votes.TryGetValue(v4, out var v12))
                     {
                         v12 = new int[3];
-                        _votes[v4] = v12;
+                        votes[v4] = v12;
                     }
 
                     for (var i = 0; i < 3; i++)
