@@ -1,6 +1,8 @@
-﻿using System;
-using System.IO;
+﻿using Impostor.Api.Extensions;
 using Impostor.Api.Innersloth.Data;
+
+using System;
+using System.IO;
 
 namespace Impostor.Api.Innersloth
 {
@@ -29,78 +31,78 @@ namespace Impostor.Api.Innersloth
         public bool ConfirmImpostor { get; set; }
         public bool VisualTasks { get; set; }
         public bool IsDefaults { get; set; }
-        
+
         public void Serialize(BinaryWriter writer, byte version)
         {
-            writer.Write((byte) version);
-            writer.Write((byte) MaxPlayers);
-            writer.Write((uint) Keywords);
-            writer.Write((byte) MapId);
-            writer.Write((float) PlayerSpeedMod);
-            writer.Write((float) CrewLightMod);
-            writer.Write((float) ImpostorLightMod);
-            writer.Write((float) KillCooldown);
-            writer.Write((byte) NumCommonTasks);
-            writer.Write((byte) NumLongTasks);
-            writer.Write((byte) NumShortTasks);
-            writer.Write((int) NumEmergencyMeetings);
-            writer.Write((byte) NumImpostors);
-            writer.Write((byte) KillDistance);
-            writer.Write((uint) DiscussionTime);
-            writer.Write((uint) VotingTime);
-            writer.Write((bool) IsDefaults);
+            writer.Write((byte)version);
+            writer.Write((byte)MaxPlayers);
+            writer.Write((uint)Keywords);
+            writer.Write((byte)MapId);
+            writer.Write((float)PlayerSpeedMod);
+            writer.Write((float)CrewLightMod);
+            writer.Write((float)ImpostorLightMod);
+            writer.Write((float)KillCooldown);
+            writer.Write((byte)NumCommonTasks);
+            writer.Write((byte)NumLongTasks);
+            writer.Write((byte)NumShortTasks);
+            writer.Write((int)NumEmergencyMeetings);
+            writer.Write((byte)NumImpostors);
+            writer.Write((byte)KillDistance);
+            writer.Write((uint)DiscussionTime);
+            writer.Write((uint)VotingTime);
+            writer.Write((bool)IsDefaults);
             if (version > 1)
             {
-                writer.Write((byte) EmergencyCooldown);
+                writer.Write((byte)EmergencyCooldown);
             }
 
             if (version > 2)
             {
-                writer.Write((bool) ConfirmImpostor);
-                writer.Write((bool) VisualTasks);
+                writer.Write((bool)ConfirmImpostor);
+                writer.Write((bool)VisualTasks);
             }
         }
 
-        public static GameOptionsData Deserialize(ReadOnlyMemory<byte> bytes)
+        public static GameOptionsData Deserialize(ReadOnlyMemory<byte> memory)
         {
-            // TODO: Remove memory allocation.
+            var bytes = memory.Span;
 
-            using (var stream = new MemoryStream(bytes.ToArray()))
-            using (var reader = new BinaryReader(stream))
+            var result = new GameOptionsData();
+            result.Version = bytes.ReadByte();
+            result.MaxPlayers = bytes.ReadByte();
+            result.Keywords = (GameKeywords)bytes.ReadUInt32();
+            result.MapId = bytes.ReadByte();
+            result.PlayerSpeedMod = bytes.ReadSingle();
+
+            result.CrewLightMod = bytes.ReadSingle();
+            result.ImpostorLightMod = bytes.ReadSingle();
+            result.KillCooldown = bytes.ReadSingle();
+
+            result.NumCommonTasks = bytes.ReadByte();
+            result.NumLongTasks = bytes.ReadByte();
+            result.NumShortTasks = bytes.ReadByte();
+
+            result.NumEmergencyMeetings = bytes.ReadInt32();
+
+            result.NumImpostors = bytes.ReadByte();
+            result.KillDistance = bytes.ReadByte();
+            result.DiscussionTime = bytes.ReadInt32();
+            result.VotingTime = bytes.ReadInt32();
+
+            result.IsDefaults = bytes.ReadBoolean();
+
+            if (result.Version > 1)
             {
-                var result = new GameOptionsData();
-
-                result.Version = reader.ReadByte();
-                result.MaxPlayers = reader.ReadByte();
-                result.Keywords = (GameKeywords) reader.ReadUInt32();
-                result.MapId = reader.ReadByte();
-                result.PlayerSpeedMod = reader.ReadSingle();
-                result.CrewLightMod = reader.ReadSingle();
-                result.ImpostorLightMod = reader.ReadSingle();
-                result.KillCooldown = reader.ReadSingle();
-                result.NumCommonTasks = reader.ReadByte();
-                result.NumLongTasks = reader.ReadByte();
-                result.NumShortTasks = reader.ReadByte();
-                result.NumEmergencyMeetings = reader.ReadInt32();
-                result.NumImpostors = reader.ReadByte();
-                result.KillDistance = reader.ReadByte();
-                result.DiscussionTime = reader.ReadInt32();
-                result.VotingTime = reader.ReadInt32();
-                result.IsDefaults = reader.ReadBoolean();
-
-                if (result.Version > 1)
-                {
-                    result.EmergencyCooldown = reader.ReadByte();
-                }
-
-                if (result.Version > 2)
-                {
-                    result.ConfirmImpostor = reader.ReadBoolean();
-                    result.VisualTasks = reader.ReadBoolean();
-                }
-                
-                return result;
+                result.EmergencyCooldown = bytes.ReadByte();
             }
+
+            if (result.Version > 2)
+            {
+                result.ConfirmImpostor = bytes.ReadBoolean();
+                result.VisualTasks = bytes.ReadBoolean();
+            }
+
+            return result;
         }
     }
 }
