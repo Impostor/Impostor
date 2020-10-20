@@ -1,4 +1,5 @@
-﻿using Impostor.Api.Innersloth.Data;
+﻿using Impostor.Api.Extensions;
+using Impostor.Api.Innersloth.Data;
 
 namespace Impostor.Api.Net.Messages.C2S
 {
@@ -11,8 +12,10 @@ namespace Impostor.Api.Net.Messages.C2S
 
         public static void Deserialize(IMessageReader reader, out AlterGameTags gameTag, out bool isPublic)
         {
-            gameTag = (AlterGameTags)reader.ReadByte();
-            isPublic = reader.ReadBoolean();
+            var slice = reader.ReadBytes(sizeof(byte) + sizeof(byte)).Span;
+
+            gameTag = (AlterGameTags)slice.ReadByte();
+            isPublic = slice.ReadBoolean();
         }
     }
 }
