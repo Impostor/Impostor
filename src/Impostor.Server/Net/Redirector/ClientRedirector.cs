@@ -58,7 +58,7 @@ namespace Impostor.Server.Net.Redirector
                         out _);
 
                     using var packet = MessageWriter.Get(MessageType.Reliable);
-                    var endpoint = _nodeLocator.Find(GameCodeParser.IntToGameName(gameCode));
+                    var endpoint = await _nodeLocator.FindAsync(GameCodeParser.IntToGameName(gameCode));
                     if (endpoint == null)
                     {
                         Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.GameMissing);
