@@ -1,23 +1,14 @@
 ﻿using System.Net;
+using System.Threading.Tasks;
 
 namespace Impostor.Server.Net.Redirector
 {
     public class NodeLocatorNoOp : INodeLocator
     {
-        public IPEndPoint Find(string gameCode)
-        {
-            // Do nothing.
-            return null;
-        }
+        public ValueTask<IPEndPoint> FindAsync(string gameCode) => ValueTask.FromResult(default(IPEndPoint));
 
-        public void Save(string gameCode, IPEndPoint endPoint)
-        {
-            // Do nothing.
-        }
+        public ValueTask SaveAsync(string gameCode, IPEndPoint endPoint) => ValueTask.CompletedTask;
 
-        public void Remove(string gameCode)
-        {
-            // Do nothing.
-        }
+        public ValueTask RemoveAsync(string gameCode) => ValueTask.CompletedTask;
     }
 }

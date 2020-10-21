@@ -6,30 +6,20 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
+using Impostor.Server.Events.Register;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Impostor.Server.Events
 {
     internal class EventManager : IEventManager
     {
-        private readonly ConcurrentDictionary<Type, object> _temporaryEventListeners;
+        private readonly ConcurrentDictionary<Type, TemporaryEventRegister> _temporaryEventListeners;
         private readonly IServiceProvider _serviceProvider;
 
         public EventManager(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _temporaryEventListeners = new ConcurrentDictionary<Type, object>();
-        }
-
-        /// <inheritdoc />
-        public IDisposable Register<TEvent>(Func<IServiceProvider, TEvent, ValueTask> callback)
-            where TEvent : IEvent
-        {
-            var register = (TemporaryEventRegister<TEvent>) _temporaryEventListeners.GetOrAdd(
-                typeof(TEvent),
-                _ => new TemporaryEventRegister<TEvent>());
-
-            return register.Add(callback);
+            _temporaryEventListeners = new ConcurrentDictionary<Type, TemporaryEventRegister>();
         }
 
         /// <inheritdoc />
@@ -41,17 +31,23 @@ namespace Impostor.Server.Events
                 throw new ArgumentNullException(nameof(listener));
             }
 
-            var registerMethod = typeof(EventManager).GetMethod(nameof(RegisterListenerImpl), BindingFlags.Instance | BindingFlags.NonPublic);
-            var methods = RegisteredEventListener.FromType(listener.GetType());
-            var disposes = new IDisposable[methods.Count];
+            var eventListeners = RegisteredEventListener.FromType(listener.GetType());
+            var disposes = new IDisposable[eventListeners.Count];
 
-            for (var i = 0; i < methods.Count; i++)
+            foreach (var eventListener in eventListeners)
             {
-                var method = methods[i];
+                IRegisteredEventListener wrappedEventListener = new WrappedRegisteredEventListener(eventListener, listener);
 
-                disposes[i] = (IDisposable) registerMethod!
-                    .MakeGenericMethod(method.EventType)
-                    .Invoke(this, new object[] { listener, method, invoker });
+                if (invoker != null)
+                {
+                    wrappedEventListener = new InvokedRegisteredEventListener(wrappedEventListener, invoker);
+                }
+
+                var register = _temporaryEventListeners.GetOrAdd(
+                    wrappedEventListener.EventType,
+                    _ => new TemporaryEventRegister());
+
+                register.Add(wrappedEventListener);
             }
 
             return new MultiDisposable(disposes);
@@ -74,14 +70,10 @@ namespace Impostor.Server.Events
 
             try
             {
-                foreach (var (handler, eventListener) in GetHandlers<T>(scope.ServiceProvider))
+                foreach (var (handler, eventListener) in GetHandlers<T>(scope.ServiceProvider)
+                    .OrderByDescending(e => e.Listener.Priority))
                 {
                     await eventListener.InvokeAsync(handler, @event, scope.ServiceProvider);
-                }
-
-                if (_temporaryEventListeners.TryGetValue(typeof(T), out var cb))
-                {
-                    await ((TemporaryEventRegister<T>) cb).CallAsync(scope.ServiceProvider, @event);
                 }
             }
             finally
@@ -95,7 +87,7 @@ namespace Impostor.Server.Events
         /// </summary>
         /// <param name="services">Current service provider.</param>
         /// <returns>The event listeners.</returns>
-        private static IEnumerable<EventHandler> GetHandlers<TEvent>(IServiceProvider services)
+        private IEnumerable<EventHandler> GetHandlers<TEvent>(IServiceProvider services)
             where TEvent : IEvent
         {
             foreach (var handler in services.GetServices<IEventListener>())
@@ -112,14 +104,14 @@ namespace Impostor.Server.Events
                     yield return new EventHandler(handler, eventHandler);
                 }
             }
-        }
 
-        private IDisposable RegisterListenerImpl<TEvent>(object obj, RegisteredEventListener listener, Func<Func<Task>, Task> invoker = null)
-            where TEvent : IEvent
-        {
-            return invoker == null
-                ? Register<TEvent>((provider, @event) => listener.InvokeAsync(obj, @event, provider))
-                : Register<TEvent>((provider, @event) => new ValueTask(invoker(() => listener.InvokeAsync(obj, @event, provider).AsTask())));
+            if (_temporaryEventListeners.TryGetValue(typeof(TEvent), out var cb))
+            {
+                foreach (var eventListener in cb.GetEventListeners())
+                {
+                    yield return new EventHandler(null, eventListener);
+                }
+            }
         }
     }
 }
