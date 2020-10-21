@@ -8,15 +8,6 @@ namespace Impostor.Api.Events.Managers
         /// <summary>
         ///     Register a temporary event listener.
         /// </summary>
-        /// <param name="callback">Event callback.</param>
-        /// <returns>Disposable that unregisters the callback from the event manager.</returns>
-        /// <typeparam name="TEvent">Type of the event.</typeparam>
-        IDisposable Register<TEvent>(Func<IServiceProvider, TEvent, ValueTask> callback)
-            where TEvent : IEvent;
-
-        /// <summary>
-        ///     Register a temporary event listener.
-        /// </summary>
         /// <param name="listener">Event listener.</param>
         /// <param name="invoker">Middleware between the events, which can be used to swap to the correct thread dispatcher.</param>
         /// <returns>Disposable that unregisters the callback from the event manager.</returns>
