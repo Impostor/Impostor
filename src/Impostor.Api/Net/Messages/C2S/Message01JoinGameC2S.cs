@@ -1,4 +1,7 @@
-﻿namespace Impostor.Api.Net.Messages.C2S
+﻿using System;
+using Impostor.Api.Extensions;
+
+namespace Impostor.Api.Net.Messages.C2S
 {
     public static class Message01JoinGameC2S
     {
@@ -9,8 +12,10 @@
 
         public static void Deserialize(IMessageReader reader, out int gameCode, out byte unknown)
         {
-            gameCode = reader.ReadInt32();
-            unknown = reader.ReadByte();
+            var slice = reader.ReadBytes(sizeof(Int32) + sizeof(byte)).Span;
+
+            gameCode = slice.ReadInt32();
+            unknown = slice.ReadByte();
         }
     }
 }

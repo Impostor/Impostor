@@ -28,7 +28,7 @@ namespace Impostor.Hazel
         public IMessageReader ReadMessage()
         {
             var length = ReadUInt16();
-            var tag = ReadByte();
+            var tag = FastByte();
             var pos = Position;
 
             Position += length;
@@ -121,7 +121,7 @@ namespace Impostor.Hazel
 
             while (readMore)
             {
-                byte b = ReadByte();
+                byte b = FastByte();
                 if (b >= 0x80)
                 {
                     readMore = true;
