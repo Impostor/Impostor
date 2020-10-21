@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using Impostor.Server.Data;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -72,11 +73,11 @@ namespace Impostor.Server.Net.Redirector
             }
         }
 
-        public IPEndPoint Find(string gameCode)
+        public ValueTask<IPEndPoint> FindAsync(string gameCode)
         {
             if (!_isMaster)
             {
-                return null;
+                return ValueTask.FromResult(default(IPEndPoint));
             }
 
             if (_availableNodes.TryGetValue(gameCode, out var node))
@@ -84,29 +85,31 @@ namespace Impostor.Server.Net.Redirector
                 if (node.Expired)
                 {
                     _availableNodes.TryRemove(gameCode, out _);
-                    return null;
+                    return ValueTask.FromResult(default(IPEndPoint));
                 }
 
-                return node.Endpoint;
+                return ValueTask.FromResult(node.Endpoint);
             }
 
-            return null;
+            return ValueTask.FromResult(default(IPEndPoint));
         }
 
-        public void Remove(string gameCode)
+        public ValueTask RemoveAsync(string gameCode)
         {
             if (!_isMaster)
             {
-                return;
+                return ValueTask.CompletedTask;
             }
 
             _availableNodes.TryRemove(gameCode, out _);
+            return ValueTask.CompletedTask;
         }
 
-        public void Save(string gameCode, IPEndPoint endPoint)
+        public ValueTask SaveAsync(string gameCode, IPEndPoint endPoint)
         {
             var data = Encoding.UTF8.GetBytes($"{gameCode},{endPoint}");
             _client.Send(data, data.Length, _server);
+            return ValueTask.CompletedTask;
         }
 
         public void Dispose()
