@@ -1,24 +1,24 @@
-﻿using Impostor.Api;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+
+using Impostor.Api;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Server.Data;
+using Impostor.Server.Extensions;
 using Impostor.Server.Net.Redirector;
 using Impostor.Server.Net.State;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Impostor.Server.Extensions;
 
 namespace Impostor.Server.Net.Manager
 {
@@ -65,7 +65,7 @@ namespace Impostor.Server.Net.Manager
             var gameCodeStr = gameCode.Code;
             var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options);
 
-            if (await _nodeLocator.NodeExistsAsync(gameCodeStr) || !_games.TryAdd(gameCode, game))
+            if (await _nodeLocator.ExistsAsync(gameCodeStr) || !_games.TryAdd(gameCode, game))
             {
                 return (false, null);
             }
@@ -139,7 +139,7 @@ namespace Impostor.Server.Net.Manager
             }
 
             _logger.LogDebug("Remove game with code {0} ({1}).", GameCodeParser.IntToGameName(gameCode), gameCode);
-            _nodeLocator.Remove(GameCodeParser.IntToGameName(gameCode));
+            await _nodeLocator.RemoveAsync(GameCodeParser.IntToGameName(gameCode));
 
             await _eventManager.CallAsync(new GameDestroyedEvent(game));
         }

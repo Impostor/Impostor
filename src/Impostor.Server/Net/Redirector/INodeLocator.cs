@@ -5,11 +5,11 @@ namespace Impostor.Server.Net.Redirector
 {
     public interface INodeLocator
     {
-        IPEndPoint Find(string gameCode);
+        ValueTask<IPEndPoint> FindAsync(string gameCode);
 
-        void Save(string gameCode, IPEndPoint endPoint);
+        ValueTask SaveAsync(string gameCode, IPEndPoint endPoint);
 
-        void Remove(string gameCode);
+        ValueTask RemoveAsync(string gameCode);
     }
 
     public interface IAsyncNodeLocator

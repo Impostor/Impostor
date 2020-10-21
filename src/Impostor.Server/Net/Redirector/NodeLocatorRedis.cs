@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Redirector
 {
-    public class NodeLocatorRedis : INodeLocator, IAsyncNodeLocator
+    public class NodeLocatorRedis : INodeLocator
     {
         private readonly IDistributedCache _cache;
 
@@ -15,30 +15,6 @@ namespace Impostor.Server.Net.Redirector
         {
             logger.LogWarning("Using the redis NodeLocator.");
             _cache = cache;
-        }
-
-        public IPEndPoint Find(string gameCode)
-        {
-            var entry = _cache.GetString(gameCode);
-            if (entry == null)
-            {
-                return null;
-            }
-
-            return IPEndPoint.Parse(entry);
-        }
-
-        public void Save(string gameCode, IPEndPoint endPoint)
-        {
-            _cache.SetString(gameCode, endPoint.ToString(), new DistributedCacheEntryOptions
-            {
-                SlidingExpiration = TimeSpan.FromHours(1),
-            });
-        }
-
-        public void Remove(string gameCode)
-        {
-            _cache.Remove(gameCode);
         }
 
         public async ValueTask<IPEndPoint> FindAsync(string gameCode)
@@ -59,7 +35,6 @@ namespace Impostor.Server.Net.Redirector
                 SlidingExpiration = TimeSpan.FromHours(1),
             });
         }
-
 
         public async ValueTask RemoveAsync(string gameCode)
         {
