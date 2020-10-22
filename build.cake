@@ -76,7 +76,7 @@ Task("Build")
         // - it is not a pull request
         if ((branch == "master" || branch == "dev") && string.IsNullOrEmpty(prNumber)) {
             // Client.
-            ImpostorPublishNF("Impostor-Patcher", "./src/Impostor.Patcher/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj");
+            ImpostorPublishNF("Impostor-Client", "./src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj");
             
             // Server.
             ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64");
