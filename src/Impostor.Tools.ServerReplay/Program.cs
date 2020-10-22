@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -42,9 +43,11 @@ namespace Impostor.Tools.ServerReplay
         private static async Task Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
+                .MinimumLevel.Information()
                 .WriteTo.Console()
                 .CreateLogger();
+
+            var stopwatch = Stopwatch.StartNew();
 
             // Create service provider.
             _serviceProvider = BuildServices();
@@ -62,6 +65,10 @@ namespace Impostor.Tools.ServerReplay
                     await ParseSession(reader);
                 }
             }
+
+            var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+
+            Logger.Information($"Took {elapsedMilliseconds}ms.");
         }
 
         private static ServiceProvider BuildServices()
