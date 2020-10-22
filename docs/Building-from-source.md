@@ -31,7 +31,7 @@ git submodule update --init
 cd src/Impostor.Server/
 dotnet build
 ```
-To setup the server, please look at [Running the server](Running-the-server).
+To setup the server, please look at [Running the server](Running-the-server.md).
 
 ## Building the client
 
