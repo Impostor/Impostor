@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
+using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
@@ -20,7 +21,7 @@ namespace Impostor.Server.Net
         private readonly ClientManager _clientManager;
         private readonly GameManager _gameManager;
 
-        public Client(ILogger<Client> logger, ClientManager clientManager, GameManager gameManager, string name, HazelConnection connection)
+        public Client(ILogger<Client> logger, ClientManager clientManager, GameManager gameManager, string name, IHazelConnection connection)
             : base(name, connection)
         {
             _logger = logger;
@@ -148,7 +149,7 @@ namespace Impostor.Server.Net
                     var readerCopy = reader.Slice(reader.Position);
 
                     // TODO: Return value, either a bool (to cancel) or a writer (to cancel (null) or modify/overwrite).
-                    await Player.Game.HandleGameData(readerCopy, Player, toPlayer);
+                    // await Player.Game.HandleGameData(readerCopy, Player, toPlayer);
 
                     // Broadcast packet to all other players.
                     using (var writer = MessageWriter.Get(messageType))

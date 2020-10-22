@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Impostor.Hazel;
 using Impostor.Hazel.Udp;
+using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 
@@ -19,7 +20,7 @@ namespace Impostor.Server.Net
         public Matchmaker(
             ILogger<Matchmaker> logger,
             ClientManager clientManager,
-            ILogger<Net.Hazel.HazelConnection> connectionLogger)
+            ILogger<HazelConnection> connectionLogger)
         {
             _logger = logger;
             _clientManager = clientManager;
@@ -52,7 +53,7 @@ namespace Impostor.Server.Net
             var clientVersion = e.HandshakeData.ReadInt32();
             var name = e.HandshakeData.ReadString();
 
-            var connection = new Net.Hazel.HazelConnection(e.Connection, _connectionLogger);
+            var connection = new HazelConnection(e.Connection, _connectionLogger);
 
             // Register client
             await _clientManager.RegisterConnectionAsync(connection, name, clientVersion);

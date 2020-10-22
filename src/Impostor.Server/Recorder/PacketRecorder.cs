@@ -2,6 +2,8 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Impostor.Api.Games;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Data;
 using Impostor.Server.Net;
 using Microsoft.Extensions.Logging;
@@ -32,17 +34,16 @@ namespace Impostor.Server.Recorder
             _writer = File.Open(path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
         }
 
-        public async Task WriteMessageAsync(ClientRecorder client, byte tag, ReadOnlyMemory<byte> buffer)
+        public async Task WriteConnectAsync(ClientRecorder client)
         {
-            _logger.LogTrace("Writing Message.");
+            _logger.LogTrace("Writing Connect.");
 
             var context = _pool.Get();
 
             try
             {
-                WriteHeader(context, RecordedPacketType.Message);
-                WriteClient(context, client);
-                WritePacket(context, tag, buffer.Span);
+                WriteHeader(context, RecordedPacketType.Connect);
+                WriteClient(context, client, true);
                 WriteLength(context);
 
                 await WriteAsync(context.Stream);
@@ -62,7 +63,49 @@ namespace Impostor.Server.Recorder
             try
             {
                 WriteHeader(context, RecordedPacketType.Disconnect);
-                WriteClient(context, client);
+                WriteClient(context, client, false);
+                WriteLength(context);
+
+                await WriteAsync(context.Stream);
+            }
+            finally
+            {
+                _pool.Return(context);
+            }
+        }
+
+        public async Task WriteMessageAsync(ClientRecorder client, IMessageReader reader, MessageType messageType)
+        {
+            _logger.LogTrace("Writing Message.");
+
+            var context = _pool.Get();
+
+            try
+            {
+                WriteHeader(context, RecordedPacketType.Message);
+                WriteClient(context, client, false);
+                WritePacket(context, reader, messageType);
+                WriteLength(context);
+
+                await WriteAsync(context.Stream);
+            }
+            finally
+            {
+                _pool.Return(context);
+            }
+        }
+
+        public async Task WriteGameCreatedAsync(ClientRecorder client, GameCode gameCode)
+        {
+            _logger.LogTrace("Writing GameCreated {0}.", gameCode);
+
+            var context = _pool.Get();
+
+            try
+            {
+                WriteHeader(context, RecordedPacketType.GameCreated);
+                WriteClient(context, client, false);
+                WriteGameCode(context, gameCode);
                 WriteLength(context);
 
                 await WriteAsync(context.Stream);
@@ -80,20 +123,32 @@ namespace Impostor.Server.Recorder
             context.Writer.Write((byte) type);
         }
 
-        private static void WriteClient(PacketSerializationContext context, ClientBase client)
+        private static void WriteClient(PacketSerializationContext context, ClientBase client, bool full)
         {
             var addressBytes = client.Connection.EndPoint.Address.GetAddressBytes();
 
-            context.Writer.Write((byte) addressBytes.Length);
-            context.Writer.Write(addressBytes);
-            context.Writer.Write((ushort) client.Connection.EndPoint.Port);
+            context.Writer.Write(client.Id);
+
+            if (full)
+            {
+                context.Writer.Write((byte) addressBytes.Length);
+                context.Writer.Write(addressBytes);
+                context.Writer.Write((ushort) client.Connection.EndPoint.Port);
+                context.Writer.Write(client.Name);
+            }
         }
 
-        private static void WritePacket(PacketSerializationContext context, byte tag, ReadOnlySpan<byte> buffer)
+        private static void WritePacket(PacketSerializationContext context, IMessageReader reader, MessageType messageType)
         {
-            context.Writer.Write((byte) tag);
-            context.Writer.Write((int) buffer.Length);
-            context.Writer.Write(buffer);
+            context.Writer.Write((byte) messageType);
+            context.Writer.Write((byte) reader.Tag);
+            context.Writer.Write((int) reader.Buffer.Length);
+            context.Writer.Write(reader.Buffer.Span);
+        }
+
+        private static void WriteGameCode(PacketSerializationContext context, in GameCode gameCode)
+        {
+            context.Writer.Write(gameCode.Code);
         }
 
         private static void WriteLength(PacketSerializationContext context)

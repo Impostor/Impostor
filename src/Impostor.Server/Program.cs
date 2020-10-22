@@ -1,5 +1,6 @@
 ﻿using System;
 using Impostor.Api.Events.Managers;
+using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Net.Manager;
 using Impostor.Server.Data;
@@ -169,6 +170,7 @@ namespace Impostor.Server
                         services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
                     }
 
+                    services.AddSingleton<IGameCodeFactory, GameCodeFactory>();
                     services.AddSingleton<IEventManager, EventManager>();
                     services.AddSingleton<Matchmaker>();
                     services.AddHostedService<MatchmakerService>();

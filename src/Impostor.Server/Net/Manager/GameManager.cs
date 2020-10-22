@@ -8,6 +8,7 @@ using Impostor.Api;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
+using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Server.Data;
@@ -20,7 +21,7 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Manager
 {
-    internal partial class GameManager
+    internal class GameManager : IGameManager
     {
         private readonly ILogger<GameManager> _logger;
         private readonly INodeLocator _nodeLocator;
@@ -28,18 +29,24 @@ namespace Impostor.Server.Net.Manager
         private readonly ConcurrentDictionary<int, Game> _games;
         private readonly IServiceProvider _serviceProvider;
         private readonly IEventManager _eventManager;
+        private readonly IGameCodeFactory _gameCodeFactory;
 
-        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, INodeLocator nodeLocator, IServiceProvider serviceProvider, IEventManager eventManager)
+        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, INodeLocator nodeLocator, IServiceProvider serviceProvider, IEventManager eventManager, IGameCodeFactory gameCodeFactory)
         {
             _logger = logger;
             _nodeLocator = nodeLocator;
             _serviceProvider = serviceProvider;
             _eventManager = eventManager;
+            _gameCodeFactory = gameCodeFactory;
             _publicIp = new IPEndPoint(IPAddress.Parse(config.Value.PublicIp), config.Value.PublicPort);
             _games = new ConcurrentDictionary<int, Game>();
         }
 
-        public async ValueTask<Game> CreateAsync(GameOptionsData options)
+        IEnumerable<IGame> IGameManager.Games => _games.Select(kv => kv.Value);
+
+        IGame IGameManager.Find(GameCode code) => Find(code);
+
+        public async ValueTask<IGame> CreateAsync(GameOptionsData options)
         {
             // TODO: Prevent duplicates when using server redirector using INodeProvider.
             var (success, game) = await TryCreateAsync(options);
@@ -57,9 +64,9 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        public async ValueTask<(bool success, Game game)> TryCreateAsync(GameOptionsData options)
+        private async ValueTask<(bool success, Game game)> TryCreateAsync(GameOptionsData options)
         {
-            var gameCode = GameCode.Create();
+            var gameCode = _gameCodeFactory.Create();
             var gameCodeStr = gameCode.Code;
             var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options);
 

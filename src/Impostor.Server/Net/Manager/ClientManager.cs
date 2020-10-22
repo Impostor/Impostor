@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Manager;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
@@ -15,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Manager
 {
-    internal partial class ClientManager
+    internal class ClientManager : IClientManager
     {
         public static HashSet<int> SupportedVersions { get; } = new HashSet<int>
         {
@@ -37,6 +38,8 @@ namespace Impostor.Server.Net.Manager
 
         public IEnumerable<ClientBase> Clients => _clients.Values;
 
+        IEnumerable<IClient> IClientManager.Clients => _clients.Values;
+
         public int NextId()
         {
             var clientId = Interlocked.Increment(ref _idLast);
@@ -53,7 +56,7 @@ namespace Impostor.Server.Net.Manager
             return clientId;
         }
 
-        public async ValueTask RegisterConnectionAsync(HazelConnection connection, string name, int clientVersion)
+        public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion)
         {
             if (name.Length > 10)
             {

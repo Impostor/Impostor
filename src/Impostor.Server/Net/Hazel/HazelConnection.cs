@@ -1,12 +1,13 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Hazel
 {
-    internal partial class HazelConnection
+    internal class HazelConnection : IHazelConnection
     {
         private readonly ILogger<HazelConnection> _logger;
 
@@ -24,7 +25,7 @@ namespace Impostor.Server.Net.Hazel
 
         public bool IsConnected => InnerConnection.State == ConnectionState.Connected;
 
-        public ClientBase Client { get; set; }
+        public IClient Client { get; set; }
 
         public ValueTask SendAsync(IMessageWriter writer)
         {

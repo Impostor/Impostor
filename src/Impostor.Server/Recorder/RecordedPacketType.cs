@@ -2,7 +2,9 @@
 {
     internal enum RecordedPacketType : byte
     {
-        Message = 1,
+        Connect = 1,
         Disconnect = 2,
+        Message = 3,
+        GameCreated = 4
     }
 }

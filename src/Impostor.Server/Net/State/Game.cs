@@ -27,7 +27,6 @@ namespace Impostor.Server.Net.State
         private readonly IServiceProvider _serviceProvider;
         private readonly GameManager _gameManager;
         private readonly ClientManager _clientManager;
-        private readonly Matchmaker _matchmaker;
         private readonly ConcurrentDictionary<int, ClientPlayer> _players;
         private readonly HashSet<IPAddress> _bannedIps;
         private readonly IEventManager _eventManager;
@@ -35,11 +34,9 @@ namespace Impostor.Server.Net.State
         public Game(
             IServiceProvider serviceProvider,
             GameManager gameManager,
-            INodeLocator nodeLocator,
             IPEndPoint publicIp,
             GameCode code,
             GameOptionsData options,
-            Matchmaker matchmaker,
             ClientManager clientManager,
             IEventManager eventManager)
         {
@@ -53,7 +50,6 @@ namespace Impostor.Server.Net.State
             HostId = -1;
             GameState = GameStates.NotStarted;
             Options = options;
-            _matchmaker = matchmaker;
             _clientManager = clientManager;
             _eventManager = eventManager;
             Items = new ConcurrentDictionary<object, object>();
@@ -103,13 +99,11 @@ namespace Impostor.Server.Net.State
             return SendToAllExceptAsync(message, player.Client.Id);
         }
 
-        private IEnumerable<Connection> GetConnections(Func<IClientPlayer, bool> filter)
+        private IEnumerable<IHazelConnection> GetConnections(Func<IClientPlayer, bool> filter)
         {
             return Players
                 .Where(filter)
-                .Select(p => p.Client.Connection)
-                .OfType<HazelConnection>()
-                .Select(c => c.InnerConnection);
+                .Select(p => p.Client.Connection);
         }
     }
 }
