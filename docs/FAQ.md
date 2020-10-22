@@ -8,4 +8,4 @@ Yes, Impostor can be used with both the Android and iOS\* versions of the game.
 ###### \* In order to play on an Impostor server with iOS, you _must_ have a jailbroken device.
 
 ## How can I get started?
-See [Setting up your Server](Running-the-server) for more information on running the server and [Client Setup](https://aeonlucid.com/Impostor/) for helping your friends join in!
+See [Setting up your Server](Running-the-server.md) for more information on running the server and [Client Setup](https://impostor.github.io/Impostor/) for helping your friends join in!
