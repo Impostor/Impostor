@@ -1,6 +1,8 @@
 var buildVersion = EnvironmentVariable("APPVEYOR_BUILD_VERSION") ?? "1.0.0";
 var buildDir = MakeAbsolute(Directory("./build"));
 
+var branch = EnvironmentVariable("APPVEYOR_REPO_BRANCH") ?? "dev";
+var prNumber = EnvironmentVariable("APPVEYOR_PULL_REQUEST_NUMBER");
 var target = Argument("target", "Deploy");
 var configuration = Argument("configuration", "Release");
 
@@ -69,15 +71,32 @@ Task("Build")
             Configuration = configuration,
         });
 
-        // Client.
-        ImpostorPublishNF("Impostor-Client", "./src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj");
-        
-        // Server.
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64");
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "osx-x64");
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-x64");
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm");
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm64");
+        // Only build artifacts if;
+        // - branch is master/dev
+        // - it is not a pull request
+        if ((branch == "master" || branch == "dev") && string.IsNullOrEmpty(prNumber)) {
+            // Client.
+            ImpostorPublishNF("Impostor-Patcher", "./src/Impostor.Patcher/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj");
+            
+            // Server.
+            ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64");
+            ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "osx-x64");
+            ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-x64");
+            ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm");
+            ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm64");
+        } else {
+            DotNetCoreBuild("./src/Impostor.Patcher/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj", new DotNetCoreBuildSettings {
+                Configuration = configuration,
+                NoRestore = true,
+                Framework = "net472"
+            });
+
+            DotNetCoreBuild("./src/Impostor.Server/Impostor.Server.csproj", new DotNetCoreBuildSettings {
+                Configuration = configuration,
+                NoRestore = true,
+                Framework = "net5.0"
+            });
+        }
     });
 
 Task("Test")
