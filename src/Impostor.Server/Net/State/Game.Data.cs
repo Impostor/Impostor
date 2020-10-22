@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth.GameData;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.GameData;
 using Impostor.Server.GameData.Objects;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.State
 {
@@ -26,7 +28,19 @@ namespace Impostor.Server.Net.State
         private readonly List<InnerNetObject> _allObjects = new List<InnerNetObject>();
         private readonly Dictionary<uint, InnerNetObject> _allObjectsFast = new Dictionary<uint, InnerNetObject>();
 
-        public async ValueTask HandleGameData(IMessageReader parent, ClientPlayer sender, bool toPlayer)
+        private int _gamedataInitialized;
+
+        public void InitGameData()
+        {
+            if (Interlocked.Exchange(ref _gamedataInitialized, 1) != 0)
+            {
+                return;
+            }
+
+
+        }
+
+        public async ValueTask HandleGameDataAsync(IMessageReader parent, ClientPlayer sender, bool toPlayer)
         {
             // Find target player.
             ClientPlayer target = null;
@@ -50,9 +64,14 @@ namespace Impostor.Server.Net.State
                 {
                     case GameDataTag.DataFlag:
                     {
-                        if (_allObjectsFast.TryGetValue(reader.ReadPackedUInt32(), out var obj))
+                        var netId = reader.ReadPackedUInt32();
+                        if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
                             obj.Deserialize(reader, false);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Received DataFlag for unregistered NetId {0}.", netId);
                         }
 
                         break;
@@ -83,7 +102,7 @@ namespace Impostor.Server.Net.State
 
                             if (componentsCount != components.Count)
                             {
-                                Logger.Error(
+                                _logger.LogError(
                                     "Children didn't match for spawnable {0}, name {1} ({2} != {3})",
                                     objectId,
                                     innerNetObject.GetType().Name,
@@ -101,7 +120,7 @@ namespace Impostor.Server.Net.State
 
                                 if (!AddNetObject(obj))
                                 {
-                                    Logger.Verbose("Failed to AddNetObject.");
+                                    _logger.LogTrace("Failed to AddNetObject.");
 
                                     obj.NetId = uint.MaxValue;
                                     break;
@@ -118,25 +137,25 @@ namespace Impostor.Server.Net.State
                             {
                                 if (TryGetPlayer(id, out var clientById))
                                 {
-                                    Logger.Verbose("Spawn character");
+                                    _logger.LogTrace("Spawn character");
                                 }
                                 else
                                 {
-                                    Logger.Verbose("Spawn unowned character");
+                                    _logger.LogTrace("Spawn unowned character");
                                 }
                             }
 
                             continue;
                         }
 
-                        Logger.Error("Couldn't find spawnable object {0}.", objectId);
+                        _logger.LogError("Couldn't find spawnable object {0}.", objectId);
                         break;
                     }
 
                     case GameDataTag.DespawnFlag:
                     {
                         var objectNetId = reader.ReadPackedUInt32();
-                        Logger.Verbose("> Destroy {0}", objectNetId);
+                        _logger.LogTrace("> Destroy {0}", objectNetId);
                         break;
                     }
 
@@ -144,20 +163,20 @@ namespace Impostor.Server.Net.State
                     {
                         var clientId = reader.ReadPackedInt32();
                         var targetScene = reader.ReadString();
-                        Logger.Verbose("> Scene {0} to {1}", clientId, targetScene);
+                        _logger.LogTrace("> Scene {0} to {1}", clientId, targetScene);
                         break;
                     }
 
                     case GameDataTag.ReadyFlag:
                     {
                         var clientId = reader.ReadPackedInt32();
-                        Logger.Verbose("> IsReady {0}", clientId);
+                        _logger.LogTrace("> IsReady {0}", clientId);
                         break;
                     }
 
                     default:
                     {
-                        Logger.Debug("Bad GameData tag {0}", reader.Tag);
+                        _logger.LogTrace("Bad GameData tag {0}", reader.Tag);
                         break;
                     }
                 }

@@ -15,6 +15,7 @@ using Impostor.Hazel;
 using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Redirector;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -22,8 +23,7 @@ namespace Impostor.Server.Net.State
 {
     internal partial class Game : IGame
     {
-        private static readonly ILogger Logger = Log.ForContext<Game>();
-
+        private readonly ILogger<Game> _logger;
         private readonly IServiceProvider _serviceProvider;
         private readonly GameManager _gameManager;
         private readonly ClientManager _clientManager;
@@ -32,6 +32,7 @@ namespace Impostor.Server.Net.State
         private readonly IEventManager _eventManager;
 
         public Game(
+            ILogger<Game> logger,
             IServiceProvider serviceProvider,
             GameManager gameManager,
             IPEndPoint publicIp,
@@ -40,6 +41,7 @@ namespace Impostor.Server.Net.State
             ClientManager clientManager,
             IEventManager eventManager)
         {
+            _logger = logger;
             _serviceProvider = serviceProvider;
             _gameManager = gameManager;
             _players = new ConcurrentDictionary<int, ClientPlayer>();

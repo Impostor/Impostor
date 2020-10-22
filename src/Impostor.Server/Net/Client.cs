@@ -149,7 +149,7 @@ namespace Impostor.Server.Net
                     var readerCopy = reader.Slice(reader.Position);
 
                     // TODO: Return value, either a bool (to cancel) or a writer (to cancel (null) or modify/overwrite).
-                    // await Player.Game.HandleGameData(readerCopy, Player, toPlayer);
+                    await Player.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
 
                     // Broadcast packet to all other players.
                     using (var writer = MessageWriter.Get(messageType))

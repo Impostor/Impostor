@@ -6,6 +6,7 @@ using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.State
 {
@@ -35,7 +36,7 @@ namespace Impostor.Server.Net.State
                 return false;
             }
 
-            Logger.Information("{0} - Player {1} ({2}) has left.", Code, player.Client.Name, playerId);
+            _logger.LogInformation("{0} - Player {1} ({2}) has left.", Code, player.Client.Name, playerId);
 
             player.Client.Player = null;
 
@@ -79,7 +80,7 @@ namespace Impostor.Server.Net.State
             }
 
             HostId = host.Client.Id;
-            Logger.Information("{0} - Assigned {1} ({2}) as new host.", Code, host.Client.Name, host.Client.Id);
+            _logger.LogInformation("{0} - Assigned {1} ({2}) as new host.", Code, host.Client.Name, host.Client.Id);
 
             // Check our current game state.
             if (GameState == GameStates.Ended && host.Limbo == LimboStates.WaitingForHost)
