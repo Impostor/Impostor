@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Impostor.Server.Events
+namespace Impostor.Server.Events.Register
 {
-    internal class RegisteredEventListener
+    internal class RegisteredEventListener : IRegisteredEventListener
     {
         private static readonly ConcurrentDictionary<Type, RegisteredEventListener[]> Instances = new ConcurrentDictionary<Type, RegisteredEventListener[]>();
         private readonly Func<object, object, IServiceProvider, ValueTask> _invoker;
@@ -21,7 +21,6 @@ namespace Impostor.Server.Events
             EventType = eventType;
             _eventListenerType = eventListenerType;
             Priority = attribute.Priority;
-            PriorityOrder = attribute.PriorityOrder;
             IgnoreCancelled = attribute.IgnoreCancelled;
             Method = method.GetFriendlyName(showParameters: false);
             _invoker = CreateInvoker(method, attribute.IgnoreCancelled);

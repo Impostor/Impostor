@@ -1,5 +1,6 @@
 ﻿using System;
 using Impostor.Api.Events.Managers;
+using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Net.Manager;
 using Impostor.Server.Data;
@@ -9,9 +10,11 @@ using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Redirector;
 using Impostor.Server.Plugins;
+using Impostor.Server.Recorder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.ObjectPool;
 using Serilog;
 using Serilog.Events;
 
@@ -80,16 +83,17 @@ namespace Impostor.Server
                 })
                 .ConfigureServices((host, services) =>
                 {
+                    var debug = host.Configuration
+                        .GetSection(DebugConfig.Section)
+                        .Get<DebugConfig>() ?? new DebugConfig();
+
                     var redirector = host.Configuration
                         .GetSection(ServerRedirectorConfig.Section)
                         .Get<ServerRedirectorConfig>() ?? new ServerRedirectorConfig();
 
-#if DEBUG
                     services.Configure<DebugConfig>(host.Configuration.GetSection(DebugConfig.Section));
-#endif
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
-                    services.Configure<ServerRedirectorConfig>(
-                        host.Configuration.GetSection(ServerRedirectorConfig.Section));
+                    services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));
 
                     if (redirector.Enabled)
                     {
@@ -142,11 +146,29 @@ namespace Impostor.Server
                     }
                     else
                     {
-                        services.AddSingleton<IClientFactory, ClientFactory<Client>>();
+                        if (debug.GameRecorderEnabled)
+                        {
+                            services.AddSingleton<ObjectPoolProvider>(new DefaultObjectPoolProvider());
+                            services.AddSingleton<ObjectPool<PacketSerializationContext>>(serviceProvider =>
+                            {
+                                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                                var policy = new PacketSerializationContextPooledObjectPolicy();
+                                return provider.Create(policy);
+                            });
+
+                            services.AddSingleton<PacketRecorder>();
+                            services.AddSingleton<IClientFactory, ClientFactory<ClientRecorder>>();
+                        }
+                        else
+                        {
+                            services.AddSingleton<IClientFactory, ClientFactory<Client>>();
+                        }
+
                         services.AddSingleton<GameManager>();
                         services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
                     }
 
+                    services.AddSingleton<IGameCodeFactory, GameCodeFactory>();
                     services.AddSingleton<IEventManager, EventManager>();
                     services.AddSingleton<Matchmaker>();
                     services.AddHostedService<MatchmakerService>();

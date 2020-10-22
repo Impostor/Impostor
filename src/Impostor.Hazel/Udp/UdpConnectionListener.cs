@@ -134,10 +134,15 @@ namespace Impostor.Hazel.Udp
                             continue;
                         }
                     }
-                    catch (SocketException e)
+                    catch (SocketException)
                     {
                         // Client no longer reachable, pretend it didn't happen
                         continue;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // Socket was disposed, don't care.
+                        return;
                     }
 
                     // Get client from active clients

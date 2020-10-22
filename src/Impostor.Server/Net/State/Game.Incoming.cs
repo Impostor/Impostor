@@ -4,6 +4,7 @@ using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.State
 {
@@ -122,7 +123,7 @@ namespace Impostor.Server.Net.State
 
         public async ValueTask HandleKickPlayer(int playerId, bool isBan)
         {
-            Logger.Information("{0} - Player {1} has left.", Code, playerId);
+            _logger.LogInformation("{0} - Player {1} has left.", Code, playerId);
 
             using var message = MessageWriter.Get(MessageType.Reliable);
 
@@ -144,7 +145,7 @@ namespace Impostor.Server.Net.State
 
         private async ValueTask HandleJoinGameNew(ClientPlayer sender, bool isNew)
         {
-            Logger.Information("{0} - Player {1} ({2}) is joining.", Code, sender.Client.Name, sender.Client.Id);
+            _logger.LogInformation("{0} - Player {1} ({2}) is joining.", Code, sender.Client.Name, sender.Client.Id);
 
             // Add player to the game.
             if (isNew)
@@ -166,7 +167,7 @@ namespace Impostor.Server.Net.State
 
         private async ValueTask HandleJoinGameNext(ClientPlayer sender, bool isNew)
         {
-            Logger.Information("{0} - Player {1} ({2}) is rejoining.", Code, sender.Client.Name, sender.Client.Id);
+            _logger.LogInformation("{0} - Player {1} ({2}) is rejoining.", Code, sender.Client.Name, sender.Client.Id);
 
             // Add player to the game.
             if (isNew)

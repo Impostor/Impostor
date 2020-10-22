@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Net
 {
@@ -30,7 +32,7 @@ namespace Impostor.Api.Net
         /// <remarks>
         ///     Null when the client was not registered by the matchmaker.
         /// </remarks>
-        IConnection? Connection { get; }
+        IHazelConnection? Connection { get; }
 
         /// <summary>
         ///     Gets a value indicating whether the client is a bot.
@@ -56,5 +58,9 @@ namespace Impostor.Api.Net
         ///     Gets or sets the current game data of the <see cref="IClient"/>.
         /// </summary>
         IClientPlayer? Player { get; }
+
+        ValueTask HandleMessageAsync(IMessageReader message, MessageType messageType);
+
+        ValueTask HandleDisconnectAsync(string reason);
     }
 }

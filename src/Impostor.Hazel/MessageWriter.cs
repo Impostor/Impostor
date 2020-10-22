@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Impostor.Api.Games;
+using Impostor.Api.Net.Messages;
+
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using Impostor.Api.Games;
-using Impostor.Api.Net.Messages;
 
 namespace Impostor.Hazel
 {
@@ -16,7 +17,7 @@ namespace Impostor.Hazel
         public MessageType SendOption { get; private set; }
 
         private Stack<int> messageStarts = new Stack<int>();
-        
+
         public MessageWriter(byte[] buffer)
         {
             this.Buffer = buffer;
@@ -56,6 +57,8 @@ namespace Impostor.Hazel
                             System.Buffer.BlockCopy(this.Buffer, 1, output, 0, this.Length - 1);
                             return output;
                         }
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
 
@@ -122,6 +125,7 @@ namespace Impostor.Hazel
                 case MessageType.Unreliable:
                     this.Length = this.Position = 1;
                     break;
+
                 case MessageType.Reliable:
                     this.Length = this.Position = 3;
                     break;
@@ -235,7 +239,15 @@ namespace Impostor.Hazel
 
         public void Write(ReadOnlyMemory<byte> data)
         {
-            this.Write(data.ToArray()); // TODO: Fix memory allocation.
+            Write(data.Span);
+        }
+
+        public void Write(ReadOnlySpan<byte> bytes)
+        {
+            bytes.CopyTo(this.Buffer.AsSpan(this.Position, bytes.Length));
+
+            this.Position += bytes.Length;
+            if (this.Position > this.Length) this.Length = this.Position;
         }
 
         public void Write(byte[] bytes)
@@ -280,7 +292,8 @@ namespace Impostor.Hazel
                 value >>= 7;
             } while (value > 0);
         }
-        #endregion
+
+        #endregion WriteMethods
 
         public void Write(MessageWriter msg, bool includeHeader)
         {
@@ -292,6 +305,7 @@ namespace Impostor.Hazel
                     case MessageType.Unreliable:
                         offset = 1;
                         break;
+
                     case MessageType.Reliable:
                         offset = 3;
                         break;

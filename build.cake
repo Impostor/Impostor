@@ -71,7 +71,10 @@ Task("Build")
             Configuration = configuration,
         });
 
-        if ((branch == "master" || branch == "dev") && !string.IsNullOrEmpty(prNumber)) {
+        // Only build artifacts if;
+        // - branch is master/dev
+        // - it is not a pull request
+        if ((branch == "master" || branch == "dev") && string.IsNullOrEmpty(prNumber)) {
             // Client.
             ImpostorPublishNF("Impostor-Patcher", "./src/Impostor.Patcher/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj");
             

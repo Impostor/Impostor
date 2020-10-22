@@ -1,4 +1,5 @@
 ﻿using System;
+using Impostor.Api.Net;
 using Impostor.Server.Net.Hazel;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,7 +15,7 @@ namespace Impostor.Server.Net.Factories
             _serviceProvider = serviceProvider;
         }
 
-        public ClientBase Create(HazelConnection connection, string name, int clientVersion)
+        public ClientBase Create(IHazelConnection connection, string name, int clientVersion)
         {
             var client = ActivatorUtilities.CreateInstance<TClient>(_serviceProvider, name, connection);
             connection.Client = client;

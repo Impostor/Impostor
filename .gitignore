@@ -1,3 +1,4 @@
 ﻿/.vscode
 /build
-/.vs
+
+launchSettings.json

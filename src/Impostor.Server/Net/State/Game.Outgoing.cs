@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
@@ -30,9 +31,9 @@ namespace Impostor.Server.Net.State
 
         public async ValueTask SendToAsync(IMessageWriter writer, int id)
         {
-            if (TryGetPlayer(id, out var player) && player.Client.Connection is HazelConnection hazelConnection)
+            if (TryGetPlayer(id, out var player))
             {
-                await hazelConnection.InnerConnection.SendAsync(writer);
+                await player.Client.Connection.SendAsync(writer);
             }
         }
 
