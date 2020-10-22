@@ -20,6 +20,7 @@
     ]
   },
   "Debug": {
-    "EnableGameRecorder": true
+    "GameRecorderEnabled": true,
+    "GameRecorderPath": ""
   }
 }

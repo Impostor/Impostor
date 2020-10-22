@@ -4,6 +4,7 @@
     {
         public const string Section = "Debug";
 
-        public bool EnableGameRecorder { get; set; }
+        public bool GameRecorderEnabled { get; set; }
+        public string GameRecorderPath { get; set; }
     }
 }

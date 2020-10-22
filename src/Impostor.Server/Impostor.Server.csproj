@@ -29,6 +29,7 @@
         <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="5.0.0-rc.1.20451.7" />
         <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="5.0.0-rc.1.20451.14" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0-rc.1.20451.14" />
+        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="5.0.0-rc.2.20475.17" />
         <PackageReference Include="Serilog.Extensions.Hosting" Version="3.1.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
         <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
@@ -38,6 +39,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="config.Development.json">
+          <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </Content>
         <Content Include="config.json">
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
