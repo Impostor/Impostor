@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-
 using Impostor.Api;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
@@ -15,7 +14,6 @@ using Impostor.Server.Data;
 using Impostor.Server.Extensions;
 using Impostor.Server.Net.Redirector;
 using Impostor.Server.Net.State;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
