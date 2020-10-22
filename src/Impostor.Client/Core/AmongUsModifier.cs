@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Impostor.Client.Core.Events;
+using Impostor.Client.Forms;
 using Impostor.Shared.Innersloth;
 using ErrorEventArgs = Impostor.Client.Core.Events.ErrorEventArgs;
 
@@ -14,17 +15,12 @@ namespace Impostor.Client.Core
     {
         private const string RegionName = "Impostor";
         public const ushort DefaultPort = 22023;
-        
-        private readonly string _amongUsDir;
-        private readonly string _regionFile;
-        
-        public AmongUsModifier()
-        {
-            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "..", "LocalLow");
-            var amongUsDir = Path.Combine(appData, "Innersloth", "Among Us");
 
-            _amongUsDir = amongUsDir;
-            _regionFile = Path.Combine(amongUsDir, "regionInfo.dat");
+        private readonly FrmMain _mainForm;
+        
+        public AmongUsModifier(FrmMain mainForm)
+        {
+            _mainForm = mainForm;
         }
         
         public async Task SaveIp(string input)
@@ -57,7 +53,7 @@ namespace Impostor.Client.Core
                     var hostAddresses = await Dns.GetHostAddressesAsync(ip);
                     if (hostAddresses.Length == 0)
                     {
-                        OnError("Invalid IP Address entered");
+                        OnError("Invalid IP Address entered", false);
                         return;
                     }
                     
@@ -66,7 +62,7 @@ namespace Impostor.Client.Core
                 }
                 catch (SocketException)
                 {
-                    OnError("Failed to resolve hostname.");
+                    OnError("Failed to resolve hostname.", false);
                     return;
                 }
             }
@@ -74,7 +70,7 @@ namespace Impostor.Client.Core
             // Only IPv4.
             if (ipAddress.AddressFamily == AddressFamily.InterNetworkV6)
             {
-                OnError("Invalid IP Address entered, only IPv4 is allowed.");
+                OnError("Invalid IP Address entered, only IPv4 is allowed.", false);
                 return;
             }
 
@@ -94,13 +90,13 @@ namespace Impostor.Client.Core
                 throw new ArgumentException(nameof(ipAddress));
             }
             
-            if (!Directory.Exists(_amongUsDir))
+            if (!Directory.Exists(_mainForm.Configuration.InstallFolder))
             {
-                OnError("Among Us directory was not found, is it installed? Try running it once.");
+                OnError("Among Us directory wasn't found, is it installed? Try running it once ; otherwise the folder should be located in \"LocalLow\\Innersloth\\Among Us\\\".\n\rClicking \"Yes\" will prompt you to chose another folder to use as installation folder, \"No\" will open the LocalLow folder, and \"Cancel\" will basically cancel and return to main program.", true);
                 return;
             }
             
-            using (var file = File.Open(_regionFile, FileMode.Create, FileAccess.Write))
+            using (var file = File.Open(Path.Combine(_mainForm.Configuration.InstallFolder, "regionInfo.dat"), FileMode.Create, FileAccess.Write))
             using (var writer = new BinaryWriter(file))
             {
                 var ip = ipAddress.ToString();
@@ -123,12 +119,12 @@ namespace Impostor.Client.Core
         {
             ipAddress = null;
             
-            if (!File.Exists(_regionFile))
+            if (!File.Exists(Path.Combine(_mainForm.Configuration.InstallFolder, "regionInfo.dat")))
             {
                 return false;
             }
 
-            using (var file = File.Open(_regionFile, FileMode.Open, FileAccess.Read))
+            using (var file = File.Open(Path.Combine(_mainForm.Configuration.InstallFolder, "regionInfo.dat"), FileMode.Open, FileAccess.Read))
             using (var reader = new BinaryReader(file))
             {
                 var region = RegionInfo.Deserialize(reader);
@@ -142,9 +138,9 @@ namespace Impostor.Client.Core
             return false;
         }
 
-        private void OnError(string message)
+        private void OnError(string message, bool openLocalLow)
         {
-            Error?.Invoke(this, new ErrorEventArgs(message));
+            Error?.Invoke(this, new ErrorEventArgs(message, openLocalLow));
         }
 
         private void OnSaved(string ipAddress, ushort port)

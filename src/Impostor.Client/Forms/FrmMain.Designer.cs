@@ -42,7 +42,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(28, 139);
+            this.label1.Location = new System.Drawing.Point(28, 160);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(60, 13);
             this.label1.TabIndex = 1;
@@ -54,16 +54,15 @@
             this.label2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(28, 23);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(225, 91);
+            this.label2.Size = new System.Drawing.Size(219, 117);
             this.label2.TabIndex = 0;
-            this.label2.Text = "Welcome to Impostor\r\n\r\nPlease enter in the IP Address of the \r\nserver you would l" +
-    "ike to use for Among Us\r\n\r\nIf you want to stop playing on the server, \r\nsimply s" +
-    "elect another region";
+            this.label2.Text = resources.GetString("label2.Text");
+            this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // buttonLaunch
             // 
             this.buttonLaunch.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonLaunch.Location = new System.Drawing.Point(179, 155);
+            this.buttonLaunch.Location = new System.Drawing.Point(179, 175);
             this.buttonLaunch.Name = "buttonLaunch";
             this.buttonLaunch.Size = new System.Drawing.Size(74, 22);
             this.buttonLaunch.TabIndex = 3;
@@ -77,7 +76,7 @@
             this.lblUrl.Cursor = System.Windows.Forms.Cursors.Hand;
             this.lblUrl.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblUrl.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.lblUrl.Location = new System.Drawing.Point(39, 232);
+            this.lblUrl.Location = new System.Drawing.Point(39, 234);
             this.lblUrl.Name = "lblUrl";
             this.lblUrl.Size = new System.Drawing.Size(212, 13);
             this.lblUrl.TabIndex = 5;
@@ -88,7 +87,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(54, 216);
+            this.label3.Location = new System.Drawing.Point(54, 221);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(182, 13);
             this.label3.TabIndex = 6;
@@ -98,7 +97,7 @@
             // 
             this.comboIp.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboIp.FormattingEnabled = true;
-            this.comboIp.Location = new System.Drawing.Point(31, 155);
+            this.comboIp.Location = new System.Drawing.Point(31, 175);
             this.comboIp.Name = "comboIp";
             this.comboIp.Size = new System.Drawing.Size(141, 21);
             this.comboIp.TabIndex = 2;
@@ -108,7 +107,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(283, 262);
+            this.ClientSize = new System.Drawing.Size(283, 272);
             this.Controls.Add(this.comboIp);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.lblUrl);

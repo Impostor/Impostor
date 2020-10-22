@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Impostor.Client.Core;
@@ -19,16 +20,20 @@ namespace Impostor.Client.Forms
 
             AcceptButton = buttonLaunch;
 
-            _config = new Configuration();
-            _modifier = new AmongUsModifier();
+            var amongUsDir = Path.GetFullPath(Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "..", "LocalLow"), "Innersloth", "Among Us"));
+
+            _config = new Configuration(amongUsDir);
+            _modifier = new AmongUsModifier(this);
             _modifier.Error += ModifierOnError;
             _modifier.Saved += ModifierOnSaved;
         }
 
+        public Configuration Configuration => _config;
+
         private void ModifierOnError(object sender, ErrorEventArgs e)
         {
-            MessageBox.Show(e.Message, "Error",
-                MessageBoxButtons.OK,
+            DialogResult dr = MessageBox.Show(e.Message, "Error",
+                MessageBoxButtons.YesNoCancel,
                 MessageBoxIcon.Error);
 
             comboIp.Text = string.Empty;
@@ -36,6 +41,35 @@ namespace Impostor.Client.Forms
 
             comboIp.Enabled = true;
             buttonLaunch.Enabled = true;
+
+            if (e.OpenLocalLow)
+            {
+                if (dr == DialogResult.No)
+                {
+                    Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "..", "LocalLow"));
+                }
+                else if (dr == DialogResult.Yes)
+                {
+                    var dialog = new FolderBrowserDialog();
+                    DialogResult folderDialogResult = dialog.ShowDialog();
+                    if (folderDialogResult == DialogResult.OK)
+                    {
+                        if (File.Exists(Path.Combine(dialog.SelectedPath, "regionInfo.dat")))
+                        {
+                            _config.SetAmongUsFolder(dialog.SelectedPath);
+                            _config.Save();
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Finished with code -1 - Invalid Among Us installation given.", "Operation cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Finished with code {folderDialogResult.GetHashCode().ToString()} - No folder given", "Operation cancelled", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
         }
 
         private void ModifierOnSaved(object sender, SavedEventArgs e)
