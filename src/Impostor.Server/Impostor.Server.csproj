@@ -39,11 +39,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="config.Development.json">
-          <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        </Content>
         <Content Include="config.json">
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
