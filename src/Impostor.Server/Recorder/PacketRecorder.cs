@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Games;
@@ -125,7 +126,8 @@ namespace Impostor.Server.Recorder
 
         private static void WriteClient(PacketSerializationContext context, ClientBase client, bool full)
         {
-            var addressBytes = client.Connection.EndPoint.Address.GetAddressBytes();
+            var address = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 12345);
+            var addressBytes = address.Address.GetAddressBytes();
 
             context.Writer.Write(client.Id);
 
@@ -133,7 +135,7 @@ namespace Impostor.Server.Recorder
             {
                 context.Writer.Write((byte) addressBytes.Length);
                 context.Writer.Write(addressBytes);
-                context.Writer.Write((ushort) client.Connection.EndPoint.Port);
+                context.Writer.Write((ushort) address.Port);
                 context.Writer.Write(client.Name);
             }
         }
