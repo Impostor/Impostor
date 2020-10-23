@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Impostor.Api.Games;
-using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Microsoft.Extensions.Logging;
@@ -115,6 +114,16 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
         public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
+            if (!sender.IsHost)
+            {
+                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerMeetingHud)} as non-host.");
+            }
+
+            if (target != null)
+            {
+                throw new ImpostorCheatException($"Client attempted to send {nameof(InnerMeetingHud)} data to a specific player, must be broadcast.");
+            }
+
             if (initialState)
             {
                 PopulateButtons(0);

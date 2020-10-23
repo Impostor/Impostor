@@ -48,6 +48,11 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
 
         public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
+            if (!sender.IsHost)
+            {
+                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerShipStatus)} as non-host.");
+            }
+
             var votes = _votes;
             var unknown = reader.ReadByte();
             if (unknown != 0)

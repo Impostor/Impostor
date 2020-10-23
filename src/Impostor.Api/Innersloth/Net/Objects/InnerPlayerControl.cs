@@ -378,6 +378,11 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
         public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
+            if (!sender.IsHost)
+            {
+                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerPlayerControl)} as non-host.");
+            }
+
             if (initialState)
             {
                 IsNew = reader.ReadBoolean();
@@ -390,6 +395,8 @@ namespace Impostor.Api.Innersloth.Net.Objects
         {
             PlayerInfo.IsDead = true;
             PlayerInfo.LastDeathReason = reason;
+
+            Console.WriteLine($"{PlayerInfo.PlayerName,-15} died {reason}");
         }
     }
 }

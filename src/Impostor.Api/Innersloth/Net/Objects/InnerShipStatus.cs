@@ -99,6 +99,16 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
         public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
+            if (!sender.IsHost)
+            {
+                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerShipStatus)} as non-host.");
+            }
+
+            if (target != null)
+            {
+                throw new ImpostorCheatException($"Client attempted to send {nameof(InnerShipStatus)} data to a specific player, must be broadcast.");
+            }
+
             if (initialState)
             {
                 // TODO: (_systems[SystemTypes.Doors] as DoorsSystemType).SetDoors();

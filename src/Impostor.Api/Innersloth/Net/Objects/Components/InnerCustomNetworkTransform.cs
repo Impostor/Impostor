@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Microsoft.Extensions.Logging;
@@ -87,6 +88,16 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             }
             else
             {
+                if (!sender.IsOwner(this))
+                {
+                    throw new ImpostorCheatException($"Client attempted to send unowned {nameof(InnerCustomNetworkTransform)} data.");
+                }
+
+                if (target != null)
+                {
+                    throw new ImpostorCheatException($"Client attempted to send {nameof(InnerCustomNetworkTransform)} data to a specific player, must be broadcast.");
+                }
+
                 if (!SidGreaterThan(sequenceId, _lastSequenceId))
                 {
                     return;

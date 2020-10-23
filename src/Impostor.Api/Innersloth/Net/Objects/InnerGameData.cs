@@ -114,6 +114,11 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
         public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
+            if (!sender.IsHost)
+            {
+                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerGameData)} as non-host.");
+            }
+
             if (initialState)
             {
                 var num = reader.ReadPackedInt32();
