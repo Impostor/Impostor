@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Impostor.Api.Games;
+using Impostor.Api.Innersloth.Net.Objects.Components;
 using Impostor.Api.Net.Messages;
-using Impostor.Server.GameData.Objects.Components;
 
-namespace Impostor.Server.GameData.Objects
+namespace Impostor.Api.Innersloth.Net.Objects
 {
     public partial class InnerGameData : InnerNetObject
     {
@@ -19,6 +19,10 @@ namespace Impostor.Server.GameData.Objects
             Components.Add(this);
             Components.Add(new InnerVoteBanSystem());
         }
+
+        public int PlayerCount => _allPlayers.Count;
+
+        public IReadOnlyList<PlayerInfo> Players => _allPlayers;
 
         public PlayerInfo GetPlayerById(byte id)
         {
@@ -58,7 +62,7 @@ namespace Impostor.Server.GameData.Objects
             }
             else
             {
-                throw new NotImplementedException("This shouldn't happen, according to Among Us assembly..");
+                throw new NotImplementedException("This shouldn't happen, according to Among Us disassembly..");
 
                 // var num = reader.ReadByte();
                 //

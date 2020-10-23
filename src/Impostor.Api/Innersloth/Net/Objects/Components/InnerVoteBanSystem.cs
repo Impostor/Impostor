@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Impostor.Api.Net.Messages;
 
-namespace Impostor.Server.GameData.Objects.Components
+namespace Impostor.Api.Innersloth.Net.Objects.Components
 {
     public class InnerVoteBanSystem : InnerNetObject
     {
@@ -26,12 +26,16 @@ namespace Impostor.Server.GameData.Objects.Components
         public override void Deserialize(IMessageReader reader, bool initialState)
         {
             var votes = _votes;
-            var unknown = reader.ReadBoolean();
-            if (unknown)
+            var unknown = reader.ReadByte();
+            if (unknown != 0)
             {
-                while (true)
+                for (var i = 0; i < unknown; i++)
                 {
                     var v4 = reader.ReadInt32();
+                    if (v4 == 0)
+                    {
+                        break;
+                    }
 
                     if (!votes.TryGetValue(v4, out var v12))
                     {
@@ -39,9 +43,9 @@ namespace Impostor.Server.GameData.Objects.Components
                         votes[v4] = v12;
                     }
 
-                    for (var i = 0; i < 3; i++)
+                    for (var j = 0; j < 3; j++)
                     {
-                        v12[i] = reader.ReadPackedInt32();
+                        v12[j] = reader.ReadPackedInt32();
                     }
                 }
             }

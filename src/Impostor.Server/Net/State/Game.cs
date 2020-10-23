@@ -51,6 +51,7 @@ namespace Impostor.Server.Net.State
             Code = code;
             HostId = -1;
             GameState = GameStates.NotStarted;
+            GameNet = new GameNet();
             Options = options;
             _clientManager = clientManager;
             _eventManager = eventManager;
@@ -66,6 +67,8 @@ namespace Impostor.Server.Net.State
         public int HostId { get; private set; }
 
         public GameStates GameState { get; private set; }
+
+        public GameNet GameNet { get; }
 
         public GameOptionsData Options { get; }
 

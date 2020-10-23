@@ -1,5 +1,4 @@
-﻿using Impostor.Api.Extensions;
-using Impostor.Api.Innersloth.Data;
+﻿using Impostor.Api.Innersloth.Data;
 
 using System;
 using System.IO;

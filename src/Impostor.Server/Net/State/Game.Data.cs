@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Innersloth.GameData;
+using Impostor.Api.Innersloth.Net;
+using Impostor.Api.Innersloth.Net.Objects;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
-using Impostor.Server.GameData;
-using Impostor.Server.GameData.Objects;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -180,7 +180,7 @@ namespace Impostor.Server.Net.State
                                 continue;
                             }
 
-                            _logger.LogTrace(
+                            _logger.LogDebug(
                                 "Spawning {0} components, SpawnFlags {1}",
                                 innerNetObject.GetType().Name,
                                 innerNetObject.SpawnFlags);
@@ -192,7 +192,7 @@ namespace Impostor.Server.Net.State
                                 obj.NetId = reader.ReadPackedUInt32();
                                 obj.OwnerId = ownerClientId;
 
-                                _logger.LogTrace(
+                                _logger.LogDebug(
                                     "- {0}, NetId {1}, OwnerId {2}",
                                     obj.GetType().Name,
                                     obj.NetId,
@@ -211,6 +211,8 @@ namespace Impostor.Server.Net.State
                                 {
                                     obj.Deserialize(readerSub, true);
                                 }
+
+                                GameNet.OnSpawn(obj);
                             }
 
                             if ((innerNetObject.SpawnFlags & SpawnFlags.IsClientCharacter) != SpawnFlags.None)
@@ -235,21 +237,30 @@ namespace Impostor.Server.Net.State
                     case GameDataTag.DespawnFlag:
                     {
                         // Only the host is allowed to despawn objects.
-                        if (!sender.IsHost)
-                        {
-                            _logger.LogWarning("Player {0} ({1}) tried to send DespawnFlag as non-host.", sender.Client.Name, sender.Client.Id);
-                            return false;
-                        }
-
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
+                            if (sender.Client.Id != obj.OwnerId && !sender.IsHost)
+                            {
+                                _logger.LogWarning(
+                                    "Player {0} ({1}) tried to send DespawnFlag for {2} but was denied.",
+                                    sender.Client.Name,
+                                    sender.Client.Id,
+                                    netId);
+                                return false;
+                            }
+
                             RemoveNetObject(obj);
-                            _logger.LogTrace("Destroyed InnerNetObject {0} ({1})", obj.GetType().Name, netId);
+                            GameNet.OnSpawn(obj);
+                            _logger.LogDebug("Destroyed InnerNetObject {0} ({1}), OwnerId {2}", obj.GetType().Name, netId, obj.OwnerId);
                         }
                         else
                         {
-                            _logger.LogWarning("Received DespawnFlag for unregistered NetId {0}.", netId);
+                            _logger.LogWarning(
+                                "Player {0} ({1}) sent DespawnFlag for unregistered NetId {2}.",
+                                sender.Client.Name,
+                                sender.Client.Id,
+                                netId);
                         }
 
                         break;

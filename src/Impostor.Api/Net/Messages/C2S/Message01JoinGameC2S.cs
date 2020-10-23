@@ -1,5 +1,4 @@
 ﻿using System;
-using Impostor.Api.Extensions;
 
 namespace Impostor.Api.Net.Messages.C2S
 {

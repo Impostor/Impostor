@@ -1,6 +1,6 @@
 ﻿using Impostor.Api.Net.Messages;
 
-namespace Impostor.Server.GameData.Objects.Components
+namespace Impostor.Api.Innersloth.Net.Objects.Components
 {
     public class InnerPlayerPhysics : InnerNetObject
     {

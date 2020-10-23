@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Impostor.Server.GameData
+namespace Impostor.Api.Innersloth.Net
 {
     public class GameObject
     {
@@ -17,9 +17,9 @@ namespace Impostor.Server.GameData
 
             foreach (var component in Components)
             {
-                if (component.GetType().IsAssignableTo(typeof(T)))
+                if (component is T c)
                 {
-                    result.Add((T) component);
+                    result.Add(c);
                 }
             }
 

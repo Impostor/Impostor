@@ -1,10 +1,10 @@
 using System;
 using Impostor.Api.Games;
+using Impostor.Api.Innersloth.Net.Objects.Components;
 using Impostor.Api.Net.Messages;
-using Impostor.Server.GameData.Objects.Components;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Impostor.Server.GameData.Objects
+namespace Impostor.Api.Innersloth.Net.Objects
 {
     public class InnerPlayerControl : InnerNetObject
     {

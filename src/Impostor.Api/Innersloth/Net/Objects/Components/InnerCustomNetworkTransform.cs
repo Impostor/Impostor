@@ -1,9 +1,8 @@
 ﻿using System.Numerics;
-using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Messages;
 using Microsoft.Extensions.Logging;
 
-namespace Impostor.Server.GameData.Objects.Components
+namespace Impostor.Api.Innersloth.Net.Objects.Components
 {
     public class InnerCustomNetworkTransform : InnerNetObject
     {

@@ -43,7 +43,8 @@ namespace Impostor.Tools.ServerReplay
         private static async Task Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
+                // .MinimumLevel.Verbose()
+                .MinimumLevel.Debug()
                 .WriteTo.Console()
                 .CreateLogger();
 

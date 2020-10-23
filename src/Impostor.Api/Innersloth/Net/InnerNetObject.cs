@@ -1,12 +1,12 @@
 ﻿using Impostor.Api.Net.Messages;
 
-namespace Impostor.Server.GameData
+namespace Impostor.Api.Innersloth.Net
 {
     public abstract class InnerNetObject : GameObject
     {
-        public uint NetId { get; set; }
+        public uint NetId { get; internal set; }
 
-        public int OwnerId { get; set; }
+        public int OwnerId { get; internal set; }
 
         public SpawnFlags SpawnFlags { get; internal set; }
 

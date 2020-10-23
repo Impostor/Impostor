@@ -1,13 +1,13 @@
 ﻿using Impostor.Api.Games;
 using Impostor.Api.Net.Messages;
 
-namespace Impostor.Server.GameData.Objects
+namespace Impostor.Api.Innersloth.Net.Objects
 {
-    public class InnerShipStatus : InnerNetObject
+    public class InnerLobbyBehaviour : InnerNetObject
     {
         private readonly IGame _game;
 
-        public InnerShipStatus(IGame game)
+        public InnerLobbyBehaviour(IGame game)
         {
             _game = game;
 

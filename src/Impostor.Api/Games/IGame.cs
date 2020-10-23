@@ -16,6 +16,8 @@ namespace Impostor.Api.Games
 
         GameStates GameState { get; }
 
+        GameNet GameNet { get; }
+
         IEnumerable<IClientPlayer> Players { get; }
 
         IPEndPoint PublicIp { get; }
