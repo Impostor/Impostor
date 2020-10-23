@@ -36,9 +36,19 @@ namespace Impostor.Api.Innersloth.Net.Objects
         {
             switch (call)
             {
+                // Play an animation.
                 case RpcCalls.PlayAnimation:
                 {
-                    // TODO: Figure out checks
+                    if (!sender.IsOwner(this))
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.PlayAnimation)} to an unowned {nameof(InnerPlayerControl)}.");
+                    }
+
+                    if (target != null)
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.PlayAnimation)} to a specific player instead of broadcast.");
+                    }
+
                     var animation = reader.ReadByte();
                     break;
                 }
