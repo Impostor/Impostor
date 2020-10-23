@@ -215,7 +215,7 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
-                            obj.Deserialize(sender, reader, false);
+                            obj.Deserialize(sender, target, reader, false);
                         }
                         else
                         {
@@ -300,7 +300,7 @@ namespace Impostor.Server.Net.State
                                 var readerSub = reader.ReadMessage();
                                 if (readerSub.Length > 0)
                                 {
-                                    obj.Deserialize(sender, readerSub, true);
+                                    obj.Deserialize(sender, target, readerSub, true);
                                 }
 
                                 OnSpawn(obj);

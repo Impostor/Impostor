@@ -15,6 +15,6 @@ namespace Impostor.Api.Innersloth.Net
 
         public abstract bool Serialize(IMessageWriter writer, bool initialState);
 
-        public abstract void Deserialize(IClientPlayer sender, IMessageReader reader, bool initialState);
+        public abstract void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState);
     }
 }

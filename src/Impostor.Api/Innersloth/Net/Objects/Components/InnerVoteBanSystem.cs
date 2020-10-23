@@ -46,7 +46,7 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             throw new NotImplementedException();
         }
 
-        public override void Deserialize(IClientPlayer sender, IMessageReader reader, bool initialState)
+        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             var votes = _votes;
             var unknown = reader.ReadByte();
