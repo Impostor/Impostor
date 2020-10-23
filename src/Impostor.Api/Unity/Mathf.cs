@@ -13,22 +13,31 @@
         /// </returns>
         public static float Clamp(float value, float min, float max)
         {
-            if ((double) value < (double) min)
+            if (value < (double)min)
+            {
                 value = min;
-            else if ((double) value > (double) max)
+            }
+            else if (value > (double)max)
+            {
                 value = max;
+            }
+
             return value;
         }
 
         /// <summary>
         ///   <para>Clamps value between 0 and 1 and returns value.</para>
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">Value.</param>
+        /// <returns>Clamped value.</returns>
         public static float Clamp01(float value)
         {
-            if ((double) value < 0.0)
+            if (value < 0.0)
+            {
                 return 0.0f;
-            return (double) value > 1.0 ? 1f : value;
+            }
+
+            return (double)value > 1.0 ? 1f : value;
         }
 
         /// <summary>
@@ -40,6 +49,6 @@
         /// <returns>
         ///   <para>The interpolated float result between the two float values.</para>
         /// </returns>
-        public static float Lerp(float a, float b, float t) => a + (b - a) * Mathf.Clamp01(t);
+        public static float Lerp(float a, float b, float t) => a + ((b - a) * Clamp01(t));
     }
 }

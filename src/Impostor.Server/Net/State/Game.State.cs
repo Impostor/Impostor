@@ -6,6 +6,7 @@ using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
+using Impostor.Server.Net.Hazel;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.State
@@ -26,6 +27,8 @@ namespace Impostor.Server.Net.State
                 HostId = player.Client.Id;
                 await InitGameDataAsync(player);
             }
+
+            player.InitializeSpawnTimeout();
 
             await _eventManager.CallAsync(new PlayerJoinedGameEvent(this, player));
         }
@@ -72,6 +75,18 @@ namespace Impostor.Server.Net.State
             }
 
             await _eventManager.CallAsync(new PlayerLeftGameEvent(this, player, isBan));
+
+            // Player can refuse to be kicked and keep the connection open, check for this.
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(Constants.ConnectionTimeout);
+
+                if (player.Client.Connection.IsConnected)
+                {
+                    _logger.LogInformation("{0} - Player {1} ({2}) kept connection open after leaving, disposing.", Code, player.Client.Name, playerId);
+                    ((HazelConnection) player.Client.Connection).DisposeInnerConnection();
+                }
+            });
 
             return true;
         }

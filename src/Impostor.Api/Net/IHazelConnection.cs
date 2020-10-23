@@ -30,5 +30,12 @@ namespace Impostor.Api.Net
         /// <param name="writer">The message.</param>
         /// <returns></returns>
         ValueTask SendAsync(IMessageWriter writer);
+
+        /// <summary>
+        ///     Disconnects the client and invokes the disconnect handler.
+        /// </summary>
+        /// <param name="reason">A reason.</param>
+        /// <returns></returns>
+        ValueTask DisconnectAsync(string reason);
     }
 }

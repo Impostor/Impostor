@@ -32,6 +32,16 @@ namespace Impostor.Server.Net.Hazel
             return InnerConnection.SendAsync(writer);
         }
 
+        public ValueTask DisconnectAsync(string reason)
+        {
+            return InnerConnection.Disconnect(reason);
+        }
+
+        public void DisposeInnerConnection()
+        {
+            InnerConnection.Dispose();
+        }
+
         private async ValueTask ConnectionOnDisconnected(DisconnectedEventArgs e)
         {
             if (Client != null)

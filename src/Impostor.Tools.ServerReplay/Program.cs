@@ -42,11 +42,11 @@ namespace Impostor.Tools.ServerReplay
 
         private static async Task Main(string[] args)
         {
-            // Log.Logger = new LoggerConfiguration()
-            //     // .MinimumLevel.Verbose()
-            //     .MinimumLevel.Debug()
-            //     .WriteTo.Console()
-            //     .CreateLogger();
+            Log.Logger = new LoggerConfiguration()
+                // .MinimumLevel.Verbose()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .CreateLogger();
 
             var stopwatch = Stopwatch.StartNew();
 

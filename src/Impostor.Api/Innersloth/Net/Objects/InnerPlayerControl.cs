@@ -395,8 +395,6 @@ namespace Impostor.Api.Innersloth.Net.Objects
         {
             PlayerInfo.IsDead = true;
             PlayerInfo.LastDeathReason = reason;
-
-            Console.WriteLine($"{PlayerInfo.PlayerName,-15} died {reason}");
         }
     }
 }

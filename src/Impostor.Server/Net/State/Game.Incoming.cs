@@ -6,6 +6,7 @@ using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.State
@@ -79,7 +80,7 @@ namespace Impostor.Server.Net.State
 
             if (player == null || player.Game != this)
             {
-                var clientPlayer = new ClientPlayer(client, this);
+                var clientPlayer = new ClientPlayer(_serviceProvider.GetRequiredService<ILogger<ClientPlayer>>(), client, this);
 
                 if (!_clientManager.Validate(client))
                 {

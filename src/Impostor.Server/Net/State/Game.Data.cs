@@ -81,6 +81,7 @@ namespace Impostor.Server.Net.State
                     if (TryGetPlayer(control.OwnerId, out var player))
                     {
                         player.Character = control;
+                        player.DisableSpawnTimeout();
                     }
 
                     // Hook up InnerPlayerControl <-> InnerPlayerControl.PlayerInfo.
