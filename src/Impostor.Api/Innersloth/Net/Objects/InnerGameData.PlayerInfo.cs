@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Innersloth.Net.Objects
@@ -29,7 +30,9 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
             public bool IsImpostor { get; internal set; }
 
-            public bool IsDead { get; private set; }
+            public bool IsDead { get; internal set; }
+
+            public DeathReason LastDeathReason { get; internal set; }
 
             public List<TaskInfo> Tasks { get; private set; }
 

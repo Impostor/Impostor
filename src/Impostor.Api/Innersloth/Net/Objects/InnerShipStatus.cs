@@ -39,11 +39,11 @@ namespace Impostor.Api.Innersloth.Net.Objects
             Components.Add(this);
         }
 
-        public override void HandleRpc(IClientPlayer sender, byte callId, IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, IClientPlayer target, RpcCalls call, IMessageReader reader)
         {
-            switch (callId)
+            switch (call)
             {
-                case 27:
+                case RpcCalls.CloseDoorsOfType:
                 {
                     if (!sender.Character.PlayerInfo.IsImpostor)
                     {
@@ -53,7 +53,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
                     break;
                 }
 
-                case 28:
+                case RpcCalls.RepairSystem:
                 {
                     var systemType = (SystemTypes)reader.ReadByte();
                     var player = _game.FindObjectByNetId<InnerPlayerControl>(reader.ReadPackedUInt32());

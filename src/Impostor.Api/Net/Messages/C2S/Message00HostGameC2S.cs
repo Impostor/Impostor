@@ -21,7 +21,7 @@ namespace Impostor.Api.Net.Messages.C2S
 
         public static GameOptionsData Deserialize(IMessageReader reader)
         {
-            return GameOptionsData.Deserialize(reader.ReadBytesAndSize());
+            return GameOptionsData.DeserializeCreate(reader);
         }
     }
 }

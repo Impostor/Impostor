@@ -5,9 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth.Data;
-using Impostor.Api.Innersloth.GameData;
 using Impostor.Api.Innersloth.Net;
 using Impostor.Api.Innersloth.Net.Objects;
+using Impostor.Api.Innersloth.Net.Objects.Components;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
@@ -49,6 +49,96 @@ namespace Impostor.Server.Net.State
 
         private int _gamedataInitialized;
         private bool _gamedataFakeReceived;
+
+        internal void OnSpawn(InnerNetObject netObj)
+        {
+            switch (netObj)
+            {
+                case InnerLobbyBehaviour lobby:
+                {
+                    GameNet.LobbyBehaviour = lobby;
+                    break;
+                }
+
+                case InnerGameData data:
+                {
+                    GameNet.GameData = data;
+                    break;
+                }
+
+                case InnerVoteBanSystem voteBan:
+                {
+                    GameNet.VoteBan = voteBan;
+                    break;
+                }
+
+                case InnerShipStatus shipStatus:
+                {
+                    GameNet.ShipStatus = shipStatus;
+                    break;
+                }
+
+                case InnerPlayerControl control:
+                {
+                    // Hook up InnerPlayerControl <-> IClientPlayer.
+                    if (TryGetPlayer(control.OwnerId, out var player))
+                    {
+                        player.Character = control;
+                    }
+
+                    // Hook up InnerPlayerControl <-> InnerPlayerControl.PlayerInfo.
+                    control.PlayerInfo = GameNet.GameData.GetPlayerById(control.PlayerId);
+
+                    if (control.PlayerInfo == null)
+                    {
+                        GameNet.GameData.AddPlayer(control);
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        internal void OnDestroy(InnerNetObject netObj)
+        {
+            switch (netObj)
+            {
+                case InnerLobbyBehaviour lobby:
+                {
+                    GameNet.LobbyBehaviour = null;
+                    break;
+                }
+
+                case InnerGameData:
+                {
+                    GameNet.GameData = null;
+                    break;
+                }
+
+                case InnerVoteBanSystem:
+                {
+                    GameNet.VoteBan = null;
+                    break;
+                }
+
+                case InnerShipStatus:
+                {
+                    GameNet.ShipStatus = null;
+                    break;
+                }
+
+                case InnerPlayerControl control:
+                {
+                    // Remove InnerPlayerControl <-> IClientPlayer.
+                    if (TryGetPlayer(control.OwnerId, out var player))
+                    {
+                        player.Character = null;
+                    }
+
+                    break;
+                }
+            }
+        }
 
         private async ValueTask InitGameDataAsync(ClientPlayer player)
         {
@@ -141,7 +231,7 @@ namespace Impostor.Server.Net.State
                             // TODO: Remove try catch.
                             try
                             {
-                                obj.HandleRpc(sender, reader.ReadByte(), reader);
+                                obj.HandleRpc(sender, target, (RpcCalls) reader.ReadByte(), reader);
                             }
                             catch (NotImplementedException)
                             {
@@ -218,7 +308,7 @@ namespace Impostor.Server.Net.State
                                     obj.Deserialize(sender, readerSub, true);
                                 }
 
-                                GameNet.OnSpawn(obj);
+                                OnSpawn(obj);
                             }
 
                             continue;
@@ -245,7 +335,7 @@ namespace Impostor.Server.Net.State
                             }
 
                             RemoveNetObject(obj);
-                            GameNet.OnDestroy(obj);
+                            OnDestroy(obj);
                             _logger.LogDebug("Destroyed InnerNetObject {0} ({1}), OwnerId {2}", obj.GetType().Name, netId, obj.OwnerId);
                         }
                         else

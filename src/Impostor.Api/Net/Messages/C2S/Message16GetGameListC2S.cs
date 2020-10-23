@@ -12,7 +12,7 @@ namespace Impostor.Api.Net.Messages.C2S
         public static void Deserialize(IMessageReader reader, out GameOptionsData options)
         {
             reader.ReadPackedInt32(); // Hardcoded 0.
-            options = GameOptionsData.Deserialize(reader.ReadBytesAndSize());
+            options = GameOptionsData.DeserializeCreate(reader);
         }
     }
 }

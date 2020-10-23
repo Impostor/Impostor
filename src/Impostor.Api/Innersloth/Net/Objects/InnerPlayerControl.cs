@@ -1,18 +1,22 @@
 using System;
 using Impostor.Api.Games;
+using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Innersloth.Net.Objects.Components;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Api.Innersloth.Net.Objects
 {
     public class InnerPlayerControl : InnerNetObject
     {
+        private readonly ILogger<InnerPlayerControl> _logger;
         private readonly IGame _game;
 
-        public InnerPlayerControl(IGame game, IServiceProvider serviceProvider)
+        public InnerPlayerControl(ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IGame game)
         {
+            _logger = logger;
             _game = game;
 
             Components.Add(this);
@@ -28,11 +32,37 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
         public InnerGameData.PlayerInfo PlayerInfo { get; internal set; }
 
-        public override void HandleRpc(IClientPlayer sender, byte callId, IMessageReader reader)
+        private void Die(DeathReason reason)
         {
-            switch (callId)
+            PlayerInfo.IsDead = true;
+            PlayerInfo.LastDeathReason = reason;
+        }
+
+        public override void HandleRpc(IClientPlayer sender, IClientPlayer target, RpcCalls call, IMessageReader reader)
+        {
+            switch (call)
             {
-                case 3:
+                case RpcCalls.PlayAnimation:
+                {
+                    var animation = reader.ReadByte();
+                    break;
+                }
+
+                case RpcCalls.CompleteTask:
+                {
+                    var index = reader.ReadPackedUInt32();
+                    break;
+                }
+
+                case RpcCalls.SyncSettings:
+                {
+                    _game.Options.Deserialize(reader.ReadBytesAndSize());
+                    Console.WriteLine(_game.Options.PlayerSpeedMod);
+                    break;
+                }
+
+                // Set Impostors.
+                case RpcCalls.SetInfected:
                 {
                     var length = reader.ReadPackedInt32();
 
@@ -47,13 +77,32 @@ namespace Impostor.Api.Innersloth.Net.Objects
                     break;
                 }
 
-                case 6:
+                // Player was voted out.
+                case RpcCalls.Exiled:
+                {
+                    Console.WriteLine(PlayerInfo.PlayerName + " was voted out.");
+                    break;
+                }
+
+                // Validates the player name at the host.
+                case RpcCalls.CheckName:
+                {
+                    if (!target.IsHost)
+                    {
+
+                    }
+                    var name = reader.ReadString();
+                    break;
+                }
+
+                case RpcCalls.SetName:
                 {
                     PlayerInfo.PlayerName = reader.ReadString();
                     break;
                 }
 
                 default:
+                    _logger.LogWarning("InnerPlayerControl: Unknown rpc call {0}", call);
                     break;
             }
         }

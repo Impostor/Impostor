@@ -17,7 +17,7 @@ namespace Impostor.Api.Games
 
         GameStates GameState { get; }
 
-        GameNet GameNet { get; }
+        IGameNet GameNet { get; }
 
         IEnumerable<IClientPlayer> Players { get; }
 

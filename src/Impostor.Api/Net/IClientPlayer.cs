@@ -24,7 +24,9 @@ namespace Impostor.Api.Net
         /// </summary>
         LimboStates Limbo { get; set; }
 
-        InnerPlayerControl Character { get; set; }
+        InnerPlayerControl Character { get; }
+
+        public bool IsHost { get; }
 
         ValueTask KickAsync();
 

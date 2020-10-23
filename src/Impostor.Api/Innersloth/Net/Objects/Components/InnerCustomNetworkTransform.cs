@@ -44,15 +44,15 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             return new Vector2(XRange.Lerp(v1), YRange.Lerp(v2));
         }
 
-        public override void HandleRpc(IClientPlayer sender, byte callId, IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, IClientPlayer target, RpcCalls call, IMessageReader reader)
         {
-            if (callId == 0)
+            if (call == 0)
             {
                 SnapTo(ReadVector2(reader), reader.ReadUInt16());
             }
             else
             {
-                _logger.LogWarning("InnerCustomNetworkTransform: Unknown rpc call {0}", callId);
+                _logger.LogWarning("InnerCustomNetworkTransform: Unknown rpc call {0}", call);
             }
         }
 

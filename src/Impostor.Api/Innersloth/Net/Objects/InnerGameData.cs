@@ -42,7 +42,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
             return _allPlayers.TryGetValue(id, out var player) ? player : null;
         }
 
-        public override void HandleRpc(IClientPlayer sender, byte callId, IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, IClientPlayer target, RpcCalls call, IMessageReader reader)
         {
             throw new NotImplementedException();
         }

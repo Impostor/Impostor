@@ -8,16 +8,12 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
+using Impostor.Api.Innersloth.Net;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
-using Impostor.Hazel;
-using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
-using Impostor.Server.Net.Redirector;
 using Microsoft.Extensions.Logging;
-using Serilog;
-using ILogger = Serilog.ILogger;
 
 namespace Impostor.Server.Net.State
 {
@@ -51,7 +47,7 @@ namespace Impostor.Server.Net.State
             Code = code;
             HostId = -1;
             GameState = GameStates.NotStarted;
-            GameNet = new GameNet(this);
+            GameNet = new GameNet();
             Options = options;
             _clientManager = clientManager;
             _eventManager = eventManager;
@@ -68,7 +64,7 @@ namespace Impostor.Server.Net.State
 
         public GameStates GameState { get; private set; }
 
-        public GameNet GameNet { get; }
+        internal GameNet GameNet { get; }
 
         public GameOptionsData Options { get; }
 

@@ -10,7 +10,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
     public partial class InnerMeetingHud : InnerNetObject
     {
         private readonly IGame _game;
-        private readonly GameNet _gameNet;
+        private readonly IGameNet _gameNet;
         private PlayerVoteArea[] _playerStates;
 
         public InnerMeetingHud(IGame game)
@@ -36,7 +36,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
                 .ToArray();
         }
 
-        public override void HandleRpc(IClientPlayer sender, byte callId, IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, IClientPlayer target, RpcCalls call, IMessageReader reader)
         {
             throw new NotImplementedException();
         }
