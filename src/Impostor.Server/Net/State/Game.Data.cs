@@ -67,8 +67,6 @@ namespace Impostor.Server.Net.State
              */
             using (var message = MessageWriter.Get(MessageType.Reliable))
             {
-                _logger.LogInformation("Sending join..");
-
                 // Spawn a fake player.
                 Message01JoinGameS2C.SerializeJoin(message, false, Code, FakeClientId, HostId);
 
@@ -153,9 +151,10 @@ namespace Impostor.Server.Net.State
 
                     case GameDataTag.SpawnFlag:
                     {
+                        // Only the host is allowed to despawn objects.
                         if (!sender.IsHost)
                         {
-                            _logger.LogWarning("Player {0} ({1}) tried to send spawn packet as non-host.", sender.Client.Name, sender.Client.Id);
+                            _logger.LogWarning("Player {0} ({1}) tried to send SpawnFlag as non-host.", sender.Client.Name, sender.Client.Id);
                             return false;
                         }
 
@@ -163,7 +162,7 @@ namespace Impostor.Server.Net.State
                         if (objectId < SpawnableObjects.Length)
                         {
                             var innerNetObject = (InnerNetObject) ActivatorUtilities.CreateInstance(_serviceProvider, SpawnableObjects[objectId], this);
-                            var id = reader.ReadPackedInt32();
+                            var ownerClientId = reader.ReadPackedInt32();
 
                             innerNetObject.SpawnFlags = (SpawnFlags) reader.ReadByte();
 
@@ -191,7 +190,7 @@ namespace Impostor.Server.Net.State
                                 var obj = components[i];
 
                                 obj.NetId = reader.ReadPackedUInt32();
-                                obj.OwnerId = id;
+                                obj.OwnerId = ownerClientId;
 
                                 _logger.LogTrace(
                                     "- {0}, NetId {1}, OwnerId {2}",
@@ -201,7 +200,7 @@ namespace Impostor.Server.Net.State
 
                                 if (!AddNetObject(obj))
                                 {
-                                    _logger.LogTrace("Failed to AddNetObject.");
+                                    _logger.LogTrace("Failed to AddNetObject, it already exists.");
 
                                     obj.NetId = uint.MaxValue;
                                     break;
@@ -216,7 +215,7 @@ namespace Impostor.Server.Net.State
 
                             if ((innerNetObject.SpawnFlags & SpawnFlags.IsClientCharacter) != SpawnFlags.None)
                             {
-                                if (TryGetPlayer(id, out var clientById))
+                                if (TryGetPlayer(ownerClientId, out var clientById))
                                 {
                                     _logger.LogTrace("Spawn character");
                                 }
@@ -235,16 +234,43 @@ namespace Impostor.Server.Net.State
 
                     case GameDataTag.DespawnFlag:
                     {
-                        var objectNetId = reader.ReadPackedUInt32();
-                        _logger.LogTrace("> Destroy {0}", objectNetId);
+                        // Only the host is allowed to despawn objects.
+                        if (!sender.IsHost)
+                        {
+                            _logger.LogWarning("Player {0} ({1}) tried to send DespawnFlag as non-host.", sender.Client.Name, sender.Client.Id);
+                            return false;
+                        }
+
+                        var netId = reader.ReadPackedUInt32();
+                        if (_allObjectsFast.TryGetValue(netId, out var obj))
+                        {
+                            RemoveNetObject(obj);
+                            _logger.LogTrace("Destroyed InnerNetObject {0} ({1})", obj.GetType().Name, netId);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Received DespawnFlag for unregistered NetId {0}.", netId);
+                        }
+
                         break;
                     }
 
                     case GameDataTag.SceneChangeFlag:
                     {
+                        // Sender is only allowed to change his own scene.
                         var clientId = reader.ReadPackedInt32();
-                        var targetScene = reader.ReadString();
-                        _logger.LogTrace("> Scene {0} to {1}", clientId, targetScene);
+                        if (clientId != sender.Client.Id)
+                        {
+                            _logger.LogWarning(
+                                "Player {0} ({1}) tried to send SceneChangeFlag for another player.",
+                                sender.Client.Name,
+                                sender.Client.Id);
+                            return false;
+                        }
+
+                        sender.Scene = reader.ReadString();
+
+                        _logger.LogTrace("> Scene {0} to {1}", clientId, sender.Scene);
                         break;
                     }
 

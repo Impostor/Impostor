@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Impostor.Api.Games;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.GameData.Objects.Components;
@@ -37,7 +37,6 @@ namespace Impostor.Server.GameData.Objects
 
         public override void Deserialize(IMessageReader reader, bool initialState)
         {
-            // TODO: Might be unreliable, maybe we need to check if the length is 2 or 1.
             if (initialState)
             {
                 IsNew = reader.ReadBoolean();

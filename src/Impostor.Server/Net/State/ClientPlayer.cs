@@ -21,6 +21,8 @@ namespace Impostor.Server.Net.State
 
         public bool IsHost => Game?.Host == this;
 
+        public string Scene { get; internal set; }
+
         /// <inheritdoc />
         public ValueTask KickAsync()
         {
