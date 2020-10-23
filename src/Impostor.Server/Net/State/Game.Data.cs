@@ -123,7 +123,7 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
-                            obj.Deserialize(reader, false);
+                            obj.Deserialize(sender, reader, false);
                         }
                         else
                         {
@@ -138,8 +138,14 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
-                            // Console.WriteLine(reader.ReadByte());
-                            // obj.HandleRpc(reader.ReadByte(), reader);
+                            // TODO: Remove try catch.
+                            try
+                            {
+                                obj.HandleRpc(sender, reader.ReadByte(), reader);
+                            }
+                            catch (NotImplementedException)
+                            {
+                            }
                         }
                         else
                         {
@@ -209,22 +215,10 @@ namespace Impostor.Server.Net.State
                                 var readerSub = reader.ReadMessage();
                                 if (readerSub.Length > 0)
                                 {
-                                    obj.Deserialize(readerSub, true);
+                                    obj.Deserialize(sender, readerSub, true);
                                 }
 
                                 GameNet.OnSpawn(obj);
-                            }
-
-                            if ((innerNetObject.SpawnFlags & SpawnFlags.IsClientCharacter) != SpawnFlags.None)
-                            {
-                                if (TryGetPlayer(ownerClientId, out var clientById))
-                                {
-                                    _logger.LogTrace("Spawn character");
-                                }
-                                else
-                                {
-                                    _logger.LogTrace("Spawn unowned character");
-                                }
                             }
 
                             continue;
@@ -251,7 +245,7 @@ namespace Impostor.Server.Net.State
                             }
 
                             RemoveNetObject(obj);
-                            GameNet.OnSpawn(obj);
+                            GameNet.OnDestroy(obj);
                             _logger.LogDebug("Destroyed InnerNetObject {0} ({1}), OwnerId {2}", obj.GetType().Name, netId, obj.OwnerId);
                         }
                         else
@@ -326,6 +320,17 @@ namespace Impostor.Server.Net.State
             _allObjectsFast.Remove(obj.NetId);
 
             obj.NetId = uint.MaxValue;
+        }
+
+        public T FindObjectByNetId<T>(uint netId)
+            where T : InnerNetObject
+        {
+            if (_allObjectsFast.TryGetValue(netId, out var obj))
+            {
+                return (T) obj;
+            }
+
+            return null;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Impostor.Api.Games;
+using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Innersloth.Net.Objects
@@ -14,7 +15,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
             Components.Add(this);
         }
 
-        public override void HandleRpc(byte callId, IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, byte callId, IMessageReader reader)
         {
             throw new System.NotImplementedException();
         }
@@ -24,7 +25,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
             throw new System.NotImplementedException();
         }
 
-        public override void Deserialize(IMessageReader reader, bool initialState)
+        public override void Deserialize(IClientPlayer sender, IMessageReader reader, bool initialState)
         {
             throw new System.NotImplementedException();
         }

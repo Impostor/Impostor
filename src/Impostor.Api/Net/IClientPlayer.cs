@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Impostor.Api.Games;
+using Impostor.Api.Innersloth.Net.Objects;
 
 namespace Impostor.Api.Net
 {
@@ -22,6 +23,8 @@ namespace Impostor.Api.Net
         ///     Gets or sets the current limbo state of the player.
         /// </summary>
         LimboStates Limbo { get; set; }
+
+        InnerPlayerControl Character { get; set; }
 
         ValueTask KickAsync();
 

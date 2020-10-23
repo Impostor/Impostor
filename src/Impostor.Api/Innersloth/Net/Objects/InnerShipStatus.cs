@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth.Net.Objects.Systems;
 using Impostor.Api.Innersloth.Net.Objects.Systems.ShipStatus;
+using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Innersloth.Net.Objects
@@ -28,18 +30,44 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
             _systems.Add(SystemTypes.Sabotage, new SabotageSystemType(new[]
             {
-                (IActivatable) _systems[SystemTypes.Comms],
-                (IActivatable) _systems[SystemTypes.Reactor],
-                (IActivatable) _systems[SystemTypes.LifeSupp],
-                (IActivatable) _systems[SystemTypes.Electrical],
+                (IActivatable)_systems[SystemTypes.Comms],
+                (IActivatable)_systems[SystemTypes.Reactor],
+                (IActivatable)_systems[SystemTypes.LifeSupp],
+                (IActivatable)_systems[SystemTypes.Electrical],
             }));
 
             Components.Add(this);
         }
 
-        public override void HandleRpc(byte callId, IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, byte callId, IMessageReader reader)
         {
-            throw new System.NotImplementedException();
+            switch (callId)
+            {
+                case 27:
+                {
+                    // Close doors.
+                    if (!sender.Character.PlayerInfo.IsImpostor)
+                    {
+                        Console.WriteLine($"OOPS Fake Impostor: {sender.Character.PlayerInfo.PlayerName} did doors");
+                    }
+
+                    break;
+                }
+
+                case 28:
+                {
+                    var systemType = (SystemTypes)reader.ReadByte();
+                    var player = _game.FindObjectByNetId<InnerPlayerControl>(reader.ReadPackedUInt32());
+                    var amount = reader.ReadByte();
+
+                    if (systemType == SystemTypes.Sabotage && !player.PlayerInfo.IsImpostor)
+                    {
+                        Console.WriteLine($"OOPS Fake Impostor: {player.PlayerInfo.PlayerName} did {(SystemTypes) amount}");
+                    }
+
+                    break;
+                }
+            }
         }
 
         public override bool Serialize(IMessageWriter writer, bool initialState)
@@ -47,7 +75,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
             throw new System.NotImplementedException();
         }
 
-        public override void Deserialize(IMessageReader reader, bool initialState)
+        public override void Deserialize(IClientPlayer sender, IMessageReader reader, bool initialState)
         {
             if (initialState)
             {
@@ -67,7 +95,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
                 foreach (var systemType in SystemTypeHelpers.AllTypes)
                 {
                     // TODO: Not sure what is going on here, check.
-                    if ((count & 1 << (int) (systemType & (SystemTypes.ShipTasks | SystemTypes.Doors))) != 0L)
+                    if ((count & 1 << (int)(systemType & (SystemTypes.ShipTasks | SystemTypes.Doors))) != 0L)
                     {
                         if (_systems.TryGetValue(systemType, out var system))
                         {

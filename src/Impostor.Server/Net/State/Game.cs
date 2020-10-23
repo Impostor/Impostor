@@ -51,7 +51,7 @@ namespace Impostor.Server.Net.State
             Code = code;
             HostId = -1;
             GameState = GameStates.NotStarted;
-            GameNet = new GameNet();
+            GameNet = new GameNet(this);
             Options = options;
             _clientManager = clientManager;
             _eventManager = eventManager;
@@ -90,6 +90,11 @@ namespace Impostor.Server.Net.State
 
             player = default;
             return false;
+        }
+
+        public IClientPlayer GetClientPlayer(int clientId)
+        {
+            return _players.TryGetValue(clientId, out var clientPlayer) ? clientPlayer : null;
         }
 
         public ValueTask EndAsync()

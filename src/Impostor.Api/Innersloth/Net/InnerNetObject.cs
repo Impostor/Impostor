@@ -1,4 +1,5 @@
-﻿using Impostor.Api.Net.Messages;
+﻿using Impostor.Api.Net;
+using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Innersloth.Net
 {
@@ -10,10 +11,10 @@ namespace Impostor.Api.Innersloth.Net
 
         public SpawnFlags SpawnFlags { get; internal set; }
 
-        public abstract void HandleRpc(byte callId, IMessageReader reader);
+        public abstract void HandleRpc(IClientPlayer sender, byte callId, IMessageReader reader);
 
         public abstract bool Serialize(IMessageWriter writer, bool initialState);
 
-        public abstract void Deserialize(IMessageReader reader, bool initialState);
+        public abstract void Deserialize(IClientPlayer sender, IMessageReader reader, bool initialState);
     }
 }

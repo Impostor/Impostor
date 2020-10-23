@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Innersloth.Net.Objects.Components
@@ -13,7 +14,7 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             _votes = new Dictionary<int, int[]>();
         }
 
-        public override void HandleRpc(byte callId, IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, byte callId, IMessageReader reader)
         {
             throw new NotImplementedException();
         }
@@ -23,7 +24,7 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             throw new NotImplementedException();
         }
 
-        public override void Deserialize(IMessageReader reader, bool initialState)
+        public override void Deserialize(IClientPlayer sender, IMessageReader reader, bool initialState)
         {
             var votes = _votes;
             var unknown = reader.ReadByte();
