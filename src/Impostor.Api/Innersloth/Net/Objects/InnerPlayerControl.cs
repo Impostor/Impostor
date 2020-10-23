@@ -108,16 +108,15 @@ namespace Impostor.Api.Innersloth.Net.Objects
                 {
                     if (!sender.IsHost)
                     {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetInfected)} but was not a host.");
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.Exiled)} but was not a host.");
                     }
 
                     if (target != null)
                     {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetInfected)} to a specific player instead of broadcast.");
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.Exiled)} to a specific player instead of broadcast.");
                     }
 
-                    Console.WriteLine(PlayerInfo.PlayerName + " was voted out.");
-
+                    // TODO: Not hit?
                     Die(DeathReason.Exile);
                     break;
                 }
@@ -250,6 +249,11 @@ namespace Impostor.Api.Innersloth.Net.Objects
                     }
 
                     var player = reader.ReadNetObject<InnerPlayerControl>(_game);
+                    if (!player.PlayerInfo.IsDead)
+                    {
+                        player.Die(DeathReason.Kill);
+                    }
+
                     break;
                 }
 

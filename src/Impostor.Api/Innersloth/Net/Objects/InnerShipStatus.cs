@@ -48,24 +48,38 @@ namespace Impostor.Api.Innersloth.Net.Objects
             {
                 case RpcCalls.CloseDoorsOfType:
                 {
+                    if (target == null || !target.IsHost)
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CloseDoorsOfType)} to wrong destinition, must be host.");
+                    }
+
                     if (!sender.Character.PlayerInfo.IsImpostor)
                     {
-                        Console.WriteLine($"OOPS Fake Impostor: {sender.Character.PlayerInfo.PlayerName} did doors");
+                        // throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CloseDoorsOfType)} as crewmate.");
                     }
+
+                    var systemType = (SystemTypes)reader.ReadByte();
 
                     break;
                 }
 
                 case RpcCalls.RepairSystem:
                 {
+                    if (target == null || !target.IsHost)
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.RepairSystem)} to wrong destinition, must be host.");
+                    }
+
+                    if (!sender.Character.PlayerInfo.IsImpostor)
+                    {
+                        // throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.RepairSystem)} as crewmate.");
+                    }
+
                     var systemType = (SystemTypes)reader.ReadByte();
                     var player = reader.ReadNetObject<InnerPlayerControl>(_game);
                     var amount = reader.ReadByte();
 
-                    if (systemType == SystemTypes.Sabotage && !player.PlayerInfo.IsImpostor)
-                    {
-                        Console.WriteLine($"OOPS Fake Impostor: {player.PlayerInfo.PlayerName} did {(SystemTypes) amount}");
-                    }
+                    // TODO: Modify data (?)
 
                     break;
                 }
@@ -80,7 +94,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
         public override bool Serialize(IMessageWriter writer, bool initialState)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void Deserialize(IClientPlayer sender, IMessageReader reader, bool initialState)
