@@ -28,8 +28,6 @@ namespace Impostor.Server.Net.State
                 await InitGameDataAsync(player);
             }
 
-            player.InitializeSpawnTimeout();
-
             await _eventManager.CallAsync(new PlayerJoinedGameEvent(this, player));
         }
 
@@ -81,10 +79,10 @@ namespace Impostor.Server.Net.State
             {
                 await Task.Delay(Constants.ConnectionTimeout);
 
-                if (player.Client.Connection.IsConnected)
+                if (player.Client.Connection.IsConnected && player.Client.Connection is HazelConnection hazel)
                 {
                     _logger.LogInformation("{0} - Player {1} ({2}) kept connection open after leaving, disposing.", Code, player.Client.Name, playerId);
-                    ((HazelConnection) player.Client.Connection).DisposeInnerConnection();
+                    hazel.DisposeInnerConnection();
                 }
             });
 

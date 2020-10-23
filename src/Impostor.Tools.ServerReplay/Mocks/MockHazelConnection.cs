@@ -22,5 +22,10 @@ namespace Impostor.Tools.ServerReplay.Mocks
         {
             return ValueTask.CompletedTask;
         }
+
+        public ValueTask DisconnectAsync(string reason)
+        {
+            return ValueTask.CompletedTask;
+        }
     }
 }

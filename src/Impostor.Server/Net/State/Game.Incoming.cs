@@ -182,6 +182,8 @@ namespace Impostor.Server.Net.State
                 await PlayerAdd(sender);
             }
 
+            sender.InitializeSpawnTimeout();
+
             using (var message = MessageWriter.Get(MessageType.Reliable))
             {
                 WriteJoinedGameMessage(message, false, sender);

@@ -44,8 +44,7 @@ namespace Impostor.Server.Net.State
 
         public void DisableSpawnTimeout()
         {
-            _spawnTimeout.Dispose();
-            _spawnTimeout = null;
+            _spawnTimeout.Change(-1, -1);
         }
 
         /// <inheritdoc />
