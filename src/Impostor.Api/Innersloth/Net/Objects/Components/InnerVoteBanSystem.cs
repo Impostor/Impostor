@@ -2,22 +2,43 @@
 using System.Collections.Generic;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Api.Innersloth.Net.Objects.Components
 {
     public class InnerVoteBanSystem : InnerNetObject
     {
+        private readonly ILogger<InnerVoteBanSystem> _logger;
         private readonly Dictionary<int, int[]> _votes;
 
-        public InnerVoteBanSystem()
+        public InnerVoteBanSystem(ILogger<InnerVoteBanSystem> logger)
         {
+            _logger = logger;
             _votes = new Dictionary<int, int[]>();
         }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call,
-            IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            throw new NotImplementedException();
+            if (call != RpcCalls.AddVote)
+            {
+                _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerVoteBanSystem), call);
+                return;
+            }
+
+            var clientId = reader.ReadInt32();
+            if (clientId != sender.Client.Id)
+            {
+                throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.AddVote)} as other client.");
+            }
+
+            if (target != null)
+            {
+                throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CastVote)} to wrong destinition, must be broadcast.");
+            }
+
+            var targetClientId = reader.ReadInt32();
+
+            // TODO: Use.
         }
 
         public override bool Serialize(IMessageWriter writer, bool initialState)

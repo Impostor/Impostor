@@ -14,6 +14,8 @@ namespace Impostor.Api.Innersloth.Net.Objects
                 PlayerId = playerId;
             }
 
+            public InnerPlayerControl Controller { get; internal set; }
+
             public byte PlayerId { get; }
 
             public string PlayerName { get; internal set; }
@@ -34,7 +36,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
             public DeathReason LastDeathReason { get; internal set; }
 
-            public List<TaskInfo> Tasks { get; private set; }
+            public List<TaskInfo> Tasks { get; internal set; }
 
             public void Serialize(IMessageWriter writer)
             {

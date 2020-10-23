@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Impostor.Api;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Innersloth.Net;
 using Impostor.Api.Innersloth.Net.Objects;
 using Impostor.Api.Innersloth.Net.Objects.Components;
 using Impostor.Api.Net.Messages;
-using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,7 +47,7 @@ namespace Impostor.Server.Net.State
         private int _gamedataInitialized;
         private bool _gamedataFakeReceived;
 
-        internal void OnSpawn(InnerNetObject netObj)
+        private void OnSpawn(InnerNetObject netObj)
         {
             switch (netObj)
             {
@@ -87,11 +84,16 @@ namespace Impostor.Server.Net.State
                     }
 
                     // Hook up InnerPlayerControl <-> InnerPlayerControl.PlayerInfo.
-                    control.PlayerInfo = GameNet.GameData.GetPlayerById(control.PlayerId);
+                    control.PlayerInfo = GameNet.GameData.GetPlayerById(control.PlayerId)!;
 
                     if (control.PlayerInfo == null)
                     {
                         GameNet.GameData.AddPlayer(control);
+                    }
+
+                    if (control.PlayerInfo != null)
+                    {
+                        control.PlayerInfo!.Controller = control;
                     }
 
                     break;
@@ -99,7 +101,7 @@ namespace Impostor.Server.Net.State
             }
         }
 
-        internal void OnDestroy(InnerNetObject netObj)
+        private void OnDestroy(InnerNetObject netObj)
         {
             switch (netObj)
             {
@@ -228,14 +230,7 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
-                            // TODO: Remove try catch.
-                            try
-                            {
-                                obj.HandleRpc(sender, target, (RpcCalls) reader.ReadByte(), reader);
-                            }
-                            catch (NotImplementedException)
-                            {
-                            }
+                            obj.HandleRpc(sender, target, (RpcCalls) reader.ReadByte(), reader);
                         }
                         else
                         {

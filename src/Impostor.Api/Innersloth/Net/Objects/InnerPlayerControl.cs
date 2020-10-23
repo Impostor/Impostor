@@ -51,6 +51,11 @@ namespace Impostor.Api.Innersloth.Net.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CompleteTask)} to an unowned {nameof(InnerPlayerControl)}.");
                     }
 
+                    if (target != null)
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CompleteTask)} to a specific player instead of broadcast.");
+                    }
+
                     var index = reader.ReadPackedUInt32();
                     break;
                 }
@@ -231,7 +236,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
                     if (!sender.Character.PlayerInfo.IsImpostor)
                     {
                         // TODO: Uncomment
-                        // throw new ImpostorHackException($"Client sent {nameof(RpcCalls.MurderPlayer)} as crewmate.");
+                        // throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.MurderPlayer)} as crewmate.");
                     }
 
                     var player = reader.ReadNetObject<InnerPlayerControl>(_game);
@@ -270,7 +275,6 @@ namespace Impostor.Api.Innersloth.Net.Objects
                     var player = _game.GameNet.GameData.GetPlayerById(playerId);
 
                     // Meeting started by "player", can also be null.
-                    Console.WriteLine("ads");
                     break;
                 }
 
@@ -346,8 +350,10 @@ namespace Impostor.Api.Innersloth.Net.Objects
                 }
 
                 default:
-                    _logger.LogWarning("InnerPlayerControl: Unknown rpc call {0}", call);
+                {
+                    _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerPlayerControl), call);
                     break;
+                }
             }
         }
 

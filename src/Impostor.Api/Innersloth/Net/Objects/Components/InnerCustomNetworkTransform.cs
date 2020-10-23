@@ -52,7 +52,7 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             }
             else
             {
-                _logger.LogWarning("InnerCustomNetworkTransform: Unknown rpc call {0}", call);
+                _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerCustomNetworkTransform), call);
             }
         }
 

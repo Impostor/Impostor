@@ -5,16 +5,19 @@ using Impostor.Api.Innersloth.Net.Objects.Systems;
 using Impostor.Api.Innersloth.Net.Objects.Systems.ShipStatus;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Api.Innersloth.Net.Objects
 {
     public class InnerShipStatus : InnerNetObject
     {
+        private readonly ILogger<InnerShipStatus> _logger;
         private readonly IGame _game;
         private readonly Dictionary<SystemTypes, ISystemType> _systems;
 
-        public InnerShipStatus(IGame game)
+        public InnerShipStatus(ILogger<InnerShipStatus> logger, IGame game)
         {
+            _logger = logger;
             _game = game;
 
             _systems = new Dictionary<SystemTypes, ISystemType>
@@ -39,8 +42,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
             Components.Add(this);
         }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call,
-            IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             switch (call)
             {
@@ -65,6 +67,12 @@ namespace Impostor.Api.Innersloth.Net.Objects
                         Console.WriteLine($"OOPS Fake Impostor: {player.PlayerInfo.PlayerName} did {(SystemTypes) amount}");
                     }
 
+                    break;
+                }
+
+                default:
+                {
+                    _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerShipStatus), call);
                     break;
                 }
             }

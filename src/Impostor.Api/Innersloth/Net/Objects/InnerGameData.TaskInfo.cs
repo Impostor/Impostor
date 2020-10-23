@@ -6,9 +6,9 @@ namespace Impostor.Api.Innersloth.Net.Objects
     {
         public class TaskInfo
         {
-            public uint Id { get; private set; }
+            public uint Id { get; internal set; }
 
-            public bool Complete { get; private set; }
+            public bool Complete { get; internal set; }
 
             public void Serialize(IMessageWriter writer)
             {
