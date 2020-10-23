@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Impostor.Api.Games;
+using Impostor.Api.Innersloth.Net;
 using Impostor.Api.Innersloth.Net.Objects;
 
 namespace Impostor.Api.Net
@@ -27,6 +28,13 @@ namespace Impostor.Api.Net
         InnerPlayerControl Character { get; }
 
         public bool IsHost { get; }
+
+        /// <summary>
+        ///     Checks if the specified <see cref="InnerNetObject"/> is owned by <see cref="IClientPlayer"/>.
+        /// </summary>
+        /// <param name="netObject">The <see cref="InnerNetObject"/>.</param>
+        /// <returns>Returns true if owned by <see cref="IClientPlayer"/>.</returns>
+        bool IsOwner(InnerNetObject netObject);
 
         ValueTask KickAsync();
 

@@ -39,7 +39,8 @@ namespace Impostor.Api.Innersloth.Net.Objects
             Components.Add(this);
         }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer target, RpcCalls call, IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call,
+            IMessageReader reader)
         {
             switch (call)
             {
@@ -56,7 +57,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
                 case RpcCalls.RepairSystem:
                 {
                     var systemType = (SystemTypes)reader.ReadByte();
-                    var player = _game.FindObjectByNetId<InnerPlayerControl>(reader.ReadPackedUInt32());
+                    var player = reader.ReadNetObject<InnerPlayerControl>(_game);
                     var amount = reader.ReadByte();
 
                     if (systemType == SystemTypes.Sabotage && !player.PlayerInfo.IsImpostor)

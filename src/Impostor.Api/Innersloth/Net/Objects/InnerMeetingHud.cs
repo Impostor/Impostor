@@ -36,7 +36,8 @@ namespace Impostor.Api.Innersloth.Net.Objects
                 .ToArray();
         }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer target, RpcCalls call, IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call,
+            IMessageReader reader)
         {
             throw new NotImplementedException();
         }

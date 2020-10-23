@@ -11,7 +11,8 @@ namespace Impostor.Api.Innersloth.Net
 
         public SpawnFlags SpawnFlags { get; internal set; }
 
-        public abstract void HandleRpc(IClientPlayer sender, IClientPlayer target, RpcCalls call, IMessageReader reader);
+        public abstract void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call,
+            IMessageReader reader);
 
         public abstract bool Serialize(IMessageWriter writer, bool initialState);
 

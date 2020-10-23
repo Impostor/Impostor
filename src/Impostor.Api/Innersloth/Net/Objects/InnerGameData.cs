@@ -37,12 +37,17 @@ namespace Impostor.Api.Innersloth.Net.Objects
             }
         }
 
-        public PlayerInfo GetPlayerById(byte id)
+        public PlayerInfo? GetPlayerById(byte id)
         {
+            if (id == byte.MaxValue)
+            {
+                return null;
+            }
+
             return _allPlayers.TryGetValue(id, out var player) ? player : null;
         }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer target, RpcCalls call, IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             throw new NotImplementedException();
         }

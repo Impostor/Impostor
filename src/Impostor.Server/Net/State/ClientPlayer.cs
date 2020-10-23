@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Impostor.Api.Innersloth.Net;
 using Impostor.Api.Innersloth.Net.Objects;
 using Impostor.Api.Net;
 
@@ -25,6 +26,12 @@ namespace Impostor.Server.Net.State
         public bool IsHost => Game?.Host == this;
 
         public string Scene { get; internal set; }
+
+        /// <inheritdoc />
+        public bool IsOwner(InnerNetObject netObject)
+        {
+            return Client.Id == netObject.OwnerId;
+        }
 
         /// <inheritdoc />
         public ValueTask KickAsync()

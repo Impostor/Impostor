@@ -44,9 +44,9 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             return new Vector2(XRange.Lerp(v1), YRange.Lerp(v2));
         }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer target, RpcCalls call, IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (call == 0)
+            if (call == RpcCalls.SnapTo)
             {
                 SnapTo(ReadVector2(reader), reader.ReadUInt16());
             }

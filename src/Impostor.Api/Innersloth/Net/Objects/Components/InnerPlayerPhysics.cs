@@ -5,7 +5,8 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
 {
     public class InnerPlayerPhysics : InnerNetObject
     {
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer target, RpcCalls call, IMessageReader reader)
+        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call,
+            IMessageReader reader)
         {
             throw new System.NotImplementedException();
         }
