@@ -3,6 +3,7 @@
         <Rule Id="SA1200" Action="None" />
     </Rules>
     <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.DocumentationRules">
+        <Rule Id="SA1600" Action="None" />
         <Rule Id="SA1633" Action="None" />
     </Rules>
     <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.ReadabilityRules">

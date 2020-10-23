@@ -45,7 +45,6 @@ namespace Impostor.Api.Innersloth.Net.Objects
             {
                 case 27:
                 {
-                    // Close doors.
                     if (!sender.Character.PlayerInfo.IsImpostor)
                     {
                         Console.WriteLine($"OOPS Fake Impostor: {sender.Character.PlayerInfo.PlayerName} did doors");
