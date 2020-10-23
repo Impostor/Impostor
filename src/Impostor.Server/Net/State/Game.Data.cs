@@ -1,9 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Impostor.Api;
+using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Innersloth.GameData;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.C2S;
+using Impostor.Api.Net.Messages.S2C;
+using Impostor.Hazel;
 using Impostor.Server.GameData;
 using Impostor.Server.GameData.Objects;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +19,19 @@ namespace Impostor.Server.Net.State
 {
     internal partial class Game
     {
+        private const int FakeClientId = int.MaxValue - 1;
+
+        /// <summary>
+        ///     Used for global object, spawned by the host.
+        /// </summary>
+        private const int InvalidClient = -2;
+
+        /// <summary>
+        ///     Used internally to set the OwnerId to the current ClientId.
+        ///     i.e: <code>ownerId = ownerId == -3 ? this.ClientId : ownerId;</code>
+        /// </summary>
+        private const int CurrentClient = -3;
+
         private static readonly Type[] SpawnableObjects =
         {
             typeof(InnerShipStatus), // ShipStatus
@@ -29,18 +48,43 @@ namespace Impostor.Server.Net.State
         private readonly Dictionary<uint, InnerNetObject> _allObjectsFast = new Dictionary<uint, InnerNetObject>();
 
         private int _gamedataInitialized;
+        private bool _gamedataFakeReceived;
 
-        public void InitGameData()
+        private async ValueTask InitGameDataAsync(ClientPlayer player)
         {
             if (Interlocked.Exchange(ref _gamedataInitialized, 1) != 0)
             {
                 return;
             }
 
+            /*
+             * The Among Us client on 20.9.22i spawns some components on the host side and
+             * only spawns these on other clients when someone else connects. This means that we can't
+             * parse data until someone connects because we don't know which component belongs to the NetId.
+             *
+             * We solve this by spawning a fake player and removing the player when the spawn GameData
+             * is received in HandleGameDataAsync.
+             */
+            using (var message = MessageWriter.Get(MessageType.Reliable))
+            {
+                _logger.LogInformation("Sending join..");
 
+                // Spawn a fake player.
+                Message01JoinGameS2C.SerializeJoin(message, false, Code, FakeClientId, HostId);
+
+                message.StartMessage(MessageFlags.GameData);
+                message.Write(Code);
+                message.StartMessage(GameDataTag.SceneChangeFlag);
+                message.WritePacked(FakeClientId);
+                message.Write("OnlineGame");
+                message.EndMessage();
+                message.EndMessage();
+
+                await player.Client.Connection.SendAsync(message);
+            }
         }
 
-        public async ValueTask HandleGameDataAsync(IMessageReader parent, ClientPlayer sender, bool toPlayer)
+        public async ValueTask<bool> HandleGameDataAsync(IMessageReader parent, ClientPlayer sender, bool toPlayer)
         {
             // Find target player.
             ClientPlayer target = null;
@@ -48,11 +92,25 @@ namespace Impostor.Server.Net.State
             if (toPlayer)
             {
                 var targetId = parent.ReadPackedInt32();
-                if (!TryGetPlayer(targetId, out target))
+                if (targetId == FakeClientId && !_gamedataFakeReceived && sender.IsHost)
                 {
-                    // Invalid target.
-                    return;
+                    _gamedataFakeReceived = true;
+
+                    // Remove the fake client, we received the data.
+                    using (var message = MessageWriter.Get(MessageType.Reliable))
+                    {
+                        WriteRemovePlayerMessage(message, false, FakeClientId, (byte)DisconnectReason.ExitGame);
+
+                        await sender.Client.Connection.SendAsync(message);
+                    }
                 }
+                else if (!TryGetPlayer(targetId, out target))
+                {
+                    _logger.LogWarning("Player {0} tried to send GameData to unknown player {1}.", sender.Client.Id, targetId);
+                    return false;
+                }
+
+                _logger.LogTrace("Received GameData for target {0}.", targetId);
             }
 
             // Parse GameData messages.
@@ -79,9 +137,15 @@ namespace Impostor.Server.Net.State
 
                     case GameDataTag.RpcFlag:
                     {
-                        if (_allObjectsFast.TryGetValue(reader.ReadPackedUInt32(), out var obj))
+                        var netId = reader.ReadPackedUInt32();
+                        if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
+                            // Console.WriteLine(reader.ReadByte());
                             // obj.HandleRpc(reader.ReadByte(), reader);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Received RpcFlag for unregistered NetId {0}.", netId);
                         }
 
                         break;
@@ -89,6 +153,12 @@ namespace Impostor.Server.Net.State
 
                     case GameDataTag.SpawnFlag:
                     {
+                        if (!sender.IsHost)
+                        {
+                            _logger.LogWarning("Player {0} ({1}) tried to send spawn packet as non-host.", sender.Client.Name, sender.Client.Id);
+                            return false;
+                        }
+
                         var objectId = reader.ReadPackedUInt32();
                         if (objectId < SpawnableObjects.Length)
                         {
@@ -111,12 +181,23 @@ namespace Impostor.Server.Net.State
                                 continue;
                             }
 
+                            _logger.LogTrace(
+                                "Spawning {0} components, SpawnFlags {1}",
+                                innerNetObject.GetType().Name,
+                                innerNetObject.SpawnFlags);
+
                             for (var i = 0; i < componentsCount; i++)
                             {
                                 var obj = components[i];
 
                                 obj.NetId = reader.ReadPackedUInt32();
                                 obj.OwnerId = id;
+
+                                _logger.LogTrace(
+                                    "- {0}, NetId {1}, OwnerId {2}",
+                                    obj.GetType().Name,
+                                    obj.NetId,
+                                    obj.OwnerId);
 
                                 if (!AddNetObject(obj))
                                 {
@@ -181,6 +262,8 @@ namespace Impostor.Server.Net.State
                     }
                 }
             }
+
+            return true;
         }
 
         private bool AddNetObject(InnerNetObject obj)

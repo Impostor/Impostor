@@ -24,6 +24,7 @@ namespace Impostor.Server.Net.State
             if (HostId == -1)
             {
                 HostId = player.Client.Id;
+                await InitGameDataAsync(player);
             }
 
             await _eventManager.CallAsync(new PlayerJoinedGameEvent(this, player));
@@ -71,7 +72,7 @@ namespace Impostor.Server.Net.State
             // Pick the first player as new host.
             var host = _players
                 .Select(p => p.Value)
-                .FirstOrDefault(p => !p.Client.IsBot);
+                .FirstOrDefault();
 
             if (host == null)
             {

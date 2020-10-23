@@ -22,8 +22,6 @@ namespace Impostor.Server.Net
 
         public IHazelConnection Connection { get; }
 
-        public bool IsBot => false;
-
         public IDictionary<object, object> Items { get; }
 
         public ClientPlayer Player { get; set; }

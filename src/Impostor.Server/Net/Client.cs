@@ -149,21 +149,23 @@ namespace Impostor.Server.Net
                     var readerCopy = reader.Slice(reader.Position);
 
                     // TODO: Return value, either a bool (to cancel) or a writer (to cancel (null) or modify/overwrite).
-                    await Player.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
-
-                    // Broadcast packet to all other players.
-                    using (var writer = MessageWriter.Get(messageType))
+                    var verified = await Player.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
+                    if (verified)
                     {
-                        if (toPlayer)
+                        // Broadcast packet to all other players.
+                        using (var writer = MessageWriter.Get(messageType))
                         {
-                            var target = reader.ReadPackedInt32();
-                            reader.CopyTo(writer);
-                            await Player.Game.SendToAsync(writer, target);
-                        }
-                        else
-                        {
-                            reader.CopyTo(writer);
-                            await Player.Game.SendToAllExceptAsync(writer, Id);
+                            if (toPlayer)
+                            {
+                                var target = reader.ReadPackedInt32();
+                                reader.CopyTo(writer);
+                                await Player.Game.SendToAsync(writer, target);
+                            }
+                            else
+                            {
+                                reader.CopyTo(writer);
+                                await Player.Game.SendToAllExceptAsync(writer, Id);
+                            }
                         }
                     }
 

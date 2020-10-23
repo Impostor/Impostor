@@ -35,11 +35,6 @@ namespace Impostor.Api.Net
         IHazelConnection? Connection { get; }
 
         /// <summary>
-        ///     Gets a value indicating whether the client is a bot.
-        /// </summary>
-        bool IsBot { get; }
-
-        /// <summary>
         ///     Gets a key/value collection that can be used to share data between messages.
         /// </summary>
         /// <remarks>
