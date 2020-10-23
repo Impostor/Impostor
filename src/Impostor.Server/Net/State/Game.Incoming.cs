@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
@@ -10,6 +12,8 @@ namespace Impostor.Server.Net.State
 {
     internal partial class Game
     {
+        private readonly SemaphoreSlim _clientAddLock = new SemaphoreSlim(1, 1);
+
         public async ValueTask HandleStartGame(IMessageReader message)
         {
             GameState = GameStates.Started;
@@ -20,6 +24,30 @@ namespace Impostor.Server.Net.State
         }
 
         public async ValueTask<GameJoinResult> AddClientAsync(ClientBase client)
+        {
+            var hasLock = false;
+
+            try
+            {
+                hasLock = await _clientAddLock.WaitAsync(TimeSpan.FromMinutes(1));
+
+                if (hasLock)
+                {
+                    return await AddClientSafeAsync(client);
+                }
+            }
+            finally
+            {
+                if (hasLock)
+                {
+                    _clientAddLock.Release();
+                }
+            }
+
+            return GameJoinResult.FromError(GameJoinError.InvalidClient);
+        }
+
+        private async ValueTask<GameJoinResult> AddClientSafeAsync(ClientBase client)
         {
             // Check if the IP of the player is banned.
             if (client.Connection != null && _bannedIps.Contains(client.Connection.EndPoint.Address))
