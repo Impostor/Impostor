@@ -31,6 +31,7 @@ namespace Impostor.Hazel.Udp
         private readonly Timer _reliablePacketTimer;
         private readonly ConcurrentDictionary<EndPoint, UdpServerConnection> _allConnections;
         private readonly CancellationTokenSource _stoppingCts;
+        private readonly UdpConnectionRateLimit _connectionRateLimit;
         private Task _executingTask;
 
         /// <summary>
@@ -58,6 +59,8 @@ namespace Impostor.Hazel.Udp
             {
                 _socket.Dispose();
             });
+
+            _connectionRateLimit = new UdpConnectionRateLimit();
         }
 
         public int ConnectionCount => this._allConnections.Count;
@@ -151,6 +154,13 @@ namespace Impostor.Hazel.Udp
                         // Check for malformed connection attempts
                         if (data.Buffer[0] != (byte)UdpSendOption.Hello)
                         {
+                            continue;
+                        }
+
+                        // Check rateLimit.
+                        if (!_connectionRateLimit.IsAllowed(data.RemoteEndPoint.Address))
+                        {
+                            Logger.Warning("Ratelimited connection attempt from {0}.", data.RemoteEndPoint);
                             continue;
                         }
 
@@ -273,6 +283,8 @@ namespace Impostor.Hazel.Udp
             await StopAsync();
 
             await _reliablePacketTimer.DisposeAsync();
+
+            _connectionRateLimit.Dispose();
 
             await base.DisposeAsync();
         }
