@@ -1,6 +1,16 @@
-﻿namespace Impostor.Api.Events
+﻿using System.Threading.Tasks;
+
+namespace Impostor.Api.Events
 {
     public interface IEventListener
     {
+    }
+
+    public interface IManualEventListener : IEventListener
+    {
+        public bool CanExecute<T>();
+
+        public ValueTask Execute(IEvent @event);
+        EventPriority Priority { get; set; }
     }
 }

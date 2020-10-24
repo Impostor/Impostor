@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+
 using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
 using Impostor.Server.Events.Register;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -99,6 +101,12 @@ namespace Impostor.Server.Events
         {
             foreach (var handler in services.GetServices<IEventListener>())
             {
+                if (handler is IManualEventListener manualEventListener && manualEventListener.CanExecute<TEvent>())
+                {
+                    yield return new EventHandler(handler, new ManualRegisteredEventListener(manualEventListener));
+                    continue;
+                }
+
                 var events = RegisteredEventListener.FromType(handler.GetType());
 
                 foreach (var eventHandler in events)
