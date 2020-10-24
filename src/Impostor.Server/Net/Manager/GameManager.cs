@@ -11,7 +11,7 @@ using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
-using Impostor.Server.Data;
+using Impostor.Server.Config;
 using Impostor.Server.Extensions;
 using Impostor.Server.Net.Redirector;
 using Impostor.Server.Net.State;

@@ -48,7 +48,7 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </Content>
-        <Content Include="config.full.json">
+        <Content Include="config-full.json">
             <CopyToPublishDirectory>Never</CopyToPublishDirectory>
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Impostor.Server.Data
+namespace Impostor.Server.Config
 {
     public class ServerRedirectorConfig
     {

@@ -1,4 +1,4 @@
-﻿namespace Impostor.Server.Data
+﻿namespace Impostor.Server.Config
 {
     internal class ServerConfig
     {
