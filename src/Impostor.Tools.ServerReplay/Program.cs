@@ -125,7 +125,7 @@ namespace Impostor.Tools.ServerReplay
                     var addressLength = reader.ReadByte();
                     var addressBytes = reader.ReadBytes(addressLength);
                     var addressPort = reader.ReadUInt16();
-                    var address = new IPEndPoint(new IPAddress(addressBytes), addressPort);
+                    var address = new IPEndPoint(new IPAddress(addressBytes), clientId);
                     var name = reader.ReadString();
 
                     // Create and register connection.
@@ -153,9 +153,9 @@ namespace Impostor.Tools.ServerReplay
                     {
                         GameOptions.Add(clientId, Message00HostGameC2S.Deserialize(message));
                     }
-                    else
+                    else if (Connections.TryGetValue(clientId, out var client))
                     {
-                        await Connections[clientId].Client!.HandleMessageAsync(message, messageType);
+                        await client.Client!.HandleMessageAsync(message, messageType);
                     }
                     break;
 

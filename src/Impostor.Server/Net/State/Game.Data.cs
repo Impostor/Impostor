@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Innersloth.Net;
 using Impostor.Api.Innersloth.Net.Objects;
@@ -246,8 +247,7 @@ namespace Impostor.Server.Net.State
                         // Only the host is allowed to despawn objects.
                         if (!sender.IsHost)
                         {
-                            _logger.LogWarning("Player {0} ({1}) tried to send SpawnFlag as non-host.", sender.Client.Name, sender.Client.Id);
-                            return false;
+                            throw new ImpostorCheatException("Tried to send SpawnFlag as non-host.");
                         }
 
                         var objectId = reader.ReadPackedUInt32();
@@ -314,9 +314,9 @@ namespace Impostor.Server.Net.State
                         break;
                     }
 
+                    // Only the host is allowed to despawn objects.
                     case GameDataTag.DespawnFlag:
                     {
-                        // Only the host is allowed to despawn objects.
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
