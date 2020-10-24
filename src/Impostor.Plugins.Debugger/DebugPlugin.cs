@@ -1,35 +1,13 @@
 ﻿using Impostor.Api.Plugins;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace Impostor.Plugins.Debugger
 {
+    [ImpostorPlugin(
+        package: "gg.impostor.debugger",
+        name: "Debugger",
+        author: "Gerard",
+        version: "1.0.0")]
     public class DebugPlugin : PluginBase
     {
-        public override void ConfigureServices(IServiceCollection services)
-        {
-            services.AddRazorPages();
-            services.AddServerSideBlazor();
-        }
-
-        public override void ConfigureHost(IHostBuilder host)
-        {
-            host.ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.Configure(app =>
-                {
-                    app.UseStaticFiles();
-                    app.UseRouting();
-
-                    app.UseEndpoints(endpoints =>
-                    {
-                        endpoints.MapBlazorHub();
-                        endpoints.MapFallbackToPage("/_Host");
-                    });
-                });
-            });
-        }
     }
 }

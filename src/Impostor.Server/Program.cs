@@ -173,9 +173,9 @@ namespace Impostor.Server
                     services.AddSingleton<Matchmaker>();
                     services.AddHostedService<MatchmakerService>();
                 })
-                .UsePluginLoader(pluginConfig)
+                .UseSerilog()
                 .UseConsoleLifetime()
-                .UseSerilog();
+                .UsePluginLoader(pluginConfig);
         }
     }
 }

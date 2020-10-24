@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using Impostor.Api.Plugins;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Hosting;
 
@@ -50,23 +51,58 @@ namespace Impostor.Server.Plugins
                 .Select(a => context.LoadFromAssemblyName(a.AssemblyName))
                 .ToList();
 
-            var plugins = assemblies
-                .SelectMany(a => a.GetTypes())
-                .Where(t => typeof(IPlugin).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
-                .Select(Activator.CreateInstance)
-                .Cast<IPlugin>()
-                .ToList();
 
-            foreach (var plugin in plugins)
+            // Find all plugins.
+            var plugins = new List<PluginInformation>();
+
+            foreach (var assembly in assemblies)
             {
-                plugin.ConfigureHost(builder);
+                // Find plugin startup.
+                var pluginStartup = assembly
+                    .GetTypes()
+                    .Where(t => typeof(IPluginStartup).IsAssignableFrom(t) && t.IsClass)
+                    .ToList();
+
+                if (pluginStartup.Count > 1)
+                {
+                    throw new PluginLoaderException("A plugin may only define zero or one IPluginStartup implementation.");
+                }
+
+                // Find plugin.
+                var plugin = assembly
+                    .GetTypes()
+                    .Where(t => typeof(IPlugin).IsAssignableFrom(t)
+                                && t.IsClass
+                                && !t.IsAbstract
+                                && t.GetCustomAttribute<ImpostorPluginAttribute>() != null)
+                    .ToList();
+
+                if (plugin.Count != 1)
+                {
+                    throw new PluginLoaderException("A plugin must define exactly one IPlugin or PluginBase implementation.");
+                }
+
+                // Save plugin.
+                plugins.Add(new PluginInformation(
+                    pluginStartup
+                        .Select(Activator.CreateInstance)
+                        .Cast<IPluginStartup>()
+                        .FirstOrDefault(),
+                    plugin.First()));
+            }
+
+            foreach (var plugin in plugins.Where(plugin => plugin.Startup != null))
+            {
+                plugin.Startup.ConfigureHost(builder);
             }
 
             builder.ConfigureServices(services =>
             {
-                foreach (var plugin in plugins)
+                services.AddHostedService(provider => ActivatorUtilities.CreateInstance<PluginLoaderService>(provider, plugins));
+
+                foreach (var plugin in plugins.Where(plugin => plugin.Startup != null))
                 {
-                    plugin.ConfigureServices(services);
+                    plugin.Startup.ConfigureServices(services);
                 }
             });
 

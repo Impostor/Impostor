@@ -12,9 +12,5 @@ namespace Impostor.Api.Plugins
         ValueTask DisableAsync();
 
         ValueTask ReloadAsync();
-
-        void ConfigureHost(IHostBuilder host);
-
-        void ConfigureServices(IServiceCollection services);
     }
 }
