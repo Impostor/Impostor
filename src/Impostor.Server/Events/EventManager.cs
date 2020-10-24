@@ -98,6 +98,12 @@ namespace Impostor.Server.Events
         {
             foreach (var handler in services.GetServices<IEventListener>())
             {
+                if (handler is IManualEventListener manualEventListener && manualEventListener.CanExecute<TEvent>())
+                {
+                    yield return new EventHandler(handler, new ManualRegisteredEventListener(manualEventListener));
+                    continue;
+                }
+
                 var events = RegisteredEventListener.FromType(handler.GetType());
 
                 foreach (var eventHandler in events)

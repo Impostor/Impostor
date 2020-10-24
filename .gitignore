@@ -4,3 +4,4 @@
 /src/Impostor.Plugins.Debugger/Properties/launchSettings.json
 /tools
 
+.local/
