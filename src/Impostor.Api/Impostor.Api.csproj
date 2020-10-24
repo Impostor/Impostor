@@ -2,11 +2,11 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <DebugType Condition=" '$(Configuration)' == 'Release' ">None</DebugType>
         <CodeAnalysisRuleSet>ProjectRules.ruleset</CodeAnalysisRuleSet>
         <LangVersion>9</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Nullable>enable</Nullable>
+        <Version>1.0.0</Version>
     </PropertyGroup>
 
     <ItemGroup>

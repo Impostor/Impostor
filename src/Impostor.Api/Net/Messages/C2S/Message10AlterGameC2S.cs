@@ -1,4 +1,4 @@
-﻿using Impostor.Api.Innersloth.Data;
+﻿using Impostor.Api.Innersloth;
 
 namespace Impostor.Api.Net.Messages.C2S
 {

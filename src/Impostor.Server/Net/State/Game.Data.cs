@@ -4,13 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Net;
-using Impostor.Api.Innersloth.Data;
-using Impostor.Api.Innersloth.Net;
-using Impostor.Api.Innersloth.Net.Objects;
-using Impostor.Api.Innersloth.Net.Objects.Components;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
+using Impostor.Server.Net.Inner;
+using Impostor.Server.Net.Inner.Objects;
+using Impostor.Server.Net.Inner.Objects.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -237,7 +237,7 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
-                            obj.HandleRpc(sender, target, (RpcCalls) reader.ReadByte(), reader);
+                            await obj.HandleRpc(sender, target, (RpcCalls) reader.ReadByte(), reader);
                         }
                         else
                         {

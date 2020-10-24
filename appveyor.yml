@@ -1,4 +1,8 @@
-version: '1.1.{build}'
+version: '{build}'
+
+environment:
+  IMPOSTOR_VERSION: '1.1.0'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
 branches:
   except:
@@ -11,18 +15,9 @@ assembly_info:
   patch: false
 
 dotnet_csproj:
-  patch: true
-  file: '**\*.csproj;**\*.props'
-  version: '{version}'
-  package_version: '{version}'
-  assembly_version: '{version}'
-  file_version: '{version}'
-  informational_version: '{version}'
+  patch: false
 
 image: Visual Studio 2019 Preview
-
-environment:
-  DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
 install:
   - git submodule update --init --recursive
@@ -36,6 +31,7 @@ test: off
 
 artifacts:
   - path: ./build/*.zip
+  - path: ./build/*.nupkg
 
 only_commits:
   files:

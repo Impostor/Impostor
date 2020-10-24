@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events;
-using Impostor.Api.Innersloth.Data;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Hazel;

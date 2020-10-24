@@ -21,13 +21,11 @@ namespace Impostor.Server.Plugins
             // Add the plugins and libraries.
             var pluginPaths = new List<string>(config.Paths);
             var libraryPaths = new List<string>(config.LibraryPaths);
+            
+          var rootFolder = AppContext.BaseDirectory;
 
-            var rootFolder = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
-            if (rootFolder != null)
-            {
-                pluginPaths.Add(Path.Combine(rootFolder, "plugins"));
-                libraryPaths.Add(Path.Combine(rootFolder, "libraries"));
-            }
+            pluginPaths.Add(Path.Combine(rootFolder, "plugins"));
+            libraryPaths.Add(Path.Combine(rootFolder, "libraries"));
 
             var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
             matcher.AddInclude("*.dll");
@@ -50,7 +48,6 @@ namespace Impostor.Server.Plugins
                 .Where(a => a.IsPlugin)
                 .Select(a => context.LoadFromAssemblyName(a.AssemblyName))
                 .ToList();
-
 
             // Find all plugins.
             var plugins = new List<PluginInformation>();

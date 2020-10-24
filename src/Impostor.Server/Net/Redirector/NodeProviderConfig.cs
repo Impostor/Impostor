@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
-using Impostor.Server.Data;
+using Impostor.Server.Config;
 using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Redirector

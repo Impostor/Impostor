@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Impostor.Api.Games.Managers;
-using Impostor.Api.Innersloth.Data;
+using Impostor.Api.Innersloth;
 
 namespace Impostor.Api.Games
 {

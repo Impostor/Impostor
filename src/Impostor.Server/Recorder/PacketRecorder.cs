@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Net.Messages;
-using Impostor.Server.Data;
+using Impostor.Server.Config;
 using Impostor.Server.Net;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;

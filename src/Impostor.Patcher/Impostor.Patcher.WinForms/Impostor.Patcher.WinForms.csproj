@@ -12,10 +12,6 @@
         <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <DebugType>none</DebugType>
-    </PropertyGroup>
-
     <ItemGroup>
         <ProjectReference Include="..\Impostor.Patcher.Shared\Impostor.Patcher.Shared.csproj" />
         <PackageReference Include="System.Resources.Extensions" Version="5.0.0-rc.2.20475.5" />

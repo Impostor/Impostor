@@ -1,13 +1,9 @@
-﻿using Impostor.Api.Innersloth.Net;
-using Impostor.Api.Innersloth.Net.Objects;
-using Impostor.Api.Innersloth.Net.Objects.Components;
+﻿using Impostor.Server.Net.Inner.Objects;
+using Impostor.Server.Net.Inner.Objects.Components;
 
 namespace Impostor.Server.Net.State
 {
-    /// <summary>
-    ///     Holds all data that is serialized over the network through GameData packets.
-    /// </summary>
-    public class GameNet : IGameNet
+    internal partial class GameNet
     {
         public InnerLobbyBehaviour LobbyBehaviour { get; internal set; }
 

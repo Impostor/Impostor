@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using Impostor.Api.Events;
 
 namespace Impostor.Server.Events.Register
 {

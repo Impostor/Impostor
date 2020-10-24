@@ -8,6 +8,6 @@ namespace Impostor.Api.Net
         PreSpawn = 1,
         NotLimbo = 2,
         WaitingForHost = 4,
-        All = PreSpawn | NotLimbo | WaitingForHost
+        All = PreSpawn | NotLimbo | WaitingForHost,
     }
 }

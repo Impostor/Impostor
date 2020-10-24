@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Impostor.Api.Games;
-using Impostor.Api.Innersloth.Net;
-using Impostor.Api.Innersloth.Net.Objects;
+using Impostor.Api.Net.Inner;
+using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Api.Net
 {
@@ -25,16 +25,16 @@ namespace Impostor.Api.Net
         /// </summary>
         LimboStates Limbo { get; set; }
 
-        InnerPlayerControl Character { get; }
+        IInnerPlayerControl Character { get; }
 
         public bool IsHost { get; }
 
         /// <summary>
-        ///     Checks if the specified <see cref="InnerNetObject"/> is owned by <see cref="IClientPlayer"/>.
+        ///     Checks if the specified <see cref="IInnerNetObject"/> is owned by <see cref="IClientPlayer"/>.
         /// </summary>
-        /// <param name="netObject">The <see cref="InnerNetObject"/>.</param>
+        /// <param name="netObject">The <see cref="IInnerNetObject"/>.</param>
         /// <returns>Returns true if owned by <see cref="IClientPlayer"/>.</returns>
-        bool IsOwner(InnerNetObject netObject);
+        bool IsOwner(IInnerNetObject netObject);
 
         ValueTask KickAsync();
 
