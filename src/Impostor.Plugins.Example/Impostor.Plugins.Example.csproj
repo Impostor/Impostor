@@ -7,8 +7,4 @@
     <ItemGroup>
       <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj" />
     </ItemGroup>
-
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Copy SourceFiles="$(ProjectDir)$(OutDir)$(TargetFileName)" DestinationFolder="$(ProjectDir)..\Impostor.Server\bin\Debug\net5.0\plugins" />
-    </Target>
 </Project>
