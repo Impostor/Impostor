@@ -55,7 +55,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
                     if (!sender.Character.PlayerInfo.IsImpostor)
                     {
-                        // throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CloseDoorsOfType)} as crewmate.");
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CloseDoorsOfType)} as crewmate.");
                     }
 
                     var systemType = (SystemTypes)reader.ReadByte();
@@ -72,7 +72,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
                     if (!sender.Character.PlayerInfo.IsImpostor)
                     {
-                        // throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.RepairSystem)} as crewmate.");
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.RepairSystem)} as crewmate.");
                     }
 
                     var systemType = (SystemTypes)reader.ReadByte();

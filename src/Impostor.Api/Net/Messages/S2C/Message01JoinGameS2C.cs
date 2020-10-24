@@ -19,7 +19,7 @@ namespace Impostor.Api.Net.Messages.S2C
             writer.EndMessage();
         }
 
-        public static void SerializeError(IMessageWriter writer, bool clear, DisconnectReason reason, string message = null)
+        public static void SerializeError(IMessageWriter writer, bool clear, DisconnectReason reason, string? message = null)
         {
             if (clear)
             {
@@ -27,7 +27,7 @@ namespace Impostor.Api.Net.Messages.S2C
             }
 
             writer.StartMessage(MessageFlags.JoinGame);
-            writer.Write((int) reason);
+            writer.Write((int)reason);
 
             if (reason == DisconnectReason.Custom)
             {

@@ -244,8 +244,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
                     if (!sender.Character.PlayerInfo.IsImpostor)
                     {
-                        // TODO: Uncomment
-                        // throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.MurderPlayer)} as crewmate.");
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.MurderPlayer)} as crewmate.");
                     }
 
                     var player = reader.ReadNetObject<InnerPlayerControl>(_game);

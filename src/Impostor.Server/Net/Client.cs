@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Data;
@@ -65,7 +66,7 @@ namespace Impostor.Server.Net
                     var game = _gameManager.Find(gameCode);
                     if (game == null)
                     {
-                        await SendDisconnectReason(DisconnectReason.GameMissing);
+                        await DisconnectAsync(DisconnectReason.GameMissing);
                         return;
                     }
 
@@ -76,28 +77,28 @@ namespace Impostor.Server.Net
                         case GameJoinError.None:
                             break;
                         case GameJoinError.InvalidClient:
-                            await SendDisconnectReason(DisconnectReason.Custom, "Client is in an invalid state.");
+                            await DisconnectAsync(DisconnectReason.Custom, "Client is in an invalid state.");
                             break;
                         case GameJoinError.Banned:
-                            await SendDisconnectReason(DisconnectReason.Banned);
+                            await DisconnectAsync(DisconnectReason.Banned);
                             break;
                         case GameJoinError.GameFull:
-                            await SendDisconnectReason(DisconnectReason.GameFull);
+                            await DisconnectAsync(DisconnectReason.GameFull);
                             break;
                         case GameJoinError.InvalidLimbo:
-                            await SendDisconnectReason(DisconnectReason.Custom, "Invalid limbo state while joining.");
+                            await DisconnectAsync(DisconnectReason.Custom, "Invalid limbo state while joining.");
                             break;
                         case GameJoinError.GameStarted:
-                            await SendDisconnectReason(DisconnectReason.GameStarted);
+                            await DisconnectAsync(DisconnectReason.GameStarted);
                             break;
                         case GameJoinError.GameDestroyed:
-                            await SendDisconnectReason(DisconnectReason.Custom, DisconnectMessages.Destroyed);
+                            await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.Destroyed);
                             break;
                         case GameJoinError.Custom:
-                            await SendDisconnectReason(DisconnectReason.Custom, result.Message);
+                            await DisconnectAsync(DisconnectReason.Custom, result.Message);
                             break;
                         default:
-                            await SendDisconnectReason(DisconnectReason.Custom, "Unknown error.");
+                            await DisconnectAsync(DisconnectReason.Custom, "Unknown error.");
                             break;
                     }
 
@@ -149,24 +150,31 @@ namespace Impostor.Server.Net
                     var readerCopy = reader.Slice(reader.Position);
 
                     // TODO: Return value, either a bool (to cancel) or a writer (to cancel (null) or modify/overwrite).
-                    var verified = await Player.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
-                    if (verified)
+                    try
                     {
-                        // Broadcast packet to all other players.
-                        using (var writer = MessageWriter.Get(messageType))
+                        var verified = await Player.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
+                        if (verified)
                         {
-                            if (toPlayer)
+                            // Broadcast packet to all other players.
+                            using (var writer = MessageWriter.Get(messageType))
                             {
-                                var target = reader.ReadPackedInt32();
-                                reader.CopyTo(writer);
-                                await Player.Game.SendToAsync(writer, target);
-                            }
-                            else
-                            {
-                                reader.CopyTo(writer);
-                                await Player.Game.SendToAllExceptAsync(writer, Id);
+                                if (toPlayer)
+                                {
+                                    var target = reader.ReadPackedInt32();
+                                    reader.CopyTo(writer);
+                                    await Player.Game.SendToAsync(writer, target);
+                                }
+                                else
+                                {
+                                    reader.CopyTo(writer);
+                                    await Player.Game.SendToAllExceptAsync(writer, Id);
+                                }
                             }
                         }
+                    }
+                    catch (ImpostorCheatException e)
+                    {
+                        await DisconnectAsync(DisconnectReason.Hacking, e.Message);
                     }
 
                     break;
@@ -223,7 +231,7 @@ namespace Impostor.Server.Net
                 case MessageFlags.GetGameListV2:
                 {
                     Message16GetGameListC2S.Deserialize(reader, out var options);
-                    await OnRequestGameList(options);
+                    await OnRequestGameListAsync(options);
                     break;
                 }
 
@@ -302,7 +310,7 @@ namespace Impostor.Server.Net
         ///     All options given.
         ///     At this moment, the client can only specify the map, impostor count and chat language.
         /// </param>
-        private ValueTask OnRequestGameList(GameOptionsData options)
+        private ValueTask OnRequestGameListAsync(GameOptionsData options)
         {
             using var message = MessageWriter.Get(MessageType.Reliable);
 
@@ -317,16 +325,18 @@ namespace Impostor.Server.Net
             return Connection.SendAsync(message);
         }
 
-        private ValueTask SendDisconnectReason(DisconnectReason reason, string message = null)
+        private async ValueTask DisconnectAsync(DisconnectReason reason, string message = null)
         {
             if (Connection == null)
             {
-                return default;
+                return;
             }
 
             using var packet = MessageWriter.Get(MessageType.Reliable);
             Message01JoinGameS2C.SerializeError(packet, false, reason, message);
-            return Connection.SendAsync(packet);
+
+            await Connection.SendAsync(packet);
+            await Connection.DisconnectAsync(message);
         }
     }
 }

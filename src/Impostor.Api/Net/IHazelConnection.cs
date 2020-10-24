@@ -36,6 +36,6 @@ namespace Impostor.Api.Net
         /// </summary>
         /// <param name="reason">A reason.</param>
         /// <returns></returns>
-        ValueTask DisconnectAsync(string reason);
+        ValueTask DisconnectAsync(string? reason);
     }
 }
