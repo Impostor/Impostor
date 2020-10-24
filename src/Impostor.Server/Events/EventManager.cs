@@ -59,8 +59,6 @@ namespace Impostor.Server.Events
         public bool IsRegistered<TEvent>()
             where TEvent : IEvent
         {
-            using var scope = _serviceProvider.CreateScope();
-
             return GetHandlers<TEvent>(_serviceProvider).Any();
         }
 
@@ -68,23 +66,17 @@ namespace Impostor.Server.Events
         public async ValueTask CallAsync<T>(T @event)
             where T : IEvent
         {
-            var scope = _serviceProvider.CreateScope();
-
             try
             {
-                foreach (var (handler, eventListener) in GetHandlers<T>(scope.ServiceProvider)
+                foreach (var (handler, eventListener) in GetHandlers<T>(_serviceProvider)
                     .OrderByDescending(e => e.Listener.Priority))
                 {
-                    await eventListener.InvokeAsync(handler, @event, scope.ServiceProvider);
+                    await eventListener.InvokeAsync(handler, @event, _serviceProvider);
                 }
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Invocation of event {0} threw an exception.", @event.GetType().Name);
-            }
-            finally
-            {
-                scope.Dispose();
             }
         }
 
