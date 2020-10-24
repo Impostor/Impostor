@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events;
+using Impostor.Api.Events.Managers;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.State;
@@ -12,13 +14,15 @@ namespace Impostor.Server.Net.Inner.Objects
     internal partial class InnerMeetingHud : InnerNetObject
     {
         private readonly ILogger<InnerMeetingHud> _logger;
+        private readonly IEventManager _eventManager;
         private readonly Game _game;
         private readonly GameNet _gameNet;
         private PlayerVoteArea[] _playerStates;
 
-        public InnerMeetingHud(ILogger<InnerMeetingHud> logger, Game game)
+        public InnerMeetingHud(ILogger<InnerMeetingHud> logger, IEventManager eventManager, Game game)
         {
             _logger = logger;
+            _eventManager = eventManager;
             _game = game;
             _gameNet = game.GameNet;
             _playerStates = null;
@@ -40,13 +44,14 @@ namespace Impostor.Server.Net.Inner.Objects
                 .ToArray();
         }
 
-        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
-            IMessageReader reader)
+        public override async ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             switch (call)
             {
                 case RpcCalls.Close:
                 {
+                    Console.WriteLine("CLOSEEEE MEETING");
+
                     if (!sender.IsHost)
                     {
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.Close)} but was not a host");
@@ -75,6 +80,9 @@ namespace Impostor.Server.Net.Inner.Objects
                     var states = reader.ReadBytesAndSize();
                     var playerId = reader.ReadByte();
                     var tie = reader.ReadBoolean();
+
+                    await _eventManager.CallAsync(new MeetingEndedEvent(_game, this));
+
                     break;
                 }
 
@@ -108,8 +116,6 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
                 }
             }
-
-            return default;
         }
 
         public override bool Serialize(IMessageWriter writer, bool initialState)

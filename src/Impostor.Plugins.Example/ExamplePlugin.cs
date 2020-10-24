@@ -21,6 +21,7 @@ namespace Impostor.Plugins.Example
 
             eventManager.RegisterListener(new GameEventListener());
             eventManager.RegisterListener(new PlayerEventListener());
+            eventManager.RegisterListener(new MeetingEventListener());
         }
 
         public override ValueTask EnableAsync()

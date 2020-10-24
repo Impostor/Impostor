@@ -9,6 +9,7 @@
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <ApplicationIcon>icon.ico</ApplicationIcon>
         <CodeAnalysisRuleSet>ProjectRules.ruleset</CodeAnalysisRuleSet>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup>

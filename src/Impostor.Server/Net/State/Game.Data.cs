@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events;
 using Impostor.Api.Events.Net;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Messages;
@@ -101,6 +102,12 @@ namespace Impostor.Server.Net.State
 
                     await _eventManager.CallAsync(new PlayerSpawnedEvent(this, control));
 
+                    break;
+                }
+
+                case InnerMeetingHud meetingHud:
+                {
+                    await _eventManager.CallAsync(new MeetingStartedEvent(this, meetingHud));
                     break;
                 }
             }
