@@ -48,12 +48,12 @@ namespace Impostor.Api.Innersloth.Net.Objects
                 {
                     if (!sender.IsHost)
                     {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetTasks)} but was not a host.");
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetTasks)} but was not a host");
                     }
 
                     if (target != null)
                     {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetTasks)} to a specific player instead of broadcast.");
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetTasks)} to a specific player instead of broadcast");
                     }
 
                     var playerId = reader.ReadByte();
@@ -67,12 +67,12 @@ namespace Impostor.Api.Innersloth.Net.Objects
                 {
                     if (!sender.IsHost)
                     {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetTasks)} but was not a host.");
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetTasks)} but was not a host");
                     }
 
                     if (target != null)
                     {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetTasks)} to a specific player instead of broadcast.");
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetTasks)} to a specific player instead of broadcast");
                     }
 
                     while (reader.Position < reader.Length)
@@ -116,7 +116,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
         {
             if (!sender.IsHost)
             {
-                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerGameData)} as non-host.");
+                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerGameData)} as non-host");
             }
 
             if (initialState)

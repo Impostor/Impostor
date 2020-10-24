@@ -90,12 +90,12 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             {
                 if (!sender.IsOwner(this))
                 {
-                    throw new ImpostorCheatException($"Client attempted to send unowned {nameof(InnerCustomNetworkTransform)} data.");
+                    throw new ImpostorCheatException($"Client attempted to send unowned {nameof(InnerCustomNetworkTransform)} data");
                 }
 
                 if (target != null)
                 {
-                    throw new ImpostorCheatException($"Client attempted to send {nameof(InnerCustomNetworkTransform)} data to a specific player, must be broadcast.");
+                    throw new ImpostorCheatException($"Client attempted to send {nameof(InnerCustomNetworkTransform)} data to a specific player, must be broadcast");
                 }
 
                 if (!SidGreaterThan(sequenceId, _lastSequenceId))

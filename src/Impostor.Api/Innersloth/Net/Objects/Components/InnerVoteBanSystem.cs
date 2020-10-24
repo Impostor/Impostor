@@ -28,12 +28,12 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             var clientId = reader.ReadInt32();
             if (clientId != sender.Client.Id)
             {
-                throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.AddVote)} as other client.");
+                throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.AddVote)} as other client");
             }
 
             if (target != null)
             {
-                throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CastVote)} to wrong destinition, must be broadcast.");
+                throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CastVote)} to wrong destinition, must be broadcast");
             }
 
             var targetClientId = reader.ReadInt32();
@@ -50,7 +50,7 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
         {
             if (!sender.IsHost)
             {
-                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerShipStatus)} as non-host.");
+                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerShipStatus)} as non-host");
             }
 
             var votes = _votes;
