@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Events.Net;
 using Impostor.Api.Innersloth;
@@ -26,9 +27,12 @@ namespace Impostor.Server.Net.Inner.Objects
             _eventManager = eventManager;
             _game = game;
 
+            Physics = ActivatorUtilities.CreateInstance<InnerPlayerPhysics>(serviceProvider, this);
+            NetworkTransform = ActivatorUtilities.CreateInstance<InnerCustomNetworkTransform>(serviceProvider, this, _game);
+
             Components.Add(this);
-            Components.Add(ActivatorUtilities.CreateInstance<InnerPlayerPhysics>(serviceProvider));
-            Components.Add(ActivatorUtilities.CreateInstance<InnerCustomNetworkTransform>(serviceProvider));
+            Components.Add(Physics);
+            Components.Add(NetworkTransform);
 
             PlayerId = byte.MaxValue;
         }
@@ -36,6 +40,10 @@ namespace Impostor.Server.Net.Inner.Objects
         public bool IsNew { get; private set; }
 
         public byte PlayerId { get; private set; }
+
+        public InnerPlayerPhysics Physics { get; }
+
+        public InnerCustomNetworkTransform NetworkTransform { get; }
 
         public InnerPlayerInfo PlayerInfo { get; internal set; }
 
@@ -103,8 +111,15 @@ namespace Impostor.Server.Net.Inner.Objects
                     {
                         var playerId = reader.ReadByte();
                         var player = _game.GameNet.GameData.GetPlayerById(playerId);
+                        if (player != null)
+                        {
+                            player.IsImpostor = true;
+                        }
+                    }
 
-                        player.IsImpostor = true;
+                    if (_game.GameState == GameStates.Starting)
+                    {
+                        await _game.StartedAsync();
                     }
 
                     break;

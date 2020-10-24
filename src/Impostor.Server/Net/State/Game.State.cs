@@ -40,7 +40,7 @@ namespace Impostor.Server.Net.State
 
             _logger.LogInformation("{0} - Player {1} ({2}) has left.", Code, player.Client.Name, playerId);
 
-            if (GameState == GameStates.Started)
+            if (GameState == GameStates.Starting || GameState == GameStates.Started)
             {
                 if (player.Character?.PlayerInfo != null)
                 {

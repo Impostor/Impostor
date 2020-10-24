@@ -8,13 +8,38 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnGameCreated(GameCreatedEvent e)
         {
-            Console.WriteLine("Game was created.");
+            Console.WriteLine("Game > created");
+        }
+
+        [EventListener]
+        public void OnGameStarting(GameStartingEvent e)
+        {
+            Console.WriteLine("Game > starting");
+        }
+
+        [EventListener]
+        public void OnGameStarted(GameStartedEvent e)
+        {
+            Console.WriteLine("Game > started");
+
+            foreach (var player in e.Game.Players)
+            {
+                var info = player.Character.PlayerInfo;
+
+                Console.WriteLine($"- {info.PlayerName} {info.IsImpostor}");
+            }
+        }
+
+        [EventListener]
+        public void OnGameEnded(GameEndedEvent e)
+        {
+            Console.WriteLine("Game > ended");
         }
 
         [EventListener]
         public void OnGameDestroyed(GameDestroyedEvent e)
         {
-            Console.WriteLine("Game was destroyed.");
+            Console.WriteLine("Game > destroyed");
         }
 
         [EventListener]

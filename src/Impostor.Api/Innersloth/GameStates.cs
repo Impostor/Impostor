@@ -3,8 +3,9 @@
     public enum GameStates : byte
     {
         NotStarted = 0,
-        Started = 1,
-        Ended = 2,
-        Destroyed = 3
+        Starting = 1,
+        Started = 2,
+        Ended = 3,
+        Destroyed = 4,
     }
 }

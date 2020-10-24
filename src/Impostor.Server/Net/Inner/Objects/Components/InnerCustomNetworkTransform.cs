@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
@@ -15,14 +16,18 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private static readonly FloatRange YRange = new FloatRange(-40f, 40f);
 
         private readonly ILogger<InnerCustomNetworkTransform> _logger;
+        private readonly InnerPlayerControl _playerControl;
+        private readonly Game _game;
 
         private ushort _lastSequenceId;
         private Vector2 _targetSyncPosition;
         private Vector2 _targetSyncVelocity;
 
-        public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger)
+        public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game)
         {
             _logger = logger;
+            _playerControl = playerControl;
+            _game = game;
         }
 
         private static bool SidGreaterThan(ushort newSid, ushort prevSid)
@@ -48,18 +53,31 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             return new Vector2(XRange.Lerp(v1), YRange.Lerp(v2));
         }
 
-        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             if (call == RpcCalls.SnapTo)
             {
+                if (!sender.IsOwner(this))
+                {
+                    throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SnapTo)} to an unowned {nameof(InnerPlayerControl)}");
+                }
+
+                if (target != null)
+                {
+                    throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SnapTo)} to a specific player instead of broadcast");
+                }
+
+                if (!sender.Character.PlayerInfo.IsImpostor)
+                {
+                    throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SnapTo)} as crewmate");
+                }
+
                 SnapTo(ReadVector2(reader), reader.ReadUInt16());
             }
             else
             {
                 _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerCustomNetworkTransform), call);
             }
-
-            return default;
         }
 
         public override bool Serialize(IMessageWriter writer, bool initialState)

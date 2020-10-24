@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
@@ -89,6 +90,18 @@ namespace Impostor.Server.Net.State
         public IClientPlayer GetClientPlayer(int clientId)
         {
             return _players.TryGetValue(clientId, out var clientPlayer) ? clientPlayer : null;
+        }
+
+        internal ValueTask StartedAsync()
+        {
+            if (GameState == GameStates.Starting)
+            {
+                GameState = GameStates.Started;
+
+                return _eventManager.CallAsync(new GameStartedEvent(this));
+            }
+
+            return default;
         }
 
         public ValueTask EndAsync()

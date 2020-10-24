@@ -4,6 +4,9 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
+using Impostor.Hazel;
+using Impostor.Hazel.Udp;
+using Impostor.Server.Net.Inner;
 
 namespace Impostor.Server.Net.State
 {
@@ -33,6 +36,37 @@ namespace Impostor.Server.Net.State
             {
                 await player.Client.Connection.SendAsync(writer);
             }
+        }
+
+        internal IMessageWriter StartRpc(uint targetNetId, RpcCalls callId, int targetClientId = -1, MessageType type = MessageType.Reliable)
+        {
+            var writer = MessageWriter.Get(type);
+
+            if (targetClientId < 0)
+            {
+                writer.StartMessage(MessageFlags.GameData);
+                writer.Write(Code);
+            }
+            else
+            {
+                writer.StartMessage(MessageFlags.GameDataTo);
+                writer.Write(Code);
+                writer.WritePacked(targetClientId);
+            }
+
+            writer.StartMessage(GameDataTag.RpcFlag);
+            writer.WritePacked(targetNetId);
+            writer.Write((byte) callId);
+
+            return writer;
+        }
+
+        internal ValueTask FinishRpcAsync(IMessageWriter writer)
+        {
+            writer.EndMessage();
+            writer.EndMessage();
+
+            return SendToAllAsync(writer);
         }
 
         private void WriteRemovePlayerMessage(IMessageWriter message, bool clear, int playerId, DisconnectReason reason)

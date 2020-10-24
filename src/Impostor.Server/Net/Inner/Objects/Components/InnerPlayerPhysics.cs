@@ -11,10 +11,12 @@ namespace Impostor.Server.Net.Inner.Objects.Components
     internal class InnerPlayerPhysics : InnerNetObject
     {
         private readonly ILogger<InnerPlayerPhysics> _logger;
+        private readonly InnerPlayerControl _playerControl;
 
-        public InnerPlayerPhysics(ILogger<InnerPlayerPhysics> logger)
+        public InnerPlayerPhysics(ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl)
         {
             _logger = logger;
+            _playerControl = playerControl;
         }
 
         public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)

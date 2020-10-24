@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Net;
 
@@ -19,9 +20,12 @@ namespace Impostor.Plugins.Example.Handlers
         }
 
         [EventListener]
-        public void OnPlayerChat(PlayerChatEvent e)
+        public async ValueTask OnPlayerChat(PlayerChatEvent e)
         {
             Console.WriteLine(e.PlayerControl.PlayerInfo.PlayerName + " said " + e.Message);
+
+            await e.PlayerControl.SetNameAsync(e.Message);
+            await e.PlayerControl.SendChatAsync(e.Message);
         }
     }
 }
