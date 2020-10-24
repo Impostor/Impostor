@@ -12,6 +12,7 @@ namespace Impostor.Server.Recorder
         private readonly PacketRecorder _recorder;
         private bool _isFirst;
         private bool _createdGame;
+        private bool _recordAfter;
 
         public ClientRecorder(ILogger<Client> logger, ClientManager clientManager, GameManager gameManager, string name, HazelConnection connection, PacketRecorder recorder)
             : base(logger, clientManager, gameManager, name, connection)
@@ -19,6 +20,7 @@ namespace Impostor.Server.Recorder
             _recorder = recorder;
             _isFirst = true;
             _createdGame = false;
+            _recordAfter = true;
         }
 
         public override async ValueTask HandleMessageAsync(IMessageReader reader, MessageType messageType)
@@ -36,6 +38,12 @@ namespace Impostor.Server.Recorder
             // Check if we were in-game before handling the message.
             var inGame = Player?.Game != null;
 
+            if (!_recordAfter)
+            {
+                // Trigger message event.
+                await _recorder.WriteMessageAsync(this, messageCopy, messageType);
+            }
+
             // Handle the message.
             await base.HandleMessageAsync(reader, messageType);
 
@@ -48,15 +56,20 @@ namespace Impostor.Server.Recorder
             {
                 _createdGame = false;
 
-                // We created a game and are now in-game, stored that event.
+                // We created a game and are now in-game, store that event.
                 if (!inGame && Player?.Game != null)
                 {
                     await _recorder.WriteGameCreatedAsync(this, Player.Game.Code);
                 }
+
+                _recordAfter = false;
             }
 
-            // Trigger message event.
-            await _recorder.WriteMessageAsync(this, messageCopy, messageType);
+            if (_recordAfter)
+            {
+                // Trigger message event.
+                await _recorder.WriteMessageAsync(this, messageCopy, messageType);
+            }
         }
 
         public override async ValueTask HandleDisconnectAsync(string reason)
