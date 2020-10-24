@@ -10,9 +10,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Impostor.Tools.Proxy", "Impostor.Tools.Proxy\Impostor.Tools.Proxy.csproj", "{D16B8DE9-8EE2-4F6A-9352-305D5AB0233D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Impostor.Server", "Impostor.Server\Impostor.Server.csproj", "{1B0390AF-A4F3-4FE4-B093-708B0135C0B3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{70F97BB7-12A1-4C7A-B2A5-B962D14B813E} = {70F97BB7-12A1-4C7A-B2A5-B962D14B813E}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Impostor.Api", "Impostor.Api\Impostor.Api.csproj", "{E096A7D7-D693-4A13-A526-38CC574D84F8}"
 EndProject
@@ -89,6 +86,7 @@ Global
 		{7C3EB599-2292-4532-B280-D5BED1094DD4}.Release|x86.ActiveCfg = Release|Any CPU
 		{7C3EB599-2292-4532-B280-D5BED1094DD4}.Release|x86.Build.0 = Release|Any CPU
 		{804CF172-0C87-4423-9688-BD97D549891E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{804CF172-0C87-4423-9688-BD97D549891E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{804CF172-0C87-4423-9688-BD97D549891E}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{804CF172-0C87-4423-9688-BD97D549891E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{804CF172-0C87-4423-9688-BD97D549891E}.Release|x86.ActiveCfg = Release|Any CPU
