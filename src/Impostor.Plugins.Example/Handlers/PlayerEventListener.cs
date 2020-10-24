@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Impostor.Api.Events;
 using Impostor.Api.Events.Net;
 
