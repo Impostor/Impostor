@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
-using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;

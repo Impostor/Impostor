@@ -3,14 +3,12 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
-using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
 using Impostor.Server.Config;
-using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 

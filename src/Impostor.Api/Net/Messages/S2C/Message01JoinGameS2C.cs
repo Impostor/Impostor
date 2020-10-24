@@ -1,5 +1,5 @@
 ﻿using System;
-using Impostor.Api.Innersloth.Data;
+using Impostor.Api.Innersloth;
 
 namespace Impostor.Api.Net.Messages.S2C
 {

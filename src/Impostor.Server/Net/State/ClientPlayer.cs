@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Impostor.Api.Innersloth.Net;
-using Impostor.Api.Innersloth.Net.Objects;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Inner;
+using Impostor.Server.Net.Inner.Objects;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.State
@@ -48,7 +48,7 @@ namespace Impostor.Server.Net.State
         }
 
         /// <inheritdoc />
-        public bool IsOwner(InnerNetObject netObject)
+        public bool IsOwner(IInnerNetObject netObject)
         {
             return Client.Id == netObject.OwnerId;
         }

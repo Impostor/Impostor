@@ -1,6 +1,5 @@
 ﻿using System;
 using Impostor.Api.Net;
-using Impostor.Server.Net.Hazel;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Impostor.Server.Net.Factories

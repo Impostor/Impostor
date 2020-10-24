@@ -1,4 +1,4 @@
-﻿using Impostor.Api.Innersloth.Net.Objects.Systems;
+﻿using Impostor.Api.Innersloth;
 
 namespace Impostor.Api
 {

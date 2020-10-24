@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Innersloth
