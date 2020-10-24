@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events.Net;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Innersloth.Net;
 using Impostor.Api.Innersloth.Net.Objects;
@@ -48,7 +49,7 @@ namespace Impostor.Server.Net.State
         private int _gamedataInitialized;
         private bool _gamedataFakeReceived;
 
-        private void OnSpawn(InnerNetObject netObj)
+        private async ValueTask OnSpawnAsync(InnerNetObject netObj)
         {
             switch (netObj)
             {
@@ -98,12 +99,14 @@ namespace Impostor.Server.Net.State
                         control.PlayerInfo!.Controller = control;
                     }
 
+                    await _eventManager.CallAsync(new PlayerSpawnedEvent(this, control));
+
                     break;
                 }
             }
         }
 
-        private void OnDestroy(InnerNetObject netObj)
+        private async ValueTask OnDestroyAsync(InnerNetObject netObj)
         {
             switch (netObj)
             {
@@ -138,6 +141,8 @@ namespace Impostor.Server.Net.State
                     {
                         player.Character = null;
                     }
+
+                    await _eventManager.CallAsync(new PlayerDestroyedEvent(this, control));
 
                     break;
                 }
@@ -304,7 +309,7 @@ namespace Impostor.Server.Net.State
                                     obj.Deserialize(sender, target, readerSub, true);
                                 }
 
-                                OnSpawn(obj);
+                                await OnSpawnAsync(obj);
                             }
 
                             continue;
@@ -331,7 +336,7 @@ namespace Impostor.Server.Net.State
                             }
 
                             RemoveNetObject(obj);
-                            OnDestroy(obj);
+                            await OnDestroyAsync(obj);
                             _logger.LogDebug("Destroyed InnerNetObject {0} ({1}), OwnerId {2}", obj.GetType().Name, netId, obj.OwnerId);
                         }
                         else
