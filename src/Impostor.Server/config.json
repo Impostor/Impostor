@@ -9,4 +9,8 @@
     "GameRecorderEnabled": false,
     "GameRecorderPath": ""
   }
+  //,"PluginLoader": {
+  //  "Paths": [ "a", "a" ],
+  //  "LibraryPaths": [ "", "" ]
+  //}
 }
