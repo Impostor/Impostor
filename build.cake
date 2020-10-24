@@ -18,7 +18,14 @@ if (buildBranch != "master") {
 // UTILS
 //////////////////////////////////////////////////////////////////////
 
-public void ImpostorPublish(string name, string project, string runtime) {
+// Remove unnecessary files for packaging.
+private void ImpostorClean(string directory) {
+    foreach (var file in System.IO.Directory.GetFiles(directory, "*.pdb", SearchOption.AllDirectories)) {
+        DeleteFile(file);
+    }
+}
+
+private void ImpostorPublish(string name, string project, string runtime) {
     var projBuildDir = buildDir.Combine(name + "_" + runtime);
     var projBuildZip = buildDir.CombineWithFilePath(name + "_" + buildVersion + "_" + runtime + ".zip");
 
@@ -33,10 +40,12 @@ public void ImpostorPublish(string name, string project, string runtime) {
         OutputDirectory = projBuildDir
     });
 
+    ImpostorClean(projBuildDir);
+
     Zip(projBuildDir, projBuildZip);
 }
 
-public void ImpostorPublishNF(string name, string project) {
+private void ImpostorPublishNF(string name, string project) {
     var runtime = "win-x64";
     var projBuildDir = buildDir.Combine(name + "_" + runtime);
     var projBuildZip = buildDir.CombineWithFilePath(name + "_" + buildVersion + "_" + runtime + ".zip");
@@ -47,6 +56,8 @@ public void ImpostorPublishNF(string name, string project) {
         Framework = "net472",
         OutputDirectory = projBuildDir
     });
+
+    ImpostorClean(projBuildDir);
 
     Zip(projBuildDir, projBuildZip);
 }
