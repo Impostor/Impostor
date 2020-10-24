@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-
 using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
 using Impostor.Server.Events.Register;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
