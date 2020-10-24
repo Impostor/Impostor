@@ -6,10 +6,6 @@
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <DebugType>none</DebugType>
-    </PropertyGroup>
-
     <ItemGroup>
         <ProjectReference Include="..\Impostor.Patcher.Shared\Impostor.Patcher.Shared.csproj" />
     </ItemGroup>

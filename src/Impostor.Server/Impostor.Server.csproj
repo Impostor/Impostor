@@ -8,7 +8,6 @@
         <TrimMode>Link</TrimMode>
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <ApplicationIcon>icon.ico</ApplicationIcon>
-        <DebugType Condition=" '$(Configuration)' == 'Release' ">None</DebugType>
         <CodeAnalysisRuleSet>ProjectRules.ruleset</CodeAnalysisRuleSet>
     </PropertyGroup>
 
