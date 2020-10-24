@@ -22,7 +22,7 @@ namespace Impostor.Server.Plugins
             var pluginPaths = new List<string>(config.Paths);
             var libraryPaths = new List<string>(config.LibraryPaths);
 
-            var rootFolder = Assembly.GetEntryAssembly()?.Location;
+            var rootFolder = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
             if (rootFolder != null)
             {
                 pluginPaths.Add(Path.Combine(rootFolder, "plugins"));
