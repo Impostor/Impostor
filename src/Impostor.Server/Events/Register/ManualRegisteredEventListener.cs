@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using Impostor.Api.Events;
 
 namespace Impostor.Server.Events.Register
