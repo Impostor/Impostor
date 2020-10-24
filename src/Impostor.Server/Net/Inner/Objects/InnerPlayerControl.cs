@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
-    internal class InnerPlayerControl : InnerNetObject, IInnerPlayerControl
+    internal partial class InnerPlayerControl : InnerNetObject
     {
         private readonly ILogger<InnerPlayerControl> _logger;
         private readonly IEventManager _eventManager;
@@ -37,10 +37,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public byte PlayerId { get; private set; }
 
-        public InnerGameData.PlayerInfo PlayerInfo { get; internal set; }
+        public InnerPlayerInfo PlayerInfo { get; internal set; }
 
-        public override async ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
-            IMessageReader reader)
+        public override async ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             switch (call)
             {

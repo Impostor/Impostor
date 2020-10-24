@@ -2,5 +2,6 @@
 {
     public interface IInnerPlayerControl
     {
+        IInnerPlayerInfo PlayerInfo { get; }
     }
 }

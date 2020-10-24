@@ -17,13 +17,13 @@ namespace Impostor.Server.Net.Inner.Objects
     {
         private readonly ILogger<InnerGameData> _logger;
         private readonly Game _game;
-        private readonly ConcurrentDictionary<byte, PlayerInfo> _allPlayers;
+        private readonly ConcurrentDictionary<byte, InnerPlayerInfo> _allPlayers;
 
         public InnerGameData(ILogger<InnerGameData> logger, Game game, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _game = game;
-            _allPlayers = new ConcurrentDictionary<byte, PlayerInfo>();
+            _allPlayers = new ConcurrentDictionary<byte, InnerPlayerInfo>();
 
             Components.Add(this);
             Components.Add(ActivatorUtilities.CreateInstance<InnerVoteBanSystem>(serviceProvider));
@@ -31,9 +31,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public int PlayerCount => _allPlayers.Count;
 
-        public IReadOnlyDictionary<byte, PlayerInfo> Players => _allPlayers;
+        public IReadOnlyDictionary<byte, InnerPlayerInfo> Players => _allPlayers;
 
-        public PlayerInfo? GetPlayerById(byte id)
+        public InnerPlayerInfo? GetPlayerById(byte id)
         {
             if (id == byte.MaxValue)
             {
@@ -89,7 +89,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         }
                         else
                         {
-                            var playerInfo = new PlayerInfo(message.Tag);
+                            var playerInfo = new InnerPlayerInfo(message.Tag);
 
                             playerInfo.Deserialize(reader);
 
@@ -132,7 +132,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 for (var i = 0; i < num; i++)
                 {
                     var playerId = reader.ReadByte();
-                    var playerInfo = new PlayerInfo(playerId);
+                    var playerInfo = new InnerPlayerInfo(playerId);
 
                     playerInfo.Deserialize(reader);
 
@@ -151,7 +151,7 @@ namespace Impostor.Server.Net.Inner.Objects
         internal void AddPlayer(InnerPlayerControl control)
         {
             var playerId = control.PlayerId;
-            var playerInfo = new PlayerInfo(control.PlayerId);
+            var playerInfo = new InnerPlayerInfo(control.PlayerId);
 
             if (_allPlayers.TryAdd(playerId, playerInfo))
             {
