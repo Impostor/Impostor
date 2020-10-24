@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
@@ -87,6 +88,7 @@ namespace Impostor.Tests.Events
         private static IEventManager CreatEventManager(TestMode mode, params IEventListener[] listeners)
         {
             var services = new ServiceCollection();
+            services.AddLogging();
             services.AddSingleton<IEventManager, EventManager>();
 
             if (mode == TestMode.Service)
