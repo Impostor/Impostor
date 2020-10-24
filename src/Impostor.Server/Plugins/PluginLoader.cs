@@ -21,7 +21,7 @@ namespace Impostor.Server.Plugins
             // Add the plugins and libraries.
             var pluginPaths = new List<string>(config.Paths);
             var libraryPaths = new List<string>(config.LibraryPaths);
-            
+
             var rootFolder = AppContext.BaseDirectory;
 
             pluginPaths.Add(Path.Combine(rootFolder, "plugins"));
