@@ -6,6 +6,10 @@ insert_final_newline=false
 indent_style=space
 indent_size=4
 
+# Proper using format
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
 # Microsoft .NET properties
 csharp_indent_braces=false
 csharp_indent_switch_labels=true
