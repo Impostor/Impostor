@@ -334,7 +334,7 @@ namespace Impostor.Server.Net
             Message01JoinGameS2C.SerializeError(packet, false, reason, message);
 
             await Connection.SendAsync(packet);
-            await Connection.DisconnectAsync(message);
+            await Connection.DisconnectAsync(message ?? reason.ToString());
         }
     }
 }
