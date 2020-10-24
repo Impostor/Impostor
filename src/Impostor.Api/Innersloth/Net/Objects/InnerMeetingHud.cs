@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
@@ -38,7 +39,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
                 .ToArray();
         }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override ValueTask HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             switch (call)
             {
@@ -105,6 +106,8 @@ namespace Impostor.Api.Innersloth.Net.Objects
                     break;
                 }
             }
+
+            return default;
         }
 
         public override bool Serialize(IMessageWriter writer, bool initialState)

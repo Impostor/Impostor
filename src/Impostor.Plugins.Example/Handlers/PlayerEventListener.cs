@@ -17,5 +17,11 @@ namespace Impostor.Plugins.Example.Handlers
         {
             Console.WriteLine(e.PlayerControl.PlayerInfo.PlayerName + " destroyed");
         }
+
+        [EventListener]
+        public void OnPlayerChat(PlayerChatEvent e)
+        {
+            Console.WriteLine(e.PlayerControl.PlayerInfo.PlayerName + " said " + e.Message);
+        }
     }
 }

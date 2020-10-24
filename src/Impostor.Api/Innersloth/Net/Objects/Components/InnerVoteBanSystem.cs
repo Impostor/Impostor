@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Microsoft.Extensions.Logging;
@@ -17,12 +18,12 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             _votes = new Dictionary<int, int[]>();
         }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override ValueTask HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             if (call != RpcCalls.AddVote)
             {
                 _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerVoteBanSystem), call);
-                return;
+                return default;
             }
 
             var clientId = reader.ReadInt32();
@@ -39,6 +40,8 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             var targetClientId = reader.ReadInt32();
 
             // TODO: Use.
+
+            return default;
         }
 
         public override bool Serialize(IMessageWriter writer, bool initialState)

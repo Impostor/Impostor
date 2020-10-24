@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Microsoft.Extensions.Logging;
@@ -45,7 +46,7 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             return new Vector2(XRange.Lerp(v1), YRange.Lerp(v2));
         }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override ValueTask HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             if (call == RpcCalls.SnapTo)
             {
@@ -55,6 +56,8 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             {
                 _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerCustomNetworkTransform), call);
             }
+
+            return default;
         }
 
         public override bool Serialize(IMessageWriter writer, bool initialState)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth.Net.Objects.Components;
 using Impostor.Api.Net;
@@ -40,7 +41,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
             return _allPlayers.TryGetValue(id, out var player) ? player : null;
         }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override ValueTask HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             switch (call)
             {
@@ -105,6 +106,8 @@ namespace Impostor.Api.Innersloth.Net.Objects
                     break;
                 }
             }
+
+            return default;
         }
 
         public override bool Serialize(IMessageWriter writer, bool initialState)

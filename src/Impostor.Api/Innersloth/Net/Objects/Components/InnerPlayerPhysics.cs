@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Microsoft.Extensions.Logging;
@@ -14,12 +15,12 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             _logger = logger;
         }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override ValueTask HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             if (call != RpcCalls.EnterVent && call != RpcCalls.ExitVent)
             {
                 _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerPlayerPhysics), call);
-                return;
+                return default;
             }
 
             if (!sender.IsOwner(this))
@@ -41,6 +42,8 @@ namespace Impostor.Api.Innersloth.Net.Objects.Components
             var ventEnter = call == RpcCalls.EnterVent;
 
             // TODO: Do stuff.
+
+            return default;
         }
 
         public override bool Serialize(IMessageWriter writer, bool initialState)

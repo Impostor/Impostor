@@ -77,6 +77,7 @@ namespace Impostor.Server.Events.Register
             }
 
             var returnTarget = Expression.Label(typeof(ValueTask));
+
             Expression invoke = Expression.Call(Expression.Convert(instance, _eventListenerType), method, arguments);
 
             if (method.ReturnType == typeof(void))

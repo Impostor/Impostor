@@ -8,16 +8,19 @@ using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
 using Impostor.Server.Events.Register;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Events
 {
     internal class EventManager : IEventManager
     {
         private readonly ConcurrentDictionary<Type, TemporaryEventRegister> _temporaryEventListeners;
+        private readonly ILogger<EventManager> _logger;
         private readonly IServiceProvider _serviceProvider;
 
-        public EventManager(IServiceProvider serviceProvider)
+        public EventManager(ILogger<EventManager> logger, IServiceProvider serviceProvider)
         {
+            _logger = logger;
             _serviceProvider = serviceProvider;
             _temporaryEventListeners = new ConcurrentDictionary<Type, TemporaryEventRegister>();
         }
@@ -75,6 +78,10 @@ namespace Impostor.Server.Events
                 {
                     await eventListener.InvokeAsync(handler, @event, scope.ServiceProvider);
                 }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Invocation of event {0} threw an exception.", @event.GetType().Name);
             }
             finally
             {

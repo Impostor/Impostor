@@ -1,4 +1,5 @@
-﻿using Impostor.Api.Games;
+﻿using System.Threading.Tasks;
+using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 
@@ -15,7 +16,8 @@ namespace Impostor.Api.Innersloth.Net.Objects
             Components.Add(this);
         }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override ValueTask HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call,
+            IMessageReader reader)
         {
             throw new System.NotImplementedException();
         }

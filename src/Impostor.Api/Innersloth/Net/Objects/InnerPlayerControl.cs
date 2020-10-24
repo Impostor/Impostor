@@ -1,4 +1,7 @@
 using System;
+using System.Threading.Tasks;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Events.Net;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth.Data;
 using Impostor.Api.Innersloth.Net.Objects.Components;
@@ -12,11 +15,13 @@ namespace Impostor.Api.Innersloth.Net.Objects
     public class InnerPlayerControl : InnerNetObject
     {
         private readonly ILogger<InnerPlayerControl> _logger;
+        private readonly IEventManager _eventManager;
         private readonly IGame _game;
 
-        public InnerPlayerControl(ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IGame game)
+        public InnerPlayerControl(ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager, IGame game)
         {
             _logger = logger;
+            _eventManager = eventManager;
             _game = game;
 
             Components.Add(this);
@@ -32,7 +37,7 @@ namespace Impostor.Api.Innersloth.Net.Objects
 
         public InnerGameData.PlayerInfo PlayerInfo { get; internal set; }
 
-        public override void HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask HandleRpc(IClientPlayer sender, IClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             switch (call)
             {
@@ -269,6 +274,8 @@ namespace Impostor.Api.Innersloth.Net.Objects
                     }
 
                     var chat = reader.ReadString();
+
+                    await _eventManager.CallAsync(new PlayerChatEvent(_game, this, chat));
                     break;
                 }
 
