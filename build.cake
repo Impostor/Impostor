@@ -21,7 +21,7 @@ if (buildBranch != "master") {
 // Remove unnecessary files for packaging.
 private void ImpostorClean(string directory) {
     foreach (var file in System.IO.Directory.GetFiles(directory, "*.pdb", SearchOption.AllDirectories)) {
-        DeleteFile(file);
+        System.IO.File.Delete(file);
     }
 }
 
@@ -40,7 +40,7 @@ private void ImpostorPublish(string name, string project, string runtime) {
         OutputDirectory = projBuildDir
     });
 
-    ImpostorClean(projBuildDir);
+    ImpostorClean(projBuildDir.ToString());
 
     Zip(projBuildDir, projBuildZip);
 }
@@ -57,7 +57,7 @@ private void ImpostorPublishNF(string name, string project) {
         OutputDirectory = projBuildDir
     });
 
-    ImpostorClean(projBuildDir);
+    ImpostorClean(projBuildDir.ToString());
 
     Zip(projBuildDir, projBuildZip);
 }
