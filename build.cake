@@ -78,7 +78,6 @@ Task("Clean")
 Task("Restore")
     .Does(() => {
         DotNetCoreRestore("./src/Impostor.sln");
-        DotNetCoreRestore("./src/Impostor.Patcher/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj");
     });
 
 Task("Patch")
@@ -104,6 +103,11 @@ Task("Build")
         if ((buildBranch == "master" || buildBranch == "dev") && string.IsNullOrEmpty(prNumber)) {
             // Client.
             ImpostorPublishNF("Impostor-Patcher", "./src/Impostor.Patcher/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj");
+
+            // Excluding these because currently it results in a ~17MB package for each.
+            // ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "win-x64");
+            // ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "osx-x64");
+            // ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "linux-x64");
             
             // Server.
             ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64");
