@@ -25,7 +25,7 @@ private void ImpostorClean(string directory) {
     }
 }
 
-private void ImpostorPublish(string name, string project, string runtime) {
+private void ImpostorPublish(string name, string project, string runtime, bool selfContained = true) {
     var projBuildDir = buildDir.Combine(name + "_" + runtime);
     var projBuildZip = buildDir.CombineWithFilePath(name + "_" + buildVersion + "_" + runtime + ".zip");
 
@@ -34,9 +34,9 @@ private void ImpostorPublish(string name, string project, string runtime) {
         NoRestore = true,
         Framework = "net5.0",
         Runtime = runtime,
-        SelfContained = true,
+        SelfContained = selfContained,
         PublishSingleFile = true,
-        PublishTrimmed = true,
+        PublishTrimmed = selfContained,
         OutputDirectory = projBuildDir
     });
 
@@ -104,10 +104,9 @@ Task("Build")
             // Client.
             ImpostorPublishNF("Impostor-Patcher", "./src/Impostor.Patcher/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj");
 
-            // Excluding these because currently it results in a ~17MB package for each.
-            // ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "win-x64");
-            // ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "osx-x64");
-            // ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "linux-x64");
+            ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "win-x64", false);
+            ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "osx-x64", false);
+            ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "linux-x64", false);
             
             // Server.
             ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64");
@@ -115,6 +114,14 @@ Task("Build")
             ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-x64");
             ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm");
             ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm64");
+
+            // API.
+            DotNetCorePack("./src/Impostor.Api/Impostor.Api.csproj", new DotNetCorePackSettings {
+                Configuration = configuration,
+                OutputDirectory = buildDir,
+                IncludeSource = true,
+                IncludeSymbols = true
+            });
         } else {
             DotNetCoreBuild("./src/Impostor.Patcher/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj", new DotNetCoreBuildSettings {
                 Configuration = configuration,
