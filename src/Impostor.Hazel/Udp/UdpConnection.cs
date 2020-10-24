@@ -40,7 +40,7 @@ namespace Impostor.Hazel.Udp
         public Task StartAsync()
         {
             // Store the task we're executing
-            _executingTask = ReadAsync();
+            _executingTask = Task.Factory.StartNew(ReadAsync, TaskCreationOptions.LongRunning);
 
             // If the task is completed then return it, this will bubble cancellation and failure to the caller
             if (_executingTask.IsCompleted)

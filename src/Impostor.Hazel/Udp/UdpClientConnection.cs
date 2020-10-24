@@ -114,7 +114,7 @@ namespace Impostor.Hazel.Udp
 
             try
             {
-                _listenTask = ListenAsync();
+                _listenTask = Task.Factory.StartNew(ListenAsync, TaskCreationOptions.LongRunning);
             }
             catch (ObjectDisposedException)
             {

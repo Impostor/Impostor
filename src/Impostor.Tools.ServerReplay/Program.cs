@@ -125,7 +125,7 @@ namespace Impostor.Tools.ServerReplay
                     var addressLength = reader.ReadByte();
                     var addressBytes = reader.ReadBytes(addressLength);
                     var addressPort = reader.ReadUInt16();
-                    var address = new IPEndPoint(new IPAddress(addressBytes), clientId);
+                    var address = new IPEndPoint(new IPAddress(addressBytes), addressPort);
                     var name = reader.ReadString();
 
                     // Create and register connection.
