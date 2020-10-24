@@ -336,7 +336,7 @@ namespace Impostor.Server.Net.State
                         }
                         else
                         {
-                            _logger.LogWarning(
+                            _logger.LogDebug(
                                 "Player {0} ({1}) sent DespawnFlag for unregistered NetId {2}.",
                                 sender.Client.Name,
                                 sender.Client.Id,
