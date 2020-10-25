@@ -43,7 +43,8 @@ See the [docs](docs/Running-the-server.md) for instructions on how to set it up.
 
 ## Contributing
 
-If you want to contribute to Impostor, make sure you work on and target the `dev` branch. That is where the latest changes will be. 
+See [CONTRIBUTING](CONTRIBUTING.md).
+
 
 ## License
 
