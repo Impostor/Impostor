@@ -13,5 +13,7 @@
                                              "running in server redirection mode.";
 
         public const string UsernameLength = "Your username is too long, please make it shorter.";
+
+        public const string UsernameIllegalCharacters = "Your username contains illegal characters, please remove them.";
     }
 }
