@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,11 +8,14 @@ using Impostor.Api.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace Impostor.Server.Plugins
 {
     public static class PluginLoader
     {
+        private static readonly ILogger Logger = Log.ForContext(typeof(PluginLoader));
+
         public static IHostBuilder UsePluginLoader(this IHostBuilder builder, PluginConfig config)
         {
             var assemblyInfos = new List<IAssemblyInformation>();
@@ -38,6 +41,15 @@ namespace Impostor.Server.Plugins
             // TODO: Move this to a new context so we can unload/reload plugins.
             context.Resolving += (loadContext, name) =>
             {
+                Logger.Verbose("Loading assembly {0} v{1}", name.Name, name.Version);
+
+                // Some plugins may be referencing another Impostor.Api version and try to load it.
+                // We want to only use the one shipped with the server.
+                if (name.Name.Equals("Impostor.Api"))
+                {
+                    return typeof(IPlugin).Assembly;
+                }
+
                 var info = assemblyInfos.FirstOrDefault(a => a.AssemblyName.Name == name.Name);
 
                 return info?.Load(loadContext);
