@@ -232,6 +232,31 @@ Some extra information that might be useful for those developing plugins.
   - `IOptions<ServerRedirectorConfig>`
 - You can add your own classes and `EventListener` implementation to the `IServiceProvider` by creating a new class and implementing `IPluginStartup`. Make sure to register them as a singleton `services.AddSingleton<IEventListener, GameEventListener>();`.
 
+### Server configuration
+
+Constantly copying the plugin dll to your server directory can be pretty annoying. Luckily we have a solution for that. In your Impostor server open the `config.json` and add the `PluginLoader` from the example below, replace the path with the build destination of your plugin.
+
+```json
+{
+  "Server": {
+    "PublicIp": "127.0.0.1",
+    "PublicPort": 22023,
+    "ListenIp": "0.0.0.0",
+    "ListenPort": 22023
+  },
+  "PluginLoader": {
+    "Paths": [
+      "D:\\Projects\\Impostor\\src\\Impostor.Plugins.Example\\bin\\Debug\\netstandard2.1"
+    ],
+    "Libraries": []
+  }
+}
+```
+
+### Using other libraries
+
+Sometimes you need to use libraries that the original Impostor server does not provide. The dll files of these libraries must be placed in the `libraries` folder next to the server executable. You could also provide them by modifying the `PluginLoader.Libraries` option in the `config.json`, similarly to the `PluginLoader.Paths` option.
+
 ## 8. Missing/invalid data or want more functions?
 
 The `Impostor.Api` is currently in beta. There are a lot of things still missing and we would like to hear from you what you need to develop a plugin.

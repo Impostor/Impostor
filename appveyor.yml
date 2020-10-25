@@ -1,7 +1,7 @@
 version: '{build}'
 
 environment:
-  IMPOSTOR_VERSION: '1.1.0'
+  IMPOSTOR_VERSION: '1.2.0'
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
 branches:
