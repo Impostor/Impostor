@@ -48,6 +48,10 @@ namespace Impostor.Api.Innersloth
 
         public bool VisualTasks { get; set; }
 
+        public bool AnonymousVotes { get; set; }
+
+        public TaskBarUpdate TaskBarUpdate { get; set; }
+
         public bool IsDefaults { get; set; }
 
         public void Serialize(BinaryWriter writer, byte version)
@@ -82,6 +86,12 @@ namespace Impostor.Api.Innersloth
             }
 
             if (Version > 3)
+            {
+                writer.Write((bool)AnonymousVotes);
+                writer.Write((byte)TaskBarUpdate);
+            }
+
+            if (Version > 4)
             {
                 throw new ImpostorException($"Unknown GameOptionsData version {Version}.");
             }
@@ -126,6 +136,12 @@ namespace Impostor.Api.Innersloth
             }
 
             if (Version > 3)
+            {
+                AnonymousVotes = bytes.ReadBoolean();
+                TaskBarUpdate = (TaskBarUpdate)bytes.ReadByte();
+            }
+
+            if (Version > 4)
             {
                 throw new ImpostorException($"Unknown GameOptionsData version {Version}.");
             }
