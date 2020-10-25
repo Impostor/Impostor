@@ -75,17 +75,16 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.RepairSystem)} to wrong destinition, must be host");
                     }
 
-                    if (!sender.Character.PlayerInfo.IsImpostor)
+                    var systemType = (SystemTypes)reader.ReadByte();
+                    if (systemType == SystemTypes.Sabotage && !sender.Character.PlayerInfo.IsImpostor)
                     {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.RepairSystem)} as crewmate");
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.RepairSystem)} for {systemType} as crewmate");
                     }
 
-                    var systemType = (SystemTypes)reader.ReadByte();
                     var player = reader.ReadNetObject<InnerPlayerControl>(_game);
                     var amount = reader.ReadByte();
 
                     // TODO: Modify data (?)
-
                     break;
                 }
 
