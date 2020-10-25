@@ -1,26 +1,34 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Impostor.Server.Exceptions;
-using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth.Data;
+using Impostor.Api;
+using Impostor.Api.Events;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Messages;
+using Impostor.Hazel;
+using Impostor.Server.Net.Hazel;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.State
 {
     internal partial class Game
     {
-        private void PlayerAdd(IClientPlayer player)
+        private async ValueTask PlayerAdd(ClientPlayer player)
         {
             // Store player.
             if (!_players.TryAdd(player.Client.Id, player))
             {
-                throw new AmongUsException("Failed to add player to game.");
+                throw new ImpostorException("Failed to add player to game.");
             }
 
             // Assign hostId if none is set.
             if (HostId == -1)
             {
                 HostId = player.Client.Id;
+                await InitGameDataAsync(player);
             }
+
+            await _eventManager.CallAsync(new PlayerJoinedGameEvent(this, player));
         }
 
         private async ValueTask<bool> PlayerRemove(int playerId, bool isBan = false)
@@ -30,7 +38,16 @@ namespace Impostor.Server.Net.State
                 return false;
             }
 
-            Logger.Information("{0} - Player {1} ({2}) has left.", Code, player.Client.Name, playerId);
+            _logger.LogInformation("{0} - Player {1} ({2}) has left.", Code, player.Client.Name, playerId);
+
+            if (GameState == GameStates.Starting || GameState == GameStates.Started)
+            {
+                if (player.Character?.PlayerInfo != null)
+                {
+                    player.Character.PlayerInfo.Disconnected = true;
+                    player.Character.PlayerInfo.LastDeathReason = DeathReason.Disconnect;
+                }
+            }
 
             player.Client.Player = null;
 
@@ -55,6 +72,20 @@ namespace Impostor.Server.Net.State
                 _bannedIps.Add(player.Client.Connection.EndPoint.Address);
             }
 
+            await _eventManager.CallAsync(new PlayerLeftGameEvent(this, player, isBan));
+
+            // Player can refuse to be kicked and keep the connection open, check for this.
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(Constants.ConnectionTimeout);
+
+                if (player.Client.Connection.IsConnected && player.Client.Connection is HazelConnection hazel)
+                {
+                    _logger.LogInformation("{0} - Player {1} ({2}) kept connection open after leaving, disposing.", Code, player.Client.Name, playerId);
+                    hazel.DisposeInnerConnection();
+                }
+            });
+
             return true;
         }
 
@@ -63,7 +94,7 @@ namespace Impostor.Server.Net.State
             // Pick the first player as new host.
             var host = _players
                 .Select(p => p.Value)
-                .FirstOrDefault(p => !p.Client.IsBot);
+                .FirstOrDefault();
 
             if (host == null)
             {
@@ -72,7 +103,7 @@ namespace Impostor.Server.Net.State
             }
 
             HostId = host.Client.Id;
-            Logger.Information("{0} - Assigned {1} ({2}) as new host.", Code, host.Client.Name, host.Client.Id);
+            _logger.LogInformation("{0} - Assigned {1} ({2}) as new host.", Code, host.Client.Name, host.Client.Id);
 
             // Check our current game state.
             if (GameState == GameStates.Ended && host.Limbo == LimboStates.WaitingForHost)
@@ -89,7 +120,7 @@ namespace Impostor.Server.Net.State
 
         private async ValueTask CheckLimboPlayers()
         {
-            using var message = CreateMessage(MessageType.Reliable);
+            using var message = MessageWriter.Get(MessageType.Reliable);
 
             foreach (var (_, player) in _players.Where(x => x.Value.Limbo == LimboStates.WaitingForHost))
             {
@@ -97,7 +128,8 @@ namespace Impostor.Server.Net.State
                 WriteAlterGameMessage(message, false, IsPublic);
 
                 player.Limbo = LimboStates.NotLimbo;
-                await message.SendToAsync(player.Client);
+
+                await SendToAsync(message, player.Client.Id);
             }
         }
     }

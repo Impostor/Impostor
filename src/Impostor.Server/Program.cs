@@ -1,16 +1,20 @@
 ﻿using System;
-using Impostor.Server.Data;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Games;
+using Impostor.Api.Games.Managers;
+using Impostor.Api.Net.Manager;
+using Impostor.Server.Config;
 using Impostor.Server.Events;
-using Impostor.Server.Events.Managers;
-using Impostor.Server.Games.Managers;
-using Impostor.Server.Hazel;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Redirector;
+using Impostor.Server.Plugins;
+using Impostor.Server.Recorder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.ObjectPool;
 using Serilog;
 using Serilog.Events;
 
@@ -49,8 +53,25 @@ namespace Impostor.Server
             }
         }
 
-        private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        private static IConfiguration CreateConfiguration(string[] args)
+        {
+            var configurationBuilder = new ConfigurationBuilder();
+
+            configurationBuilder.AddJsonFile("config.json", true);
+            configurationBuilder.AddJsonFile("config.Development.json", true);
+            configurationBuilder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
+            configurationBuilder.AddCommandLine(args);
+
+            return configurationBuilder.Build();
+        }
+
+        private static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            var configuration = CreateConfiguration(args);
+            var pluginConfig = configuration.GetSection("PluginLoader")
+                .Get<PluginConfig>() ?? new PluginConfig();
+
+            return Host.CreateDefaultBuilder(args)
 #if DEBUG
                 .UseEnvironment(Environment.GetEnvironmentVariable("IMPOSTOR_ENV") ?? "Development")
 #else
@@ -58,17 +79,19 @@ namespace Impostor.Server
 #endif
                 .ConfigureAppConfiguration(builder =>
                 {
-                    builder.AddJsonFile("config.json", true);
-                    builder.AddJsonFile("config.Development.json", true);
-                    builder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
-                    builder.AddCommandLine(args);
+                    builder.AddConfiguration(configuration);
                 })
                 .ConfigureServices((host, services) =>
                 {
+                    var debug = host.Configuration
+                        .GetSection(DebugConfig.Section)
+                        .Get<DebugConfig>() ?? new DebugConfig();
+
                     var redirector = host.Configuration
                         .GetSection(ServerRedirectorConfig.Section)
                         .Get<ServerRedirectorConfig>() ?? new ServerRedirectorConfig();
 
+                    services.Configure<DebugConfig>(host.Configuration.GetSection(DebugConfig.Section));
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                     services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));
 
@@ -112,7 +135,8 @@ namespace Impostor.Server
                         services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
                     }
 
-                    services.AddSingleton<IClientManager, ClientManager>();
+                    services.AddSingleton<ClientManager>();
+                    services.AddSingleton<IClientManager>(p => p.GetRequiredService<ClientManager>());
 
                     if (redirector.Enabled && redirector.Master)
                     {
@@ -122,15 +146,36 @@ namespace Impostor.Server
                     }
                     else
                     {
-                        services.AddSingleton<IClientFactory, ClientFactory<Client>>();
-                        services.AddSingleton<IGameManager, GameManager>();
+                        if (debug.GameRecorderEnabled)
+                        {
+                            services.AddSingleton<ObjectPoolProvider>(new DefaultObjectPoolProvider());
+                            services.AddSingleton<ObjectPool<PacketSerializationContext>>(serviceProvider =>
+                            {
+                                var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                                var policy = new PacketSerializationContextPooledObjectPolicy();
+                                return provider.Create(policy);
+                            });
+
+                            services.AddSingleton<PacketRecorder>();
+                            services.AddSingleton<IClientFactory, ClientFactory<ClientRecorder>>();
+                        }
+                        else
+                        {
+                            services.AddSingleton<IClientFactory, ClientFactory<Client>>();
+                        }
+
+                        services.AddSingleton<GameManager>();
+                        services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
                     }
 
+                    services.AddSingleton<IGameCodeFactory, GameCodeFactory>();
                     services.AddSingleton<IEventManager, EventManager>();
-                    services.UseHazelMatchmaking();
+                    services.AddSingleton<Matchmaker>();
                     services.AddHostedService<MatchmakerService>();
                 })
+                .UseSerilog()
                 .UseConsoleLifetime()
-                .UseSerilog();
+                .UsePluginLoader(pluginConfig);
+        }
     }
 }

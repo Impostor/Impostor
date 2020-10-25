@@ -1,27 +1,26 @@
 using System;
 using System.Threading.Tasks;
-using Hazel;
-using Impostor.Server.Data;
-using Impostor.Server.Games;
-using Impostor.Server.Games.Managers;
-using Impostor.Server.Hazel.Messages;
+using Impostor.Api;
+using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.C2S;
+using Impostor.Api.Net.Messages.S2C;
+using Impostor.Hazel;
+using Impostor.Server.Config;
 using Impostor.Server.Net.Manager;
-using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth;
-using Impostor.Shared.Innersloth.Data;
 using Microsoft.Extensions.Logging;
-using Serilog;
-using ILogger = Serilog.ILogger;
 
 namespace Impostor.Server.Net
 {
     internal class Client : ClientBase
     {
         private readonly ILogger<Client> _logger;
-        private readonly IClientManager _clientManager;
-        private readonly IGameManager _gameManager;
+        private readonly ClientManager _clientManager;
+        private readonly GameManager _gameManager;
 
-        public Client(ILogger<Client> logger, IClientManager clientManager, IGameManager gameManager, string name, IConnection connection)
+        public Client(ILogger<Client> logger, ClientManager clientManager, GameManager gameManager, string name, IHazelConnection connection)
             : base(name, connection)
         {
             _logger = logger;
@@ -29,10 +28,8 @@ namespace Impostor.Server.Net
             _gameManager = gameManager;
         }
 
-        public override async ValueTask HandleMessageAsync(IMessage message)
+        public override async ValueTask HandleMessageAsync(IMessageReader reader, MessageType messageType)
         {
-            var reader = message.CreateReader();
-
             var flag = reader.Tag;
 
             _logger.LogTrace("[{0}] Server got {1}.", Id, flag);
@@ -42,23 +39,24 @@ namespace Impostor.Server.Net
                 case MessageFlags.HostGame:
                 {
                     // Read game settings.
-                    var gameInfo = Message00HostGame.Deserialize(reader);
+                    var gameInfo = Message00HostGameC2S.Deserialize(reader);
 
                     // Create game.
                     var game = await _gameManager.CreateAsync(gameInfo);
 
                     // Code in the packet below will be used in JoinGame.
-                    using var writer = Connection.CreateMessage(MessageType.Reliable);
-                    Message00HostGame.Serialize(writer, game.Code);
-
-                    await writer.SendAsync();
+                    using (var writer = MessageWriter.Get(MessageType.Reliable))
+                    {
+                        Message00HostGameS2C.Serialize(writer, game.Code);
+                        await Connection.SendAsync(writer);
+                    }
 
                     break;
                 }
 
                 case MessageFlags.JoinGame:
                 {
-                    Message01JoinGame.Deserialize(
+                    Message01JoinGameC2S.Deserialize(
                         reader,
                         out var gameCode,
                         out _);
@@ -66,7 +64,7 @@ namespace Impostor.Server.Net
                     var game = _gameManager.Find(gameCode);
                     if (game == null)
                     {
-                        await SendDisconnectReason(DisconnectReason.GameMissing);
+                        await DisconnectAsync(DisconnectReason.GameMissing);
                         return;
                     }
 
@@ -77,28 +75,28 @@ namespace Impostor.Server.Net
                         case GameJoinError.None:
                             break;
                         case GameJoinError.InvalidClient:
-                            await SendDisconnectReason(DisconnectReason.Custom, "Client is in an invalid state.");
+                            await DisconnectAsync(DisconnectReason.Custom, "Client is in an invalid state.");
                             break;
                         case GameJoinError.Banned:
-                            await SendDisconnectReason(DisconnectReason.Banned);
+                            await DisconnectAsync(DisconnectReason.Banned);
                             break;
                         case GameJoinError.GameFull:
-                            await SendDisconnectReason(DisconnectReason.GameFull);
+                            await DisconnectAsync(DisconnectReason.GameFull);
                             break;
                         case GameJoinError.InvalidLimbo:
-                            await SendDisconnectReason(DisconnectReason.Custom, "Invalid limbo state while joining.");
+                            await DisconnectAsync(DisconnectReason.Custom, "Invalid limbo state while joining.");
                             break;
                         case GameJoinError.GameStarted:
-                            await SendDisconnectReason(DisconnectReason.GameStarted);
+                            await DisconnectAsync(DisconnectReason.GameStarted);
                             break;
                         case GameJoinError.GameDestroyed:
-                            await SendDisconnectReason(DisconnectReason.Custom, DisconnectMessages.Destroyed);
+                            await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.Destroyed);
                             break;
                         case GameJoinError.Custom:
-                            await SendDisconnectReason(DisconnectReason.Custom, result.Message);
+                            await DisconnectAsync(DisconnectReason.Custom, result.Message);
                             break;
                         default:
-                            await SendDisconnectReason(DisconnectReason.Custom, "Unknown error.");
+                            await DisconnectAsync(DisconnectReason.Custom, "Unknown error.");
                             break;
                     }
 
@@ -127,7 +125,7 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    Message04RemovePlayer.Deserialize(
+                    Message04RemovePlayerC2S.Deserialize(
                         reader,
                         out var playerId,
                         out var reason);
@@ -144,19 +142,37 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    // Broadcast packet to all other players.
-                    using var writer = Player.Game.CreateMessage(message.Type);
+                    var toPlayer = flag == MessageFlags.GameDataTo;
 
-                    if (flag == MessageFlags.GameDataTo)
+                    // Handle packet.
+                    var readerCopy = reader.Slice(reader.Position);
+
+                    // TODO: Return value, either a bool (to cancel) or a writer (to cancel (null) or modify/overwrite).
+                    try
                     {
-                        var target = reader.ReadPackedInt32();
-                        reader.CopyTo(writer);
-                        await writer.SendToAsync(target);
+                        var verified = await Player.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
+                        if (verified)
+                        {
+                            // Broadcast packet to all other players.
+                            using (var writer = MessageWriter.Get(messageType))
+                            {
+                                if (toPlayer)
+                                {
+                                    var target = reader.ReadPackedInt32();
+                                    reader.CopyTo(writer);
+                                    await Player.Game.SendToAsync(writer, target);
+                                }
+                                else
+                                {
+                                    reader.CopyTo(writer);
+                                    await Player.Game.SendToAllExceptAsync(writer, Id);
+                                }
+                            }
+                        }
                     }
-                    else
+                    catch (ImpostorCheatException e)
                     {
-                        reader.CopyTo(writer);
-                        await writer.SendToAllExceptAsync(Id);
+                        await DisconnectAsync(DisconnectReason.Hacking, e.Message);
                     }
 
                     break;
@@ -180,7 +196,7 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    Message10AlterGame.Deserialize(
+                    Message10AlterGameC2S.Deserialize(
                         reader,
                         out var gameTag,
                         out var value);
@@ -201,7 +217,7 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    Message11KickPlayer.Deserialize(
+                    Message11KickPlayerC2S.Deserialize(
                         reader,
                         out var playerId,
                         out var isBan);
@@ -212,8 +228,8 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.GetGameListV2:
                 {
-                    Message16GetGameListV2.Deserialize(reader, out var options);
-                    await OnRequestGameList(options);
+                    Message16GetGameListC2S.Deserialize(reader, out var options);
+                    await OnRequestGameListAsync(options);
                     break;
                 }
 
@@ -251,7 +267,7 @@ namespace Impostor.Server.Net
                 _logger.LogError(ex, "Exception caught in client disconnection.");
             }
 
-            _logger.LogInformation("Client disconnecting, reason: {0}.", reason);
+            _logger.LogInformation("Client {0} disconnecting, reason: {1}.", Id, reason);
             _clientManager.Remove(this);
         }
 
@@ -292,30 +308,33 @@ namespace Impostor.Server.Net
         ///     All options given.
         ///     At this moment, the client can only specify the map, impostor count and chat language.
         /// </param>
-        private async ValueTask OnRequestGameList(GameOptionsData options)
+        private ValueTask OnRequestGameListAsync(GameOptionsData options)
         {
-            using var message = Connection.CreateMessage(MessageType.Reliable);
+            using var message = MessageWriter.Get(MessageType.Reliable);
+
             var games = _gameManager.FindListings((MapFlags)options.MapId, options.NumImpostors, options.Keywords);
 
             var skeldGameCount = _gameManager.GetGameCount(MapFlags.Skeld);
             var miraHqGameCount = _gameManager.GetGameCount(MapFlags.MiraHQ);
             var polusGameCount = _gameManager.GetGameCount(MapFlags.Polus);
 
-            Message16GetGameListV2.Serialize(message, skeldGameCount, miraHqGameCount, polusGameCount, games);
+            Message16GetGameListS2C.Serialize(message, skeldGameCount, miraHqGameCount, polusGameCount, games);
 
-            await message.SendAsync();
+            return Connection.SendAsync(message);
         }
 
-        private async ValueTask SendDisconnectReason(DisconnectReason reason, string message = null)
+        private async ValueTask DisconnectAsync(DisconnectReason reason, string message = null)
         {
             if (Connection == null)
             {
                 return;
             }
 
-            using var packet = Connection.CreateMessage(MessageType.Reliable);
-            Message01JoinGame.SerializeError(packet, false, reason, message);
-            await packet.SendAsync();
+            using var packet = MessageWriter.Get(MessageType.Reliable);
+            Message01JoinGameS2C.SerializeError(packet, false, reason, message);
+
+            await Connection.SendAsync(packet);
+            await Connection.DisconnectAsync(message ?? reason.ToString());
         }
     }
 }

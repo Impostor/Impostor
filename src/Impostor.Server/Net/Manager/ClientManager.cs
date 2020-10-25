@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Impostor.Server.Data;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Manager;
+using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.S2C;
+using Impostor.Hazel;
+using Impostor.Server.Config;
 using Impostor.Server.Net.Factories;
-using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth;
-using Impostor.Shared.Innersloth.Data;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Manager
@@ -20,7 +23,7 @@ namespace Impostor.Server.Net.Manager
         };
 
         private readonly ILogger<ClientManager> _logger;
-        private readonly ConcurrentDictionary<int, IClient> _clients;
+        private readonly ConcurrentDictionary<int, ClientBase> _clients;
         private readonly IClientFactory _clientFactory;
         private int _idLast;
 
@@ -28,8 +31,12 @@ namespace Impostor.Server.Net.Manager
         {
             _logger = logger;
             _clientFactory = clientFactory;
-            _clients = new ConcurrentDictionary<int, IClient>();
+            _clients = new ConcurrentDictionary<int, ClientBase>();
         }
+
+        public IEnumerable<ClientBase> Clients => _clients.Values;
+
+        IEnumerable<IClient> IClientManager.Clients => _clients.Values;
 
         public int NextId()
         {
@@ -47,31 +54,25 @@ namespace Impostor.Server.Net.Manager
             return clientId;
         }
 
-        public async ValueTask RegisterConnectionAsync(IConnection connection, string name, int clientVersion)
+        public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion)
         {
             if (name.Length > 10)
             {
-                using var packet = connection.CreateMessage(MessageType.Reliable);
-                Message01JoinGame.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameLength);
-                await packet.SendAsync();
+                using var packet = MessageWriter.Get(MessageType.Reliable);
+                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameLength);
+                await connection.SendAsync(packet);
                 return;
             }
 
             if (!SupportedVersions.Contains(clientVersion))
             {
-                using var packet = connection.CreateMessage(MessageType.Reliable);
-                Message01JoinGame.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
-                await packet.SendAsync();
+                using var packet = MessageWriter.Get(MessageType.Reliable);
+                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
+                await connection.SendAsync(packet);
                 return;
             }
 
             var client = _clientFactory.Create(connection, name, clientVersion);
-
-            Register(client);
-        }
-
-        public void Register(IClient client)
-        {
             var id = NextId();
 
             client.Id = id;

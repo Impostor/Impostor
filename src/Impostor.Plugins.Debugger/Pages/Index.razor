@@ -1,0 +1,68 @@
+﻿@page "/"
+@implements IDisposable
+@using Impostor.Api.Events.Managers
+@using Impostor.Api.Games.Managers
+@using Impostor.Api.Events
+@implements Impostor.Api.Events.IEventListener
+@inject IEventManager EventManager
+@inject IGameManager GameManager
+
+<div class="container">
+    <h2>Games</h2>
+    @if (GameManager.Games.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Code</th>
+                <th>Players</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var game in GameManager.Games)
+            {
+                <tr>
+                    <td>@game.Code</td>
+                    <td>
+                        <ul class="mb-0">
+                            @foreach (var player in game.Players)
+                            {
+                                <li>@player.Client.Name</li>
+                            }
+                        </ul>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="text-center">
+            <i class="text-muted">There are no active games.</i>
+        </div>
+    }
+</div>
+
+@code {
+    private IDisposable _disposable;
+
+    [EventListener(typeof(GameCreatedEvent))]
+    [EventListener(typeof(GameDestroyedEvent))]
+    [EventListener(typeof(PlayerJoinedGameEvent))]
+    [EventListener(typeof(PlayerLeftGameEvent))]
+    public void OnGameCreated(IGameEvent e)
+    {
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        _disposable = EventManager.RegisterListener(this, InvokeAsync);
+    }
+
+    public void Dispose()
+    {
+        _disposable?.Dispose();
+    }
+}

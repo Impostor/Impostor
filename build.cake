@@ -1,37 +1,54 @@
-var buildVersion = EnvironmentVariable("APPVEYOR_BUILD_VERSION") ?? "1.0.0";
+#addin "nuget:?package=Cake.FileHelpers&Version=3.3.0"
+
+var buildId = EnvironmentVariable("APPVEYOR_BUILD_VERSION") ?? "0";
+var buildVersion = EnvironmentVariable("IMPOSTOR_VERSION") ?? "1.0.0";
+var buildBranch = EnvironmentVariable("APPVEYOR_REPO_BRANCH") ?? "dev";
 var buildDir = MakeAbsolute(Directory("./build"));
 
-var branch = EnvironmentVariable("APPVEYOR_REPO_BRANCH") ?? "dev";
 var prNumber = EnvironmentVariable("APPVEYOR_PULL_REQUEST_NUMBER");
 var target = Argument("target", "Deploy");
 var configuration = Argument("configuration", "Release");
+
+// On any branch that is not master, we need to tag the version as prerelease.
+if (buildBranch != "master") {
+    buildVersion = buildVersion + "-ci." + buildId;
+}
 
 //////////////////////////////////////////////////////////////////////
 // UTILS
 //////////////////////////////////////////////////////////////////////
 
-public void ImpostorPublish(string name, string project, string runtime) {
-    var projBuildDir = buildDir.Combine(name + "-" + runtime);
-    var projBuildZip = buildDir.CombineWithFilePath(name + "-" + buildVersion + "-" + runtime + ".zip");
+// Remove unnecessary files for packaging.
+private void ImpostorClean(string directory) {
+    foreach (var file in System.IO.Directory.GetFiles(directory, "*.pdb", SearchOption.AllDirectories)) {
+        System.IO.File.Delete(file);
+    }
+}
+
+private void ImpostorPublish(string name, string project, string runtime, bool selfContained = true) {
+    var projBuildDir = buildDir.Combine(name + "_" + runtime);
+    var projBuildZip = buildDir.CombineWithFilePath(name + "_" + buildVersion + "_" + runtime + ".zip");
 
     DotNetCorePublish(project, new DotNetCorePublishSettings {
         Configuration = configuration,
         NoRestore = true,
         Framework = "net5.0",
         Runtime = runtime,
-        SelfContained = true,
+        SelfContained = selfContained,
         PublishSingleFile = true,
-        PublishTrimmed = true,
+        PublishTrimmed = selfContained,
         OutputDirectory = projBuildDir
     });
+
+    ImpostorClean(projBuildDir.ToString());
 
     Zip(projBuildDir, projBuildZip);
 }
 
-public void ImpostorPublishNF(string name, string project) {
+private void ImpostorPublishNF(string name, string project) {
     var runtime = "win-x64";
-    var projBuildDir = buildDir.Combine(name + "-" + runtime);
-    var projBuildZip = buildDir.CombineWithFilePath(name + "-" + buildVersion + "-" + runtime + ".zip");
+    var projBuildDir = buildDir.Combine(name + "_" + runtime);
+    var projBuildZip = buildDir.CombineWithFilePath(name + "_" + buildVersion + "_" + runtime + ".zip");
 
     DotNetCorePublish(project, new DotNetCorePublishSettings {
         Configuration = configuration,
@@ -39,6 +56,8 @@ public void ImpostorPublishNF(string name, string project) {
         Framework = "net472",
         OutputDirectory = projBuildDir
     });
+
+    ImpostorClean(projBuildDir.ToString());
 
     Zip(projBuildDir, projBuildZip);
 }
@@ -59,11 +78,18 @@ Task("Clean")
 Task("Restore")
     .Does(() => {
         DotNetCoreRestore("./src/Impostor.sln");
-        DotNetCoreRestore("./src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj");
+    });
+
+Task("Patch")
+    .WithCriteria(BuildSystem.AppVeyor.IsRunningOnAppVeyor)
+    .Does(() => {
+        ReplaceRegexInFiles("./src/**/*.csproj", @"<Version>.*?<\/Version>", "<Version>" + buildVersion + "</Version>");
+        ReplaceRegexInFiles("./src/**/*.props", @"<Version>.*?<\/Version>", "<Version>" + buildVersion + "</Version>");
     });
 
 Task("Build")
     .IsDependentOn("Clean")
+    .IsDependentOn("Patch")
     .IsDependentOn("Restore")
     .Does(() => {
         // Tests.
@@ -72,11 +98,15 @@ Task("Build")
         });
 
         // Only build artifacts if;
-        // - branch is master/dev
+        // - buildBranch is master/dev
         // - it is not a pull request
-        if ((branch == "master" || branch == "dev") && string.IsNullOrEmpty(prNumber)) {
+        if ((buildBranch == "master" || buildBranch == "dev") && string.IsNullOrEmpty(prNumber)) {
             // Client.
-            ImpostorPublishNF("Impostor-Client", "./src/Impostor.Client/Impostor.Client.WinForms/Impostor.Client.WinForms.csproj");
+            ImpostorPublishNF("Impostor-Patcher", "./src/Impostor.Patcher/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj");
+
+            ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "win-x64", false);
+            ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "osx-x64", false);
+            ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "linux-x64", false);
             
             // Server.
             ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64");
@@ -84,6 +114,14 @@ Task("Build")
             ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-x64");
             ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm");
             ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm64");
+
+            // API.
+            DotNetCorePack("./src/Impostor.Api/Impostor.Api.csproj", new DotNetCorePackSettings {
+                Configuration = configuration,
+                OutputDirectory = buildDir,
+                IncludeSource = true,
+                IncludeSymbols = true
+            });
         } else {
             DotNetCoreBuild("./src/Impostor.Patcher/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj", new DotNetCoreBuildSettings {
                 Configuration = configuration,

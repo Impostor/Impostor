@@ -1,22 +1,57 @@
-﻿using System.Threading.Tasks;
-using Impostor.Server.Games;
-using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth.Data;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Impostor.Api.Events;
+using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Messages;
+using Impostor.Hazel;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.State
 {
     internal partial class Game
     {
+        private readonly SemaphoreSlim _clientAddLock = new SemaphoreSlim(1, 1);
+
         public async ValueTask HandleStartGame(IMessageReader message)
         {
-            GameState = GameStates.Started;
+            GameState = GameStates.Starting;
 
-            using var packet = CreateMessage(MessageType.Reliable);
+            using var packet = MessageWriter.Get(MessageType.Reliable);
             message.CopyTo(packet);
-            await packet.SendToAllAsync();
+            await SendToAllAsync(packet);
+
+            await _eventManager.CallAsync(new GameStartingEvent(this));
         }
 
-        public async ValueTask<GameJoinResult> AddClientAsync(IClient client)
+        public async ValueTask<GameJoinResult> AddClientAsync(ClientBase client)
+        {
+            var hasLock = false;
+
+            try
+            {
+                hasLock = await _clientAddLock.WaitAsync(TimeSpan.FromMinutes(1));
+
+                if (hasLock)
+                {
+                    return await AddClientSafeAsync(client);
+                }
+            }
+            finally
+            {
+                if (hasLock)
+                {
+                    _clientAddLock.Release();
+                }
+            }
+
+            return GameJoinResult.FromError(GameJoinError.InvalidClient);
+        }
+
+        private async ValueTask<GameJoinResult> AddClientSafeAsync(ClientBase client)
         {
             // Check if the IP of the player is banned.
             if (client.Connection != null && _bannedIps.Contains(client.Connection.EndPoint.Address))
@@ -34,7 +69,7 @@ namespace Impostor.Server.Net.State
                 return GameJoinResult.FromError(GameJoinError.GameFull);
             }
 
-            if (GameState == GameStates.Started)
+            if (GameState == GameStates.Starting || GameState == GameStates.Started)
             {
                 return GameJoinResult.FromError(GameJoinError.GameStarted);
             }
@@ -48,7 +83,7 @@ namespace Impostor.Server.Net.State
 
             if (player == null || player.Game != this)
             {
-                var clientPlayer = new ClientPlayer(client, this);
+                var clientPlayer = new ClientPlayer(_serviceProvider.GetRequiredService<ILogger<ClientPlayer>>(), client, this);
 
                 if (!_clientManager.Validate(client))
                 {
@@ -81,10 +116,10 @@ namespace Impostor.Server.Net.State
             GameState = GameStates.Ended;
 
             // Broadcast end of the game.
-            using (var packet = CreateMessage(MessageType.Reliable))
+            using (var packet = MessageWriter.Get(MessageType.Reliable))
             {
                 message.CopyTo(packet);
-                await packet.SendToAllAsync();
+                await SendToAllAsync(packet);
             }
 
             // Put all players in the correct limbo state.
@@ -92,15 +127,17 @@ namespace Impostor.Server.Net.State
             {
                 player.Value.Limbo = LimboStates.PreSpawn;
             }
+
+            await _eventManager.CallAsync(new GameEndedEvent(this));
         }
 
         public async ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic)
         {
             IsPublic = isPublic;
 
-            using var packet = CreateMessage(MessageType.Reliable);
+            using var packet = MessageWriter.Get(MessageType.Reliable);
             message.CopyTo(packet);
-            await packet.SendToAllExceptAsync(sender.Client.Id);
+            await SendToAllExceptAsync(packet, sender.Client.Id);
         }
 
         public async ValueTask HandleRemovePlayer(int playerId, DisconnectReason reason)
@@ -113,21 +150,21 @@ namespace Impostor.Server.Net.State
                 return;
             }
 
-            using var packet = CreateMessage(MessageType.Reliable);
+            using var packet = MessageWriter.Get(MessageType.Reliable);
             WriteRemovePlayerMessage(packet, false, playerId, reason);
-            await packet.SendToAllExceptAsync(playerId);
+            await SendToAllExceptAsync(packet, playerId);
         }
 
         public async ValueTask HandleKickPlayer(int playerId, bool isBan)
         {
-            Logger.Information("{0} - Player {1} has left.", Code, playerId);
+            _logger.LogInformation("{0} - Player {1} has left.", Code, playerId);
 
-            using var message = CreateMessage(MessageType.Reliable);
+            using var message = MessageWriter.Get(MessageType.Reliable);
 
             // Send message to everyone that this player was kicked.
             WriteKickPlayerMessage(message, false, playerId, isBan);
-            await message.SendToAllAsync();
 
+            await SendToAllAsync(message);
             await PlayerRemove(playerId, isBan);
 
             // Remove the player from everyone's game.
@@ -136,39 +173,42 @@ namespace Impostor.Server.Net.State
                 true,
                 playerId,
                 isBan ? DisconnectReason.Banned : DisconnectReason.Kicked);
-            await message.SendToAllExceptAsync(playerId);
+
+            await SendToAllExceptAsync(message, playerId);
         }
 
-        private async ValueTask HandleJoinGameNew(IClientPlayer sender, bool isNew)
+        private async ValueTask HandleJoinGameNew(ClientPlayer sender, bool isNew)
         {
-            Logger.Information("{0} - Player {1} ({2}) is joining.", Code, sender.Client.Name, sender.Client.Id);
+            _logger.LogInformation("{0} - Player {1} ({2}) is joining.", Code, sender.Client.Name, sender.Client.Id);
 
             // Add player to the game.
             if (isNew)
             {
-                PlayerAdd(sender);
+                await PlayerAdd(sender);
             }
 
-            using (var message = CreateMessage(MessageType.Reliable))
+            sender.InitializeSpawnTimeout();
+
+            using (var message = MessageWriter.Get(MessageType.Reliable))
             {
                 WriteJoinedGameMessage(message, false, sender);
                 WriteAlterGameMessage(message, false, IsPublic);
 
                 sender.Limbo = LimboStates.NotLimbo;
-                await message.SendToAsync(sender);
 
+                await SendToAsync(message, sender.Client.Id);
                 await BroadcastJoinMessage(message, true, sender);
             }
         }
 
-        private async ValueTask HandleJoinGameNext(IClientPlayer sender, bool isNew)
+        private async ValueTask HandleJoinGameNext(ClientPlayer sender, bool isNew)
         {
-            Logger.Information("{0} - Player {1} ({2}) is rejoining.", Code, sender.Client.Name, sender.Client.Id);
+            _logger.LogInformation("{0} - Player {1} ({2}) is rejoining.", Code, sender.Client.Name, sender.Client.Id);
 
             // Add player to the game.
             if (isNew)
             {
-                PlayerAdd(sender);
+                await PlayerAdd(sender);
             }
 
             // Check if the host joined and let everyone join.
@@ -186,12 +226,13 @@ namespace Impostor.Server.Net.State
 
             sender.Limbo = LimboStates.WaitingForHost;
 
-            using var packet = CreateMessage(MessageType.Reliable);
+            using (var packet = MessageWriter.Get(MessageType.Reliable))
+            {
+                WriteWaitForHostMessage(packet, false, sender);
 
-            WriteWaitForHostMessage(packet, false, sender);
-            await packet.SendToAsync(sender.Client);
-
-            await BroadcastJoinMessage(packet, true, sender);
+                await SendToAsync(packet, sender.Client.Id);
+                await BroadcastJoinMessage(packet, true, sender);
+            }
         }
     }
 }

@@ -8,8 +8,8 @@
         <TrimMode>Link</TrimMode>
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <ApplicationIcon>icon.ico</ApplicationIcon>
-        <DebugType Condition=" '$(Configuration)' == 'Release' ">None</DebugType>
         <CodeAnalysisRuleSet>ProjectRules.ruleset</CodeAnalysisRuleSet>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -21,16 +21,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Impostor.Server.Api\Impostor.Server.Api.csproj"/>
-        <ProjectReference Include="..\Impostor.Server.Hazel\Impostor.Server.Hazel.csproj"/>
-        <ProjectReference Include="..\Impostor.Shared\Impostor.Shared.csproj"/>
+        <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj" />
+        <ProjectReference Include="..\Impostor.Hazel\Impostor.Hazel.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="5.0.0-rc.1.20451.7"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0-rc.1.20451.14"/>
-        <PackageReference Include="Serilog.Extensions.Hosting" Version="3.1.0"/>
-        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="5.0.0-rc.1.20451.7" />
+        <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="5.0.0-rc.1.20451.14" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0-rc.1.20451.14" />
+        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="5.0.0-rc.2.20475.17" />
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="3.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
         <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -43,12 +44,12 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </Content>
-        <Content Update="config.Development.json">
+        <Content Include="config.*.json">
             <CopyToPublishDirectory>Never</CopyToPublishDirectory>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </Content>
-        <Content Include="config.full.json">
+        <Content Include="config-full.json">
             <CopyToPublishDirectory>Never</CopyToPublishDirectory>
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

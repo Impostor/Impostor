@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Impostor.Shared\Impostor.Shared.csproj" />
+      <ProjectReference Include="..\Impostor.Server\Impostor.Server.csproj" />
     </ItemGroup>
 
 </Project>

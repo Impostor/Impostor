@@ -1,14 +1,77 @@
 ﻿using System.Linq;
-using Impostor.Server.Net.Messages;
-using Impostor.Shared.Innersloth.Data;
+using System.Threading.Tasks;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.S2C;
+using Impostor.Hazel;
+using Impostor.Hazel.Udp;
+using Impostor.Server.Net.Inner;
 
 namespace Impostor.Server.Net.State
 {
     internal partial class Game
     {
+        public async ValueTask SendToAllAsync(IMessageWriter writer, LimboStates states = LimboStates.NotLimbo)
+        {
+            foreach (var connection in GetConnections(x => x.Limbo.HasFlag(states)))
+            {
+                await connection.SendAsync(writer);
+            }
+        }
+
+        public async ValueTask SendToAllExceptAsync(IMessageWriter writer, int senderId, LimboStates states = LimboStates.NotLimbo)
+        {
+            foreach (var connection in GetConnections(x =>
+                x.Limbo.HasFlag(states) &&
+                x.Client.Id != senderId))
+            {
+                await connection.SendAsync(writer);
+            }
+        }
+
+        public async ValueTask SendToAsync(IMessageWriter writer, int id)
+        {
+            if (TryGetPlayer(id, out var player))
+            {
+                await player.Client.Connection.SendAsync(writer);
+            }
+        }
+
+        internal IMessageWriter StartRpc(uint targetNetId, RpcCalls callId, int targetClientId = -1, MessageType type = MessageType.Reliable)
+        {
+            var writer = MessageWriter.Get(type);
+
+            if (targetClientId < 0)
+            {
+                writer.StartMessage(MessageFlags.GameData);
+                writer.Write(Code);
+            }
+            else
+            {
+                writer.StartMessage(MessageFlags.GameDataTo);
+                writer.Write(Code);
+                writer.WritePacked(targetClientId);
+            }
+
+            writer.StartMessage(GameDataTag.RpcFlag);
+            writer.WritePacked(targetNetId);
+            writer.Write((byte) callId);
+
+            return writer;
+        }
+
+        internal ValueTask FinishRpcAsync(IMessageWriter writer)
+        {
+            writer.EndMessage();
+            writer.EndMessage();
+
+            return SendToAllAsync(writer);
+        }
+
         private void WriteRemovePlayerMessage(IMessageWriter message, bool clear, int playerId, DisconnectReason reason)
         {
-            Message04RemovePlayer.Serialize(message, clear, Code, playerId, HostId, reason);
+            Message04RemovePlayerS2C.Serialize(message, clear, Code, playerId, HostId, reason);
         }
 
         private void WriteJoinedGameMessage(IMessageWriter message, bool clear, IClientPlayer player)
@@ -18,22 +81,22 @@ namespace Impostor.Server.Net.State
                 .Select(x => x.Key)
                 .ToArray();
 
-            Message07JoinedGame.Serialize(message, clear, Code, player.Client.Id, HostId, playerIds);
+            Message07JoinedGameS2C.Serialize(message, clear, Code, player.Client.Id, HostId, playerIds);
         }
 
         private void WriteAlterGameMessage(IMessageWriter message, bool clear, bool isPublic)
         {
-            Message10AlterGame.Serialize(message, clear, Code, isPublic);
+            Message10AlterGameS2C.Serialize(message, clear, Code, isPublic);
         }
 
         private void WriteKickPlayerMessage(IMessageWriter message, bool clear, int playerId, bool isBan)
         {
-            Message11KickPlayer.Serialize(message, clear, Code, playerId, isBan);
+            Message11KickPlayerS2C.Serialize(message, clear, Code, playerId, isBan);
         }
 
         private void WriteWaitForHostMessage(IMessageWriter message, bool clear, IClientPlayer player)
         {
-            Message12WaitForHost.Serialize(message, clear, Code, player.Client.Id);
+            Message12WaitForHostS2C.Serialize(message, clear, Code, player.Client.Id);
         }
     }
 }

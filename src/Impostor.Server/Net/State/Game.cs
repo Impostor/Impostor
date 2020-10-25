@@ -1,50 +1,55 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Impostor.Server.Games;
-using Impostor.Server.Games.Managers;
+using Impostor.Api.Events;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.S2C;
 using Impostor.Server.Net.Manager;
-using Impostor.Server.Net.Messages;
-using Impostor.Server.Net.Redirector;
-using Impostor.Shared.Innersloth;
-using Impostor.Shared.Innersloth.Data;
-using Serilog;
-using ILogger = Serilog.ILogger;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.State
 {
     internal partial class Game : IGame
     {
-        private static readonly ILogger Logger = Log.ForContext<Game>();
-
-        private readonly IGameManager _gameManager;
-        private readonly IClientManager _clientManager;
-        private readonly IMatchmaker _matchmaker;
-        private readonly ConcurrentDictionary<int, IClientPlayer> _players;
+        private readonly ILogger<Game> _logger;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly GameManager _gameManager;
+        private readonly ClientManager _clientManager;
+        private readonly ConcurrentDictionary<int, ClientPlayer> _players;
         private readonly HashSet<IPAddress> _bannedIps;
+        private readonly IEventManager _eventManager;
 
         public Game(
-            IGameManager gameManager,
-            INodeLocator nodeLocator,
+            ILogger<Game> logger,
+            IServiceProvider serviceProvider,
+            GameManager gameManager,
             IPEndPoint publicIp,
             GameCode code,
             GameOptionsData options,
-            IMatchmaker matchmaker,
-            IClientManager clientManager)
+            ClientManager clientManager,
+            IEventManager eventManager)
         {
+            _logger = logger;
+            _serviceProvider = serviceProvider;
             _gameManager = gameManager;
-            _players = new ConcurrentDictionary<int, IClientPlayer>();
+            _players = new ConcurrentDictionary<int, ClientPlayer>();
             _bannedIps = new HashSet<IPAddress>();
 
             PublicIp = publicIp;
             Code = code;
             HostId = -1;
             GameState = GameStates.NotStarted;
+            GameNet = new GameNet();
             Options = options;
-            _matchmaker = matchmaker;
             _clientManager = clientManager;
+            _eventManager = eventManager;
             Items = new ConcurrentDictionary<object, object>();
         }
 
@@ -58,22 +63,19 @@ namespace Impostor.Server.Net.State
 
         public GameStates GameState { get; private set; }
 
+        internal GameNet GameNet { get; }
+
         public GameOptionsData Options { get; }
 
         public IDictionary<object, object> Items { get; }
 
         public int PlayerCount => _players.Count;
 
-        public IClientPlayer Host => _players[HostId];
+        public ClientPlayer Host => _players[HostId];
 
         public IEnumerable<IClientPlayer> Players => _players.Select(p => p.Value);
 
-        public IGameMessageWriter CreateMessage(MessageType type)
-        {
-            return _matchmaker.CreateGameMessageWriter(this, type);
-        }
-
-        public bool TryGetPlayer(int id, out IClientPlayer player)
+        public bool TryGetPlayer(int id, out ClientPlayer player)
         {
             if (_players.TryGetValue(id, out var result))
             {
@@ -85,16 +87,40 @@ namespace Impostor.Server.Net.State
             return false;
         }
 
+        public IClientPlayer GetClientPlayer(int clientId)
+        {
+            return _players.TryGetValue(clientId, out var clientPlayer) ? clientPlayer : null;
+        }
+
+        internal ValueTask StartedAsync()
+        {
+            if (GameState == GameStates.Starting)
+            {
+                GameState = GameStates.Started;
+
+                return _eventManager.CallAsync(new GameStartedEvent(this));
+            }
+
+            return default;
+        }
+
         public ValueTask EndAsync()
         {
             return _gameManager.RemoveAsync(Code);
         }
 
-        private ValueTask BroadcastJoinMessage(IGameMessageWriter message, bool clear, IClientPlayer player)
+        private ValueTask BroadcastJoinMessage(IMessageWriter message, bool clear, ClientPlayer player)
         {
-            Message01JoinGame.SerializeJoin(message, clear, Code, player.Client.Id, HostId);
+            Message01JoinGameS2C.SerializeJoin(message, clear, Code, player.Client.Id, HostId);
 
-            return message.SendToAllExceptAsync(player.Client.Id);
+            return SendToAllExceptAsync(message, player.Client.Id);
+        }
+
+        private IEnumerable<IHazelConnection> GetConnections(Func<IClientPlayer, bool> filter)
+        {
+            return Players
+                .Where(filter)
+                .Select(p => p.Client.Connection);
         }
     }
 }

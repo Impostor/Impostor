@@ -1,0 +1,26 @@
+﻿{
+  "Server": {
+    "PublicIp": "127.0.0.1",
+    "PublicPort": 22023,
+    "ListenIp": "0.0.0.0",
+    "ListenPort": 22023
+  },
+  "ServerRedirector": {
+    "Enabled": false,
+    "Master": true,
+    "Locator": {
+      "Redis": "127.0.0.1.6379",
+      "UdpMasterEndpoint": "127.0.0.1:32320"
+    },
+    "Nodes": [
+      {
+        "Ip": "127.0.0.1",
+        "Port": 22024
+      }
+    ]
+  },
+  "Debug": {
+    "GameRecorderEnabled": true,
+    "GameRecorderPath": ""
+  }
+}
