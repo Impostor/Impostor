@@ -1,9 +1,9 @@
 ---
-name: Bug Reporting
+name: 1. Bug reporting
 about: Bugs within Imposter
-title: 
-labels: 
-assignees: 
+title: ''
+labels: ''
+assignees: ''
 
 ---
 

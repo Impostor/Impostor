@@ -1,9 +1,9 @@
 ---
-name: Feature request
+name: 2. Feature request
 about: To ask and request new features with Impostor
-title: 
-labels: 
-assignees: 
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
