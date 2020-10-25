@@ -18,6 +18,7 @@ There are no special features at this moment, the goal is aiming to be as close 
 
 - All Among Us features are implemented. It is a full replacement for the official server.
 - Plugin support.
+- Server-sided anticheat.
 
 ## Installation
 
