@@ -1,5 +1,5 @@
 ---
-name: Feature Request
+name: Feature request
 about: To ask and request new features with Impostor
 ---
 
