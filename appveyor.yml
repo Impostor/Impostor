@@ -32,6 +32,15 @@ test: off
 artifacts:
   - path: ./build/*.zip
   - path: ./build/*.nupkg
+  - path: ./build/*.snupkg
+
+deploy:
+  - provider: NuGet
+    artifact: /.*(\.|\.s)nupkg/
+    on:
+      branch: dev
+    api_key:
+      secure: 4OHXl+m1KVi60hB1j54MpdP8tVv0UNfkdF4rVP+2AhAjN4a2MVT+Bl90gJZ96xHF
 
 only_commits:
   files:
