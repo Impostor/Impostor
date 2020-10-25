@@ -63,6 +63,9 @@ namespace Impostor.Server.Recorder
                 }
 
                 _recordAfter = false;
+
+                // Trigger message event.
+                await _recorder.WriteMessageAsync(this, messageCopy, messageType);
             }
 
             if (_recordAfter)

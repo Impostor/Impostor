@@ -50,8 +50,6 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 case RpcCalls.Close:
                 {
-                    Console.WriteLine("CLOSEEEE MEETING");
-
                     if (!sender.IsHost)
                     {
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.Close)} but was not a host");
