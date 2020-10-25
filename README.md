@@ -14,8 +14,6 @@ We support steam, itch, android and iOS. The latest version supported is `2020.9
 
 There are no special features at this moment, the goal is aiming to be as close as possible to the real server, for now. In a later stage, making modifications to game logic by modifying `GameData` packets can be looked at.
 
-
-
 ## Features
 
 - All Among Us features are implemented. It is a full replacement for the official server.

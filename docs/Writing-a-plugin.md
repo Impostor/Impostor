@@ -13,6 +13,9 @@ Impostor has support for plugins. This document will help you to setup a develop
 - [7. Extra](#7-extra)
   - [Event listeners](#event-listeners)
   - [Dependency injection](#dependency-injection)
+  - [Server configuration](#server-configuration)
+  - [Using other libraries](#using-other-libraries)
+  - [Impostor versions](#impostor-versions)
 - [8. Missing/invalid data or want more functions?](#8-missinginvalid-data-or-want-more-functions)
 
 ## 1. Install .NET Core SDK
@@ -256,6 +259,14 @@ Constantly copying the plugin dll to your server directory can be pretty annoyin
 ### Using other libraries
 
 Sometimes you need to use libraries that the original Impostor server does not provide. The dll files of these libraries must be placed in the `libraries` folder next to the server executable. You could also provide them by modifying the `PluginLoader.Libraries` option in the `config.json`, similarly to the `PluginLoader.Paths` option.
+
+### Impostor versions
+
+It is important to use the correct versions when working with `Impostor.Api` prereleases and the `Impostor` dev builds to reduce the chances of mismatching assemblies. 
+
+**Example** 
+
+The prerelease `Impostor.Api` package `1.2.0-ci.54` belongs to build `54` on AppVeyor, which can be found here https://ci.appveyor.com/project/Impostor/Impostor/build/54. Notice the `54` on the end of the url.
 
 ## 8. Missing/invalid data or want more functions?
 
