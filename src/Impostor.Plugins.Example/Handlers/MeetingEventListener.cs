@@ -1,5 +1,6 @@
 ﻿using System;
 using Impostor.Api.Events;
+using Impostor.Api.Events.Meeting;
 
 namespace Impostor.Plugins.Example.Handlers
 {

@@ -66,6 +66,13 @@ Make sure to get a prerelease if you are writing a plugin for a dev release of t
 5. Search for `Impostor.Api`.
 6. Click the `Impostor.Api` result and press install on the right side.
 
+### Dotnet CLI
+
+> Make sure to grab the latest (pre-)release version from NuGet [here](https://www.nuget.org/packages/Impostor.Api).
+
+1. Open your project folder in command prompt / bash.
+2. Run `dotnet add package Impostor.Api -v "1.2.0-ci.58"`.
+
 ## 4. The plugin class
 
 Now the `Impostor.Api` is installed, you need to create a class for your plugin. A plugin **must** contain exactly one. See the code below for an example.

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
+using Impostor.Api.Events.Meeting;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.State;

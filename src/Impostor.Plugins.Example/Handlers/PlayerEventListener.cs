@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
-using Impostor.Api.Events.Net;
+using Impostor.Api.Events.Player;
 
 namespace Impostor.Plugins.Example.Handlers
 {

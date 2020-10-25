@@ -1,11 +1,11 @@
 ﻿using Impostor.Api.Games;
 using Impostor.Api.Net.Inner.Objects;
 
-namespace Impostor.Api.Events.Net
+namespace Impostor.Api.Events.Player
 {
-    public class PlayerSpawnedEvent : IGameEvent
+    public class PlayerDestroyedEvent : IGameEvent
     {
-        public PlayerSpawnedEvent(IGame game, IInnerPlayerControl playerControl)
+        public PlayerDestroyedEvent(IGame game, IInnerPlayerControl playerControl)
         {
             Game = game;
             PlayerControl = playerControl;

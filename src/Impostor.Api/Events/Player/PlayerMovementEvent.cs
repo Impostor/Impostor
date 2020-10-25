@@ -1,6 +1,6 @@
 ﻿using Impostor.Api.Games;
 
-namespace Impostor.Api.Events
+namespace Impostor.Api.Events.Player
 {
     public class PlayerMovementEvent : IGameEvent
     {
