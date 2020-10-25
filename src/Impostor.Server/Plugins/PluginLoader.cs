@@ -74,7 +74,8 @@ namespace Impostor.Server.Plugins
 
                 if (pluginStartup.Count > 1)
                 {
-                    throw new PluginLoaderException("A plugin may only define zero or one IPluginStartup implementation.");
+                    Logger.Warning("A plugin may only define zero or one IPluginStartup implementation ({0}).", assembly);
+                    continue;
                 }
 
                 // Find plugin.
@@ -88,7 +89,8 @@ namespace Impostor.Server.Plugins
 
                 if (plugin.Count != 1)
                 {
-                    throw new PluginLoaderException("A plugin must define exactly one IPlugin or PluginBase implementation.");
+                    Logger.Warning("A plugin must define exactly one IPlugin or PluginBase implementation ({0}).", assembly);
+                    continue;
                 }
 
                 // Save plugin.
