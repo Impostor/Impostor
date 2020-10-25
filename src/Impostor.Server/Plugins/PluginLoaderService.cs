@@ -25,9 +25,11 @@ namespace Impostor.Server.Plugins
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Loading plugins.");
+
             foreach (var plugin in _plugins)
             {
-                _logger.LogInformation("Enabling plugin {0}", plugin);
+                _logger.LogInformation("Enabling plugin {0}.", plugin);
 
                 // Create instance and inject services.
                 plugin.Instance = (IPlugin) ActivatorUtilities.CreateInstance(_serviceProvider, plugin.PluginType);
@@ -35,6 +37,11 @@ namespace Impostor.Server.Plugins
                 // Enable plugin.
                 await plugin.Instance.EnableAsync();
             }
+
+            _logger.LogInformation(
+                _plugins.Count == 1
+                    ? "Loaded {0} plugin."
+                    : "Loaded {0} plugins.", _plugins.Count);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
@@ -43,7 +50,7 @@ namespace Impostor.Server.Plugins
             // In the case of a failed startup, some can be null.
             foreach (var plugin in _plugins.Where(plugin => plugin.Instance != null))
             {
-                _logger.LogInformation("Disabling plugin {0}", plugin);
+                _logger.LogInformation("Disabling plugin {0}.", plugin);
 
                 // Disable plugin.
                 await plugin.Instance.DisableAsync();

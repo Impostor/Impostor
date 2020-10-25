@@ -5,11 +5,15 @@ There are currently two modes to run the Impostor server in. The first way is th
 ## Single server
 
 ### Without docker
-1. Find the [latest release](https://github.com/AeonLucid/Impostor/releases/latest).
-2. Download either the Windows or the Linux version.
-3. Extract the zip.
-4. Modify `config.json` to your liking.
-5. Run `Impostor.Server.exe` (Windows) / `Impostor.Server` (Linux)
+1. Install the **.NET 5.0 runtime**.
+    - [Windows x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-aspnetcore-5.0.0-rc.2-windows-x64-binaries)
+    - [Linux x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-aspnetcore-5.0.0-rc.2-linux-x64-binaries)
+    - [macOS x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-aspnetcore-5.0.0-rc.2-macos-x64-binaries)
+2. Find the [latest release](https://github.com/AeonLucid/Impostor/releases/latest).
+3. Download either the Windows or the Linux version.
+4. Extract the zip.
+5. Modify `config.json` to your liking.
+6. Run `Impostor.Server.exe` (Windows) / `Impostor.Server` (Linux)
 
 ### Using docker
 
@@ -21,8 +25,6 @@ docker run -p 22023:22023/udp aeonlucid/impostor
 ```
 
 ## Multiple servers
-
-**This is only in the `dev` branch at this moment so you will need to build it yourself.**
 
 Follow the steps from the single server on two or more servers.
 
