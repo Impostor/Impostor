@@ -1,7 +1,7 @@
 ﻿using Impostor.Api.Games;
 using Impostor.Api.Net;
 
-namespace Impostor.Api.Events.Player
+namespace Impostor.Api.Events
 {
     public class PlayerLeftGameEvent : IGameEvent
     {

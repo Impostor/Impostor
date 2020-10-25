@@ -292,7 +292,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     var chat = reader.ReadString();
 
-                    await _eventManager.CallAsync(new PlayerChatEvent(_game, this, chat));
+                    await _eventManager.CallAsync(new PlayerChatEvent(_game, sender, this, chat));
                     break;
                 }
 

@@ -8,7 +8,7 @@ namespace Impostor.Api.Events
         {
             Game = game;
         }
-        
+
         public IGame Game { get; }
     }
 }

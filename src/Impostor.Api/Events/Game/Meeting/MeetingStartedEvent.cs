@@ -1,7 +1,7 @@
 ﻿using Impostor.Api.Games;
 using Impostor.Api.Net.Inner.Objects;
 
-namespace Impostor.Api.Events
+namespace Impostor.Api.Events.Meeting
 {
     public class MeetingStartedEvent : IEvent
     {
