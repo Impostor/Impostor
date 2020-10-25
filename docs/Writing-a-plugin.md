@@ -9,14 +9,15 @@ Impostor has support for plugins. This document will help you to setup a develop
   - [Visual Studio](#visual-studio)
 - [4. The plugin class](#4-the-plugin-class)
 - [5. Adding an event listener](#5-adding-an-event-listener)
-- [6. Build and run your plugin](#6-build-and-run-your-plugin)
-- [7. Extra](#7-extra)
+- [6. Registering the event listener](#6-registering-the-event-listener)
+- [7. Build and run your plugin](#7-build-and-run-your-plugin)
+- [8. Extra](#8-extra)
   - [Event listeners](#event-listeners)
   - [Dependency injection](#dependency-injection)
   - [Server configuration](#server-configuration)
   - [Using other libraries](#using-other-libraries)
   - [Impostor versions](#impostor-versions)
-- [8. Missing/invalid data or want more functions?](#8-missinginvalid-data-or-want-more-functions)
+- [9. Missing/invalid data or want more functions?](#9-missinginvalid-data-or-want-more-functions)
 
 ## 1. Install .NET Core SDK
 
@@ -203,7 +204,20 @@ namespace Impostor.Plugins.Example.Handlers
 }
 ```
 
-## 6. Build and run your plugin
+## 6. Registering the event listener
+
+The last step to get your plugin working is to register the event listener, so the server knows about it. Go back to your plugin class and modify it as below.
+
+```csharp
+public ExamplePlugin(ILogger<ExamplePlugin> logger, IEventManager eventManager)
+{
+    _logger = logger;
+    // Add this line!
+    eventManager.RegisterListener(new GameEventListener(logger));
+}
+```
+
+## 7. Build and run your plugin
 
 Now your plugin is ready to be tested.
 
@@ -215,7 +229,7 @@ Now your plugin is ready to be tested.
 6. (Re)start your Impostor server.
 7. Open Among Us, create a game and send a chat message. In the console you should see your plugin being loaded and the messages from the example.
 
-## 7. Extra
+## 8. Extra
 
 Some extra information that might be useful for those developing plugins.
 
@@ -268,7 +282,7 @@ It is important to use the correct versions when working with `Impostor.Api` pre
 
 The prerelease `Impostor.Api` package `1.2.0-ci.54` belongs to build `54` on AppVeyor, which can be found here https://ci.appveyor.com/project/Impostor/Impostor/build/54. Notice the `54` on the end of the url.
 
-## 8. Missing/invalid data or want more functions?
+## 9. Missing/invalid data or want more functions?
 
 The `Impostor.Api` is currently in beta. There are a lot of things still missing and we would like to hear from you what you need to develop a plugin.
 
