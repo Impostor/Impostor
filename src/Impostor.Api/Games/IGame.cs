@@ -35,6 +35,13 @@ namespace Impostor.Api.Games
         IClientPlayer GetClientPlayer(int clientId);
 
         /// <summary>
+        ///     Syncs the internal <see cref="GameOptionsData"/> to all players.
+        ///     Necessary to do if you modified it, otherwise it won't be used.
+        /// </summary>
+        /// <returns></returns>
+        ValueTask SyncSettingsAsync();
+
+        /// <summary>
         ///     Send the message to all players.
         /// </summary>
         /// <param name="writer">Message to send.</param>

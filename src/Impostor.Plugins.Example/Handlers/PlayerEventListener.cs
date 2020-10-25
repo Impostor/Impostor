@@ -24,6 +24,15 @@ namespace Impostor.Plugins.Example.Handlers
         {
             Console.WriteLine(e.PlayerControl.PlayerInfo.PlayerName + " said " + e.Message);
 
+            if (e.Message == "test")
+            {
+                e.Game.Options.KillCooldown = 0;
+                e.Game.Options.NumImpostors = 2;
+                e.Game.Options.PlayerSpeedMod = 5;
+
+                await e.Game.SyncSettingsAsync();
+            }
+
             await e.PlayerControl.SetNameAsync(e.Message);
             await e.PlayerControl.SendChatAsync(e.Message);
         }
