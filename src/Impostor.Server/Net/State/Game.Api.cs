@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
@@ -13,6 +14,11 @@ namespace Impostor.Server.Net.State
         IClientPlayer IGame.Host => Host;
 
         IGameNet IGame.GameNet => GameNet;
+
+        public void BanIp(IPAddress ipAddress)
+        {
+            _bannedIps.Add(ipAddress);
+        }
 
         public async ValueTask SyncSettingsAsync()
         {

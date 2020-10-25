@@ -69,7 +69,7 @@ namespace Impostor.Server.Net.State
 
             if (isBan && player.Client.Connection != null)
             {
-                _bannedIps.Add(player.Client.Connection.EndPoint.Address);
+                BanIp(player.Client.Connection.EndPoint.Address);
             }
 
             await _eventManager.CallAsync(new PlayerLeftGameEvent(this, player, isBan));

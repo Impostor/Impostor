@@ -172,6 +172,8 @@ namespace Impostor.Server.Net
                     }
                     catch (ImpostorCheatException e)
                     {
+                        Player.Game.BanIp(Connection.EndPoint.Address);
+
                         await DisconnectAsync(DisconnectReason.Hacking, e.Message);
                     }
 

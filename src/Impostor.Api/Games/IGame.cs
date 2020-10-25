@@ -35,6 +35,17 @@ namespace Impostor.Api.Games
         IClientPlayer GetClientPlayer(int clientId);
 
         /// <summary>
+        ///     Adds an <see cref="IPAddress"/> to the ban list of this game.
+        ///     Prevents all future joins from this <see cref="IPAddress"/>.
+        ///
+        ///     This does not kick the player with that <see cref="IPAddress"/> from the lobby.
+        /// </summary>
+        /// <param name="ipAddress">
+        ///     The <see cref="IPAddress"/> to ban.
+        /// </param>
+        void BanIp(IPAddress ipAddress);
+
+        /// <summary>
         ///     Syncs the internal <see cref="GameOptionsData"/> to all players.
         ///     Necessary to do if you modified it, otherwise it won't be used.
         /// </summary>
