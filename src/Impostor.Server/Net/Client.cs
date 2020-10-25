@@ -9,21 +9,25 @@ using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
 using Impostor.Server.Config;
+using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net
 {
     internal class Client : ClientBase
     {
         private readonly ILogger<Client> _logger;
+        private readonly AntiCheatConfig _antiCheatConfig;
         private readonly ClientManager _clientManager;
         private readonly GameManager _gameManager;
 
-        public Client(ILogger<Client> logger, ClientManager clientManager, GameManager gameManager, string name, IHazelConnection connection)
+        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, IHazelConnection connection)
             : base(name, connection)
         {
             _logger = logger;
+            _antiCheatConfig = antiCheatOptions.Value;
             _clientManager = clientManager;
             _gameManager = gameManager;
         }
@@ -172,7 +176,10 @@ namespace Impostor.Server.Net
                     }
                     catch (ImpostorCheatException e)
                     {
-                        Player.Game.BanIp(Connection.EndPoint.Address);
+                        if (_antiCheatConfig.BanIpFromGame)
+                        {
+                            Player.Game.BanIp(Connection.EndPoint.Address);
+                        }
 
                         await DisconnectAsync(DisconnectReason.Hacking, e.Message);
                     }
