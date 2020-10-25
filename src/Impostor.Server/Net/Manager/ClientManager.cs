@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
@@ -54,8 +55,21 @@ namespace Impostor.Server.Net.Manager
             return clientId;
         }
 
+        private static bool IsCharAllowed(char i)
+        {
+            return i == ' ' || (i >= 'A' && i <= 'Z') || (i >= 'a' && i <= 'z') || (i >= '0' && i <= '9') || (i >= 'À' && i <= 'ÿ') || (i >= 'Ѐ' && i <= 'џ') || (i >= 'ㄱ' && i <= 'ㆎ') || (i >= '가' && i <= '힣');
+        }
+
         public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion)
         {
+            if (!SupportedVersions.Contains(clientVersion))
+            {
+                using var packet = MessageWriter.Get(MessageType.Reliable);
+                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
+                await connection.SendAsync(packet);
+                return;
+            }
+
             if (name.Length > 10)
             {
                 using var packet = MessageWriter.Get(MessageType.Reliable);
@@ -64,10 +78,10 @@ namespace Impostor.Server.Net.Manager
                 return;
             }
 
-            if (!SupportedVersions.Contains(clientVersion))
+            if (string.IsNullOrWhiteSpace(name) || !name.All(IsCharAllowed))
             {
                 using var packet = MessageWriter.Get(MessageType.Reliable);
-                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
+                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameIllegalCharacters);
                 await connection.SendAsync(packet);
                 return;
             }
