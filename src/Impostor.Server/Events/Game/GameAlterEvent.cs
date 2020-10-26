@@ -1,8 +1,9 @@
+using Impostor.Api.Events;
 using Impostor.Api.Games;
 
-namespace Impostor.Api.Events
+namespace Impostor.Server.Events
 {
-    public class GameAlterEvent : IGameEvent
+    public class GameAlterEvent : IGameAlterEvent
     {
         public GameAlterEvent(IGame game, bool isPublic)
         {
@@ -11,6 +12,7 @@ namespace Impostor.Api.Events
         }
 
         public IGame Game { get; }
+
         public bool IsPublic { get; }
     }
 }

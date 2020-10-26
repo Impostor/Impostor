@@ -138,7 +138,7 @@ namespace Impostor.Server.Net.State
             using var packet = MessageWriter.Get(MessageType.Reliable);
             message.CopyTo(packet);
             await SendToAllExceptAsync(packet, sender.Client.Id);
-            
+
             await _eventManager.CallAsync(new GameAlterEvent(this, isPublic));
         }
 
