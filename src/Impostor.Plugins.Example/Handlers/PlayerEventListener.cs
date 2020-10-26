@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
-using Impostor.Api.Events.Net;
+using Impostor.Api.Events.Player;
 
 namespace Impostor.Plugins.Example.Handlers
 {
     public class PlayerEventListener : IEventListener
     {
         [EventListener]
-        public void OnPlayerSpawned(PlayerSpawnedEvent e)
+        public void OnPlayerSpawned(IPlayerSpawnedEvent e)
         {
             Console.WriteLine(e.PlayerControl.PlayerInfo.PlayerName + " spawned");
         }
 
         [EventListener]
-        public void OnPlayerDestroyed(PlayerDestroyedEvent e)
+        public void OnPlayerDestroyed(IPlayerDestroyedEvent e)
         {
             Console.WriteLine(e.PlayerControl.PlayerInfo.PlayerName + " destroyed");
         }
 
         [EventListener]
-        public async ValueTask OnPlayerChat(PlayerChatEvent e)
+        public async ValueTask OnPlayerChat(IPlayerChatEvent e)
         {
             Console.WriteLine(e.PlayerControl.PlayerInfo.PlayerName + " said " + e.Message);
 

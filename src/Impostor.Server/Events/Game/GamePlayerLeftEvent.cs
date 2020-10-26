@@ -1,11 +1,12 @@
-﻿using Impostor.Api.Games;
+﻿using Impostor.Api.Events;
+using Impostor.Api.Games;
 using Impostor.Api.Net;
 
-namespace Impostor.Api.Events
+namespace Impostor.Server.Events
 {
-    public class PlayerLeftGameEvent : IGameEvent
+    public class GamePlayerLeftEvent : IGamePlayerLeftEvent
     {
-        public PlayerLeftGameEvent(IGame game, IClientPlayer player, bool isBan)
+        public GamePlayerLeftEvent(IGame game, IClientPlayer player, bool isBan)
         {
             Game = game;
             Player = player;

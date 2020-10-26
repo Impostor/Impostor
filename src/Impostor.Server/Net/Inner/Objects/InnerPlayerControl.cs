@@ -1,13 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using Impostor.Api;
-using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
-using Impostor.Api.Events.Net;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner.Objects.Components;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.DependencyInjection;
@@ -292,7 +290,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     var chat = reader.ReadString();
 
-                    await _eventManager.CallAsync(new PlayerChatEvent(_game, this, chat));
+                    await _eventManager.CallAsync(new PlayerChatEvent(_game, sender, this, chat));
                     break;
                 }
 

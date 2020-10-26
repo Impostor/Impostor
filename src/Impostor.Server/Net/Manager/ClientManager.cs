@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Manager;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
@@ -15,9 +14,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Manager
 {
-    internal class ClientManager : IClientManager
+    internal partial class ClientManager
     {
-        public static HashSet<int> SupportedVersions { get; } = new HashSet<int>
+        private static HashSet<int> SupportedVersions { get; } = new HashSet<int>
         {
             GameVersion.GetVersion(2020, 09, 07), // 2020.09.07 - 2020.09.22
             GameVersion.GetVersion(2020, 10, 08), // 2020.10.08
@@ -37,8 +36,6 @@ namespace Impostor.Server.Net.Manager
 
         public IEnumerable<ClientBase> Clients => _clients.Values;
 
-        IEnumerable<IClient> IClientManager.Clients => _clients.Values;
-
         public int NextId()
         {
             var clientId = Interlocked.Increment(ref _idLast);
@@ -53,11 +50,6 @@ namespace Impostor.Server.Net.Manager
             }
 
             return clientId;
-        }
-
-        private static bool IsCharAllowed(char i)
-        {
-            return i == ' ' || (i >= 'A' && i <= 'Z') || (i >= 'a' && i <= 'z') || (i >= '0' && i <= '9') || (i >= 'À' && i <= 'ÿ') || (i >= 'Ѐ' && i <= 'џ') || (i >= 'ㄱ' && i <= 'ㆎ') || (i >= '가' && i <= '힣');
         }
 
         public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion)
@@ -78,7 +70,7 @@ namespace Impostor.Server.Net.Manager
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(name) || !name.All(IsCharAllowed))
+            if (string.IsNullOrWhiteSpace(name) || !name.All(TextBox.IsCharAllowed))
             {
                 using var packet = MessageWriter.Get(MessageType.Reliable);
                 Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameIllegalCharacters);

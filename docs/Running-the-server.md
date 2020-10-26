@@ -74,8 +74,8 @@ Example configuration:
     "ListenPort": 22024
   },
   "ServerRedirector": {
-    "Enabled": false,
-    "Master": true,
+    "Enabled": true,
+    "Master": false,
     "Locator": {
       "Redis": "",
       "UdpMasterEndpoint": "127.0.0.1:22023"

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api;
-using Impostor.Api.Events;
-using Impostor.Api.Events.Net;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
+using Impostor.Server.Events.Meeting;
+using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner;
 using Impostor.Server.Net.Inner.Objects;
 using Impostor.Server.Net.Inner.Objects.Components;
@@ -81,11 +81,13 @@ namespace Impostor.Server.Net.State
                 case InnerPlayerControl control:
                 {
                     // Hook up InnerPlayerControl <-> IClientPlayer.
-                    if (TryGetPlayer(control.OwnerId, out var player))
+                    if (!TryGetPlayer(control.OwnerId, out var player))
                     {
-                        player.Character = control;
-                        player.DisableSpawnTimeout();
+                        throw new ImpostorException("Failed to find player that spawned the InnerPlayerControl");
                     }
+
+                    player.Character = control;
+                    player.DisableSpawnTimeout();
 
                     // Hook up InnerPlayerControl <-> InnerPlayerControl.PlayerInfo.
                     control.PlayerInfo = GameNet.GameData.GetPlayerById(control.PlayerId)!;
@@ -100,7 +102,7 @@ namespace Impostor.Server.Net.State
                         control.PlayerInfo!.Controller = control;
                     }
 
-                    await _eventManager.CallAsync(new PlayerSpawnedEvent(this, control));
+                    await _eventManager.CallAsync(new PlayerSpawnedEvent(this, player, control));
 
                     break;
                 }
@@ -117,7 +119,7 @@ namespace Impostor.Server.Net.State
         {
             switch (netObj)
             {
-                case InnerLobbyBehaviour lobby:
+                case InnerLobbyBehaviour:
                 {
                     GameNet.LobbyBehaviour = null;
                     break;
@@ -149,7 +151,7 @@ namespace Impostor.Server.Net.State
                         player.Character = null;
                     }
 
-                    await _eventManager.CallAsync(new PlayerDestroyedEvent(this, control));
+                    await _eventManager.CallAsync(new PlayerDestroyedEvent(this, player, control));
 
                     break;
                 }

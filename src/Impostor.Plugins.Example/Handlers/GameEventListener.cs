@@ -6,19 +6,19 @@ namespace Impostor.Plugins.Example.Handlers
     public class GameEventListener : IEventListener
     {
         [EventListener]
-        public void OnGameCreated(GameCreatedEvent e)
+        public void OnGameCreated(IGameCreatedEvent e)
         {
             Console.WriteLine("Game > created");
         }
 
         [EventListener]
-        public void OnGameStarting(GameStartingEvent e)
+        public void OnGameStarting(IGameStartingEvent e)
         {
             Console.WriteLine("Game > starting");
         }
 
         [EventListener]
-        public void OnGameStarted(GameStartedEvent e)
+        public void OnGameStarted(IGameStartedEvent e)
         {
             Console.WriteLine("Game > started");
 
@@ -31,25 +31,25 @@ namespace Impostor.Plugins.Example.Handlers
         }
 
         [EventListener]
-        public void OnGameEnded(GameEndedEvent e)
+        public void OnGameEnded(IGameEndedEvent e)
         {
             Console.WriteLine("Game > ended");
         }
 
         [EventListener]
-        public void OnGameDestroyed(GameDestroyedEvent e)
+        public void OnGameDestroyed(IGameDestroyedEvent e)
         {
             Console.WriteLine("Game > destroyed");
         }
 
         [EventListener]
-        public void OnPlayerJoined(PlayerJoinedGameEvent e)
+        public void OnPlayerJoined(IGamePlayerJoinedEvent e)
         {
             Console.WriteLine("Player joined a game.");
         }
 
         [EventListener]
-        public void OnPlayerLeftGame(PlayerLeftGameEvent e)
+        public void OnPlayerLeftGame(IGamePlayerLeftEvent e)
         {
             Console.WriteLine("Player left a game.");
         }

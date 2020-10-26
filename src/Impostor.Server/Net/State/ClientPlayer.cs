@@ -11,8 +11,7 @@ namespace Impostor.Server.Net.State
     internal partial class ClientPlayer : IClientPlayer
     {
         private readonly ILogger<ClientPlayer> _logger;
-
-        private Timer _spawnTimeout;
+        private readonly Timer _spawnTimeout;
 
         public ClientPlayer(ILogger<ClientPlayer> logger, ClientBase client, Game game)
         {
