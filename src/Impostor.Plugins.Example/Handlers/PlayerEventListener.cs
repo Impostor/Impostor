@@ -7,10 +7,39 @@ namespace Impostor.Plugins.Example.Handlers
 {
     public class PlayerEventListener : IEventListener
     {
+        private static readonly Random Random = new Random();
+
         [EventListener]
         public void OnPlayerSpawned(IPlayerSpawnedEvent e)
         {
             Console.WriteLine(e.PlayerControl.PlayerInfo.PlayerName + " spawned");
+
+            // Need to make a local copy because it might be possible that
+            // the event gets changed after being handled.
+            var clientPlayer = e.ClientPlayer;
+            var playerControl = e.PlayerControl;
+
+            Task.Run(async () =>
+            {
+                Console.WriteLine("Starting player task.");
+
+                // Give the player time to load.
+                await Task.Delay(TimeSpan.FromSeconds(3));
+
+                while (clientPlayer.Client.Connection != null &&
+                       clientPlayer.Client.Connection.IsConnected)
+                {
+                    // Modify player properties.
+                    await playerControl.SetColorAsync((byte) Random.Next(1, 9));
+                    await playerControl.SetHatAsync((uint) Random.Next(1, 9));
+                    await playerControl.SetSkinAsync((uint) Random.Next(1, 9));
+                    await playerControl.SetPetAsync((uint) Random.Next(1, 9));
+
+                    await Task.Delay(TimeSpan.FromMilliseconds(500));
+                }
+
+                Console.WriteLine("Stopping player task.");
+            });
         }
 
         [EventListener]

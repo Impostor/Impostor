@@ -54,7 +54,6 @@ namespace Impostor.Server.Net.Hazel
         {
             if (Client == null)
             {
-                _logger.LogWarning("Client was null.");
                 return;
             }
 
