@@ -42,7 +42,6 @@ See the [docs](docs/Running-the-server.md) for instructions on how to set it up.
 
 See [CONTRIBUTING](CONTRIBUTING.md).
 
-
 ## License
 
 This software is distributed under the **GNU GPLv3** License.
