@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api;
-using Impostor.Api.Events;
-using Impostor.Api.Events.Meeting;
-using Impostor.Api.Events.Player;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
+using Impostor.Server.Events.Meeting;
+using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner;
 using Impostor.Server.Net.Inner.Objects;
 using Impostor.Server.Net.Inner.Objects.Components;
@@ -120,7 +119,7 @@ namespace Impostor.Server.Net.State
         {
             switch (netObj)
             {
-                case InnerLobbyBehaviour lobby:
+                case InnerLobbyBehaviour:
                 {
                     GameNet.LobbyBehaviour = null;
                     break;

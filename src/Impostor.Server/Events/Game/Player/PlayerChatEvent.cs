@@ -1,10 +1,11 @@
-﻿using Impostor.Api.Games;
+﻿using Impostor.Api.Events.Player;
+using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 
-namespace Impostor.Api.Events.Player
+namespace Impostor.Server.Events.Player
 {
-    public class PlayerChatEvent : IPlayerEvent
+    public class PlayerChatEvent : IPlayerChatEvent
     {
         public PlayerChatEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, string message)
         {
@@ -14,18 +15,12 @@ namespace Impostor.Api.Events.Player
             Message = message;
         }
 
-        /// <inheritdoc/>
         public IGame Game { get; }
 
-        /// <inheritdoc/>
         public IClientPlayer ClientPlayer { get; }
 
-        /// <inheritdoc/>
         public IInnerPlayerControl PlayerControl { get; }
 
-        /// <summary>
-        ///     Gets the message sent by the player.
-        /// </summary>
         public string Message { get; }
     }
 }

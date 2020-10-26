@@ -1,25 +1,24 @@
-﻿using Impostor.Api.Games;
+﻿using Impostor.Api.Events.Player;
+using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 
-namespace Impostor.Api.Events.Player
+namespace Impostor.Server.Events.Player
 {
-    public class PlayerSpawnedEvent : IPlayerEvent
+    // TODO: Finish and use event, needs to be pooled
+    public class PlayerMovementEvent : IPlayerEvent
     {
-        public PlayerSpawnedEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl)
+        public PlayerMovementEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl)
         {
             Game = game;
             ClientPlayer = clientPlayer;
             PlayerControl = playerControl;
         }
 
-        /// <inheritdoc/>
         public IGame Game { get; }
 
-        /// <inheritdoc/>
         public IClientPlayer ClientPlayer { get; }
 
-        /// <inheritdoc/>
         public IInnerPlayerControl PlayerControl { get; }
     }
 }

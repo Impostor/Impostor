@@ -150,6 +150,7 @@ Create a new class called `GameEventListener`. Example code:
 
 ```csharp
 using Impostor.Api.Events;
+using Impostor.Api.Events.Player;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example.Handlers
@@ -176,7 +177,7 @@ namespace Impostor.Plugins.Example.Handlers
         ///     The event you want to listen for.
         /// </param>
         [EventListener]
-        public void OnGameStarted(GameStartedEvent e)
+        public void OnGameStarted(IGameStartedEvent e)
         {
             _logger.LogInformation($"Game is starting.");
 
@@ -197,13 +198,13 @@ namespace Impostor.Plugins.Example.Handlers
         }
 
         [EventListener]
-        public void OnGameEnded(GameEndedEvent e)
+        public void OnGameEnded(IGameEndedEvent e)
         {
             _logger.LogInformation($"Game has ended.");
         }
 
         [EventListener]
-        public void OnPlayerChat(PlayerChatEvent e)
+        public void OnPlayerChat(IPlayerChatEvent e)
         {
             _logger.LogInformation($"{e.PlayerControl.PlayerInfo.PlayerName} said {e.Message}");
         }

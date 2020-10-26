@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
+using Impostor.Server.Events;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 

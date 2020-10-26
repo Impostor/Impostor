@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
@@ -88,6 +89,16 @@ namespace Impostor.Server.Events
         private IEnumerable<EventHandler> GetHandlers<TEvent>(IServiceProvider services)
             where TEvent : IEvent
         {
+            var eventType = typeof(TEvent);
+            var interfaces = eventType.GetInterfaces();
+            if (interfaces.Length > 0 && _temporaryEventListeners.TryGetValue(interfaces[0], out var cb))
+            {
+                foreach (var eventListener in cb.GetEventListeners())
+                {
+                    yield return new EventHandler(null, eventListener);
+                }
+            }
+
             foreach (var handler in services.GetServices<IEventListener>())
             {
                 if (handler is IManualEventListener manualEventListener && manualEventListener.CanExecute<TEvent>())
@@ -109,7 +120,7 @@ namespace Impostor.Server.Events
                 }
             }
 
-            if (_temporaryEventListeners.TryGetValue(typeof(TEvent), out var cb))
+            if (_temporaryEventListeners.TryGetValue(eventType, out cb))
             {
                 foreach (var eventListener in cb.GetEventListeners())
                 {

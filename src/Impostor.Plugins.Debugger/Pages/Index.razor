@@ -48,10 +48,10 @@
 @code {
     private IDisposable _disposable;
 
-    [EventListener(typeof(GameCreatedEvent))]
-    [EventListener(typeof(GameDestroyedEvent))]
-    [EventListener(typeof(PlayerJoinedGameEvent))]
-    [EventListener(typeof(PlayerLeftGameEvent))]
+    [EventListener(typeof(IGameCreatedEvent))]
+    [EventListener(typeof(IGameDestroyedEvent))]
+    [EventListener(typeof(IGamePlayerJoinedEvent))]
+    [EventListener(typeof(IGamePlayerLeftEvent))]
     public void OnGameCreated(IGameEvent e)
     {
         StateHasChanged();

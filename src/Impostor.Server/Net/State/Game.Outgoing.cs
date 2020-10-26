@@ -5,7 +5,6 @@ using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
-using Impostor.Hazel.Udp;
 using Impostor.Server.Net.Inner;
 
 namespace Impostor.Server.Net.State

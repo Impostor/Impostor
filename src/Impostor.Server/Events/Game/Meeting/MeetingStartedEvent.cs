@@ -1,9 +1,10 @@
-﻿using Impostor.Api.Games;
+﻿using Impostor.Api.Events.Meeting;
+using Impostor.Api.Games;
 using Impostor.Api.Net.Inner.Objects;
 
-namespace Impostor.Api.Events.Meeting
+namespace Impostor.Server.Events.Meeting
 {
-    public class MeetingStartedEvent : IEvent
+    public class MeetingStartedEvent : IMeetingStartedEvent
     {
         public MeetingStartedEvent(IGame game, IInnerMeetingHud meetingHud)
         {
