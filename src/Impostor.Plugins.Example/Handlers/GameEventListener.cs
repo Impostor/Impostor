@@ -5,6 +5,12 @@ namespace Impostor.Plugins.Example.Handlers
 {
     public class GameEventListener : IEventListener
     {
+        [EventListener(EventPriority.Monitor)]
+        public void OnGame(IGameEvent e)
+        {
+            Console.WriteLine(e.GetType().Name + " triggered");
+        }
+
         [EventListener]
         public void OnGameCreated(IGameCreatedEvent e)
         {

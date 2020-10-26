@@ -7,6 +7,6 @@
         Normal = 2,
         High = 3,
         Highest = 4,
-        Monitor = 5
+        Monitor = 5,
     }
 }

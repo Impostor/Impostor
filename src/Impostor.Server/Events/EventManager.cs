@@ -91,11 +91,15 @@ namespace Impostor.Server.Events
         {
             var eventType = typeof(TEvent);
             var interfaces = eventType.GetInterfaces();
-            if (interfaces.Length > 0 && _temporaryEventListeners.TryGetValue(interfaces[0], out var cb))
+
+            foreach (var @interface in interfaces)
             {
-                foreach (var eventListener in cb.GetEventListeners())
+                if (_temporaryEventListeners.TryGetValue(@interface, out var cb))
                 {
-                    yield return new EventHandler(null, eventListener);
+                    foreach (var eventListener in cb.GetEventListeners())
+                    {
+                        yield return new EventHandler(null, eventListener);
+                    }
                 }
             }
 
@@ -120,9 +124,9 @@ namespace Impostor.Server.Events
                 }
             }
 
-            if (_temporaryEventListeners.TryGetValue(eventType, out cb))
+            if (_temporaryEventListeners.TryGetValue(eventType, out var cb2))
             {
-                foreach (var eventListener in cb.GetEventListeners())
+                foreach (var eventListener in cb2.GetEventListeners())
                 {
                     yield return new EventHandler(null, eventListener);
                 }
