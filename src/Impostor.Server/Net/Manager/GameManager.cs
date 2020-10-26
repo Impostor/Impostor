@@ -36,7 +36,7 @@ namespace Impostor.Server.Net.Manager
             _serviceProvider = serviceProvider;
             _eventManager = eventManager;
             _gameCodeFactory = gameCodeFactory;
-            _publicIp = new IPEndPoint(IPAddress.Parse(config.Value.PublicIp), config.Value.PublicPort);
+            _publicIp = new IPEndPoint(IPAddress.Parse(config.Value.ResolvePublicIp()), config.Value.PublicPort);
             _games = new ConcurrentDictionary<int, Game>();
         }
 

@@ -8,9 +8,9 @@ Some information about all the possible configurations. Click [here](https://git
 
 | Key | Default | Description |
 |-|-|-|
-| **PublicIp** | `127.0.0.1` | This needs to the IPv4 address of the server, what you give to others to connect. You can find the your IPv4 address [here](http://whatismyip.host/). |
+| **PublicIp** | `127.0.0.1` | This needs to the IPv4 address of the server, what you give to others to connect. You can find the your IPv4 address [here](http://whatismyip.host/). Since 1.2.2 it is also possible to use hostnames instead of IPv4 addresses, these must resolve to a valid IPv4 address. |
 | **PublicPort** | `22023` | The public port of the server, what you give to others to  connect. Usually `22023`. |
-| **ListenIp** | `0.0.0.0` | The network interface to listen on. If you do not know what to put here, use `0.0.0.0`. |
+| **ListenIp** | `0.0.0.0` | The network interface to listen on. If you do not know what to put here, use `0.0.0.0`. Since 1.2.2 it is also possible to use hostnames instead of IPv4 addresses, these must resolve to a valid IPv4 address. |
 | **ListenPort** | `22023` | The listen port of the server, usually `22023`. |
 
 ### AntiCheat

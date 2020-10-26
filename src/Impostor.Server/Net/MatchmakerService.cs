@@ -29,7 +29,7 @@ namespace Impostor.Server.Net
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            var endpoint = new IPEndPoint(IPAddress.Parse(_serverConfig.ListenIp), _serverConfig.ListenPort);
+            var endpoint = new IPEndPoint(IPAddress.Parse(_serverConfig.ResolveListenIp()), _serverConfig.ListenPort);
 
             await _matchmaker.StartAsync(endpoint);
 
@@ -37,7 +37,7 @@ namespace Impostor.Server.Net
                 "Matchmaker is listening on {0}:{1}, the public server ip is {2}:{3}.",
                 endpoint.Address,
                 endpoint.Port,
-                _serverConfig.PublicIp,
+                _serverConfig.ResolvePublicIp(),
                 _serverConfig.PublicPort);
 
             if (_redirectorConfig.Enabled)
