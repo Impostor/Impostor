@@ -55,11 +55,11 @@ namespace Impostor.Hazel.Udp
         /// <summary>
         ///     Sends a disconnect message to the end point.
         /// </summary>
-        protected override ValueTask<bool> SendDisconnect(MessageWriter data = null)
+        protected override async ValueTask<bool> SendDisconnect(MessageWriter data = null)
         {
             lock (this)
             {
-                if (this._state != ConnectionState.Connected) return ValueTask.FromResult(false);
+                if (this._state != ConnectionState.Connected) return false;
                 this._state = ConnectionState.NotConnected;
             }
             
@@ -74,11 +74,11 @@ namespace Impostor.Hazel.Udp
 
             try
             {
-                Listener.SendDataSync(bytes, bytes.Length, RemoteEndPoint);
+                await Listener.SendData(bytes, bytes.Length, RemoteEndPoint);
             }
             catch { }
 
-            return ValueTask.FromResult(true);
+            return true;
         }
 
         protected override void Dispose(bool disposing)

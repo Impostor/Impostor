@@ -392,6 +392,12 @@ namespace Impostor.Server.Net.State
                         break;
                     }
                 }
+
+                if (sender.Client.Player == null)
+                {
+                    // Disconnect handler was probably invoked, cancel the rest.
+                    return false;
+                }
             }
 
             return true;

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Net
@@ -57,5 +58,19 @@ namespace Impostor.Api.Net
         ValueTask HandleMessageAsync(IMessageReader message, MessageType messageType);
 
         ValueTask HandleDisconnectAsync(string reason);
+
+        /// <summary>
+        ///     Disconnect the client with a <see cref="DisconnectReason"/>.
+        /// </summary>
+        /// <param name="reason">
+        ///     The message to show to the player.
+        /// </param>
+        /// <param name="message">
+        ///     Only used when <see cref="reason"/> is set to <see cref="DisconnectReason.Custom"/>.
+        /// </param>
+        /// <returns>
+        ///     A <see cref="ValueTask"/> representing the asynchronous operation.
+        /// </returns>
+        ValueTask DisconnectAsync(DisconnectReason reason, string? message = null);
     }
 }

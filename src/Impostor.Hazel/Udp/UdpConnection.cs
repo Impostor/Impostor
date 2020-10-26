@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -63,8 +63,15 @@ namespace Impostor.Hazel.Udp
             // Signal cancellation to methods.
             _stoppingCts.Cancel();
 
-            // Cancel reader.
-            Pipeline.Writer.Complete();
+            try
+            {
+                // Cancel reader.
+                Pipeline.Writer.Complete();
+            }
+            catch (ChannelClosedException)
+            {
+                // Already done.
+            }
 
             // Remove references.
             if (!_isDisposing)

@@ -275,7 +275,7 @@ namespace Impostor.Server.Net
                 _logger.LogError(ex, "Exception caught in client disconnection.");
             }
 
-            _logger.LogInformation("Client {0} disconnecting, reason: {1}.", Id, reason);
+            _logger.LogInformation("Client {0} disconnecting, reason: {1}", Id, reason);
             _clientManager.Remove(this);
         }
 
@@ -329,20 +329,6 @@ namespace Impostor.Server.Net
             Message16GetGameListS2C.Serialize(message, skeldGameCount, miraHqGameCount, polusGameCount, games);
 
             return Connection.SendAsync(message);
-        }
-
-        private async ValueTask DisconnectAsync(DisconnectReason reason, string message = null)
-        {
-            if (Connection == null)
-            {
-                return;
-            }
-
-            using var packet = MessageWriter.Get(MessageType.Reliable);
-            Message01JoinGameS2C.SerializeError(packet, false, reason, message);
-
-            await Connection.SendAsync(packet);
-            await Connection.DisconnectAsync(message ?? reason.ToString());
         }
     }
 }
