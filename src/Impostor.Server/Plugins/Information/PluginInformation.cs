@@ -4,13 +4,13 @@ using Impostor.Api.Plugins;
 
 namespace Impostor.Server.Plugins
 {
-    public class PluginInformation
+    public class PluginInformation : IPluginInformation
     {
         private readonly ImpostorPluginAttribute _attribute;
 
-        public PluginInformation(IPluginStartup startup, Type pluginType)
+        public PluginInformation(IPluginStartup? startup, Type pluginType)
         {
-            _attribute = pluginType.GetCustomAttribute<ImpostorPluginAttribute>();
+            _attribute = pluginType.GetCustomAttribute<ImpostorPluginAttribute>()!;
 
             Startup = startup;
             PluginType = pluginType;
@@ -24,11 +24,11 @@ namespace Impostor.Server.Plugins
 
         public string Version => _attribute.Version;
 
-        public IPluginStartup Startup { get; }
+        public IPluginStartup? Startup { get; }
+
+        public IPlugin? Instance { get; set; }
 
         public Type PluginType { get; }
-
-        public IPlugin Instance { get; set; }
 
         public override string ToString()
         {

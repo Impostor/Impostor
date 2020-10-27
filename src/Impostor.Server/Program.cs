@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Linq;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Net.Manager;
+using Impostor.Api.Plugins;
+using Impostor.Api.Plugins.Managers;
 using Impostor.Server.Config;
 using Impostor.Server.Events;
 using Impostor.Server.Net;
@@ -10,6 +13,10 @@ using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Redirector;
 using Impostor.Server.Plugins;
+using Impostor.Server.Plugins.Config;
+using Impostor.Server.Plugins.Managers;
+using Impostor.Server.Plugins.Proxies;
+using Impostor.Server.Plugins.Services;
 using Impostor.Server.Recorder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,25 +60,8 @@ namespace Impostor.Server
             }
         }
 
-        private static IConfiguration CreateConfiguration(string[] args)
-        {
-            var configurationBuilder = new ConfigurationBuilder();
-
-            configurationBuilder.AddJsonFile("config.json", true);
-            configurationBuilder.AddJsonFile("config.Development.json", true);
-            configurationBuilder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
-            configurationBuilder.AddCommandLine(args);
-
-            return configurationBuilder.Build();
-        }
-
         private static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            var configuration = CreateConfiguration(args);
-            var pluginConfig = configuration.GetSection("PluginLoader")
-                .Get<PluginConfig>() ?? new PluginConfig();
-
-            return Host.CreateDefaultBuilder(args)
+            => Host.CreateDefaultBuilder(args)
 #if DEBUG
                 .UseEnvironment(Environment.GetEnvironmentVariable("IMPOSTOR_ENV") ?? "Development")
 #else
@@ -79,7 +69,10 @@ namespace Impostor.Server
 #endif
                 .ConfigureAppConfiguration(builder =>
                 {
-                    builder.AddConfiguration(configuration);
+                    builder.AddJsonFile("config.json", true);
+                    builder.AddJsonFile("config.Development.json", true);
+                    builder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
+                    builder.AddCommandLine(args);
                 })
                 .ConfigureServices((host, services) =>
                 {
@@ -95,6 +88,7 @@ namespace Impostor.Server
                     services.Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section));
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                     services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));
+                    services.Configure<PluginConfig>(host.Configuration.GetSection(PluginConfig.Section));
 
                     if (redirector.Enabled)
                     {
@@ -173,10 +167,23 @@ namespace Impostor.Server
                     services.AddSingleton<IEventManager, EventManager>();
                     services.AddSingleton<Matchmaker>();
                     services.AddHostedService<MatchmakerService>();
+
+                    services.AddSingleton<PluginManager>();
+                    services.AddSingleton<IPluginManager>(p => p.GetRequiredService<PluginManager>());
+                    services.AddHostedService<PluginService>();
+
+                    // Note: This service registration has to be at the bottom of ConfigureServices.
+                    var apiAssembly = typeof(IPlugin).Assembly;
+                    var pluginManagerType = typeof(IPluginManager);
+
+                    services.AddSingleton(new ServiceProxyCollection(
+                        services
+                            .Where(t => t.ServiceType.Assembly == apiAssembly || t.ServiceType == pluginManagerType)
+                            .Select(t => new ServiceRegistration(t.ServiceType, t.Lifetime))
+                            .Distinct()
+                            .ToArray()));
                 })
                 .UseSerilog()
-                .UseConsoleLifetime()
-                .UsePluginLoader(pluginConfig);
-        }
+                .UseConsoleLifetime();
     }
 }

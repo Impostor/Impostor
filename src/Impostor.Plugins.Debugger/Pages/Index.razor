@@ -3,10 +3,13 @@
 @using Impostor.Api.Events.Managers
 @using Impostor.Api.Games.Managers
 @using Impostor.Api.Events
-@using Impostor.Api.Events.Player
+@using Impostor.Api.Plugins.Managers
 @implements Impostor.Api.Events.IEventListener
 @inject IEventManager EventManager
 @inject IGameManager GameManager
+@inject IPluginManager PluginManager
+
+<button class="btn btn-primary" @onclick="ReloadPlugins">Reload server</button>
 
 <div class="container">
     <h2>Games</h2>
@@ -66,4 +69,10 @@
     {
         _disposable?.Dispose();
     }
+
+    private async Task ReloadPlugins()
+    {
+        await PluginManager.ReloadAsync();
+    }
+
 }
