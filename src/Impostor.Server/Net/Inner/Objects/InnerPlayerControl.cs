@@ -273,9 +273,9 @@ namespace Impostor.Server.Net.Inner.Objects
                     if (!player.PlayerInfo.IsDead)
                     {
                         player.Die(DeathReason.Kill);
+                        await _eventManager.CallAsync(new PlayerMurderEvent(_game, sender, this, player));
                     }
 
-                    await _eventManager.CallAsync(new PlayerMurderEvent(_game, sender, this, player));
                     break;
                 }
 
