@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Player;
+using Impostor.Api.Innersloth.Customization;
 
 namespace Impostor.Plugins.Example.Handlers
 {
@@ -35,7 +36,7 @@ namespace Impostor.Plugins.Example.Handlers
                     await playerControl.SetSkinAsync((uint) Random.Next(1, 9));
                     await playerControl.SetPetAsync((uint) Random.Next(1, 9));
 
-                    await Task.Delay(TimeSpan.FromMilliseconds(500));
+                    await Task.Delay(TimeSpan.FromMilliseconds(5000));
                 }
 
                 Console.WriteLine("Stopping player task.");
@@ -60,6 +61,14 @@ namespace Impostor.Plugins.Example.Handlers
                 e.Game.Options.PlayerSpeedMod = 5;
 
                 await e.Game.SyncSettingsAsync();
+            }
+
+            if (e.Message == "look")
+            {
+                await e.PlayerControl.SetColorAsync(ColorType.Pink);
+                await e.PlayerControl.SetHatAsync(HatType.Cheese);
+                await e.PlayerControl.SetSkinAsync(SkinType.Police);
+                await e.PlayerControl.SetPetAsync(PetType.Ufo);
             }
 
             await e.PlayerControl.SetNameAsync(e.Message);
