@@ -138,6 +138,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     // TODO: Not hit?
                     Die(DeathReason.Exile);
+
+                    await _eventManager.CallAsync(new PlayerExileEvent(_game, sender, this));
                     break;
                 }
 
@@ -273,6 +275,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         player.Die(DeathReason.Kill);
                     }
 
+                    await _eventManager.CallAsync(new PlayerMurderEvent(_game, sender, this, player));
                     break;
                 }
 
