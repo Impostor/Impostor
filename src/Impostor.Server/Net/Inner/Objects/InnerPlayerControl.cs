@@ -249,11 +249,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     var deadBodyPlayerId = reader.ReadByte();
-                    foreach (var player in _game.Players.Where(p => p.Client.Id == deadBodyPlayerId))
-                    {
-                        await _eventManager.CallAsync(new PlayerReportedBodyEvent(_game, sender, this, player.Character));
-                        break;
-                    }
+                    await _eventManager.CallAsync(new PlayerReportedBodyEvent(_game, sender, this, _game.GetClientPlayer(deadBodyPlayerId).Character));
 
                     break;
                 }
