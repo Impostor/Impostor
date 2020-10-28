@@ -7,12 +7,12 @@ namespace Impostor.Server.Events.Player
 {
     public class PlayerReportedBodyEvent : IPlayerReportedBodyEvent
     {
-        public PlayerReportedBodyEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, IInnerPlayerControl victim)
+        public PlayerReportedBodyEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, IInnerPlayerControl body)
         {
             Game = game;
             ClientPlayer = clientPlayer;
             PlayerControl = playerControl;
-            Victim = victim;
+            Body = body;
         }
 
         public IGame Game { get; }
@@ -21,6 +21,6 @@ namespace Impostor.Server.Events.Player
 
         public IInnerPlayerControl PlayerControl { get; }
 
-        public IInnerPlayerControl Victim { get; }
+        public IInnerPlayerControl Body { get; }
     }
 }
