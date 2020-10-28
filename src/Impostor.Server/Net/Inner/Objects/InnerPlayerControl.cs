@@ -80,6 +80,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     var index = reader.ReadPackedUInt32();
+                    await _eventManager.CallAsync(new PlayerCompletedTaskEvent(_game, sender, this, index));
                     break;
                 }
 
