@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
@@ -248,6 +249,12 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     var deadBodyPlayerId = reader.ReadByte();
+                    foreach (var player in _game.Players.Where(p => p.Client.Id == deadBodyPlayerId))
+                    {
+                        await _eventManager.CallAsync(new PlayerReportedBodyEvent(_game, sender, this, player.Character));
+                        break;
+                    }
+
                     break;
                 }
 
