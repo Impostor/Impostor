@@ -175,6 +175,7 @@ namespace Impostor.Server.Recorder
                     data.Position = 0;
 
                     await data.CopyToAsync(_writer);
+                    await _writer.FlushAsync();
                 }
             }
             finally
