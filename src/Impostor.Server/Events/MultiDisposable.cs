@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Impostor.Server.Events
@@ -19,7 +19,7 @@ namespace Impostor.Server.Events
         {
             foreach (var disposable in _disposables)
             {
-                disposable.Dispose();
+                disposable?.Dispose();
             }
         }
     }
