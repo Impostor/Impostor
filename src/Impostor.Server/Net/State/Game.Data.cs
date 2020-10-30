@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -269,6 +269,13 @@ namespace Impostor.Server.Net.State
                         {
                             var innerNetObject = (InnerNetObject) ActivatorUtilities.CreateInstance(_serviceProvider, SpawnableObjects[objectId], this);
                             var ownerClientId = reader.ReadPackedInt32();
+
+                            // Prevent fake client from being broadcasted.
+                            // TODO: Remove message from stream properly.
+                            if (ownerClientId == FakeClientId)
+                            {
+                                return false;
+                            }
 
                             innerNetObject.SpawnFlags = (SpawnFlags) reader.ReadByte();
 
