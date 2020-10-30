@@ -8,11 +8,10 @@ using System.Text;
 
 namespace Impostor.Hazel
 {
-    ///
     public class MessageWriter : IMessageWriter, IRecyclable, IDisposable
     {
-        public static int BufferSize = 64000;
-        public static readonly ObjectPool<MessageWriter> WriterPool = new ObjectPool<MessageWriter>(() => new MessageWriter(BufferSize));
+        private static int BufferSize = 64000;
+        private static readonly ObjectPool<MessageWriter> WriterPool = new ObjectPool<MessageWriter>(() => new MessageWriter(BufferSize));
 
         public MessageType SendOption { get; private set; }
 
