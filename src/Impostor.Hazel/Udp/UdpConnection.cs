@@ -31,14 +31,14 @@ namespace Impostor.Hazel.Udp
             _readerPool = readerPool;
             _stoppingCts = new CancellationTokenSource();
 
-            Pipeline = Channel.CreateUnbounded<MessageData>(new UnboundedChannelOptions
+            Pipeline = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
             {
                 SingleReader = true,
                 SingleWriter = true
             });
         }
 
-        internal Channel<MessageData> Pipeline { get; }
+        internal Channel<byte[]> Pipeline { get; }
 
         public Task StartAsync()
         {
@@ -85,18 +85,17 @@ namespace Impostor.Hazel.Udp
 
         private async Task ReadAsync()
         {
-            // Read loop.
+            var reader = new MessageReader(_readerPool);
+
             while (!_stoppingCts.IsCancellationRequested)
             {
                 var result = await Pipeline.Reader.ReadAsync(_stoppingCts.Token);
 
                 try
                 {
-                    using (var reader = _readerPool.Get())
-                    {
-                        reader.Update(byte.MaxValue, result.Buffer);
-                        await HandleReceive(reader);
-                    }
+                    reader.Update(result);
+
+                    await HandleReceive(reader);
                 }
                 catch (Exception e)
                 {
@@ -104,16 +103,6 @@ namespace Impostor.Hazel.Udp
                     Dispose(true);
                     break;
                 }
-                finally
-                {
-                    result.Return();
-                }
-            }
-
-            // Exhaust pipeline.
-            while (Pipeline.Reader.TryRead(out var mem))
-            {
-                mem.Return();
             }
         }
 
@@ -203,11 +192,14 @@ namespace Impostor.Hazel.Udp
                 // Slice 4 bytes to get handshake data.
                 if (_listener != null)
                 {
-                    await _listener.InvokeNewConnection(message.Slice(4), this);
+                    using (var handshake = message.Copy(4))
+                    {
+                        await _listener.InvokeNewConnection(handshake, this);
+                    }
                 }
             }
 
-            switch (message.Buffer.Span[0])
+            switch (message.Buffer[0])
             {
                 //Handle reliable receives
                 case (byte)MessageType.Reliable:
@@ -216,7 +208,7 @@ namespace Impostor.Hazel.Udp
 
                 //Handle acknowledgments
                 case (byte)UdpSendOption.Acknowledgement:
-                    AcknowledgementMessageReceive(message.Buffer.Span);
+                    AcknowledgementMessageReceive(message.Buffer);
                     break;
 
                 //We need to acknowledge hello and ping messages but dont want to invoke any events!
@@ -230,12 +222,18 @@ namespace Impostor.Hazel.Udp
                     break;
 
                 case (byte)UdpSendOption.Disconnect:
-                    await DisconnectRemote("The remote sent a disconnect request", message.Slice(1));
+                    using (var reader = message.Copy(1))
+                    {
+                        await DisconnectRemote("The remote sent a disconnect request", reader);
+                    }
                     break;
                     
                 //Treat everything else as unreliable
                 default:
-                    await InvokeDataReceived(message.Slice(1), MessageType.Unreliable);
+                    using (var reader = message.Copy(1))
+                    {
+                        await InvokeDataReceived(reader, MessageType.Unreliable);
+                    }
                     Statistics.LogUnreliableReceive(message.Length - 1, message.Length);
                     break;
             }

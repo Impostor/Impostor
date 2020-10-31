@@ -27,7 +27,7 @@ namespace Impostor.Server.Recorder
 
         public override async ValueTask HandleMessageAsync(IMessageReader reader, MessageType messageType)
         {
-            var messageCopy = reader.Slice(0);
+            using var messageCopy = reader.Copy();
 
             // Trigger connect event.
             if (_isFirst)

@@ -12,28 +12,34 @@ namespace Impostor.Hazel
         private readonly ObjectPool<MessageReader> _pool;
         private bool _inUse;
 
-        public byte Tag { get; private set; }
-        public ReadOnlyMemory<byte> Buffer { get; private set; }
-        public int Position { get; set; }
-        public int Length => Buffer.Length;
+        private byte _tag;
 
         internal MessageReader(ObjectPool<MessageReader> pool)
         {
             _pool = pool;
         }
 
-        public void Update(ReadOnlyMemory<byte> buffer)
-        {
-            Update(byte.MaxValue, buffer);
-        }
+        public byte[] Buffer { get; private set; }
 
-        public void Update(byte tag, ReadOnlyMemory<byte> buffer)
+        public int Offset { get; internal set; }
+
+        public int Position { get; internal set; }
+
+        public int Length { get; internal set; }
+
+        public byte Tag { get; private set; }
+
+        private int ReadPosition => Offset + Position;
+
+        public void Update(byte[] buffer, int offset = 0, int position = 0, int? length = null, byte tag = byte.MaxValue)
         {
             _inUse = true;
 
-            Tag = tag;
             Buffer = buffer;
-            Position = 0;
+            Offset = offset;
+            Position = position;
+            Length = length ?? buffer.Length;
+            Tag = tag;
         }
 
         internal void Reset()
@@ -42,19 +48,21 @@ namespace Impostor.Hazel
 
             Tag = byte.MaxValue;
             Buffer = null;
+            Offset = 0;
             Position = 0;
+            Length = 0;
         }
 
         public IMessageReader ReadMessage()
         {
             var length = ReadUInt16();
             var tag = FastByte();
-            var pos = Position;
+            var pos = ReadPosition;
 
             Position += length;
 
             var reader = _pool.Get();
-            reader.Update(tag, Buffer.Slice(pos, length));
+            reader.Update(Buffer, pos, 0, length, tag);
             return reader;
         }
 
@@ -76,35 +84,35 @@ namespace Impostor.Hazel
 
         public ushort ReadUInt16()
         {
-            var output = BinaryPrimitives.ReadUInt16LittleEndian(Buffer.Span.Slice(Position));
+            var output = BinaryPrimitives.ReadUInt16LittleEndian(Buffer.AsSpan(ReadPosition));
             Position += sizeof(ushort);
             return output;
         }
 
         public short ReadInt16()
         {
-            var output = BinaryPrimitives.ReadInt16LittleEndian(Buffer.Span.Slice(Position));
+            var output = BinaryPrimitives.ReadInt16LittleEndian(Buffer.AsSpan(ReadPosition));
             Position += sizeof(short);
             return output;
         }
 
         public uint ReadUInt32()
         {
-            var output = BinaryPrimitives.ReadUInt32LittleEndian(Buffer.Span.Slice(Position));
+            var output = BinaryPrimitives.ReadUInt32LittleEndian(Buffer.AsSpan(ReadPosition));
             Position += sizeof(uint);
             return output;
         }
 
         public int ReadInt32()
         {
-            var output = BinaryPrimitives.ReadInt32LittleEndian(Buffer.Span.Slice(Position));
+            var output = BinaryPrimitives.ReadInt32LittleEndian(Buffer.AsSpan(ReadPosition));
             Position += sizeof(int);
             return output;
         }
 
         public unsafe float ReadSingle()
         {
-            var output = BinaryPrimitives.ReadSingleLittleEndian(Buffer.Span.Slice(Position));
+            var output = BinaryPrimitives.ReadSingleLittleEndian(Buffer.AsSpan(ReadPosition));
             Position += sizeof(float);
             return output;
         }
@@ -112,7 +120,7 @@ namespace Impostor.Hazel
         public string ReadString()
         {
             var len = ReadPackedInt32();
-            var output = Encoding.UTF8.GetString(Buffer.Span.Slice(Position, len));
+            var output = Encoding.UTF8.GetString(Buffer.AsSpan(ReadPosition, len));
             Position += len;
             return output;
         }
@@ -125,7 +133,7 @@ namespace Impostor.Hazel
 
         public ReadOnlyMemory<byte> ReadBytes(int length)
         {
-            var output = Buffer.Slice(Position, length);
+            var output = Buffer.AsMemory(ReadPosition, length);
             Position += length;
             return output;
         }
@@ -165,27 +173,25 @@ namespace Impostor.Hazel
         {
             writer.Write((ushort) Length);
             writer.Write((byte) Tag);
-            writer.Write(Buffer);
+            writer.Write(Buffer.AsMemory(Offset, Length));
         }
 
-        public IMessageReader Slice(int start)
+        public void Seek(int position)
         {
-            var reader = _pool.Get();
-            reader.Update(Tag, Buffer.Slice(start));
-            return reader;
+            Position = position;
         }
 
-        public IMessageReader Slice(int start, int length)
+        public IMessageReader Copy(int offset = 0)
         {
             var reader = _pool.Get();
-            reader.Update(Tag, Buffer.Slice(start, length));
+            reader.Update(Buffer, Offset + offset, Position, Length - offset, Tag);
             return reader;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private byte FastByte()
         {
-            return Buffer.Span[Position++];
+            return Buffer[Offset + Position++];
         }
 
         public void Dispose()

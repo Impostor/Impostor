@@ -285,7 +285,11 @@ namespace Impostor.Hazel.Udp
         {
             if (await ProcessReliableReceive(message.Buffer, 1))
             {
-                await InvokeDataReceived(message.Slice(3), MessageType.Reliable);
+                message.Offset += 3;
+                message.Length -= 3;
+                message.Position = 0;
+
+                await InvokeDataReceived(message, MessageType.Reliable);
             }
 
             Statistics.LogReliableReceive(message.Length - 3, message.Length);

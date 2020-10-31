@@ -146,7 +146,7 @@ namespace Impostor.Server.Recorder
             context.Writer.Write((byte) messageType);
             context.Writer.Write((byte) reader.Tag);
             context.Writer.Write((int) reader.Buffer.Length);
-            context.Writer.Write(reader.Buffer.Span);
+            context.Writer.Write(reader.Buffer);
         }
 
         private static void WriteGameCode(PacketSerializationContext context, in GameCode gameCode)

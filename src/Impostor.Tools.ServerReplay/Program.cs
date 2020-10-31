@@ -165,7 +165,7 @@ namespace Impostor.Tools.ServerReplay
                     var buffer = reader.ReadBytes(length);
                     using var message = _readerPool.Get();
 
-                    message.Update(tag, buffer);
+                    message.Update(buffer, tag: tag);
 
                     if (tag == MessageFlags.HostGame)
                     {

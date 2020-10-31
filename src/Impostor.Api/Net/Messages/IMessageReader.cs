@@ -12,7 +12,12 @@ namespace Impostor.Api.Net.Messages
         /// <summary>
         ///     Gets the buffer of the message.
         /// </summary>
-        ReadOnlyMemory<byte> Buffer { get; }
+        byte[] Buffer { get; }
+
+        /// <summary>
+        ///     Gets the offset of our current <see cref="IMessageReader"/> in the entire <see cref="Buffer"/>.
+        /// </summary>
+        int Offset { get; }
 
         /// <summary>
         ///     Gets the current position of the reader.
@@ -54,8 +59,8 @@ namespace Impostor.Api.Net.Messages
 
         void CopyTo(IMessageWriter writer);
 
-        IMessageReader Slice(int start);
+        void Seek(int position);
 
-        IMessageReader Slice(int start, int length);
+        IMessageReader Copy(int offset = 0);
     }
 }

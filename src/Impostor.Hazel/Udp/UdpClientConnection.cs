@@ -26,8 +26,8 @@ namespace Impostor.Hazel.Udp
 
         private readonly Timer _reliablePacketTimer;
         private readonly SemaphoreSlim _connectWaitLock;
-        private readonly MemoryPool<byte> _pool;
-        private readonly Channel<MessageData> _channel;
+        private readonly ArrayPool<byte> _pool;
+        private readonly Channel<byte[]> _channel;
         private Task _listenTask;
         private Task _handleTask;
 
@@ -48,8 +48,8 @@ namespace Impostor.Hazel.Udp
 
             _reliablePacketTimer = new Timer(ManageReliablePacketsInternal, null, 100, Timeout.Infinite);
             _connectWaitLock = new SemaphoreSlim(1, 1);
-            _pool = MemoryPool<byte>.Shared;
-            _channel = Channel.CreateUnbounded<MessageData>(new UnboundedChannelOptions
+            _pool = ArrayPool<byte>.Shared;
+            _channel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
             {
                 SingleReader = true,
                 SingleWriter = true
@@ -171,27 +171,8 @@ namespace Impostor.Hazel.Udp
                     return;
                 }
 
-                await HandleAsync(data.Buffer);
-            }
-        }
-
-        private async ValueTask HandleAsync(ReadOnlyMemory<byte> memory)
-        {
-            // Rent memory.
-            var dest = _pool.Rent(memory.Length);
-
-            // Copy data.
-            memory.CopyTo(dest.Memory);
-
-            try
-            {
                 // Write to client.
-                await Pipeline.Writer.WriteAsync(new MessageData(dest, memory.Length));
-            }
-            catch (ChannelClosedException)
-            {
-                // Clean up.
-                dest.Dispose();
+                await Pipeline.Writer.WriteAsync(data.Buffer);
             }
         }
 
