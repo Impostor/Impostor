@@ -9,7 +9,12 @@ namespace Impostor.Benchmarks
     {
         private static void Main(string[] args)
         {
-            BenchmarkRunner.Run<EventManagerBenchmark>(
+            // BenchmarkRunner.Run<EventManagerBenchmark>(
+            //     DefaultConfig.Instance
+            //         .AddDiagnoser(MemoryDiagnoser.Default)
+            // );
+
+            BenchmarkRunner.Run<MessageReaderBenchmark>(
                 DefaultConfig.Instance
                     .AddDiagnoser(MemoryDiagnoser.Default)
             );
