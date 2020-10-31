@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Microsoft.Extensions.ObjectPool;
 using Serilog;
 
 namespace Impostor.Hazel.Udp
@@ -27,6 +28,7 @@ namespace Impostor.Hazel.Udp
         public delegate bool AcceptConnectionCheck(IPEndPoint endPoint, byte[] input, out byte[] response);
 
         private readonly UdpClient _socket;
+        private readonly ObjectPool<MessageReader> _readerPool;
         private readonly MemoryPool<byte> _pool;
         private readonly Timer _reliablePacketTimer;
         private readonly ConcurrentDictionary<EndPoint, UdpServerConnection> _allConnections;
@@ -39,11 +41,12 @@ namespace Impostor.Hazel.Udp
         /// </summary>
         /// <param name="endPoint">The endpoint to listen on.</param>
         /// <param name="ipMode"></param>
-        public UdpConnectionListener(IPEndPoint endPoint, IPMode ipMode = IPMode.IPv4)
+        public UdpConnectionListener(IPEndPoint endPoint, ObjectPool<MessageReader> readerPool, IPMode ipMode = IPMode.IPv4)
         {
             EndPoint = endPoint;
             IPMode = ipMode;
 
+            _readerPool = readerPool;
             _pool = MemoryPool<byte>.Shared;
             _socket = new UdpClient(endPoint)
             {
@@ -165,7 +168,7 @@ namespace Impostor.Hazel.Udp
                         }
 
                         // Create new client
-                        client = new UdpServerConnection(this, data.RemoteEndPoint, IPMode);
+                        client = new UdpServerConnection(this, data.RemoteEndPoint, IPMode, _readerPool);
 
                         // Store the client
                         if (!_allConnections.TryAdd(data.RemoteEndPoint, client))

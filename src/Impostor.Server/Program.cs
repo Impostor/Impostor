@@ -4,6 +4,7 @@ using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Net.Messages;
+using Impostor.Hazel.Extensions;
 using Impostor.Server.Config;
 using Impostor.Server.Events;
 using Impostor.Server.Net;
@@ -171,6 +172,7 @@ namespace Impostor.Server
                         services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
                     }
 
+                    services.AddHazel();
                     services.AddSingleton<IMessageWriterProvider, MessageWriterProvider>();
                     services.AddSingleton<IGameCodeFactory, GameCodeFactory>();
                     services.AddSingleton<IEventManager, EventManager>();

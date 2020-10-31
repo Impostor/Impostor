@@ -2,7 +2,7 @@
 
 namespace Impostor.Api.Net.Messages
 {
-    public interface IMessageReader
+    public interface IMessageReader : IDisposable
     {
         /// <summary>
         ///     Gets the tag of the message.

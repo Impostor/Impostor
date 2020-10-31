@@ -62,20 +62,20 @@ namespace Impostor.Benchmarks.Tests
             }
         }
 
-        [Benchmark]
-        public void Normal_Run_1_000_000()
-        {
-            for (var i = 0; i < 1_000_000; i++)
-            {
-                var reader = new MessageReader(_data);
-                var inner = reader.ReadMessage();
-
-                _ = inner.ReadUInt16();
-                _ = inner.ReadByte();
-                _ = inner.ReadInt32();
-                // inner.ReadPackedInt32();
-            }
-        }
+        // [Benchmark]
+        // public void Normal_Run_1_000_000()
+        // {
+        //     for (var i = 0; i < 1_000_000; i++)
+        //     {
+        //         var reader = new MessageReader(_data);
+        //         var inner = reader.ReadMessage();
+        //
+        //         _ = inner.ReadUInt16();
+        //         _ = inner.ReadByte();
+        //         _ = inner.ReadInt32();
+        //         // inner.ReadPackedInt32();
+        //     }
+        // }
 
         [Benchmark]
         public void Bytes_Run_1_000_000()

@@ -11,7 +11,7 @@ namespace Impostor.Hazel
     public class MessageWriter : IMessageWriter, IRecyclable, IDisposable
     {
         private static int BufferSize = 64000;
-        private static readonly ObjectPool<MessageWriter> WriterPool = new ObjectPool<MessageWriter>(() => new MessageWriter(BufferSize));
+        private static readonly ObjectPoolCustom<MessageWriter> WriterPool = new ObjectPoolCustom<MessageWriter>(() => new MessageWriter(BufferSize));
 
         public MessageType SendOption { get; private set; }
 

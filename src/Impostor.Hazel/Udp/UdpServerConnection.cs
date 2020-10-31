@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Net.Messages;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Impostor.Hazel.Udp
 {
@@ -26,7 +27,7 @@ namespace Impostor.Hazel.Udp
         /// <param name="listener">The listener that created this connection.</param>
         /// <param name="endPoint">The endpoint that we are connected to.</param>
         /// <param name="IPMode">The IPMode we are connected using.</param>
-        internal UdpServerConnection(UdpConnectionListener listener, IPEndPoint endPoint, IPMode IPMode) : base(listener)
+        internal UdpServerConnection(UdpConnectionListener listener, IPEndPoint endPoint, IPMode IPMode, ObjectPool<MessageReader> readerPool) : base(listener, readerPool)
         {
             this.Listener = listener;
             this.RemoteEndPoint = endPoint;

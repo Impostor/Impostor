@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
+using Impostor.Hazel.Extensions;
 using Impostor.Hazel.Udp;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 using PcapDotNet.Core;
 using PcapDotNet.Packets;
 
@@ -32,9 +35,18 @@ namespace Impostor.Tools.Proxy
             {14, "ReselectServer"},
             {16, "GetGameListV2"}
         };
-        
+
+        private static IServiceProvider _serviceProvider;
+        private static ObjectPool<MessageReader> _readerPool;
+
         private static void Main(string[] args)
         {
+            var services = new ServiceCollection();
+            services.AddHazel();
+
+            _serviceProvider = services.BuildServiceProvider();
+            _readerPool = _serviceProvider.GetRequiredService<ObjectPool<MessageReader>>();
+            
             var devices = LivePacketDevice.AllLocalMachine;
             if (devices.Count == 0)
             {
@@ -69,11 +81,14 @@ namespace Impostor.Tools.Proxy
             // True if this is our own packet.
             using (var stream = udp.Payload.ToMemoryStream())
             {
-                var reader = (IMessageReader) new MessageReader(stream.ToArray());
+                using var reader = _readerPool.Get();
+
+                reader.Update(stream.ToArray());
+
                 var option = reader.Buffer.Span[0];
                 if (option == (byte) MessageType.Reliable)
                 {
-                    reader = reader.Slice(3);
+                    reader.Position += 3;
                 }
                 else if (option == (byte) UdpSendOption.Acknowledgement ||
                          option == (byte) UdpSendOption.Ping ||
@@ -84,7 +99,7 @@ namespace Impostor.Tools.Proxy
                 }
                 else
                 {
-                    reader = reader.Slice(1);
+                    reader.Position += 1;
                 }
                 
                 var isSent = ipSrc.StartsWith("192.");

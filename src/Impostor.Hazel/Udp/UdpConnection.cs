@@ -17,15 +17,17 @@ namespace Impostor.Hazel.Udp
 
         private static readonly ILogger Logger = Log.ForContext<UdpConnection>();
         private readonly ConnectionListener _listener;
+        private readonly Microsoft.Extensions.ObjectPool.ObjectPool<MessageReader> _readerPool;
         private readonly CancellationTokenSource _stoppingCts;
 
         private bool _isDisposing;
         private bool _isFirst = true;
         private Task _executingTask;
 
-        protected UdpConnection(ConnectionListener listener)
+        protected UdpConnection(ConnectionListener listener, Microsoft.Extensions.ObjectPool.ObjectPool<MessageReader> readerPool)
         {
             _listener = listener;
+            _readerPool = readerPool;
             _stoppingCts = new CancellationTokenSource();
 
             Pipeline = Channel.CreateUnbounded<MessageData>(new UnboundedChannelOptions
@@ -89,7 +91,11 @@ namespace Impostor.Hazel.Udp
 
                 try
                 {
-                    await HandleReceive(new MessageReader(result.Buffer));
+                    using (var reader = _readerPool.Get())
+                    {
+                        reader.Update(byte.MaxValue, result.Buffer);
+                        await HandleReceive(reader);
+                    }
                 }
                 catch (Exception e)
                 {

@@ -7,23 +7,27 @@ using Impostor.Hazel.Udp;
 using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Impostor.Server.Net
 {
     internal class Matchmaker
     {
         private readonly ClientManager _clientManager;
+        private readonly ObjectPool<MessageReader> _readerPool;
         private readonly ILogger<Matchmaker> _logger;
-        private readonly ILogger<Net.Hazel.HazelConnection> _connectionLogger;
+        private readonly ILogger<HazelConnection> _connectionLogger;
         private UdpConnectionListener _connection;
 
         public Matchmaker(
             ILogger<Matchmaker> logger,
             ClientManager clientManager,
+            ObjectPool<MessageReader> readerPool,
             ILogger<HazelConnection> connectionLogger)
         {
             _logger = logger;
             _clientManager = clientManager;
+            _readerPool = readerPool;
             _connectionLogger = connectionLogger;
         }
 
@@ -36,7 +40,7 @@ namespace Impostor.Server.Net
                 _ => throw new InvalidOperationException()
             };
 
-            _connection = new UdpConnectionListener(ipEndPoint, mode);
+            _connection = new UdpConnectionListener(ipEndPoint, _readerPool, mode);
             _connection.NewConnection = OnNewConnection;
 
             await _connection.StartAsync();

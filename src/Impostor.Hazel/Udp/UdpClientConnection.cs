@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Impostor.Api.Net.Messages;
+using Microsoft.Extensions.ObjectPool;
 using Serilog;
 
 namespace Impostor.Hazel.Udp
@@ -34,7 +35,7 @@ namespace Impostor.Hazel.Udp
         ///     Creates a new UdpClientConnection.
         /// </summary>
         /// <param name="remoteEndPoint">A <see cref="NetworkEndPoint"/> to connect to.</param>
-        public UdpClientConnection(IPEndPoint remoteEndPoint, IPMode ipMode = IPMode.IPv4) : base(null)
+        public UdpClientConnection(IPEndPoint remoteEndPoint, ObjectPool<MessageReader> readerPool, IPMode ipMode = IPMode.IPv4) : base(null, readerPool)
         {
             EndPoint = remoteEndPoint;
             RemoteEndPoint = remoteEndPoint;

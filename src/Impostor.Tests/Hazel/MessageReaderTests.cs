@@ -1,10 +1,21 @@
-﻿using Impostor.Hazel;
+﻿using System;
+using Impostor.Hazel;
+using Impostor.Hazel.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.ObjectPool;
 using Xunit;
 
 namespace Impostor.Tests.Hazel
 {
     public class BufferMessageReaderTests
     {
+        private ObjectPool<MessageReader> CreateReaderPool()
+        {
+            var services = new ServiceCollection();
+            services.AddHazel();
+            return services.BuildServiceProvider().GetRequiredService<ObjectPool<MessageReader>>();
+        }
+
         [Fact]
         public void ReadProperInt()
         {
@@ -20,7 +31,9 @@ namespace Impostor.Tests.Hazel
             Assert.Equal(11, msg.Length);
             Assert.Equal(msg.Length, msg.Position);
 
-            var reader = new MessageReader(msg.Buffer);
+            var readerPool = CreateReaderPool();
+            var reader = readerPool.Get();
+            reader.Update(msg.Buffer);
             Assert.Equal(byte.MaxValue, reader.Tag);
             var message = reader.ReadMessage();
             Assert.Equal(1, message.Tag);
@@ -43,7 +56,9 @@ namespace Impostor.Tests.Hazel
             Assert.Equal(5, msg.Length);
             Assert.Equal(msg.Length, msg.Position);
 
-            var reader = new MessageReader(msg.Buffer);
+            var readerPool = CreateReaderPool();
+            var reader = readerPool.Get();
+            reader.Update(msg.Buffer);
             Assert.Equal(byte.MaxValue, reader.Tag);
             var message = reader.ReadMessage();
             Assert.Equal(1, message.Tag);
@@ -65,7 +80,9 @@ namespace Impostor.Tests.Hazel
 
             Assert.Equal(msg.Length, msg.Position);
 
-            var reader = new MessageReader(msg.Buffer);
+            var readerPool = CreateReaderPool();
+            var reader = readerPool.Get();
+            reader.Update(msg.Buffer);
             Assert.Equal(byte.MaxValue, reader.Tag);
             var message = reader.ReadMessage();
             Assert.Equal(1, message.Tag);
@@ -87,7 +104,9 @@ namespace Impostor.Tests.Hazel
             Assert.Equal(7, msg.Length);
             Assert.Equal(msg.Length, msg.Position);
 
-            var reader = new MessageReader(msg.Buffer);
+            var readerPool = CreateReaderPool();
+            var reader = readerPool.Get();
+            reader.Update(msg.Buffer);
             Assert.Equal(byte.MaxValue, reader.Tag);
             var message = reader.ReadMessage();
             Assert.Equal(1, message.Tag);
@@ -110,7 +129,9 @@ namespace Impostor.Tests.Hazel
 
             msg.EndMessage();
 
-            var handleReader = new MessageReader(msg.Buffer);
+            var readerPool = CreateReaderPool();
+            var handleReader = readerPool.Get();
+            handleReader.Update(msg.Buffer);
             var handleMessage = handleReader.ReadMessage();
             Assert.Equal(1, handleMessage.Tag);
 
@@ -141,7 +162,9 @@ namespace Impostor.Tests.Hazel
 
             Assert.Equal(msg.Length, msg.Position);
 
-            var reader = new MessageReader(msg.Buffer);
+            var readerPool = CreateReaderPool();
+            var reader = readerPool.Get();
+            reader.Update(msg.Buffer);
             Assert.Equal(byte.MaxValue, reader.Tag);
             var message = reader.ReadMessage();
             Assert.Equal(1, message.Tag);
@@ -189,7 +212,9 @@ namespace Impostor.Tests.Hazel
             messageWriter.EndMessage();
 
             // Do the magic.
-            var reader = new MessageReader(messageWriter.Buffer);
+            var readerPool = CreateReaderPool();
+            var reader = readerPool.Get();
+            reader.Update(messageWriter.Buffer);
             var inner = reader.ReadMessage();
 
             while (inner.Position < inner.Length)

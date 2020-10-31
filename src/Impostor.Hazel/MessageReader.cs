@@ -3,26 +3,41 @@ using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Impostor.Api.Net.Messages;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Impostor.Hazel
 {
     public class MessageReader : IMessageReader
     {
-        public byte Tag { get; }
-        public ReadOnlyMemory<byte> Buffer { get; }
+        private readonly ObjectPool<MessageReader> _pool;
+
+        public byte Tag { get; private set; }
+        public ReadOnlyMemory<byte> Buffer { get; private set; }
         public int Position { get; set; }
         public int Length => Buffer.Length;
 
-        public MessageReader(ReadOnlyMemory<byte> buffer)
+        internal MessageReader(ObjectPool<MessageReader> pool)
         {
-            Tag = byte.MaxValue;
-            Buffer = buffer;
+            _pool = pool;
         }
 
-        public MessageReader(byte tag, ReadOnlyMemory<byte> buffer)
+        public void Update(ReadOnlyMemory<byte> buffer)
+        {
+            Update(byte.MaxValue, buffer);
+        }
+
+        public void Update(byte tag, ReadOnlyMemory<byte> buffer)
         {
             Tag = tag;
             Buffer = buffer;
+            Position = 0;
+        }
+
+        internal void Reset()
+        {
+            Tag = byte.MaxValue;
+            Buffer = null;
+            Position = 0;
         }
 
         public IMessageReader ReadMessage()
@@ -33,7 +48,9 @@ namespace Impostor.Hazel
 
             Position += length;
 
-            return new MessageReader(tag, Buffer.Slice(pos, length));
+            var reader = _pool.Get();
+            reader.Update(tag, Buffer.Slice(pos, length));
+            return reader;
         }
 
         public bool ReadBoolean()
@@ -148,18 +165,27 @@ namespace Impostor.Hazel
 
         public IMessageReader Slice(int start)
         {
-            return new MessageReader(Tag, Buffer.Slice(start));
+            var reader = _pool.Get();
+            reader.Update(Tag, Buffer.Slice(start));
+            return reader;
         }
 
         public IMessageReader Slice(int start, int length)
         {
-            return new MessageReader(Tag, Buffer.Slice(start, length));
+            var reader = _pool.Get();
+            reader.Update(Tag, Buffer.Slice(start, length));
+            return reader;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private byte FastByte()
         {
             return Buffer.Span[Position++];
+        }
+
+        public void Dispose()
+        {
+            _pool.Return(this);
         }
     }
 }

@@ -21,6 +21,7 @@ using Impostor.Server.Recorder;
 using Impostor.Tools.ServerReplay.Mocks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -36,6 +37,7 @@ namespace Impostor.Tools.ServerReplay
 
         private static ServiceProvider _serviceProvider;
 
+        private static ObjectPool<MessageReader> _readerPool;
         private static MockGameCodeFactory _gameCodeFactory;
         private static ClientManager _clientManager;
         private static GameManager _gameManager;
@@ -54,6 +56,7 @@ namespace Impostor.Tools.ServerReplay
             _serviceProvider = BuildServices();
 
             // Create required instances.
+            _readerPool = _serviceProvider.GetRequiredService<ObjectPool<MessageReader>>();
             _gameCodeFactory = _serviceProvider.GetRequiredService<MockGameCodeFactory>();
             _clientManager = _serviceProvider.GetRequiredService<ClientManager>();
             _gameManager = _serviceProvider.GetRequiredService<GameManager>();
@@ -143,11 +146,14 @@ namespace Impostor.Tools.ServerReplay
                     break;
 
                 case RecordedPacketType.Message:
-                    var messageType = (MessageType) reader.ReadByte();
+                {
+                    var messageType = (MessageType)reader.ReadByte();
                     var tag = reader.ReadByte();
                     var length = reader.ReadInt32();
                     var buffer = reader.ReadBytes(length);
-                    var message = new MessageReader(tag, buffer);
+                    using var message = _readerPool.Get();
+
+                    message.Update(tag, buffer);
 
                     if (tag == MessageFlags.HostGame)
                     {
@@ -157,7 +163,9 @@ namespace Impostor.Tools.ServerReplay
                     {
                         await client.Client!.HandleMessageAsync(message, messageType);
                     }
+
                     break;
+                }
 
                 case RecordedPacketType.GameCreated:
                     _gameCodeFactory.Result = GameCode.From(reader.ReadString());

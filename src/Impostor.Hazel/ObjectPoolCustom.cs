@@ -9,7 +9,7 @@ namespace Impostor.Hazel
     /// </summary>
     /// <typeparam name="T">The type that is pooled.</typeparam>
     /// <threadsafety static="true" instance="true"/>
-    public sealed class ObjectPool<T> where T : IRecyclable
+    public sealed class ObjectPoolCustom<T> where T : IRecyclable
     {
         private int numberCreated;
         public int NumberCreated { get { return numberCreated; } }
@@ -36,7 +36,7 @@ namespace Impostor.Hazel
         /// <summary>
         ///     Internal constructor for our ObjectPool.
         /// </summary>
-        internal ObjectPool(Func<T> objectFactory)
+        internal ObjectPoolCustom(Func<T> objectFactory)
         {
             this.objectFactory = objectFactory;
         }

@@ -87,7 +87,7 @@ namespace Impostor.Hazel.Udp
             /// <summary>
             ///     Object pool for this event.
             /// </summary>
-            public static readonly ObjectPool<Packet> PacketPool = new ObjectPool<Packet>(() => new Packet());
+            public static readonly ObjectPoolCustom<Packet> PacketPool = new ObjectPoolCustom<Packet>(() => new Packet());
 
             /// <summary>
             ///     Returns an instance of this object from the pool.
