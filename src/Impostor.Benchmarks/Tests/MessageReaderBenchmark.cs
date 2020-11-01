@@ -14,7 +14,7 @@ namespace Impostor.Benchmarks.Tests
     public class MessageReaderBenchmark
     {
         private byte[] _data;
-        private Microsoft.Extensions.ObjectPool.ObjectPool<MessageReader_Bytes_Pooled_Improved> _pool;
+        private ObjectPool<MessageReader_Bytes_Pooled_Improved> _pool;
 
         [GlobalSetup]
         public void Setup()
@@ -45,7 +45,7 @@ namespace Impostor.Benchmarks.Tests
 
             _pool = services
                 .BuildServiceProvider()
-                .GetRequiredService<Microsoft.Extensions.ObjectPool.ObjectPool<MessageReader_Bytes_Pooled_Improved>>();
+                .GetRequiredService<ObjectPool<MessageReader_Bytes_Pooled_Improved>>();
         }
 
         [Benchmark]

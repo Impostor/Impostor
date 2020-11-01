@@ -10,6 +10,7 @@ namespace Impostor.Hazel
     public class MessageReader : IMessageReader
     {
         private readonly ObjectPool<MessageReader> _pool;
+        private bool _inUse;
 
         public byte Tag { get; private set; }
         public ReadOnlyMemory<byte> Buffer { get; private set; }
@@ -28,6 +29,8 @@ namespace Impostor.Hazel
 
         public void Update(byte tag, ReadOnlyMemory<byte> buffer)
         {
+            _inUse = true;
+
             Tag = tag;
             Buffer = buffer;
             Position = 0;
@@ -35,6 +38,8 @@ namespace Impostor.Hazel
 
         internal void Reset()
         {
+            _inUse = false;
+
             Tag = byte.MaxValue;
             Buffer = null;
             Position = 0;
@@ -185,7 +190,10 @@ namespace Impostor.Hazel
 
         public void Dispose()
         {
-            _pool.Return(this);
+            if (_inUse)
+            {
+                _pool.Return(this);
+            }
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Impostor.Hazel
 
         public MessageReader Create()
         {
-            return new MessageReader(_serviceProvider.GetRequiredService<Microsoft.Extensions.ObjectPool.ObjectPool<MessageReader>>());
+            return new MessageReader(_serviceProvider.GetRequiredService<ObjectPool<MessageReader>>());
         }
 
         public bool Return(MessageReader obj)

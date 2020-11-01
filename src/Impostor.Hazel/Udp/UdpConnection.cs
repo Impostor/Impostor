@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Impostor.Api.Net.Messages;
+using Microsoft.Extensions.ObjectPool;
 using Serilog;
 
 namespace Impostor.Hazel.Udp
@@ -17,14 +18,14 @@ namespace Impostor.Hazel.Udp
 
         private static readonly ILogger Logger = Log.ForContext<UdpConnection>();
         private readonly ConnectionListener _listener;
-        private readonly Microsoft.Extensions.ObjectPool.ObjectPool<MessageReader> _readerPool;
+        private readonly ObjectPool<MessageReader> _readerPool;
         private readonly CancellationTokenSource _stoppingCts;
 
         private bool _isDisposing;
         private bool _isFirst = true;
         private Task _executingTask;
 
-        protected UdpConnection(ConnectionListener listener, Microsoft.Extensions.ObjectPool.ObjectPool<MessageReader> readerPool)
+        protected UdpConnection(ConnectionListener listener, ObjectPool<MessageReader> readerPool)
         {
             _listener = listener;
             _readerPool = readerPool;
