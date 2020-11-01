@@ -148,7 +148,7 @@ namespace Impostor.Server.Net
                     var toPlayer = flag == MessageFlags.GameDataTo;
 
                     // Handle packet.
-                    var readerCopy = reader.Slice(reader.Position);
+                    using var readerCopy = reader.Copy();
 
                     // TODO: Return value, either a bool (to cancel) or a writer (to cancel (null) or modify/overwrite).
                     try

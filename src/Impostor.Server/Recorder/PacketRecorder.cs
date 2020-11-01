@@ -2,11 +2,13 @@
 using System.IO;
 using System.Net;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Config;
 using Impostor.Server.Net;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
@@ -16,23 +18,51 @@ namespace Impostor.Server.Recorder
     /// <summary>
     ///     Records all packets received in <see cref="ClientRecorder.HandleMessageAsync"/>.
     /// </summary>
-    internal class PacketRecorder : IDisposable
+    internal class PacketRecorder : BackgroundService
     {
+        private readonly string _path;
         private readonly ILogger<PacketRecorder> _logger;
         private readonly ObjectPool<PacketSerializationContext> _pool;
-        private readonly SemaphoreSlim _writerLock;
-        private readonly FileStream _writer;
+        private readonly Channel<byte[]> _channel;
 
         public PacketRecorder(ILogger<PacketRecorder> logger, IOptions<DebugConfig> options, ObjectPool<PacketSerializationContext> pool)
         {
             var name = $"session_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}.dat";
-            var path = Path.Combine(options.Value.GameRecorderPath, name);
 
+            _path = Path.Combine(options.Value.GameRecorderPath, name);
             _logger = logger;
-            _logger.LogInformation("PacketRecorder is enabled, writing packets to {0}.", path);
             _pool = pool;
-            _writerLock = new SemaphoreSlim(1, 1);
-            _writer = File.Open(path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+
+            _channel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
+            {
+                SingleReader = true,
+                SingleWriter = false,
+            });
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            _logger.LogInformation("PacketRecorder is enabled, writing packets to {0}.", _path);
+
+            var writer = File.Open(_path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+
+            // Handle messages.
+            try
+            {
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    var result = await _channel.Reader.ReadAsync(stoppingToken);
+
+                    await writer.WriteAsync(result, stoppingToken);
+                    await writer.FlushAsync(stoppingToken);
+                }
+            }
+            catch (TaskCanceledException)
+            {
+            }
+
+            // Clean up.
+            await writer.DisposeAsync();
         }
 
         public async Task WriteConnectAsync(ClientRecorder client)
@@ -145,8 +175,8 @@ namespace Impostor.Server.Recorder
         {
             context.Writer.Write((byte) messageType);
             context.Writer.Write((byte) reader.Tag);
-            context.Writer.Write((int) reader.Buffer.Length);
-            context.Writer.Write(reader.Buffer.Span);
+            context.Writer.Write((int) reader.Length);
+            context.Writer.Write(reader.Buffer, reader.Offset, reader.Length);
         }
 
         private static void WriteGameCode(PacketSerializationContext context, in GameCode gameCode)
@@ -163,35 +193,9 @@ namespace Impostor.Server.Recorder
             context.Stream.Position = length;
         }
 
-        private async Task WriteAsync(Stream data)
+        private async Task WriteAsync(MemoryStream data)
         {
-            var hasLock = false;
-
-            try
-            {
-                hasLock = await _writerLock.WaitAsync(TimeSpan.FromMinutes(1));
-
-                if (hasLock)
-                {
-                    data.Position = 0;
-
-                    await data.CopyToAsync(_writer);
-                    await _writer.FlushAsync();
-                }
-            }
-            finally
-            {
-                if (hasLock)
-                {
-                    _writerLock.Release();
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            _writer.Dispose();
-            _writerLock.Dispose();
+            await _channel.Writer.WriteAsync(data.ToArray());
         }
     }
 }

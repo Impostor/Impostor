@@ -180,32 +180,13 @@ namespace Impostor.Hazel.Udp
                         await client.StartAsync();
                     }
 
-                    await WriteToClientAsync(client, data.Buffer);
+                    // Write to client.
+                    await client.Pipeline.Writer.WriteAsync(data.Buffer);
                 }
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Listen loop error");
-            }
-        }
-
-        private async ValueTask WriteToClientAsync(UdpConnection client, ReadOnlyMemory<byte> memory)
-        {
-            // Rent memory.
-            var dest = _pool.Rent(memory.Length);
-
-            // Copy data.
-            memory.CopyTo(dest.Memory);
-
-            try
-            {
-                // Write to client.
-                await client.Pipeline.Writer.WriteAsync(new MessageData(dest, memory.Length));
-            }
-            catch (ChannelClosedException)
-            {
-                // Clean up.
-                dest.Dispose();
             }
         }
 

@@ -85,10 +85,10 @@ namespace Impostor.Tools.Proxy
 
                 reader.Update(stream.ToArray());
 
-                var option = reader.Buffer.Span[0];
+                var option = reader.Buffer[0];
                 if (option == (byte) MessageType.Reliable)
                 {
-                    reader.Position += 3;
+                    reader.Seek(reader.Position + 3);
                 }
                 else if (option == (byte) UdpSendOption.Acknowledgement ||
                          option == (byte) UdpSendOption.Ping ||
@@ -99,7 +99,7 @@ namespace Impostor.Tools.Proxy
                 }
                 else
                 {
-                    reader.Position += 1;
+                    reader.Seek(reader.Position + 1);
                 }
                 
                 var isSent = ipSrc.StartsWith("192.");

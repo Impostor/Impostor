@@ -161,6 +161,7 @@ namespace Impostor.Server
                             });
 
                             services.AddSingleton<PacketRecorder>();
+                            services.AddHostedService(sp => sp.GetRequiredService<PacketRecorder>());
                             services.AddSingleton<IClientFactory, ClientFactory<ClientRecorder>>();
                         }
                         else
