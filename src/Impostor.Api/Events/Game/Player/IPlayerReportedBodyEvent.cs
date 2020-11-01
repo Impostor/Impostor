@@ -7,6 +7,6 @@ namespace Impostor.Api.Events.Player
         /// <summary>
         ///     Gets the player who's body got reported.
         /// </summary>
-        IInnerPlayerControl Body { get; }
+        IInnerPlayerControl? Body { get; }
     }
 }
