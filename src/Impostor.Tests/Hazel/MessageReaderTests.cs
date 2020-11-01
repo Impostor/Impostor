@@ -280,67 +280,67 @@ namespace Impostor.Tests.Hazel
             Assert.Equal("NO", sub.ReadString());
         }
 
-        // [Fact]
-        // public void RemoveMessage()
-        // {
-        //     // Create expected message.
-        //     var messageExpected = new MessageWriter(1024);
-        //
-        //     messageExpected.StartMessage(0);
-        //     messageExpected.StartMessage(1);
-        //     messageExpected.Write("HiTest");
-        //     messageExpected.EndMessage();
-        //     messageExpected.StartMessage(2);
-        //     messageExpected.Write("HiTest");
-        //     messageExpected.EndMessage();
-        //     messageExpected.EndMessage();
-        //
-        //     // Create message.
-        //     var messageWriter = new MessageWriter(1024);
-        //
-        //     messageWriter.StartMessage(0);
-        //         messageWriter.StartMessage(1);
-        //             messageWriter.Write("HiTest1");
-        //             messageWriter.StartMessage(2);
-        //                 messageWriter.Write("RemoveMe!");
-        //             messageWriter.EndMessage();
-        //         messageWriter.EndMessage();
-        //         messageWriter.StartMessage(2);
-        //             messageWriter.Write("HiTest2");
-        //         messageWriter.EndMessage();
-        //     messageWriter.EndMessage();
-        //
-        //     // Do the magic.
-        //     var readerPool = CreateReaderPool();
-        //     var reader = readerPool.Get();
-        //     reader.Update(messageWriter.Buffer);
-        //     var inner = reader.ReadMessage();
-        //
-        //     while (inner.Position < inner.Length)
-        //     {
-        //         var message = inner.ReadMessage();
-        //         if (message.Tag == 1)
-        //         {
-        //             Assert.Equal("HiTest1", message.ReadString());
-        //
-        //             var messageSub = message.ReadMessage();
-        //             if (messageSub.Tag == 2)
-        //             {
-        //                 Assert.Equal("RemoveMe!", messageSub.ReadString());
-        //
-        //                 // Remove this message.
-        //                 // inner.RemoveMessage(messageSub);
-        //             }
-        //         }
-        //         else if (message.Tag == 2)
-        //         {
-        //             Assert.Equal("HiTest2", message.ReadString());
-        //         }
-        //     }
-        //
-        //     // Check if the magic was successful.
-        //     Assert.Equal(messageExpected.ToByteArray(true), messageWriter.ToByteArray(true));
-        // }
+        [Fact]
+        public void RemoveMessage()
+        {
+            // Create expected message.
+            var messageExpected = new MessageWriter(1024);
+
+            messageExpected.StartMessage(0);
+            messageExpected.StartMessage(1);
+            messageExpected.Write("HiTest");
+            messageExpected.EndMessage();
+            messageExpected.StartMessage(2);
+            messageExpected.Write("HiTest");
+            messageExpected.EndMessage();
+            messageExpected.EndMessage();
+
+            // Create message.
+            var messageWriter = new MessageWriter(1024);
+
+            messageWriter.StartMessage(0);
+                messageWriter.StartMessage(1);
+                    messageWriter.Write("HiTest1");
+                    messageWriter.StartMessage(2);
+                        messageWriter.Write("RemoveMe!");
+                    messageWriter.EndMessage();
+                messageWriter.EndMessage();
+                messageWriter.StartMessage(2);
+                    messageWriter.Write("HiTest2");
+                messageWriter.EndMessage();
+            messageWriter.EndMessage();
+
+            // Do the magic.
+            var readerPool = CreateReaderPool();
+            var reader = readerPool.Get();
+            reader.Update(messageWriter.Buffer);
+            var inner = reader.ReadMessage();
+
+            while (inner.Position < inner.Length)
+            {
+                var message = inner.ReadMessage();
+                if (message.Tag == 1)
+                {
+                    Assert.Equal("HiTest1", message.ReadString());
+
+                    var messageSub = message.ReadMessage();
+                    if (messageSub.Tag == 2)
+                    {
+                        Assert.Equal("RemoveMe!", messageSub.ReadString());
+
+                        // Remove this message.
+                        inner.RemoveMessage(messageSub);
+                    }
+                }
+                else if (message.Tag == 2)
+                {
+                    Assert.Equal("HiTest2", message.ReadString());
+                }
+            }
+
+            // Check if the magic was successful.
+            Assert.Equal(messageExpected.ToByteArray(true), messageWriter.ToByteArray(true));
+        }
 
         [Fact]
         public void GetLittleEndian()
