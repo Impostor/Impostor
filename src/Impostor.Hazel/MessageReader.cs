@@ -188,27 +188,24 @@ namespace Impostor.Hazel
 
         public void RemoveMessage(IMessageReader message)
         {
-            var pool = ArrayPool.Rent(message.Buffer.Length);
+            // Offset of where to start removing.
+            var offsetStart = message.Offset - 3;
 
-            try
-            {
-                var offsetHeader = message.Offset - 3;
-                var offsetEnd = message.Offset + message.Length;
-                var len = message.Buffer.Length - offsetEnd;
+            // Offset of where to end removing.
+            var offsetEnd = message.Offset + message.Length;
 
-                Array.Copy(message.Buffer, offsetEnd, pool, 0, len);
-                Array.Copy(pool, 0, this.Buffer, offsetHeader, len);
+            // The amount of bytes to copy over ourselves.
+            var lengthToCopy = message.Buffer.Length - offsetEnd;
 
-                AdjustLength(message.Offset, message.Length + 3);
-            }
-            finally
-            {
-                ArrayPool.Return(pool);
-            }
+            System.Buffer.BlockCopy(Buffer, offsetEnd, Buffer, offsetStart, lengthToCopy);
+
+            ((MessageReader) message).Parent.AdjustLength(message.Offset, message.Length + 3);
         }
 
         private void AdjustLength(int offset, int amount)
         {
+            this.Length -= amount;
+
             if (this.ReadPosition > offset)
             {
                 this.Position -= amount;
@@ -217,11 +214,10 @@ namespace Impostor.Hazel
             if (Parent != null)
             {
                 var lengthOffset = this.Offset - 3;
-                var curLen = this.Buffer[lengthOffset]
-                             | (this.Buffer[lengthOffset + 1] << 8);
+                var curLen = this.Buffer[lengthOffset] |
+                             (this.Buffer[lengthOffset + 1] << 8);
 
                 curLen -= amount;
-                this.Length -= amount;
 
                 this.Buffer[lengthOffset] = (byte)curLen;
                 this.Buffer[lengthOffset + 1] = (byte)(this.Buffer[lengthOffset + 1] >> 8);

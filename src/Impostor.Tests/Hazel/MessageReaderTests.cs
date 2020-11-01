@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Impostor.Hazel;
 using Impostor.Hazel.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +8,7 @@ using Xunit;
 
 namespace Impostor.Tests.Hazel
 {
-    public class BufferMessageReaderTests
+    public class MessageReaderTests
     {
         private ObjectPool<MessageReader> CreateReaderPool()
         {
@@ -288,10 +289,10 @@ namespace Impostor.Tests.Hazel
 
             messageExpected.StartMessage(0);
             messageExpected.StartMessage(1);
-            messageExpected.Write("HiTest");
+            messageExpected.Write("HiTest1");
             messageExpected.EndMessage();
             messageExpected.StartMessage(2);
-            messageExpected.Write("HiTest");
+            messageExpected.Write("HiTest2");
             messageExpected.EndMessage();
             messageExpected.EndMessage();
 
@@ -310,10 +311,14 @@ namespace Impostor.Tests.Hazel
                 messageWriter.EndMessage();
             messageWriter.EndMessage();
 
+            // Copy buffer.
+            var bufferCopy = new byte[messageWriter.Length];
+            Buffer.BlockCopy(messageWriter.Buffer, 0, bufferCopy, 0, bufferCopy.Length);
+
             // Do the magic.
             var readerPool = CreateReaderPool();
             var reader = readerPool.Get();
-            reader.Update(messageWriter.Buffer);
+            reader.Update(bufferCopy);
             var inner = reader.ReadMessage();
 
             while (inner.Position < inner.Length)
@@ -336,10 +341,15 @@ namespace Impostor.Tests.Hazel
                 {
                     Assert.Equal("HiTest2", message.ReadString());
                 }
+                else
+                {
+                    Assert.True(false, "Invalid tag was read.");
+                }
             }
 
             // Check if the magic was successful.
-            Assert.Equal(messageExpected.ToByteArray(true), messageWriter.ToByteArray(true));
+            Assert.Equal(messageExpected.Length, reader.Length);
+            Assert.Equal(messageExpected.ToByteArray(true), reader.Buffer.Take(reader.Length).ToArray());
         }
 
         [Fact]
