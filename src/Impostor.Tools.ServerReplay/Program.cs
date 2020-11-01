@@ -12,6 +12,7 @@ using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Hazel;
+using Impostor.Hazel.Extensions;
 using Impostor.Server.Events;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Factories;
@@ -29,8 +30,6 @@ namespace Impostor.Tools.ServerReplay
 {
     internal static class Program
     {
-        private const string GameRecorderPath = "C:\\DevData\\ImpostorSessions";
-
         private static readonly ILogger Logger = Log.ForContext(typeof(Program));
         private static readonly Dictionary<int, IHazelConnection> Connections = new Dictionary<int, IHazelConnection>();
         private static readonly Dictionary<int, GameOptionsData> GameOptions = new Dictionary<int, GameOptionsData>();
@@ -52,17 +51,21 @@ namespace Impostor.Tools.ServerReplay
 
             var stopwatch = Stopwatch.StartNew();
 
-            // Create service provider.
-            _serviceProvider = BuildServices();
-
-            // Create required instances.
-            _readerPool = _serviceProvider.GetRequiredService<ObjectPool<MessageReader>>();
-            _gameCodeFactory = _serviceProvider.GetRequiredService<MockGameCodeFactory>();
-            _clientManager = _serviceProvider.GetRequiredService<ClientManager>();
-            _gameManager = _serviceProvider.GetRequiredService<GameManager>();
-
-            foreach (var file in Directory.GetFiles(GameRecorderPath))
+            foreach (var file in Directory.GetFiles(args[0]))
             {
+                // Clear.
+                Connections.Clear();
+                GameOptions.Clear();
+
+                // Create service provider.
+                _serviceProvider = BuildServices();
+
+                // Create required instances.
+                _readerPool = _serviceProvider.GetRequiredService<ObjectPool<MessageReader>>();
+                _gameCodeFactory = _serviceProvider.GetRequiredService<MockGameCodeFactory>();
+                _clientManager = _serviceProvider.GetRequiredService<ClientManager>();
+                _gameManager = _serviceProvider.GetRequiredService<GameManager>();
+
                 await using (var stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read))
                 using (var reader = new BinaryReader(stream))
                 {
@@ -95,6 +98,8 @@ namespace Impostor.Tools.ServerReplay
             services.AddSingleton<IClientFactory, ClientFactory<Client>>();
             services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
             services.AddSingleton<IEventManager, EventManager>();
+
+            services.AddHazel();
 
             return services.BuildServiceProvider();
         }

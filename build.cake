@@ -103,10 +103,23 @@ Task("Patch")
         ReplaceRegexInFiles("./src/**/*.props", @"<Version>.*?<\/Version>", "<Version>" + buildVersion + "</Version>");
     });
 
+Task("Replay")
+    .Does(() => {
+        // D:\Projects\GitHub\Impostor\Impostor\src\Impostor.Tools.ServerReplay\sessions
+        DotNetCoreRun(
+            "./src/Impostor.Tools.ServerReplay/Impostor.Tools.ServerReplay.csproj", 
+            "./src/Impostor.Tools.ServerReplay/sessions", new DotNetCoreRunSettings {
+                Configuration = configuration,
+                NoRestore = true,
+                Framework = "net5.0"
+            });
+    });
+
 Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Patch")
     .IsDependentOn("Restore")
+    .IsDependentOn("Replay")
     .Does(() => {
         // Tests.
         DotNetCoreBuild("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetCoreBuildSettings {
