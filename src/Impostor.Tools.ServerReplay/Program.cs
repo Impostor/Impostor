@@ -146,7 +146,14 @@ namespace Impostor.Tools.ServerReplay
                     break;
 
                 case RecordedPacketType.Disconnect:
-                    await Connections[clientId].Client!.HandleDisconnectAsync(null);
+                    string reason = null;
+
+                    if (reader.BaseStream.Position < reader.BaseStream.Length)
+                    {
+                        reason = reader.ReadString();
+                    }
+
+                    await Connections[clientId].Client!.HandleDisconnectAsync(reason);
                     Connections.Remove(clientId);
                     break;
 

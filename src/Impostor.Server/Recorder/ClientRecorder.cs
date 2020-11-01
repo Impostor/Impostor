@@ -79,7 +79,7 @@ namespace Impostor.Server.Recorder
 
         public override async ValueTask HandleDisconnectAsync(string reason)
         {
-            await _recorder.WriteDisconnectAsync(this);
+            await _recorder.WriteDisconnectAsync(this, reason);
             await base.HandleDisconnectAsync(reason);
         }
     }

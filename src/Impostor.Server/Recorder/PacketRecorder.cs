@@ -55,7 +55,7 @@ namespace Impostor.Server.Recorder
             }
         }
 
-        public async Task WriteDisconnectAsync(ClientRecorder client)
+        public async Task WriteDisconnectAsync(ClientRecorder client, string reason)
         {
             _logger.LogTrace("Writing Disconnect.");
 
@@ -65,6 +65,7 @@ namespace Impostor.Server.Recorder
             {
                 WriteHeader(context, RecordedPacketType.Disconnect);
                 WriteClient(context, client, false);
+                context.Writer.Write(reason);
                 WriteLength(context);
 
                 await WriteAsync(context.Stream);
