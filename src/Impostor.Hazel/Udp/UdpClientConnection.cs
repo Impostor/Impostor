@@ -26,10 +26,7 @@ namespace Impostor.Hazel.Udp
 
         private readonly Timer _reliablePacketTimer;
         private readonly SemaphoreSlim _connectWaitLock;
-        private readonly ArrayPool<byte> _pool;
-        private readonly Channel<byte[]> _channel;
         private Task _listenTask;
-        private Task _handleTask;
 
         /// <summary>
         ///     Creates a new UdpClientConnection.
@@ -48,12 +45,6 @@ namespace Impostor.Hazel.Udp
 
             _reliablePacketTimer = new Timer(ManageReliablePacketsInternal, null, 100, Timeout.Infinite);
             _connectWaitLock = new SemaphoreSlim(1, 1);
-            _pool = ArrayPool<byte>.Shared;
-            _channel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
-            {
-                SingleReader = true,
-                SingleWriter = true
-            });
         }
 
         ~UdpClientConnection()
