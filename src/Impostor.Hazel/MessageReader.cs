@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -9,10 +10,10 @@ namespace Impostor.Hazel
 {
     public class MessageReader : IMessageReader
     {
+        private static readonly ArrayPool<byte> ArrayPool = ArrayPool<byte>.Shared;
+
         private readonly ObjectPool<MessageReader> _pool;
         private bool _inUse;
-
-        private byte _tag;
 
         internal MessageReader(ObjectPool<MessageReader> pool)
         {
@@ -29,9 +30,11 @@ namespace Impostor.Hazel
 
         public byte Tag { get; private set; }
 
+        public MessageReader Parent { get; private set; }
+
         private int ReadPosition => Offset + Position;
 
-        public void Update(byte[] buffer, int offset = 0, int position = 0, int? length = null, byte tag = byte.MaxValue)
+        public void Update(byte[] buffer, int offset = 0, int position = 0, int? length = null, byte tag = byte.MaxValue, MessageReader parent = null)
         {
             _inUse = true;
 
@@ -40,6 +43,7 @@ namespace Impostor.Hazel
             Position = position;
             Length = length ?? buffer.Length;
             Tag = tag;
+            Parent = parent;
         }
 
         internal void Reset()
@@ -51,6 +55,7 @@ namespace Impostor.Hazel
             Offset = 0;
             Position = 0;
             Length = 0;
+            Parent = null;
         }
 
         public IMessageReader ReadMessage()
@@ -62,7 +67,7 @@ namespace Impostor.Hazel
             Position += length;
 
             var reader = _pool.Get();
-            reader.Update(Buffer, pos, 0, length, tag);
+            reader.Update(Buffer, pos, 0, length, tag, this);
             return reader;
         }
 
@@ -179,6 +184,50 @@ namespace Impostor.Hazel
         public void Seek(int position)
         {
             Position = position;
+        }
+
+        public void RemoveMessage(IMessageReader message)
+        {
+            var pool = ArrayPool.Rent(message.Buffer.Length);
+
+            try
+            {
+                var offsetHeader = message.Offset - 3;
+                var offsetEnd = message.Offset + message.Length;
+                var len = message.Buffer.Length - offsetEnd;
+
+                Array.Copy(message.Buffer, offsetEnd, pool, 0, len);
+                Array.Copy(pool, 0, this.Buffer, offsetHeader, len);
+
+                AdjustLength(message.Offset, message.Length + 3);
+            }
+            finally
+            {
+                ArrayPool.Return(pool);
+            }
+        }
+
+        private void AdjustLength(int offset, int amount)
+        {
+            if (this.ReadPosition > offset)
+            {
+                this.Position -= amount;
+            }
+
+            if (Parent != null)
+            {
+                var lengthOffset = this.Offset - 3;
+                var curLen = this.Buffer[lengthOffset]
+                             | (this.Buffer[lengthOffset + 1] << 8);
+
+                curLen -= amount;
+                this.Length -= amount;
+
+                this.Buffer[lengthOffset] = (byte)curLen;
+                this.Buffer[lengthOffset + 1] = (byte)(this.Buffer[lengthOffset + 1] >> 8);
+
+                Parent.AdjustLength(offset, amount);
+            }
         }
 
         public IMessageReader Copy(int offset = 0)

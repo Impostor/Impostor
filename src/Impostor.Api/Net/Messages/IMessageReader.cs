@@ -61,6 +61,8 @@ namespace Impostor.Api.Net.Messages
 
         void Seek(int position);
 
+        void RemoveMessage(IMessageReader message);
+
         IMessageReader Copy(int offset = 0);
     }
 }
