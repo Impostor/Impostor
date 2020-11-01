@@ -47,19 +47,18 @@ namespace Impostor.Server.Recorder
             var writer = File.Open(_path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
 
             // Handle messages.
-            while (!stoppingToken.IsCancellationRequested)
+            try
             {
-                try
+                while (!stoppingToken.IsCancellationRequested)
                 {
                     var result = await _channel.Reader.ReadAsync(stoppingToken);
 
                     await writer.WriteAsync(result, stoppingToken);
                     await writer.FlushAsync(stoppingToken);
                 }
-                catch (TaskCanceledException)
-                {
-                    break;
-                }
+            }
+            catch (TaskCanceledException)
+            {
             }
 
             // Clean up.
