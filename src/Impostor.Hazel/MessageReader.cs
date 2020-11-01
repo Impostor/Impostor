@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Impostor.Api;
 using Impostor.Api.Net.Messages;
 using Microsoft.Extensions.ObjectPool;
 
@@ -188,6 +189,11 @@ namespace Impostor.Hazel
 
         public void RemoveMessage(IMessageReader message)
         {
+            if (message.Buffer != Buffer)
+            {
+                throw new ImpostorProtocolException("Tried to remove message from a message that does not have the same buffer.");
+            }
+
             // Offset of where to start removing.
             var offsetStart = message.Offset - 3;
 

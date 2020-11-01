@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Impostor.Api;
 using Impostor.Hazel;
 using Impostor.Hazel.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -315,6 +316,9 @@ namespace Impostor.Tests.Hazel
             var bufferCopy = new byte[messageWriter.Length];
             Buffer.BlockCopy(messageWriter.Buffer, 0, bufferCopy, 0, bufferCopy.Length);
 
+            var bufferCopyTwo = new byte[messageWriter.Length];
+            Buffer.BlockCopy(messageWriter.Buffer, 0, bufferCopyTwo, 0, bufferCopyTwo.Length);
+
             // Do the magic.
             var readerPool = CreateReaderPool();
             var reader = readerPool.Get();
@@ -350,6 +354,13 @@ namespace Impostor.Tests.Hazel
             // Check if the magic was successful.
             Assert.Equal(messageExpected.Length, reader.Length);
             Assert.Equal(messageExpected.ToByteArray(true), reader.Buffer.Take(reader.Length).ToArray());
+
+            // Test ownership.
+            var readerTwo = readerPool.Get();
+
+            readerTwo.Update(bufferCopyTwo);
+
+            Assert.Throws<ImpostorProtocolException>(() => reader.RemoveMessage(readerTwo.ReadMessage()));
         }
 
         [Fact]
