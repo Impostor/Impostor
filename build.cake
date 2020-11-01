@@ -22,12 +22,6 @@ if (buildBranch != "master") {
 //////////////////////////////////////////////////////////////////////
 
 // Remove unnecessary files for packaging.
-private void ImpostorClean(string directory) {
-    foreach (var file in System.IO.Directory.GetFiles(directory, "*.pdb", SearchOption.AllDirectories)) {
-        System.IO.File.Delete(file);
-    }
-}
-
 private void ImpostorPublish(string name, string project, string runtime, bool isServer = false) {
     var projBuildDir = buildDir.Combine(name + "_" + runtime);
     var projBuildName = name + "_" + buildVersion + "_" + runtime;
@@ -42,8 +36,6 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
         PublishTrimmed = false,
         OutputDirectory = projBuildDir
     });
-
-    ImpostorClean(projBuildDir.ToString());
 
     if (isServer) {
         CreateDirectory(projBuildDir.Combine("plugins"));
@@ -72,8 +64,6 @@ private void ImpostorPublishNF(string name, string project) {
         Framework = "net472",
         OutputDirectory = projBuildDir
     });
-
-    ImpostorClean(projBuildDir.ToString());
 
     Zip(projBuildDir, projBuildZip);
 }
