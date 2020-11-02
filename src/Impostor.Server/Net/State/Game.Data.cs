@@ -222,7 +222,7 @@ namespace Impostor.Server.Net.State
             // Parse GameData messages.
             while (parent.Position < parent.Length)
             {
-                var reader = parent.ReadMessage();
+                using var reader = parent.ReadMessage();
 
                 switch (reader.Tag)
                 {
@@ -319,7 +319,7 @@ namespace Impostor.Server.Net.State
                                     break;
                                 }
 
-                                var readerSub = reader.ReadMessage();
+                                using var readerSub = reader.ReadMessage();
                                 if (readerSub.Length > 0)
                                 {
                                     obj.Deserialize(sender, target, readerSub, true);

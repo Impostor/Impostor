@@ -111,7 +111,7 @@ namespace Impostor.Tools.Proxy
                         break;
                     }
 
-                    var message = reader.ReadMessage();
+                    using var message = reader.ReadMessage();
                     if (isSent)
                     {
                         HandleToServer(ipSrc, message);
