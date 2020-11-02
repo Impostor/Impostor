@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Inner.Objects.Components
 {
-    internal class InnerPlayerPhysics : InnerNetObject
+    internal partial class InnerPlayerPhysics : InnerNetObject
     {
         private readonly ILogger<InnerPlayerPhysics> _logger;
         private readonly InnerPlayerControl _playerControl;

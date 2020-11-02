@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Inner.Objects.Components
 {
-    internal class InnerCustomNetworkTransform : InnerNetObject
+    internal partial class InnerCustomNetworkTransform : InnerNetObject
     {
         private static readonly FloatRange XRange = new FloatRange(-40f, 40f);
         private static readonly FloatRange YRange = new FloatRange(-40f, 40f);

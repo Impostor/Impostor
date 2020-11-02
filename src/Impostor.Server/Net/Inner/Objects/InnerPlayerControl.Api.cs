@@ -2,11 +2,16 @@ using System.Threading.Tasks;
 using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
+using Impostor.Api.Net.Inner.Objects.Components;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
     internal partial class InnerPlayerControl : IInnerPlayerControl
     {
+        IInnerPlayerPhysics IInnerPlayerControl.Physics => Physics;
+
+        IInnerCustomNetworkTransform IInnerPlayerControl.NetworkTransform => NetworkTransform;
+
         IInnerPlayerInfo IInnerPlayerControl.PlayerInfo => PlayerInfo;
 
         public async ValueTask SetNameAsync(string name)

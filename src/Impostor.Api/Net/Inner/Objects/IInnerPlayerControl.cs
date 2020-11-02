@@ -1,10 +1,23 @@
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth.Customization;
+using Impostor.Api.Net.Inner.Objects.Components;
 
 namespace Impostor.Api.Net.Inner.Objects
 {
     public interface IInnerPlayerControl : IInnerNetObject
     {
+        /// <summary>
+        ///     Gets the <see cref="IInnerPlayerPhysics"/> of the <see cref="IInnerPlayerControl"/>.
+        ///     Contains vent logic.
+        /// </summary>
+        IInnerPlayerPhysics Physics { get; }
+
+        /// <summary>
+        ///     Gets the <see cref="IInnerCustomNetworkTransform"/> of the <see cref="IInnerPlayerControl"/>.
+        ///     Contains position data about the player.
+        /// </summary>
+        IInnerCustomNetworkTransform NetworkTransform { get; }
+
         /// <summary>
         ///     Gets the <see cref="IInnerPlayerInfo"/> of the <see cref="IInnerPlayerControl"/>.
         ///     Contains metadata about the player.
