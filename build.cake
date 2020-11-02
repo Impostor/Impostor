@@ -22,12 +22,6 @@ if (buildBranch != "master") {
 //////////////////////////////////////////////////////////////////////
 
 // Remove unnecessary files for packaging.
-private void ImpostorClean(string directory) {
-    foreach (var file in System.IO.Directory.GetFiles(directory, "*.pdb", SearchOption.AllDirectories)) {
-        System.IO.File.Delete(file);
-    }
-}
-
 private void ImpostorPublish(string name, string project, string runtime, bool isServer = false) {
     var projBuildDir = buildDir.Combine(name + "_" + runtime);
     var projBuildName = name + "_" + buildVersion + "_" + runtime;
@@ -42,8 +36,6 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
         PublishTrimmed = false,
         OutputDirectory = projBuildDir
     });
-
-    ImpostorClean(projBuildDir.ToString());
 
     if (isServer) {
         CreateDirectory(projBuildDir.Combine("plugins"));
@@ -73,8 +65,6 @@ private void ImpostorPublishNF(string name, string project) {
         OutputDirectory = projBuildDir
     });
 
-    ImpostorClean(projBuildDir.ToString());
-
     Zip(projBuildDir, projBuildZip);
 }
 
@@ -103,10 +93,23 @@ Task("Patch")
         ReplaceRegexInFiles("./src/**/*.props", @"<Version>.*?<\/Version>", "<Version>" + buildVersion + "</Version>");
     });
 
+Task("Replay")
+    .Does(() => {
+        // D:\Projects\GitHub\Impostor\Impostor\src\Impostor.Tools.ServerReplay\sessions
+        DotNetCoreRun(
+            "./src/Impostor.Tools.ServerReplay/Impostor.Tools.ServerReplay.csproj", 
+            "./src/Impostor.Tools.ServerReplay/sessions", new DotNetCoreRunSettings {
+                Configuration = configuration,
+                NoRestore = true,
+                Framework = "net5.0"
+            });
+    });
+
 Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Patch")
     .IsDependentOn("Restore")
+    .IsDependentOn("Replay")
     .Does(() => {
         // Tests.
         DotNetCoreBuild("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetCoreBuildSettings {

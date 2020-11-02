@@ -3,11 +3,14 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Net.Manager;
+using Impostor.Api.Net.Messages;
+using Impostor.Hazel.Extensions;
 using Impostor.Server.Config;
 using Impostor.Server.Events;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
+using Impostor.Server.Net.Messages;
 using Impostor.Server.Net.Redirector;
 using Impostor.Server.Plugins;
 using Impostor.Server.Recorder;
@@ -158,6 +161,7 @@ namespace Impostor.Server
                             });
 
                             services.AddSingleton<PacketRecorder>();
+                            services.AddHostedService(sp => sp.GetRequiredService<PacketRecorder>());
                             services.AddSingleton<IClientFactory, ClientFactory<ClientRecorder>>();
                         }
                         else
@@ -169,6 +173,8 @@ namespace Impostor.Server
                         services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
                     }
 
+                    services.AddHazel();
+                    services.AddSingleton<IMessageWriterProvider, MessageWriterProvider>();
                     services.AddSingleton<IGameCodeFactory, GameCodeFactory>();
                     services.AddSingleton<IEventManager, EventManager>();
                     services.AddSingleton<Matchmaker>();

@@ -12,6 +12,7 @@ using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Hazel;
+using Impostor.Hazel.Extensions;
 using Impostor.Server.Events;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Factories;
@@ -21,6 +22,7 @@ using Impostor.Server.Recorder;
 using Impostor.Tools.ServerReplay.Mocks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -28,14 +30,13 @@ namespace Impostor.Tools.ServerReplay
 {
     internal static class Program
     {
-        private const string GameRecorderPath = "C:\\DevData\\ImpostorSessions";
-
         private static readonly ILogger Logger = Log.ForContext(typeof(Program));
         private static readonly Dictionary<int, IHazelConnection> Connections = new Dictionary<int, IHazelConnection>();
         private static readonly Dictionary<int, GameOptionsData> GameOptions = new Dictionary<int, GameOptionsData>();
 
         private static ServiceProvider _serviceProvider;
 
+        private static ObjectPool<MessageReader> _readerPool;
         private static MockGameCodeFactory _gameCodeFactory;
         private static ClientManager _clientManager;
         private static GameManager _gameManager;
@@ -50,16 +51,21 @@ namespace Impostor.Tools.ServerReplay
 
             var stopwatch = Stopwatch.StartNew();
 
-            // Create service provider.
-            _serviceProvider = BuildServices();
-
-            // Create required instances.
-            _gameCodeFactory = _serviceProvider.GetRequiredService<MockGameCodeFactory>();
-            _clientManager = _serviceProvider.GetRequiredService<ClientManager>();
-            _gameManager = _serviceProvider.GetRequiredService<GameManager>();
-
-            foreach (var file in Directory.GetFiles(GameRecorderPath))
+            foreach (var file in Directory.GetFiles(args[0]))
             {
+                // Clear.
+                Connections.Clear();
+                GameOptions.Clear();
+
+                // Create service provider.
+                _serviceProvider = BuildServices();
+
+                // Create required instances.
+                _readerPool = _serviceProvider.GetRequiredService<ObjectPool<MessageReader>>();
+                _gameCodeFactory = _serviceProvider.GetRequiredService<MockGameCodeFactory>();
+                _clientManager = _serviceProvider.GetRequiredService<ClientManager>();
+                _gameManager = _serviceProvider.GetRequiredService<GameManager>();
+
                 await using (var stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read))
                 using (var reader = new BinaryReader(stream))
                 {
@@ -92,6 +98,8 @@ namespace Impostor.Tools.ServerReplay
             services.AddSingleton<IClientFactory, ClientFactory<Client>>();
             services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
             services.AddSingleton<IEventManager, EventManager>();
+
+            services.AddHazel();
 
             return services.BuildServiceProvider();
         }
@@ -138,16 +146,26 @@ namespace Impostor.Tools.ServerReplay
                     break;
 
                 case RecordedPacketType.Disconnect:
-                    await Connections[clientId].Client!.HandleDisconnectAsync(null);
+                    string reason = null;
+
+                    if (reader.BaseStream.Position < reader.BaseStream.Length)
+                    {
+                        reason = reader.ReadString();
+                    }
+
+                    await Connections[clientId].Client!.HandleDisconnectAsync(reason);
                     Connections.Remove(clientId);
                     break;
 
                 case RecordedPacketType.Message:
-                    var messageType = (MessageType) reader.ReadByte();
+                {
+                    var messageType = (MessageType)reader.ReadByte();
                     var tag = reader.ReadByte();
                     var length = reader.ReadInt32();
                     var buffer = reader.ReadBytes(length);
-                    var message = new MessageReader(tag, buffer);
+                    using var message = _readerPool.Get();
+
+                    message.Update(buffer, tag: tag);
 
                     if (tag == MessageFlags.HostGame)
                     {
@@ -157,7 +175,9 @@ namespace Impostor.Tools.ServerReplay
                     {
                         await client.Client!.HandleMessageAsync(message, messageType);
                     }
+
                     break;
+                }
 
                 case RecordedPacketType.GameCreated:
                     _gameCodeFactory.Result = GameCode.From(reader.ReadString());

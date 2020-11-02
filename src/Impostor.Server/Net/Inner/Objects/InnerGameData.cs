@@ -81,7 +81,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     while (reader.Position < reader.Length)
                     {
-                        var message = reader.ReadMessage();
+                        using var message = reader.ReadMessage();
                         var player = GetPlayerById(message.Tag);
                         if (player != null)
                         {

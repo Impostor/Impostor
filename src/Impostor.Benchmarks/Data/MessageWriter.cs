@@ -1,17 +1,15 @@
-﻿using Impostor.Api.Games;
-using Impostor.Api.Net.Messages;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using Impostor.Api.Games;
+using Impostor.Api.Net.Messages;
 
-namespace Impostor.Hazel
+namespace Impostor.Benchmarks.Data
 {
-    public class MessageWriter : IMessageWriter, IRecyclable, IDisposable
+    public class MessageWriter
     {
         private static int BufferSize = 64000;
-        private static readonly ObjectPoolCustom<MessageWriter> WriterPool = new ObjectPoolCustom<MessageWriter>(() => new MessageWriter(BufferSize));
 
         public MessageType SendOption { get; private set; }
 
@@ -62,16 +60,6 @@ namespace Impostor.Hazel
             }
 
             throw new NotImplementedException();
-        }
-
-        ///
-        /// <param name="sendOption">The option specifying how the message should be sent.</param>
-        public static MessageWriter Get(MessageType sendOption = MessageType.Unreliable)
-        {
-            var output = WriterPool.GetObject();
-            output.Clear(sendOption);
-
-            return output;
         }
 
         public bool HasBytes(int expected)
@@ -129,13 +117,6 @@ namespace Impostor.Hazel
                     this.Length = this.Position = 3;
                     break;
             }
-        }
-
-        ///
-        public void Recycle()
-        {
-            this.Position = this.Length = 0;
-            WriterPool.PutObject(this);
         }
 
         #region WriteMethods
@@ -325,11 +306,6 @@ namespace Impostor.Hazel
             }
 
             return b == 1;
-        }
-
-        public void Dispose()
-        {
-            Recycle();
         }
     }
 }

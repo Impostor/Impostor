@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -222,7 +222,7 @@ namespace Impostor.Server.Net.State
             // Parse GameData messages.
             while (parent.Position < parent.Length)
             {
-                var reader = parent.ReadMessage();
+                using var reader = parent.ReadMessage();
 
                 switch (reader.Tag)
                 {
@@ -270,6 +270,13 @@ namespace Impostor.Server.Net.State
                             var innerNetObject = (InnerNetObject) ActivatorUtilities.CreateInstance(_serviceProvider, SpawnableObjects[objectId], this);
                             var ownerClientId = reader.ReadPackedInt32();
 
+                            // Prevent fake client from being broadcasted.
+                            // TODO: Remove message from stream properly.
+                            if (ownerClientId == FakeClientId)
+                            {
+                                return false;
+                            }
+
                             innerNetObject.SpawnFlags = (SpawnFlags) reader.ReadByte();
 
                             var components = innerNetObject.GetComponentsInChildren<InnerNetObject>();
@@ -312,7 +319,7 @@ namespace Impostor.Server.Net.State
                                     break;
                                 }
 
-                                var readerSub = reader.ReadMessage();
+                                using var readerSub = reader.ReadMessage();
                                 if (readerSub.Length > 0)
                                 {
                                     obj.Deserialize(sender, target, readerSub, true);

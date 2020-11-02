@@ -34,7 +34,8 @@ namespace Impostor.Client.App
                 NumImpostors = 2
             });
 
-            using (var connection = new UdpClientConnection(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 22023)))
+            // TODO: ObjectPool for MessageReaders
+            using (var connection = new UdpClientConnection(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 22023), null))
             {
                 var e = new ManualResetEvent(false);
 

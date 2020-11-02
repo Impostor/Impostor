@@ -14,7 +14,7 @@ namespace Impostor.Hazel.Udp
         /// </summary>
         public class PingPacket : IRecyclable
         {
-            private static readonly ObjectPool<PingPacket> PacketPool = new ObjectPool<PingPacket>(() => new PingPacket());
+            private static readonly ObjectPoolCustom<PingPacket> PacketPool = new ObjectPoolCustom<PingPacket>(() => new PingPacket());
 
             public readonly Stopwatch Stopwatch = new Stopwatch();
 

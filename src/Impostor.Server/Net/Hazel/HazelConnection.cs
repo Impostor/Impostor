@@ -64,7 +64,10 @@ namespace Impostor.Server.Net.Hazel
                     break;
                 }
 
-                await Client.HandleMessageAsync(e.Message.ReadMessage(), e.Type);
+                using (var message = e.Message.ReadMessage())
+                {
+                    await Client.HandleMessageAsync(message, e.Type);
+                }
             }
         }
     }

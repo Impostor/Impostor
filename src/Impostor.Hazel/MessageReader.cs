@@ -1,39 +1,75 @@
 ﻿using System;
+using System.Buffers;
 using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Impostor.Api;
 using Impostor.Api.Net.Messages;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Impostor.Hazel
 {
     public class MessageReader : IMessageReader
     {
-        public byte Tag { get; }
-        public ReadOnlyMemory<byte> Buffer { get; }
-        public int Position { get; set; }
-        public int Length => Buffer.Length;
+        private static readonly ArrayPool<byte> ArrayPool = ArrayPool<byte>.Shared;
 
-        public MessageReader(ReadOnlyMemory<byte> buffer)
+        private readonly ObjectPool<MessageReader> _pool;
+        private bool _inUse;
+
+        internal MessageReader(ObjectPool<MessageReader> pool)
         {
-            Tag = byte.MaxValue;
-            Buffer = buffer;
+            _pool = pool;
         }
 
-        public MessageReader(byte tag, ReadOnlyMemory<byte> buffer)
+        public byte[] Buffer { get; private set; }
+
+        public int Offset { get; internal set; }
+
+        public int Position { get; internal set; }
+
+        public int Length { get; internal set; }
+
+        public byte Tag { get; private set; }
+
+        public MessageReader Parent { get; private set; }
+
+        private int ReadPosition => Offset + Position;
+
+        public void Update(byte[] buffer, int offset = 0, int position = 0, int? length = null, byte tag = byte.MaxValue, MessageReader parent = null)
         {
-            Tag = tag;
+            _inUse = true;
+
             Buffer = buffer;
+            Offset = offset;
+            Position = position;
+            Length = length ?? buffer.Length;
+            Tag = tag;
+            Parent = parent;
+        }
+
+        internal void Reset()
+        {
+            _inUse = false;
+
+            Tag = byte.MaxValue;
+            Buffer = null;
+            Offset = 0;
+            Position = 0;
+            Length = 0;
+            Parent = null;
         }
 
         public IMessageReader ReadMessage()
         {
             var length = ReadUInt16();
             var tag = FastByte();
-            var pos = Position;
+            var pos = ReadPosition;
 
             Position += length;
 
-            return new MessageReader(tag, Buffer.Slice(pos, length));
+            var reader = _pool.Get();
+            reader.Update(Buffer, pos, 0, length, tag, this);
+            return reader;
         }
 
         public bool ReadBoolean()
@@ -54,35 +90,35 @@ namespace Impostor.Hazel
 
         public ushort ReadUInt16()
         {
-            var output = BinaryPrimitives.ReadUInt16LittleEndian(Buffer.Span.Slice(Position));
+            var output = BinaryPrimitives.ReadUInt16LittleEndian(Buffer.AsSpan(ReadPosition));
             Position += sizeof(ushort);
             return output;
         }
 
         public short ReadInt16()
         {
-            var output = BinaryPrimitives.ReadInt16LittleEndian(Buffer.Span.Slice(Position));
+            var output = BinaryPrimitives.ReadInt16LittleEndian(Buffer.AsSpan(ReadPosition));
             Position += sizeof(short);
             return output;
         }
 
         public uint ReadUInt32()
         {
-            var output = BinaryPrimitives.ReadUInt32LittleEndian(Buffer.Span.Slice(Position));
+            var output = BinaryPrimitives.ReadUInt32LittleEndian(Buffer.AsSpan(ReadPosition));
             Position += sizeof(uint);
             return output;
         }
 
         public int ReadInt32()
         {
-            var output = BinaryPrimitives.ReadInt32LittleEndian(Buffer.Span.Slice(Position));
+            var output = BinaryPrimitives.ReadInt32LittleEndian(Buffer.AsSpan(ReadPosition));
             Position += sizeof(int);
             return output;
         }
 
         public unsafe float ReadSingle()
         {
-            var output = BinaryPrimitives.ReadSingleLittleEndian(Buffer.Span.Slice(Position));
+            var output = BinaryPrimitives.ReadSingleLittleEndian(Buffer.AsSpan(ReadPosition));
             Position += sizeof(float);
             return output;
         }
@@ -90,7 +126,7 @@ namespace Impostor.Hazel
         public string ReadString()
         {
             var len = ReadPackedInt32();
-            var output = Encoding.UTF8.GetString(Buffer.Span.Slice(Position, len));
+            var output = Encoding.UTF8.GetString(Buffer.AsSpan(ReadPosition, len));
             Position += len;
             return output;
         }
@@ -103,7 +139,7 @@ namespace Impostor.Hazel
 
         public ReadOnlyMemory<byte> ReadBytes(int length)
         {
-            var output = Buffer.Slice(Position, length);
+            var output = Buffer.AsMemory(ReadPosition, length);
             Position += length;
             return output;
         }
@@ -143,23 +179,78 @@ namespace Impostor.Hazel
         {
             writer.Write((ushort) Length);
             writer.Write((byte) Tag);
-            writer.Write(Buffer);
+            writer.Write(Buffer.AsMemory(Offset, Length));
         }
 
-        public IMessageReader Slice(int start)
+        public void Seek(int position)
         {
-            return new MessageReader(Tag, Buffer.Slice(start));
+            Position = position;
         }
 
-        public IMessageReader Slice(int start, int length)
+        public void RemoveMessage(IMessageReader message)
         {
-            return new MessageReader(Tag, Buffer.Slice(start, length));
+            if (message.Buffer != Buffer)
+            {
+                throw new ImpostorProtocolException("Tried to remove message from a message that does not have the same buffer.");
+            }
+
+            // Offset of where to start removing.
+            var offsetStart = message.Offset - 3;
+
+            // Offset of where to end removing.
+            var offsetEnd = message.Offset + message.Length;
+
+            // The amount of bytes to copy over ourselves.
+            var lengthToCopy = message.Buffer.Length - offsetEnd;
+
+            System.Buffer.BlockCopy(Buffer, offsetEnd, Buffer, offsetStart, lengthToCopy);
+
+            ((MessageReader) message).Parent.AdjustLength(message.Offset, message.Length + 3);
+        }
+
+        private void AdjustLength(int offset, int amount)
+        {
+            this.Length -= amount;
+
+            if (this.ReadPosition > offset)
+            {
+                this.Position -= amount;
+            }
+
+            if (Parent != null)
+            {
+                var lengthOffset = this.Offset - 3;
+                var curLen = this.Buffer[lengthOffset] |
+                             (this.Buffer[lengthOffset + 1] << 8);
+
+                curLen -= amount;
+
+                this.Buffer[lengthOffset] = (byte)curLen;
+                this.Buffer[lengthOffset + 1] = (byte)(this.Buffer[lengthOffset + 1] >> 8);
+
+                Parent.AdjustLength(offset, amount);
+            }
+        }
+
+        public IMessageReader Copy(int offset = 0)
+        {
+            var reader = _pool.Get();
+            reader.Update(Buffer, Offset + offset, Position, Length - offset, Tag);
+            return reader;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private byte FastByte()
         {
-            return Buffer.Span[Position++];
+            return Buffer[Offset + Position++];
+        }
+
+        public void Dispose()
+        {
+            if (_inUse)
+            {
+                _pool.Return(this);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
@@ -247,7 +248,19 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.ReportDeadBody)} to a specific player instead of broadcast");
                     }
 
+                    // deadBodyPlayerId can be byte.MaxValue.
+                    // It happens when internally PlayerInfo is null.
                     var deadBodyPlayerId = reader.ReadByte();
+                    var deadPlayer = deadBodyPlayerId != byte.MaxValue
+                        ? _game.GameNet.GameData.GetPlayerById(deadBodyPlayerId)?.Controller
+                        : null;
+
+                    if (deadBodyPlayerId == byte.MaxValue)
+                    {
+                        _logger.LogWarning("deadBodyPlayerId was byte.MaxValue");
+                    }
+
+                    await _eventManager.CallAsync(new PlayerReportedBodyEvent(_game, sender, this, deadPlayer));
                     break;
                 }
 
