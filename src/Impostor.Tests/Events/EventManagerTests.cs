@@ -118,7 +118,12 @@ namespace Impostor.Tests.Events
             Temporary
         }
 
-        public class SetValueEvent : IEventCancelable
+        public interface ISetValueEvent : IEventCancelable
+        {
+            int Value { get; }
+        }
+
+        public class SetValueEvent : ISetValueEvent
         {
             public SetValueEvent(int value)
             {
@@ -133,7 +138,7 @@ namespace Impostor.Tests.Events
         private class CancelAtHighEventListener : IEventListener
         {
             [EventListener(Priority = EventPriority.High)]
-            public void OnSetCalled(SetValueEvent e) => e.IsCancelled = true;
+            public void OnSetCalled(ISetValueEvent e) => e.IsCancelled = true;
         }
 
         private class EventListener : IEventListener
@@ -141,7 +146,7 @@ namespace Impostor.Tests.Events
             public int Value { get; private set; }
 
             [EventListener]
-            public void OnSetCalled(SetValueEvent e) => Value = e.Value;
+            public void OnSetCalled(ISetValueEvent e) => Value = e.Value;
         }
 
         private class PriorityEventListener : IEventListener
@@ -149,22 +154,22 @@ namespace Impostor.Tests.Events
             public List<EventPriority> Priorities { get; } = new List<EventPriority>();
 
             [EventListener(EventPriority.Lowest)]
-            public void OnLowest(SetValueEvent e) => Priorities.Add(EventPriority.Lowest);
+            public void OnLowest(ISetValueEvent e) => Priorities.Add(EventPriority.Lowest);
 
             [EventListener(EventPriority.Low)]
-            public void OnLow(SetValueEvent e) => Priorities.Add(EventPriority.Low);
+            public void OnLow(ISetValueEvent e) => Priorities.Add(EventPriority.Low);
 
             [EventListener]
-            public void OnNormal(SetValueEvent e) => Priorities.Add(EventPriority.Normal);
+            public void OnNormal(ISetValueEvent e) => Priorities.Add(EventPriority.Normal);
 
             [EventListener(EventPriority.High)]
-            public void OnHigh(SetValueEvent e) => Priorities.Add(EventPriority.High);
+            public void OnHigh(ISetValueEvent e) => Priorities.Add(EventPriority.High);
 
             [EventListener(EventPriority.Highest)]
-            public void OnHighest(SetValueEvent e) => Priorities.Add(EventPriority.Highest);
+            public void OnHighest(ISetValueEvent e) => Priorities.Add(EventPriority.Highest);
 
             [EventListener(EventPriority.Monitor)]
-            public void OnMonitor(SetValueEvent e) => Priorities.Add(EventPriority.Monitor);
+            public void OnMonitor(ISetValueEvent e) => Priorities.Add(EventPriority.Monitor);
         }
     }
 }

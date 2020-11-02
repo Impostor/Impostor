@@ -12,6 +12,8 @@ namespace Impostor.Server.Events.Register
 {
     internal class RegisteredEventListener : IRegisteredEventListener
     {
+        private static readonly PropertyInfo IsCancelledProperty = typeof(IEventCancelable).GetProperty(nameof(IEventCancelable.IsCancelled))!;
+
         private static readonly ConcurrentDictionary<Type, RegisteredEventListener[]> Instances = new ConcurrentDictionary<Type, RegisteredEventListener[]>();
         private readonly Func<object, object, IServiceProvider, ValueTask> _invoker;
         private readonly Type _eventListenerType;
@@ -86,7 +88,7 @@ namespace Impostor.Server.Events.Register
                 {
                     invoke = Expression.Block(
                         Expression.IfThenElse(
-                            Expression.Property(@event, nameof(IEventCancelable.IsCancelled)),
+                            Expression.Property(@event, IsCancelledProperty),
                             Expression.Return(returnTarget, Expression.Default(typeof(ValueTask))),
                             Expression.Block(
                                 invoke,
@@ -106,7 +108,7 @@ namespace Impostor.Server.Events.Register
                 {
                     invoke = Expression.Block(
                         Expression.IfThenElse(
-                            Expression.Property(@event, nameof(IEventCancelable.IsCancelled)),
+                            Expression.Property(@event, IsCancelledProperty),
                             Expression.Return(returnTarget, Expression.Default(typeof(ValueTask))),
                             Expression.Return(returnTarget, invoke)),
                         Expression.Label(returnTarget, Expression.Default(typeof(ValueTask))));

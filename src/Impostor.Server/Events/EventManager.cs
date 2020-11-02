@@ -146,7 +146,7 @@ namespace Impostor.Server.Events
 
                 foreach (var eventHandler in events)
                 {
-                    if (eventHandler.EventType != typeof(TEvent))
+                    if (eventHandler.EventType != typeof(TEvent) && !interfaces.Contains(eventHandler.EventType))
                     {
                         continue;
                     }
