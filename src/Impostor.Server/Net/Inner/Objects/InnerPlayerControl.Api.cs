@@ -1,5 +1,6 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Impostor.Api.Innersloth.Customization;
+using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Net.Inner.Objects
@@ -77,6 +78,27 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             using var writer = _game.StartRpc(NetId, RpcCalls.SendChat);
             writer.Write(text);
+            await _game.FinishRpcAsync(writer);
+        }
+
+        public async ValueTask SendChatToPlayerAsync(string text, IInnerPlayerControl player)
+        {
+            using var writer = _game.StartRpc(NetId, RpcCalls.SendChat);
+            writer.Write(text);
+            await _game.FinishRpcAsync(writer, player.OwnerId);
+        }
+
+        public async ValueTask SetMurderedAsync()
+        {
+            var writer = _game.StartRpc(NetId, RpcCalls.MurderPlayer);
+            writer.Write((byte)NetId);
+            await _game.FinishRpcAsync(writer);
+        }
+
+        public async ValueTask SetInfectedAsync()
+        {
+            var writer = _game.StartRpc(NetId, RpcCalls.SetInfected);
+            writer.Write((byte)NetId);
             await _game.FinishRpcAsync(writer);
         }
     }

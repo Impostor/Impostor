@@ -60,12 +60,14 @@ namespace Impostor.Server.Net.State
             return writer;
         }
 
-        internal ValueTask FinishRpcAsync(IMessageWriter writer)
+        internal ValueTask FinishRpcAsync(IMessageWriter writer, int? targetClientId = null)
         {
             writer.EndMessage();
             writer.EndMessage();
 
-            return SendToAllAsync(writer);
+            return targetClientId.HasValue
+                ? SendToAsync(writer, targetClientId.Value)
+                : SendToAllAsync(writer);
         }
 
         private void WriteRemovePlayerMessage(IMessageWriter message, bool clear, int playerId, DisconnectReason reason)
