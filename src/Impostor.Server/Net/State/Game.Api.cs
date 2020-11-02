@@ -1,10 +1,12 @@
-﻿using System.IO;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
+using Impostor.Api.Net.Messages;
+using Impostor.Hazel;
 using Impostor.Server.Net.Inner;
 
 namespace Impostor.Server.Net.State
@@ -34,8 +36,23 @@ namespace Impostor.Server.Net.State
                     Options.Serialize(writerBin, GameOptionsData.LatestVersion);
                     writer.WriteBytesAndSize(memory.ToArray());
                 }
-
                 await FinishRpcAsync(writer);
+            }
+        }
+
+        public async ValueTask ForceEndGameAsync()
+        {
+            // Force the game to end
+            var writer = MessageWriter.Get(MessageType.Reliable);
+            writer.StartMessage(MessageFlags.EndGame);
+            writer.Write(Code);
+            await SendToAllAsync(writer);
+
+            GameState = GameStates.Ended;
+
+            foreach (var player in _players.Values)
+            {
+                player.Limbo = LimboStates.WaitingForHost;
             }
         }
     }

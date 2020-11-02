@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
@@ -76,5 +76,13 @@ namespace Impostor.Api.Games
         /// <param name="id">ID of the client.</param>
         /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
         ValueTask SendToAsync(IMessageWriter writer, int id);
+
+        /// <summary>
+        ///     Sets the game state to Ended and sets the players limbo state to waiting for host.
+        /// </summary>
+        /// <param name="writer">Message to send.</param>
+        /// <param name="id">ID of the client.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        ValueTask ForceEndGameAsync();
     }
 }
