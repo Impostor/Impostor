@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth.Customization;
+using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Net.Inner.Objects
@@ -80,15 +81,11 @@ namespace Impostor.Server.Net.Inner.Objects
             await _game.FinishRpcAsync(writer);
         }
 
-        public async ValueTask SendChatToPlayerAsync(string text)
+        public async ValueTask SendChatToPlayerAsync(string text, IInnerPlayerControl player)
         {
             using var writer = _game.StartRpc(NetId, RpcCalls.SendChat);
             writer.Write(text);
-
-            writer.EndMessage();
-            writer.EndMessage();
-
-            await _game.SendToAsync(writer, OwnerId);
+            await _game.FinishRpcAsync(writer, player.OwnerId);
         }
 
         public async ValueTask SetMurderedAsync()

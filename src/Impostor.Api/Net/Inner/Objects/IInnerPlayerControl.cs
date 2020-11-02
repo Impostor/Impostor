@@ -3,7 +3,7 @@ using Impostor.Api.Innersloth.Customization;
 
 namespace Impostor.Api.Net.Inner.Objects
 {
-    public interface IInnerPlayerControl
+    public interface IInnerPlayerControl : IInnerNetObject
     {
         /// <summary>
         ///     Gets the <see cref="IInnerPlayerInfo"/> of the <see cref="IInnerPlayerControl"/>.
@@ -80,8 +80,9 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     Visible to only the current.
         /// </summary>
         /// <param name="text">The message to send.</param>
+        /// <param name="player">The player that should receive this chat message.</param>
         /// <returns>Task that must be awaited.</returns>
-        ValueTask SendChatToPlayerAsync(string text);
+        ValueTask SendChatToPlayerAsync(string text, IInnerPlayerControl player);
 
         /// <summary>
         ///     Sets the current to infected (impostor) <see cref="IInnerPlayerControl"/>.
