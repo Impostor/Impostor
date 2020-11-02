@@ -1,10 +1,11 @@
-﻿using System.IO;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
+using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.Inner;
 
 namespace Impostor.Server.Net.State
@@ -36,6 +37,22 @@ namespace Impostor.Server.Net.State
                 }
 
                 await FinishRpcAsync(writer);
+            }
+        }
+
+        public async ValueTask ForceEndGame()
+        {
+            // Force the game to end
+            var writer = Impostor.Hazel.MessageWriter.Get(MessageType.Reliable);
+            writer.StartMessage(MessageFlags.EndGame);
+            writer.Write(Code);
+            await SendToAllAsync(writer);
+
+            GameState = GameStates.Ended;
+
+            foreach (var player in _players.Values)
+            {
+                player.Limbo = LimboStates.WaitingForHost;
             }
         }
     }
