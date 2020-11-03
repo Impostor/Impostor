@@ -235,7 +235,7 @@ namespace Impostor.Hazel
         public IMessageReader Copy(int offset = 0)
         {
             var reader = _pool.Get();
-            reader.Update(Buffer, Offset + offset, Position, Length - offset, Tag);
+            reader.Update(Buffer, Offset + offset, Position, Length - offset, Tag, Parent);
             return reader;
         }
 
