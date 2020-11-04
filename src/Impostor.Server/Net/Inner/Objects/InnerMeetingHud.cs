@@ -6,6 +6,7 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Events.Meeting;
+using Impostor.Server.Events.Player;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
 
@@ -80,7 +81,15 @@ namespace Impostor.Server.Net.Inner.Objects
                     var tie = reader.ReadBoolean();
 
                     await _eventManager.CallAsync(new MeetingEndedEvent(_game, this));
-
+                    if(playerId != 0xFF){ // make sure a player was voted out
+                        var player = _game.GameNet.GameData.GetPlayerById(playerId);
+                        if(player != null) // fixes a warning
+                        {
+                            player.IsDead = true; // mark player as dead
+                            player.LastDeathReason = Api.Innersloth.DeathReason.Exile; // set death reason
+                            await _eventManager.CallAsync(new PlayerExileEvent(_game,sender,player.Controller)); // call PlayerExileEvent
+                        }
+                    }
                     break;
                 }
 
