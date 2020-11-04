@@ -6,6 +6,7 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Events.Game.Player;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner.Objects.Components;
 using Impostor.Server.Net.State;
@@ -397,6 +398,12 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     // Is either start countdown or byte.MaxValue
                     var secondsLeft = reader.ReadByte();
+
+                    if (secondsLeft < byte.MaxValue)
+                    {
+                        await _eventManager.CallAsync(new PlayerSetStartCounterEvent(_game, sender, this, secondsLeft));
+                    }
+
                     break;
                 }
 
