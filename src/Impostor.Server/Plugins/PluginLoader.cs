@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using Impostor.Api.Plugins;
+using Impostor.Server.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Hosting;
@@ -25,7 +26,7 @@ namespace Impostor.Server.Plugins
             var pluginPaths = new List<string>(config.Paths);
             var libraryPaths = new List<string>(config.LibraryPaths);
 
-            var rootFolder = AppContext.BaseDirectory;
+            var rootFolder = DirUtils.GetExecutableDirectory();
 
             pluginPaths.Add(Path.Combine(rootFolder, "plugins"));
             libraryPaths.Add(Path.Combine(rootFolder, "libraries"));

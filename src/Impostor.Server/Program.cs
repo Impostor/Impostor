@@ -14,6 +14,7 @@ using Impostor.Server.Net.Messages;
 using Impostor.Server.Net.Redirector;
 using Impostor.Server.Plugins;
 using Impostor.Server.Recorder;
+using Impostor.Server.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -75,6 +76,7 @@ namespace Impostor.Server
                 .Get<PluginConfig>() ?? new PluginConfig();
 
             return Host.CreateDefaultBuilder(args)
+                .UseContentRoot(DirUtils.GetExecutableDirectory())
 #if DEBUG
                 .UseEnvironment(Environment.GetEnvironmentVariable("IMPOSTOR_ENV") ?? "Development")
 #else
