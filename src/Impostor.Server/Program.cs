@@ -46,10 +46,10 @@ namespace Impostor.Server
 
             try
             {
-                var assembly = Assembly.GetExecutingAssembly();
-                var fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
+                // var assembly = Assembly.GetExecutingAssembly();
+                // var fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
 
-                Log.Information("Starting Impostor v{0}", fileVersion.ProductVersion);
+                Log.Information("Starting Impostor"); // v{0}", fileVersion.ProductVersion);
                 CreateHostBuilder(args).Build().Run();
                 return 0;
             }
