@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
@@ -34,7 +38,7 @@ namespace Impostor.Server
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
 #else
                 .MinimumLevel.Information()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
 #endif
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
@@ -42,7 +46,10 @@ namespace Impostor.Server
 
             try
             {
-                Log.Information("Starting Impostor");
+                var assembly = Assembly.GetExecutingAssembly();
+                var fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
+
+                Log.Information("Starting Impostor v{0}", fileVersion.ProductVersion);
                 CreateHostBuilder(args).Build().Run();
                 return 0;
             }
@@ -76,7 +83,7 @@ namespace Impostor.Server
                 .Get<PluginConfig>() ?? new PluginConfig();
 
             return Host.CreateDefaultBuilder(args)
-                .UseContentRoot(DirUtils.GetExecutableDirectory())
+                .UseContentRoot(Directory.GetCurrentDirectory())
 #if DEBUG
                 .UseEnvironment(Environment.GetEnvironmentVariable("IMPOSTOR_ENV") ?? "Development")
 #else

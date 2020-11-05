@@ -26,7 +26,7 @@ namespace Impostor.Server.Plugins
             var pluginPaths = new List<string>(config.Paths);
             var libraryPaths = new List<string>(config.LibraryPaths);
 
-            var rootFolder = DirUtils.GetExecutableDirectory();
+            var rootFolder = Directory.GetCurrentDirectory();
 
             pluginPaths.Add(Path.Combine(rootFolder, "plugins"));
             libraryPaths.Add(Path.Combine(rootFolder, "libraries"));
