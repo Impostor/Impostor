@@ -175,12 +175,15 @@ namespace Impostor.Server.Net
                     }
                     catch (ImpostorCheatException e)
                     {
-                        if (_antiCheatConfig.BanIpFromGame)
+                        if (_antiCheatConfig.Enabled)
                         {
-                            Player.Game.BanIp(Connection.EndPoint.Address);
-                        }
+                            if (_antiCheatConfig.BanIpFromGame)
+                            {
+                                Player.Game.BanIp(Connection.EndPoint.Address);
+                            }
 
-                        await DisconnectAsync(DisconnectReason.Hacking, e.Message);
+                            await DisconnectAsync(DisconnectReason.Hacking, e.Message);
+                        }
                     }
 
                     break;
