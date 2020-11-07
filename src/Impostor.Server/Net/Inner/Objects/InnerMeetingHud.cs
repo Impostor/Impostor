@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Events.Meeting;
@@ -80,17 +81,18 @@ namespace Impostor.Server.Net.Inner.Objects
                     var playerId = reader.ReadByte();
                     var tie = reader.ReadBoolean();
 
-                    await _eventManager.CallAsync(new MeetingEndedEvent(_game, this));
-                    if (playerId != byte.MaxValue) // make sure a player was voted out
+                    if (playerId != byte.MaxValue)
                     {
                         var player = _game.GameNet.GameData.GetPlayerById(playerId);
                         if (player != null)
                         {
-                            player.IsDead = true;
-                            player.LastDeathReason = Api.Innersloth.DeathReason.Exile;
+                            player.Controller.Die(DeathReason.Exile);
                             await _eventManager.CallAsync(new PlayerExileEvent(_game, sender, player.Controller));
                         }
                     }
+
+                    await _eventManager.CallAsync(new MeetingEndedEvent(_game, this));
+
                     break;
                 }
 

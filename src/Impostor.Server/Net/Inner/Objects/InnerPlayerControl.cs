@@ -428,7 +428,7 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerId = reader.ReadByte();
         }
 
-        private void Die(DeathReason reason)
+        internal void Die(DeathReason reason)
         {
             PlayerInfo.IsDead = true;
             PlayerInfo.LastDeathReason = reason;
