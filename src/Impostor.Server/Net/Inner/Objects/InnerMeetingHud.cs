@@ -3,9 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Events.Meeting;
+using Impostor.Server.Events.Player;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
 
@@ -78,6 +80,16 @@ namespace Impostor.Server.Net.Inner.Objects
                     var states = reader.ReadBytesAndSize();
                     var playerId = reader.ReadByte();
                     var tie = reader.ReadBoolean();
+
+                    if (playerId != byte.MaxValue)
+                    {
+                        var player = _game.GameNet.GameData.GetPlayerById(playerId);
+                        if (player != null)
+                        {
+                            player.Controller.Die(DeathReason.Exile);
+                            await _eventManager.CallAsync(new PlayerExileEvent(_game, sender, player.Controller));
+                        }
+                    }
 
                     await _eventManager.CallAsync(new MeetingEndedEvent(_game, this));
 
