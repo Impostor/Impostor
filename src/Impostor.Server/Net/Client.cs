@@ -193,7 +193,12 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    await Player.Game.HandleEndGame(reader);
+                    Message08EndGameC2S.Deserialize(
+                        reader,
+                        out var gameOverReason,
+                        out _);
+                    
+                    await Player.Game.HandleEndGame(reader, gameOverReason);
                     break;
                 }
 
