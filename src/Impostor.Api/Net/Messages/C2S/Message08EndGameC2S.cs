@@ -9,10 +9,10 @@ namespace Impostor.Api.Net.Messages.C2S
             throw new System.NotImplementedException();
         }
 
-        public static void Deserialize(IMessageReader reader, out GameOverReason gameOverReason, out bool showAd)
+        public static void Deserialize(IMessageReader reader, out GameOverReason gameOverReason)
         {
             gameOverReason = (GameOverReason)reader.ReadByte();
-            showAd = reader.ReadBoolean(); // Perhaps we could disable ads on Impostor?
+            reader.ReadBoolean(); // showAd
         }
     }
 }

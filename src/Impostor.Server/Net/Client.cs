@@ -195,8 +195,7 @@ namespace Impostor.Server.Net
 
                     Message08EndGameC2S.Deserialize(
                         reader,
-                        out var gameOverReason,
-                        out _);
+                        out var gameOverReason);
                     
                     await Player.Game.HandleEndGame(reader, gameOverReason);
                     break;
