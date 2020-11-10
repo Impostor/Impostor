@@ -42,7 +42,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public bool CanMurder(IGame game)
         {
-            return DateTimeOffset.UtcNow.Subtract(LastMurder).TotalSeconds < game.Options.KillCooldown;
+            return DateTimeOffset.UtcNow.Subtract(LastMurder).TotalSeconds >= game.Options.KillCooldown;
         }
 
         public void Serialize(IMessageWriter writer)
