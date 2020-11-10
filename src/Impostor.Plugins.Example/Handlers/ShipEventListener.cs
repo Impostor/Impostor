@@ -18,5 +18,12 @@ namespace Impostor.Plugins.Example.Handlers
             Console.WriteLine("Ship > doors closed");
             Console.WriteLine("- " + e.SystemType);
         }
+        
+        [EventListener]
+        public void OnSabotage(IShipSabotageEvent e)
+        {
+            Console.WriteLine("Ship > sabotage");
+            Console.WriteLine("- " + e.SystemType);
+        }
     }
 }

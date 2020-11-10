@@ -50,8 +50,7 @@ namespace Impostor.Server.Net.Inner.Objects
             Components.Add(this);
         }
 
-        public override async ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
-            IMessageReader reader)
+        public override async ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             switch (call)
             {
@@ -88,6 +87,36 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     var player = reader.ReadNetObject<InnerPlayerControl>(_game);
                     var amount = reader.ReadByte();
+                    
+                    if (systemType == SystemTypes.Sabotage)
+                    {
+                        SystemTypes type; // Should I use SystemTypes or create a new SabotageType enum?
+                        switch (amount)
+                        {
+                            case 3: // Reactor
+                            case 21: // Seismic Stabilizers
+                                type = SystemTypes.Reactor;
+                                break;
+                            
+                            case 7: // Lights
+                                type = SystemTypes.Electrical;
+                                break;
+                            
+                            case 8: // O2
+                                type = SystemTypes.LifeSupp;
+                                break;
+                            
+                            case 14: // Comms
+                                type = SystemTypes.Comms;
+                                break;
+                            
+                            default:
+                                _logger.LogWarning("{0}: Unknown sabotage type {1}", nameof(InnerShipStatus), amount);
+                                return;
+                        }
+
+                        await _eventManager.CallAsync(new ShipSabotageEvent(_game, this, sender, type));
+                    }
 
                     // TODO: Modify data (?)
                     break;
