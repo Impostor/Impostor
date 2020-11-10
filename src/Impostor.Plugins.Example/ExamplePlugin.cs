@@ -32,7 +32,8 @@ namespace Impostor.Plugins.Example
             {
                 _eventManager.RegisterListener(new GameEventListener()),
                 _eventManager.RegisterListener(new PlayerEventListener()),
-                _eventManager.RegisterListener(new MeetingEventListener())
+                _eventManager.RegisterListener(new MeetingEventListener()),
+                _eventManager.RegisterListener(new ShipEventListener())
             };
 
             return default;

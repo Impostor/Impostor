@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Events.Ship;
 using Impostor.Server.Net.Inner.Objects.Systems;
 using Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 using Impostor.Server.Net.State;
@@ -16,12 +18,14 @@ namespace Impostor.Server.Net.Inner.Objects
     internal class InnerShipStatus : InnerNetObject, IInnerShipStatus
     {
         private readonly ILogger<InnerShipStatus> _logger;
+        private readonly IEventManager _eventManager;
         private readonly Game _game;
         private readonly Dictionary<SystemTypes, ISystemType> _systems;
 
-        public InnerShipStatus(ILogger<InnerShipStatus> logger, Game game)
+        public InnerShipStatus(ILogger<InnerShipStatus> logger, IEventManager eventManager, Game game)
         {
             _logger = logger;
+            _eventManager = eventManager;
             _game = game;
 
             _systems = new Dictionary<SystemTypes, ISystemType>
@@ -46,7 +50,7 @@ namespace Impostor.Server.Net.Inner.Objects
             Components.Add(this);
         }
 
-        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
+        public override async ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
             IMessageReader reader)
         {
             switch (call)
@@ -64,7 +68,8 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     var systemType = (SystemTypes)reader.ReadByte();
-
+                    
+                    await _eventManager.CallAsync(new ShipDoorsCloseEvent(_game, this, sender, systemType));
                     break;
                 }
 
@@ -74,7 +79,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     {
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.RepairSystem)} to wrong destinition, must be host");
                     }
-
+                    
                     var systemType = (SystemTypes)reader.ReadByte();
                     if (systemType == SystemTypes.Sabotage && !sender.Character.PlayerInfo.IsImpostor)
                     {
@@ -94,8 +99,6 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
                 }
             }
-
-            return default;
         }
 
         public override bool Serialize(IMessageWriter writer, bool initialState)
