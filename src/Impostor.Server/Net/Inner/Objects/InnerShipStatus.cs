@@ -88,37 +88,62 @@ namespace Impostor.Server.Net.Inner.Objects
                     var player = reader.ReadNetObject<InnerPlayerControl>(_game);
                     var amount = reader.ReadByte();
                     
-                    if (systemType == SystemTypes.Sabotage)
+                    Console.WriteLine(systemType + " " + amount);
+                    
+                    switch (systemType)
                     {
-                        SystemTypes type; // Should I use SystemTypes or create a new SabotageType enum?
-                        switch (amount)
-                        {
-                            case 3: // Reactor
-                            case 21: // Seismic Stabilizers
-                                type = SystemTypes.Reactor;
-                                break;
+                        case SystemTypes.Sabotage:
                             
-                            case 7: // Lights
-                                type = SystemTypes.Electrical;
-                                break;
-                            
-                            case 8: // O2
-                                type = SystemTypes.LifeSupp;
-                                break;
-                            
-                            case 14: // Comms
-                                type = SystemTypes.Comms;
-                                break;
-                            
-                            default:
-                                _logger.LogWarning("{0}: Unknown sabotage type {1}", nameof(InnerShipStatus), amount);
-                                return;
-                        }
+                            SystemTypes type; // Should I use SystemTypes or create a new SabotageType enum?
+                            switch (amount)
+                            {
+                                case 3: // Reactor
+                                    type = SystemTypes.Reactor;
+                                    break;
+                                
+                                case 7: // Lights
+                                    type = SystemTypes.Electrical;
+                                    break;
+                                
+                                case 8: // O2
+                                    type = SystemTypes.LifeSupp;
+                                    break;
+                                
+                                case 14: // Comms
+                                    type = SystemTypes.Comms;
+                                    break;
+                                
+                                case 21: // Seismic Stabilizers
+                                    type = SystemTypes.Laboratory;
+                                    break;
+                                
+                                default:
+                                    _logger.LogWarning("{0}: Unknown sabotage type {1}", nameof(InnerShipStatus), amount);
+                                    return;
+                            }
 
-                        await _eventManager.CallAsync(new ShipSabotageEvent(_game, this, sender, type));
+                            await _eventManager.CallAsync(new ShipSabotageEvent(_game, this, sender, type));
+                            break;
+                        
+                        case SystemTypes.Doors:
+
+                            if (_game.Options.MapId != 2)
+                            {
+                                _logger.LogWarning($"{nameof(InnerShipStatus)}: Client sent {nameof(RpcCalls.RepairSystem)} for {nameof(SystemTypes.Doors)} on map {_game.Options.MapId}");
+                                break;
+                            }
+                            
+                            if (amount < 64 || amount > 75)
+                            {
+                                _logger.LogWarning("{0}: Unknown polus door {1}", nameof(InnerShipStatus), amount);
+                                break;
+                            }
+                            
+                            await _eventManager.CallAsync(new ShipPolusDoorsOpenEvent(_game, this, sender, (PolusDoors)amount));
+
+                            break;
                     }
-
-                    // TODO: Modify data (?)
+                    
                     break;
                 }
 
