@@ -261,7 +261,7 @@ namespace Impostor.Server.Net.State
                         // Only the host is allowed to despawn objects.
                         if (!sender.IsHost)
                         {
-                            throw new ImpostorCheatException("Tried to send SpawnFlag as non-host.");
+                            ImpostorCheatException.ThrowIfEnabled("Tried to send SpawnFlag as non-host.");
                         }
 
                         var objectId = reader.ReadPackedUInt32();

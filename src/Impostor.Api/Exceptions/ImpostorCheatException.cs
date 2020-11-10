@@ -20,5 +20,23 @@ namespace Impostor.Api
         public ImpostorCheatException(string? message, Exception? innerException) : base(message, innerException)
         {
         }
+
+        public static void ThrowIfEnabled(ImpostorCheatException exception)
+        {
+            // if (antiCheatConfig.Enabled) throw exception;
+            
+            // TODO: Figure out how to access the anticheat config without breaking dependency injection guidelines
+            
+            throw new NotImplementedException();
+        }
+        
+        public static void ThrowIfEnabled(SerializationInfo info, StreamingContext context)
+            => ThrowIfEnabled(new ImpostorCheatException(info, context));
+        
+        public static void ThrowIfEnabled(string? message)
+            => ThrowIfEnabled(new ImpostorCheatException(message));
+        
+        public static void ThrowIfEnabled(string? message, Exception? innerException)
+            => ThrowIfEnabled(new ImpostorCheatException(message, innerException));
     }
 }

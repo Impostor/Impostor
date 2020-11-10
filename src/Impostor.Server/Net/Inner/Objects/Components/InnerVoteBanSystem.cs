@@ -32,12 +32,12 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             var clientId = reader.ReadInt32();
             if (clientId != sender.Client.Id)
             {
-                throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.AddVote)} as other client");
+                ImpostorCheatException.ThrowIfEnabled($"Client sent {nameof(RpcCalls.AddVote)} as other client");
             }
 
             if (target != null)
             {
-                throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CastVote)} to wrong destinition, must be broadcast");
+                ImpostorCheatException.ThrowIfEnabled($"Client sent {nameof(RpcCalls.CastVote)} to wrong destinition, must be broadcast");
             }
 
             var targetClientId = reader.ReadInt32();
@@ -56,7 +56,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         {
             if (!sender.IsHost)
             {
-                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerShipStatus)} as non-host");
+                ImpostorCheatException.ThrowIfEnabled($"Client attempted to send data for {nameof(InnerShipStatus)} as non-host");
             }
 
             var votes = _votes;

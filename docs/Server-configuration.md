@@ -17,7 +17,8 @@ Some information about all the possible configurations. Click [here](https://git
 
 | Key | Default | Value |
 |-|-|-|
-| **BanIpFromGame** | `true` | When a player is caught hacking, he will be kicked from the server. If this value is set to `true`, the player will also be banned and can not rejoin that specific game. |
+| **Enabled** | `true` | If enabled, players sending packets they shouldn't send will be kicked from the server. |
+| **BanIpFromGame** | `true` | Whether or not cheating players should be banned. If this is set to false, they will only be kicked. |
 
 ### ServerRedirector
 
