@@ -93,36 +93,17 @@ namespace Impostor.Server.Net.Inner.Objects
                     switch (systemType)
                     {
                         case SystemTypes.Sabotage:
-                            
-                            SystemTypes type; // Should I use SystemTypes or create a new SabotageType enum?
-                            switch (amount)
-                            {
-                                case 3: // Reactor
-                                    type = SystemTypes.Reactor;
-                                    break;
-                                
-                                case 7: // Lights
-                                    type = SystemTypes.Electrical;
-                                    break;
-                                
-                                case 8: // O2
-                                    type = SystemTypes.LifeSupp;
-                                    break;
-                                
-                                case 14: // Comms
-                                    type = SystemTypes.Comms;
-                                    break;
-                                
-                                case 21: // Seismic Stabilizers
-                                    type = SystemTypes.Laboratory;
-                                    break;
-                                
-                                default:
-                                    _logger.LogWarning("{0}: Unknown sabotage type {1}", nameof(InnerShipStatus), amount);
-                                    return;
-                            }
 
-                            await _eventManager.CallAsync(new ShipSabotageEvent(_game, this, sender, type));
+                            if (!new List<SystemTypes>
+                            {
+                                SystemTypes.Reactor, SystemTypes.Electrical, SystemTypes.LifeSupp, SystemTypes.Comms, SystemTypes.Laboratory
+                            }.Contains((SystemTypes)amount))
+                            {
+                                _logger.LogWarning("{0}: Unknown sabotage type {1}", nameof(InnerShipStatus), amount);
+                                break;
+                            }
+                            
+                            await _eventManager.CallAsync(new ShipSabotageEvent(_game, this, sender, (SystemTypes)amount));
                             break;
                         
                         case SystemTypes.Doors:
