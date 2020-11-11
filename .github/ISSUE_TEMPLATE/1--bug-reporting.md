@@ -1,6 +1,6 @@
 ---
 name: 1. Bug reporting
-about: Bugs within Imposter
+about: Bugs within Impostor
 title: ''
 labels: ''
 assignees: ''
@@ -11,7 +11,7 @@ assignees: ''
 
 ## Base Information
 - Operating System
-- Imposter Version
+- Impostor Version
 - Among Us Version
 
 ## I confirm:
