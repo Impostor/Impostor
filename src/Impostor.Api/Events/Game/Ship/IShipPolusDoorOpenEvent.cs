@@ -5,7 +5,7 @@ namespace Impostor.Api.Events.Ship
     /// <summary>
     ///     Called whenever doors are opened on Polus
     /// </summary>
-    public interface IShipPolusDoorsOpenEvent : IShipEvent
+    public interface IShipPolusDoorOpenEvent : IShipEvent
     {
         /// <summary>
         /// Gets the door which has been opened

@@ -86,9 +86,9 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     var player = reader.ReadNetObject<InnerPlayerControl>(_game);
-                    var amount = reader.ReadByte();
+                    var flag = reader.ReadByte();
                     
-                    Console.WriteLine(systemType + " " + amount);
+                    Console.WriteLine(systemType + " " + flag);
                     
                     switch (systemType)
                     {
@@ -97,13 +97,13 @@ namespace Impostor.Server.Net.Inner.Objects
                             if (!new List<SystemTypes>
                             {
                                 SystemTypes.Reactor, SystemTypes.Electrical, SystemTypes.LifeSupp, SystemTypes.Comms, SystemTypes.Laboratory
-                            }.Contains((SystemTypes)amount))
+                            }.Contains((SystemTypes)flag))
                             {
-                                _logger.LogWarning("{0}: Unknown sabotage type {1}", nameof(InnerShipStatus), amount);
+                                _logger.LogWarning("{0}: Unknown sabotage type {1}", nameof(InnerShipStatus), flag);
                                 break;
                             }
                             
-                            await _eventManager.CallAsync(new ShipSabotageEvent(_game, this, sender, (SystemTypes)amount));
+                            await _eventManager.CallAsync(new ShipSabotageEvent(_game, this, sender, (SystemTypes)flag));
                             break;
                         
                         case SystemTypes.Doors:
@@ -114,14 +114,33 @@ namespace Impostor.Server.Net.Inner.Objects
                                 break;
                             }
                             
-                            if (amount < 64 || amount > 75)
+                            if (flag < 64 || flag > 75)
                             {
-                                _logger.LogWarning("{0}: Unknown polus door {1}", nameof(InnerShipStatus), amount);
+                                _logger.LogWarning("{0}: Unknown polus door {1}", nameof(InnerShipStatus), flag);
                                 break;
                             }
                             
-                            await _eventManager.CallAsync(new ShipPolusDoorsOpenEvent(_game, this, sender, (PolusDoors)amount));
+                            await _eventManager.CallAsync(new ShipPolusDoorOpenEvent(_game, this, sender, (PolusDoors)flag));
 
+                            break;
+                        
+                        case SystemTypes.Decontamination:
+                        case SystemTypes.TopDecontaminationPolus:
+
+                            if (_game.Options.MapId == 0)
+                            {
+                                _logger.LogWarning($"{nameof(InnerShipStatus)}: Client sent {nameof(RpcCalls.RepairSystem)} for {systemType} on map {_game.Options.MapId}");
+                                break;
+                            }
+                            
+                            if (flag < 1 || flag > 4)
+                            {
+                                _logger.LogWarning("{0}: Unknown decontamination door {1}", nameof(InnerShipStatus), flag);
+                                break;
+                            }
+
+                            await _eventManager.CallAsync(new ShipDecontamDoorOpenEvent(_game, this, sender, systemType, flag));
+                            
                             break;
                     }
                     

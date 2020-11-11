@@ -6,9 +6,9 @@ using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Events.Ship
 {
-    public class ShipPolusDoorsOpenEvent : IShipPolusDoorsOpenEvent
+    public class ShipPolusDoorOpenEvent : IShipPolusDoorOpenEvent
     {
-        public ShipPolusDoorsOpenEvent(IGame game, IInnerShipStatus shipStatus, IClientPlayer clientPlayer, PolusDoors door)
+        public ShipPolusDoorOpenEvent(IGame game, IInnerShipStatus shipStatus, IClientPlayer clientPlayer, PolusDoors door)
         {
             Game = game;
             ShipStatus = shipStatus;

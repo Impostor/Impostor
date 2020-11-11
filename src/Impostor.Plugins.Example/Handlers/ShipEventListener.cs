@@ -27,10 +27,17 @@ namespace Impostor.Plugins.Example.Handlers
         }
 
         [EventListener]
-        public void OnPolusDoorOpened(IShipPolusDoorsOpenEvent e)
+        public void OnPolusDoorOpened(IShipPolusDoorOpenEvent e)
         {
             Console.WriteLine("Ship - door opened");
             Console.WriteLine("- " + e.Door);
+        }
+
+        [EventListener]
+        public void OnDecontamDoorOpened(IShipDecontamDoorOpenEvent e)
+        {
+            Console.WriteLine("Ship - decontam door opened");
+            Console.WriteLine("- " + e.DecontamDoor);
         }
     }
 }

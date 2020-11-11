@@ -1,4 +1,6 @@
-﻿namespace Impostor.Api.Innersloth
+﻿using Impostor.Api.Events.Ship;
+
+namespace Impostor.Api.Innersloth
 {
     public enum SystemTypes : byte
     {
@@ -27,5 +29,9 @@
         Balcony,
         Office,
         Greenhouse,
+        /// <summary>
+        /// This enum value does not exist in the original enum. This is only used for <see cref="IShipDecontamDoorOpenEvent"/>
+        /// </summary>
+        TopDecontaminationPolus = 26, // Should we keep this here so modders know about it?
     }
 }
