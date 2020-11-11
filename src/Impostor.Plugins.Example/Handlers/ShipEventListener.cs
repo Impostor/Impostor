@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Security;
+using System.Threading.Tasks;
 using Impostor.Api.Events;
+using Impostor.Api.Events.Player;
 using Impostor.Api.Events.Ship;
+using Impostor.Api.Innersloth;
 
 namespace Impostor.Plugins.Example.Handlers
 {
@@ -18,12 +22,14 @@ namespace Impostor.Plugins.Example.Handlers
             Console.WriteLine("Ship > sabotage");
             Console.WriteLine("- " + e.SystemType);
         }
-        
+
         [EventListener]
         public void OnDoorsClosed(IShipDoorsCloseEvent e)
         {
             Console.WriteLine("Ship > doors closed");
             Console.WriteLine("- " + e.SystemType);
+
+            e.ShipStatus.Sabotage(SystemTypes.Electrical);
         }
 
         [EventListener]

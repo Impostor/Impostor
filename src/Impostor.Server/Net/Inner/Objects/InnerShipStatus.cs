@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
-    internal class InnerShipStatus : InnerNetObject, IInnerShipStatus
+    internal partial class InnerShipStatus : InnerNetObject
     {
         private readonly ILogger<InnerShipStatus> _logger;
         private readonly IEventManager _eventManager;
@@ -89,6 +89,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     var flag = reader.ReadByte();
                     
                     Console.WriteLine(systemType + " " + flag);
+                    Console.WriteLine(player.NetId);
                     
                     switch (systemType)
                     {
