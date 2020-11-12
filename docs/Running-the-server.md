@@ -6,10 +6,10 @@ There are currently two modes to run the Impostor server in. The first way is th
 
 ### Without docker
 1. Install the **.NET 5.0 runtime**.
-    - [Windows x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.0-rc.2-windows-x64-installer)
-    - [Linux x64](https://github.com/dotnet/core/blob/master/release-notes/5.0/preview/5.0.0-rc.2-install-instructions.md#install-using-debrpm-packages)
-    - [macOS x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.0-rc.2-macos-x64-installer)
-2. Find the [latest release](https://github.com/AeonLucid/Impostor/releases/latest).
+    - [Windows x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.0-windows-x64-installer)
+    - [Linux x64](https://docs.microsoft.com/en-us/dotnet/core/install/linux)
+    - [macOS x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.0-macos-x64-installer)
+2. Find the [latest dev release](https://ci.appveyor.com/project/Impostor/Impostor/branch/dev/artifacts).
 3. Download either the Windows or the Linux version.
 4. Extract the zip.
 5. Modify `config.json` to your liking.
@@ -21,7 +21,7 @@ There are currently two modes to run the Impostor server in. The first way is th
 [![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor/edge)](https://hub.docker.com/repository/docker/aeonlucid/impostor)
 
 ```
-docker run -p 22023:22023/udp aeonlucid/impostor
+docker run -p 22023:22023/udp aeonlucid/impostor:nightly
 ```
 
 ## Multiple servers
