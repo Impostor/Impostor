@@ -80,7 +80,8 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CompleteTask)} to a specific player instead of broadcast");
                     }
 
-                    var index = reader.ReadPackedUInt32();
+                    var taskId = reader.ReadPackedUInt32();
+                    await _eventManager.CallAsync(new PlayerCompletedTaskEvent(_game, sender, this, taskId));
                     break;
                 }
 
