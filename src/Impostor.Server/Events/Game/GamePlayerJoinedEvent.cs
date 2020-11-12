@@ -12,6 +12,8 @@ namespace Impostor.Server.Events
             Player = player;
         }
 
+        public bool Cancel { get; set; }
+
         public IGame Game { get; }
 
         public IClientPlayer Player { get; }

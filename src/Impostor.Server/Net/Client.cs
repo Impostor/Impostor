@@ -47,7 +47,7 @@ namespace Impostor.Server.Net
                     var gameInfo = Message00HostGameC2S.Deserialize(reader);
 
                     // Create game.
-                    var game = await _gameManager.CreateAsync(gameInfo);
+                    var game = await _gameManager.CreateAsync(gameInfo); // TODO: CATCH EXCEPTION IF EVENT IS CANCELLED
 
                     // Code in the packet below will be used in JoinGame.
                     using (var writer = MessageWriter.Get(MessageType.Reliable))

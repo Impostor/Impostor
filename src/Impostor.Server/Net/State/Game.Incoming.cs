@@ -105,6 +105,15 @@ namespace Impostor.Server.Net.State
                 return GameJoinResult.FromError(GameJoinError.InvalidLimbo);
             }
 
+            if (isNew)
+            {
+                var cancel = !await _eventManager.CallAsync(new GamePlayerJoinedEvent(this, player), EventCallStep.Pre);
+                if (cancel)
+                {
+                    return GameJoinResult.FromError(GameJoinError.GameDestroyed);
+                }
+            }
+
             if (GameState == GameStates.Ended)
             {
                 await HandleJoinGameNext(player, isNew);

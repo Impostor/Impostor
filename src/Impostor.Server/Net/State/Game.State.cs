@@ -29,7 +29,7 @@ namespace Impostor.Server.Net.State
                 await InitGameDataAsync(player);
             }
 
-            await _eventManager.CallAsync(new GamePlayerJoinedEvent(this, player), EventCallStep.All);
+            await _eventManager.CallAsync(new GamePlayerJoinedEvent(this, player), EventCallStep.Post);
         }
 
         private async ValueTask<bool> PlayerRemove(int playerId, bool isBan = false)
