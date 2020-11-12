@@ -10,6 +10,8 @@ namespace Impostor.Server.Events
             Game = game;
         }
 
+        public bool Cancel { get; set; }
+        
         public IGame Game { get; }
     }
 }

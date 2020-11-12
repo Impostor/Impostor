@@ -27,9 +27,10 @@ namespace Impostor.Api.Events.Managers
         ///     Call all the event listeners for the type <see cref="TEvent"/>.
         /// </summary>
         /// <param name="event">The event argument.</param>
+        /// <param name="event">The call step argument.</param>
         /// <typeparam name="TEvent">Type of the event.</typeparam>
         /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
-        ValueTask CallAsync<TEvent>(TEvent @event)
+        ValueTask<bool> CallAsync<TEvent>(TEvent @event, EventCallStep callStep)
             where TEvent : IEvent;
     }
 }

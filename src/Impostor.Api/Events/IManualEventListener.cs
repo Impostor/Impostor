@@ -9,5 +9,7 @@ namespace Impostor.Api.Events
         public ValueTask Execute(IEvent @event);
 
         EventPriority Priority { get; set; }
+        
+        EventCallStep CallStep { get; set; }
     }
 }

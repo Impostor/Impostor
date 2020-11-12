@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
@@ -26,7 +27,7 @@ namespace Impostor.Server.Net.Manager
         private readonly IPEndPoint _publicIp;
         private readonly ConcurrentDictionary<int, Game> _games;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IEventManager _eventManager;
+        internal readonly IEventManager _eventManager;
         private readonly IGameCodeFactory _gameCodeFactory;
 
         public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, INodeLocator nodeLocator, IServiceProvider serviceProvider, IEventManager eventManager, IGameCodeFactory gameCodeFactory)
@@ -68,15 +69,15 @@ namespace Impostor.Server.Net.Manager
             var gameCodeStr = gameCode.Code;
             var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options);
 
-            if (await _nodeLocator.ExistsAsync(gameCodeStr) || !_games.TryAdd(gameCode, game))
-            {
-                return (false, null);
-            }
+            if (await _nodeLocator.ExistsAsync(gameCodeStr) || _games.ContainsKey(gameCode)) return (false, null);
+
+            var cancel = !await _eventManager.CallAsync(new GameCreatedEvent(game), EventCallStep.Pre);
+            if (cancel) return (false, null);
+
+            if (!_games.TryAdd(gameCode, game)) return (false, null);
 
             await _nodeLocator.SaveAsync(gameCodeStr, _publicIp);
             _logger.LogDebug("Created game with code {0}.", game.Code);
-
-            await _eventManager.CallAsync(new GameCreatedEvent(game));
 
             return (true, game);
         }
@@ -144,7 +145,7 @@ namespace Impostor.Server.Net.Manager
             _logger.LogDebug("Remove game with code {0} ({1}).", GameCodeParser.IntToGameName(gameCode), gameCode);
             await _nodeLocator.RemoveAsync(GameCodeParser.IntToGameName(gameCode));
 
-            await _eventManager.CallAsync(new GameDestroyedEvent(game));
+            await _eventManager.CallAsync(new GameDestroyedEvent(game), EventCallStep.All);
         }
     }
 }

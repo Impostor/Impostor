@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
@@ -102,14 +103,14 @@ namespace Impostor.Server.Net.State
                         control.PlayerInfo!.Controller = control;
                     }
 
-                    await _eventManager.CallAsync(new PlayerSpawnedEvent(this, player, control));
+                    await _eventManager.CallAsync(new PlayerSpawnedEvent(this, player, control), EventCallStep.All);
 
                     break;
                 }
 
                 case InnerMeetingHud meetingHud:
                 {
-                    await _eventManager.CallAsync(new MeetingStartedEvent(this, meetingHud));
+                    await _eventManager.CallAsync(new MeetingStartedEvent(this, meetingHud), EventCallStep.All);
                     break;
                 }
             }

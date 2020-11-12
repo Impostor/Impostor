@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
@@ -9,6 +10,7 @@ using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
 using Impostor.Server.Config;
+using Impostor.Server.Events;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -53,6 +55,8 @@ namespace Impostor.Server.Net
                         Message00HostGameS2C.Serialize(writer, game.Code);
                         await Connection.SendAsync(writer);
                     }
+                    
+                    await _gameManager._eventManager.CallAsync(new GameCreatedEvent(game), EventCallStep.Post);
 
                     break;
                 }

@@ -9,6 +9,8 @@ namespace Impostor.Server.Events.Register
         Type EventType { get; }
 
         EventPriority Priority { get; }
+        
+        EventCallStep CallStep { get; }
 
         ValueTask InvokeAsync(object eventHandler, object @event, IServiceProvider provider);
     }

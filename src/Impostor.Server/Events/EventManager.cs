@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events;
@@ -76,7 +77,7 @@ namespace Impostor.Server.Events
         }
 
         /// <inheritdoc />
-        public async ValueTask CallAsync<T>(T @event)
+        public async ValueTask<bool> CallAsync<T>(T @event, EventCallStep callStep)
             where T : IEvent
         {
             try
@@ -88,8 +89,39 @@ namespace Impostor.Server.Events
 
                 foreach (var (handler, eventListener) in handlers)
                 {
-                    await eventListener.InvokeAsync(handler, @event, _serviceProvider);
+                    if (callStep == EventCallStep.All && eventListener.CallStep == EventCallStep.Pre)
+                    {
+                        _logger.LogWarning(
+                            "Event listener {0} for event {1} hall a call step of Pre, but the event does not support it. Running as Post instead.",
+                            eventListener.GetType().Name,
+                            @event.GetType().Name);
+                    }
+                    else if (eventListener.CallStep != EventCallStep.All && eventListener.CallStep != callStep)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        await eventListener.InvokeAsync(handler, @event, _serviceProvider);
+                    }
+                    catch (ImpostorCheatException)
+                    {
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e, "Invocation of event listener {0} threw an exception.", eventListener.GetType().Name);
+                    }
                 }
+
+                if (typeof(ICancellableEvent).IsAssignableFrom(typeof(T)))
+                {
+                    var cancellableEvent = (ICancellableEvent)@event;
+                    return cancellableEvent.Cancel;
+                }
+                
+                return true;
             }
             catch (ImpostorCheatException)
             {
@@ -98,6 +130,7 @@ namespace Impostor.Server.Events
             catch (Exception e)
             {
                 _logger.LogError(e, "Invocation of event {0} threw an exception.", @event.GetType().Name);
+                return false;
             }
         }
 

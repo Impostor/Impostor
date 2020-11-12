@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Impostor.Api.Events;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
@@ -18,13 +19,16 @@ namespace Impostor.Server.Net.State
 
         public async ValueTask HandleStartGame(IMessageReader message)
         {
+            var shouldCancel = !await _eventManager.CallAsync(new GameStartingEvent(this), EventCallStep.Pre);
+            if (shouldCancel) return;
+            
             GameState = GameStates.Starting;
 
             using var packet = MessageWriter.Get(MessageType.Reliable);
             message.CopyTo(packet);
             await SendToAllAsync(packet);
 
-            await _eventManager.CallAsync(new GameStartingEvent(this));
+            await _eventManager.CallAsync(new GameStartingEvent(this), EventCallStep.Post);
         }
 
         public async ValueTask<GameJoinResult> AddClientAsync(ClientBase client)
@@ -128,18 +132,31 @@ namespace Impostor.Server.Net.State
                 player.Value.Limbo = LimboStates.PreSpawn;
             }
 
-            await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));
+            await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason), EventCallStep.All);
         }
 
         public async ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic)
         {
+            var oldIsPublic = IsPublic;
             IsPublic = isPublic;
+
+            var cancel = !await _eventManager.CallAsync(new GameAlterEvent(this, isPublic), EventCallStep.Pre);
+            if (cancel)
+            {
+                IsPublic = oldIsPublic;
+                
+                using var writer = MessageWriter.Get(MessageType.Reliable);
+                message.CopyTo(writer);
+                await SendToAsync(writer, sender.Client.Id);
+
+                return;
+            }
 
             using var packet = MessageWriter.Get(MessageType.Reliable);
             message.CopyTo(packet);
             await SendToAllExceptAsync(packet, sender.Client.Id);
 
-            await _eventManager.CallAsync(new GameAlterEvent(this, isPublic));
+            await _eventManager.CallAsync(new GameAlterEvent(this, isPublic), EventCallStep.Post);
         }
 
         public async ValueTask HandleRemovePlayer(int playerId, DisconnectReason reason)

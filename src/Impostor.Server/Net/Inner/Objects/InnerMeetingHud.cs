@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
@@ -87,11 +88,11 @@ namespace Impostor.Server.Net.Inner.Objects
                         if (player != null)
                         {
                             player.Controller.Die(DeathReason.Exile);
-                            await _eventManager.CallAsync(new PlayerExileEvent(_game, sender, player.Controller));
+                            await _eventManager.CallAsync(new PlayerExileEvent(_game, sender, player.Controller), EventCallStep.All);
                         }
                     }
 
-                    await _eventManager.CallAsync(new MeetingEndedEvent(_game, this));
+                    await _eventManager.CallAsync(new MeetingEndedEvent(_game, this), EventCallStep.All);
 
                     break;
                 }

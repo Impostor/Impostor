@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
@@ -28,7 +29,7 @@ namespace Impostor.Server.Net.State
                 await InitGameDataAsync(player);
             }
 
-            await _eventManager.CallAsync(new GamePlayerJoinedEvent(this, player));
+            await _eventManager.CallAsync(new GamePlayerJoinedEvent(this, player), EventCallStep.All);
         }
 
         private async ValueTask<bool> PlayerRemove(int playerId, bool isBan = false)
@@ -72,7 +73,7 @@ namespace Impostor.Server.Net.State
                 BanIp(player.Client.Connection.EndPoint.Address);
             }
 
-            await _eventManager.CallAsync(new GamePlayerLeftEvent(this, player, isBan));
+            await _eventManager.CallAsync(new GamePlayerLeftEvent(this, player, isBan), EventCallStep.All);
 
             // Player can refuse to be kicked and keep the connection open, check for this.
             _ = Task.Run(async () =>

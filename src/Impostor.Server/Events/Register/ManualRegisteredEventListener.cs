@@ -16,6 +16,8 @@ namespace Impostor.Server.Events.Register
         }
 
         public EventPriority Priority => _manualEventListener.Priority;
+        
+        public EventCallStep CallStep => _manualEventListener.CallStep;
 
         public ValueTask InvokeAsync(object eventHandler, object @event, IServiceProvider provider)
         {

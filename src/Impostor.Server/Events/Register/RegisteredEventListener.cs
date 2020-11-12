@@ -12,8 +12,6 @@ namespace Impostor.Server.Events.Register
 {
     internal class RegisteredEventListener : IRegisteredEventListener
     {
-        private static readonly PropertyInfo IsCancelledProperty = typeof(IEventCancelable).GetProperty(nameof(IEventCancelable.IsCancelled))!;
-
         private static readonly ConcurrentDictionary<Type, RegisteredEventListener[]> Instances = new ConcurrentDictionary<Type, RegisteredEventListener[]>();
         private readonly Func<object, object, IServiceProvider, ValueTask> _invoker;
         private readonly Type _eventListenerType;
@@ -23,18 +21,18 @@ namespace Impostor.Server.Events.Register
             EventType = eventType;
             _eventListenerType = eventListenerType;
             Priority = attribute.Priority;
-            IgnoreCancelled = attribute.IgnoreCancelled;
+            CallStep = attribute.CallStep;
             Method = method.GetFriendlyName(showParameters: false);
-            _invoker = CreateInvoker(method, attribute.IgnoreCancelled);
+            _invoker = CreateInvoker(method);
         }
 
         public Type EventType { get; }
 
         public EventPriority Priority { get; }
 
-        public int PriorityOrder { get; set; }
+        public EventCallStep CallStep { get; }
 
-        public bool IgnoreCancelled { get; }
+        public int PriorityOrder { get; set; }
 
         public string Method { get; }
 
@@ -43,7 +41,7 @@ namespace Impostor.Server.Events.Register
             return _invoker(eventHandler, @event, provider);
         }
 
-        private Func<object, object, IServiceProvider, ValueTask> CreateInvoker(MethodInfo method, bool ignoreCancelled)
+        private Func<object, object, IServiceProvider, ValueTask> CreateInvoker(MethodInfo method)
         {
             var instance = Expression.Parameter(typeof(object), "instance");
             var eventParameter = Expression.Parameter(typeof(object), "event");
@@ -84,35 +82,15 @@ namespace Impostor.Server.Events.Register
 
             if (method.ReturnType == typeof(void))
             {
-                if (!ignoreCancelled && typeof(IEventCancelable).IsAssignableFrom(EventType))
-                {
-                    invoke = Expression.Block(
-                        Expression.IfThenElse(
-                            Expression.Property(@event, IsCancelledProperty),
-                            Expression.Return(returnTarget, Expression.Default(typeof(ValueTask))),
-                            Expression.Block(
-                                invoke,
-                                Expression.Return(returnTarget, Expression.Default(typeof(ValueTask))))),
-                        Expression.Label(returnTarget, Expression.Default(typeof(ValueTask))));
-                }
-                else
-                {
-                    invoke = Expression.Block(
-                        invoke,
-                        Expression.Label(returnTarget, Expression.Default(typeof(ValueTask))));
-                }
+                invoke = Expression.Block(
+                    invoke,
+                    Expression.Label(returnTarget, Expression.Default(typeof(ValueTask))));
             }
             else if (method.ReturnType == typeof(ValueTask))
             {
-                if (!ignoreCancelled && typeof(IEventCancelable).IsAssignableFrom(EventType))
-                {
-                    invoke = Expression.Block(
-                        Expression.IfThenElse(
-                            Expression.Property(@event, IsCancelledProperty),
-                            Expression.Return(returnTarget, Expression.Default(typeof(ValueTask))),
-                            Expression.Return(returnTarget, invoke)),
-                        Expression.Label(returnTarget, Expression.Default(typeof(ValueTask))));
-                }
+                invoke = Expression.Block(
+                    Expression.Return(returnTarget, invoke),
+                    Expression.Label(returnTarget, Expression.Default(typeof(ValueTask))));
             }
             else
             {

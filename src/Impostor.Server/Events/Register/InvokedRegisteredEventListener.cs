@@ -18,6 +18,8 @@ namespace Impostor.Server.Events.Register
         public Type EventType => _innerObject.EventType;
 
         public EventPriority Priority => _innerObject.Priority;
+        
+        public EventCallStep CallStep => _innerObject.CallStep;
 
         public ValueTask InvokeAsync(object eventHandler, object @event, IServiceProvider provider)
         {
