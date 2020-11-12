@@ -42,6 +42,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public bool CanMurder(IGame game)
         {
+            if (!IsImpostor)
+            {
+                return false;
+            }
+
             return DateTimeOffset.UtcNow.Subtract(LastMurder).TotalSeconds >= game.Options.KillCooldown;
         }
 
