@@ -52,6 +52,14 @@ namespace Impostor.Api.Games
         /// </summary>
         /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
         ValueTask SyncSettingsAsync();
+        
+        /// <summary>
+        ///     Syncs the internal <see cref="GameOptionsData"/> to the specified player.
+        ///     Necessary to do if you modified it, otherwise it won't be used.
+        /// </summary>
+        /// <param name="player">The player to send the settings to.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        ValueTask SendSettingsToAsync(IInnerPlayerControl player);
 
         /// <summary>
         ///     Sets the specified list as Impostor on all connected players.
