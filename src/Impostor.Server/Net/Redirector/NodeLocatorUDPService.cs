@@ -30,10 +30,15 @@ namespace Impostor.Server.Net.Redirector
                 throw new ArgumentException("UdpMasterEndpoint should be in the ip:port format.");
             }
 
-            _client = new UdpClient(endpoint)
+            _client = new UdpClient(endpoint);
+
+            try
             {
-                DontFragment = true,
-            };
+                _client.DontFragment = true;
+            }
+            catch (SocketException)
+            {
+            }
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

@@ -38,10 +38,15 @@ namespace Impostor.Server.Net.Redirector
 
                 _logger.LogWarning("Node server will send updates to {0}.", endpoint);
                 _server = endpoint;
-                _client = new UdpClient
+                _client = new UdpClient();
+
+                try
                 {
-                    DontFragment = true
-                };
+                    _client.DontFragment = true;
+                }
+                catch (SocketException)
+                {
+                }
             }
         }
 
