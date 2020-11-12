@@ -1,4 +1,6 @@
-﻿using Impostor.Api.Innersloth;
+﻿using System;
+using System.Collections.Generic;
+using Impostor.Api.Innersloth;
 
 namespace Impostor.Api.Net.Inner.Objects
 {
@@ -43,5 +45,9 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     Gets the reason why the player is dead in the current game.
         /// </summary>
         DeathReason LastDeathReason { get; }
+        
+        List<ITaskInfo> Tasks { get; }
+        
+        DateTimeOffset LastMurder { get; }
     }
 }
