@@ -25,7 +25,7 @@ namespace Impostor.Api.Net
         /// </summary>
         LimboStates Limbo { get; set; }
 
-        IInnerPlayerControl Character { get; }
+        IInnerPlayerControl? Character { get; }
 
         public bool IsHost { get; }
 

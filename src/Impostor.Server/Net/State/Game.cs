@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.State
 {
-    internal partial class Game : IGame
+    internal partial class Game
     {
         private readonly ILogger<Game> _logger;
         private readonly IServiceProvider _serviceProvider;

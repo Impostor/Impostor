@@ -99,14 +99,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetMurderedAsync()
         {
-            var writer = _game.StartRpc(NetId, RpcCalls.MurderPlayer);
-            writer.Write((byte)NetId);
-            await _game.FinishRpcAsync(writer);
-        }
-
-        public async ValueTask SetInfectedAsync()
-        {
-            var writer = _game.StartRpc(NetId, RpcCalls.SetInfected);
+            using var writer = _game.StartRpc(NetId, RpcCalls.MurderPlayer);
             writer.Write((byte)NetId);
             await _game.FinishRpcAsync(writer);
         }
