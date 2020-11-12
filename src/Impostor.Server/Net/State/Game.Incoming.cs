@@ -111,7 +111,7 @@ namespace Impostor.Server.Net.State
             return GameJoinResult.CreateSuccess(player);
         }
 
-        public async ValueTask HandleEndGame(IMessageReader message)
+        public async ValueTask HandleEndGame(IMessageReader message, GameOverReason gameOverReason)
         {
             GameState = GameStates.Ended;
 
@@ -128,7 +128,7 @@ namespace Impostor.Server.Net.State
                 player.Value.Limbo = LimboStates.PreSpawn;
             }
 
-            await _eventManager.CallAsync(new GameEndedEvent(this));
+            await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));
         }
 
         public async ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic)
