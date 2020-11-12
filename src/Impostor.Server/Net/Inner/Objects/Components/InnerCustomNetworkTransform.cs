@@ -135,7 +135,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
         private void SnapTo(Vector2 position, ushort minSid)
         {
-            if (SidGreaterThan(minSid, _lastSequenceId))
+            if (!SidGreaterThan(minSid, _lastSequenceId))
             {
                 return;
             }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Player;
@@ -79,6 +80,11 @@ namespace Impostor.Plugins.Example.Handlers
                 await e.PlayerControl.SetHatAsync(HatType.Cheese);
                 await e.PlayerControl.SetSkinAsync(SkinType.Police);
                 await e.PlayerControl.SetPetAsync(PetType.Ufo);
+            }
+
+            if (e.Message == "snap")
+            {
+                await e.PlayerControl.NetworkTransform.SnapToAsync(new Vector2(1, 1));
             }
 
             await e.PlayerControl.SetNameAsync(e.Message);

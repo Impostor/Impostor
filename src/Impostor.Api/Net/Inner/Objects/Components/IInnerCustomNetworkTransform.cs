@@ -10,6 +10,6 @@ namespace Impostor.Api.Net.Inner.Objects.Components
         /// </summary>
         /// <param name="position">The target position.</param>
         /// <returns>Task that must be awaited.</returns>
-        ValueTask SnapTo(Vector2 position);
+        ValueTask SnapToAsync(Vector2 position);
     }
 }
