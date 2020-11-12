@@ -48,10 +48,15 @@ namespace Impostor.Hazel.Udp
 
             _readerPool = readerPool;
             _pool = MemoryPool<byte>.Shared;
-            _socket = new UdpClient(endPoint)
+            _socket = new UdpClient(endPoint);
+
+            try
             {
-                DontFragment = false
-            };
+                _socket.DontFragment = false;
+            }
+            catch (SocketException)
+            {
+            }
 
             _reliablePacketTimer = new Timer(ManageReliablePackets, null, 100, Timeout.Infinite);
 
