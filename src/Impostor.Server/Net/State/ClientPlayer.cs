@@ -30,7 +30,7 @@ namespace Impostor.Server.Net.State
         /// <inheritdoc />
         public LimboStates Limbo { get; set; }
 
-        public InnerPlayerControl Character { get; internal set; }
+        public InnerPlayerControl? Character { get; internal set; }
 
         public bool IsHost => Game?.Host == this;
 

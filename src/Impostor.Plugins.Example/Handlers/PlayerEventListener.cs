@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Player;
 using Impostor.Api.Innersloth.Customization;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example.Handlers
 {
@@ -10,16 +12,24 @@ namespace Impostor.Plugins.Example.Handlers
     {
         private static readonly Random Random = new Random();
 
+        private readonly ILogger<PlayerEventListener> _logger;
+
+        public PlayerEventListener(ILogger<PlayerEventListener> logger)
+        {
+            _logger = logger;
+        }
+
         [EventListener]
         public void OnPlayerSpawned(IPlayerSpawnedEvent e)
         {
-            Console.WriteLine(e.PlayerControl.PlayerInfo.PlayerName + " spawned");
+            _logger.LogDebug(e.PlayerControl.PlayerInfo.PlayerName + " spawned");
 
             // Need to make a local copy because it might be possible that
             // the event gets changed after being handled.
             var clientPlayer = e.ClientPlayer;
             var playerControl = e.PlayerControl;
 
+            /*
             Task.Run(async () =>
             {
                 Console.WriteLine("Starting player task.");
@@ -39,20 +49,21 @@ namespace Impostor.Plugins.Example.Handlers
                     await Task.Delay(TimeSpan.FromMilliseconds(5000));
                 }
 
-                Console.WriteLine("Stopping player task.");
+                _logger.LogDebug("Stopping player task.");
             });
+            */
         }
 
         [EventListener]
         public void OnPlayerDestroyed(IPlayerDestroyedEvent e)
         {
-            Console.WriteLine(e.PlayerControl.PlayerInfo.PlayerName + " destroyed");
+            _logger.LogDebug(e.PlayerControl.PlayerInfo.PlayerName + " destroyed");
         }
 
         [EventListener]
         public async ValueTask OnPlayerChat(IPlayerChatEvent e)
         {
-            Console.WriteLine(e.PlayerControl.PlayerInfo.PlayerName + " said " + e.Message);
+            _logger.LogDebug(e.PlayerControl.PlayerInfo.PlayerName + " said " + e.Message);
 
             if (e.Message == "test")
             {
@@ -71,8 +82,19 @@ namespace Impostor.Plugins.Example.Handlers
                 await e.PlayerControl.SetPetAsync(PetType.Ufo);
             }
 
+            if (e.Message == "snap")
+            {
+                await e.PlayerControl.NetworkTransform.SnapToAsync(new Vector2(1, 1));
+            }
+
             await e.PlayerControl.SetNameAsync(e.Message);
             await e.PlayerControl.SendChatAsync(e.Message);
+        }
+
+        [EventListener]
+        public void OnPlayerReportedBodyEvent(IPlayerReportedBodyEvent e)
+        {
+            _logger.LogDebug("Player reported body");
         }
     }
 }

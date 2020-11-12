@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Impostor.Patcher.Shared\Impostor.Patcher.Shared.csproj" />
-        <PackageReference Include="System.Resources.Extensions" Version="5.0.0-rc.2.20475.5" />
+        <PackageReference Include="System.Resources.Extensions" Version="5.0.0" />
         <Reference Include="System.Runtime.InteropServices.RuntimeInformation" />
         <Reference Include="System.Windows.Forms" />
     </ItemGroup>

@@ -40,6 +40,7 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnGameEnded(IGameEndedEvent e)
         {
             Console.WriteLine("Game > ended");
+            Console.WriteLine("- Reason: " + e.GameOverReason);
         }
 
         [EventListener]

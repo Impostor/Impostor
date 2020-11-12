@@ -19,7 +19,7 @@ namespace Impostor.Server.Events
         {
             foreach (var disposable in _disposables)
             {
-                disposable.Dispose();
+                disposable?.Dispose();
             }
         }
     }

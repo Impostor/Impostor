@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
@@ -46,10 +43,7 @@ namespace Impostor.Server
 
             try
             {
-                // var assembly = Assembly.GetExecutingAssembly();
-                // var fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
-
-                Log.Information("Starting Impostor"); // v{0}", fileVersion.ProductVersion);
+                Log.Information("Starting Impostor v{0}", DotnetUtils.GetVersion());
                 CreateHostBuilder(args).Build().Run();
                 return 0;
             }

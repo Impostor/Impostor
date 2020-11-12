@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
+using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Games
@@ -49,8 +50,15 @@ namespace Impostor.Api.Games
         ///     Syncs the internal <see cref="GameOptionsData"/> to all players.
         ///     Necessary to do if you modified it, otherwise it won't be used.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
         ValueTask SyncSettingsAsync();
+
+        /// <summary>
+        ///     Sets the specified list as Impostor on all connected players.
+        /// </summary>
+        /// <param name="players">List of players to be Impostor.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        ValueTask SetInfectedAsync(IEnumerable<IInnerPlayerControl> players);
 
         /// <summary>
         ///     Send the message to all players.

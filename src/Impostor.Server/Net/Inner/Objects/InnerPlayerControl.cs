@@ -282,6 +282,13 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.MurderPlayer)} as crewmate");
                     }
 
+                    if (!sender.Character.PlayerInfo.CanMurder(_game))
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.MurderPlayer)} too fast");
+                    }
+
+                    sender.Character.PlayerInfo.LastMurder = DateTimeOffset.UtcNow;
+
                     var player = reader.ReadNetObject<InnerPlayerControl>(_game);
                     if (!player.PlayerInfo.IsDead)
                     {
@@ -397,6 +404,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     // Is either start countdown or byte.MaxValue
                     var secondsLeft = reader.ReadByte();
+                    if (secondsLeft < byte.MaxValue)
+                    {
+                        await _eventManager.CallAsync(new PlayerSetStartCounterEvent(_game, sender, this, secondsLeft));
+                    }
+
                     break;
                 }
 

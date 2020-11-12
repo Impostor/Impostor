@@ -43,8 +43,7 @@ namespace Impostor.Server.Net.Inner.Objects
             return _allPlayers.TryGetValue(id, out var player) ? player : null;
         }
 
-        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
-            IMessageReader reader)
+        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             switch (call)
             {
