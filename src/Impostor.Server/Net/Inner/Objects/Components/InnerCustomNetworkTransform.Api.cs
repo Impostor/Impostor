@@ -14,10 +14,12 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             SnapTo(position, minSid);
 
             // Broadcast to all clients.
-            var writer = _game.StartRpc(NetId, RpcCalls.SnapTo);
-            WriteVector2(writer, position);
-            writer.Write(_lastSequenceId);
-            await _game.FinishRpcAsync(writer);
+            using (var writer = _game.StartRpc(NetId, RpcCalls.SnapTo))
+            {
+                WriteVector2(writer, position);
+                writer.Write(_lastSequenceId);
+                await _game.FinishRpcAsync(writer);
+            }
         }
     }
 }
