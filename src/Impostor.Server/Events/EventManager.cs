@@ -92,7 +92,7 @@ namespace Impostor.Server.Events
                     if (callStep == EventCallStep.All && eventListener.CallStep == EventCallStep.Pre)
                     {
                         _logger.LogWarning(
-                            "Event listener {0} for event {1} hall a call step of Pre, but the event does not support it. Running as Post instead.",
+                            "Event listener {0} for event {1} has a call step of Pre, but the event does not support it. Running as Post instead.",
                             eventListener.GetType().Name,
                             @event.GetType().Name);
                     }

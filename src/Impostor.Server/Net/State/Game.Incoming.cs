@@ -6,6 +6,7 @@ using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
 using Impostor.Server.Events;
 using Microsoft.Extensions.DependencyInjection;
@@ -155,7 +156,8 @@ namespace Impostor.Server.Net.State
                 IsPublic = oldIsPublic;
                 
                 using var writer = MessageWriter.Get(MessageType.Reliable);
-                message.CopyTo(writer);
+                Message10AlterGameS2C.Serialize(writer, false, Code.Value, oldIsPublic);
+
                 await SendToAsync(writer, sender.Client.Id);
 
                 return;

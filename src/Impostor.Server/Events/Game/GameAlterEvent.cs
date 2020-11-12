@@ -11,6 +11,8 @@ namespace Impostor.Server.Events
             IsPublic = isPublic;
         }
 
+        public bool Cancel { get; set; }
+
         public IGame Game { get; }
 
         public bool IsPublic { get; }
