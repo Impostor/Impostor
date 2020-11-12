@@ -282,6 +282,13 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.MurderPlayer)} as crewmate");
                     }
 
+                    if (!sender.Character.PlayerInfo.CanMurder(_game))
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.MurderPlayer)} too fast");
+                    }
+
+                    sender.Character.PlayerInfo.LastMurder = DateTimeOffset.UtcNow;
+
                     var player = reader.ReadNetObject<InnerPlayerControl>(_game);
                     if (!player.PlayerInfo.IsDead)
                     {

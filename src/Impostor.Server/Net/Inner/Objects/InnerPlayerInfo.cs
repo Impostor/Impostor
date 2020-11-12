@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
@@ -36,6 +37,13 @@ namespace Impostor.Server.Net.Inner.Objects
         public DeathReason LastDeathReason { get; internal set; }
 
         public List<InnerGameData.TaskInfo> Tasks { get; internal set; }
+
+        public DateTimeOffset LastMurder { get; set; }
+
+        public bool CanMurder(IGame game)
+        {
+            return DateTimeOffset.UtcNow.Subtract(LastMurder).TotalSeconds >= game.Options.KillCooldown;
+        }
 
         public void Serialize(IMessageWriter writer)
         {
