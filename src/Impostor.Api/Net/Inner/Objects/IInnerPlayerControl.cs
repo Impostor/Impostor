@@ -7,6 +7,11 @@ namespace Impostor.Api.Net.Inner.Objects
     public interface IInnerPlayerControl : IInnerNetObject
     {
         /// <summary>
+        ///     Gets the <see cref="PlayerId"/> assigned by the client of the host of the game.
+        /// </summary>
+        byte PlayerId { get; }
+
+        /// <summary>
         ///     Gets the <see cref="IInnerPlayerPhysics"/> of the <see cref="IInnerPlayerControl"/>.
         ///     Contains vent logic.
         /// </summary>
@@ -99,13 +104,6 @@ namespace Impostor.Api.Net.Inner.Objects
         /// </param>
         /// <returns>Task that must be awaited.</returns>
         ValueTask SendChatToPlayerAsync(string text, IInnerPlayerControl? player = null);
-
-        /// <summary>
-        ///     Sets the current to infected (impostor) <see cref="IInnerPlayerControl"/>.
-        ///     Visible to all players.
-        /// </summary>
-        /// <returns>Task that must be awaited.</returns>
-        ValueTask SetInfectedAsync();
 
         /// <summary>
         ///     Sets the current to be murdered <see cref="IInnerPlayerControl"/>.

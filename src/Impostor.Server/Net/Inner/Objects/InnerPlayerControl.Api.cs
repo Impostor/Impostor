@@ -103,12 +103,5 @@ namespace Impostor.Server.Net.Inner.Objects
             writer.Write((byte)NetId);
             await _game.FinishRpcAsync(writer);
         }
-
-        public async ValueTask SetInfectedAsync()
-        {
-            var writer = _game.StartRpc(NetId, RpcCalls.SetInfected);
-            writer.Write((byte)NetId);
-            await _game.FinishRpcAsync(writer);
-        }
     }
 }

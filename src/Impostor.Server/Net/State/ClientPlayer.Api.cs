@@ -13,6 +13,6 @@ namespace Impostor.Server.Net.State
         IGame IClientPlayer.Game => Game;
 
         /// <inheritdoc />
-        IInnerPlayerControl IClientPlayer.Character => Character;
+        IInnerPlayerControl? IClientPlayer.Character => Character;
     }
 }
