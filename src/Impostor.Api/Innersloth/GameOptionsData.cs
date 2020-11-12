@@ -33,6 +33,15 @@ namespace Impostor.Api.Innersloth
         /// Skeld = 0, MiraHQ = 1, Polus = 2.
         /// </remarks>
         public byte MapId { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the map selected for this lobby
+        /// </summary>
+        public MapTypes Map 
+        {
+            get => (MapTypes)MapId;
+            set => MapId = (byte)value;
+        }
 
         /// <summary>
         /// Gets or sets the Player speed modifier.

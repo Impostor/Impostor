@@ -1,8 +1,10 @@
-﻿namespace Impostor.Api.Innersloth
+﻿using System;
+
+namespace Impostor.Api.Innersloth
 {
+    [Obsolete("Use Map property instead of MapId, and compare with MapTypes enum.")]
     public static class MapId
     {
-        // TODO: Not sure if correct, check
         public const int Skeld = 0;
         public const int MiraHQ = 1;
         public const int Polus = 2;

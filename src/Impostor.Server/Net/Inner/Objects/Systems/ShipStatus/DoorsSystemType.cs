@@ -14,11 +14,11 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
         public DoorsSystemType(IGame game)
         {
             // TODO: Check
-            var doorCount = game.Options.MapId switch
+            var doorCount = game.Options.Map switch
             {
-                MapId.Skeld => 13,
-                MapId.MiraHQ => 2,
-                MapId.Polus => 12,
+                MapTypes.Skeld => 13,
+                MapTypes.MiraHQ => 2,
+                MapTypes.Polus => 12,
                 _ => throw new ArgumentOutOfRangeException()
             };
 
