@@ -3,19 +3,19 @@ using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 
-namespace Impostor.Server.Events.Game.Player
+namespace Impostor.Server.Events.Player
 {
     public class PlayerSetStartCounterEvent : IPlayerSetStartCounterEvent
     {
-        public PlayerSetStartCounterEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, byte value)
+        public PlayerSetStartCounterEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, byte secondsLeft)
         {
             Game = game;
             ClientPlayer = clientPlayer;
             PlayerControl = playerControl;
-            Value = value;
+            SecondsLeft = secondsLeft;
         }
 
-        public byte Value { get; }
+        public byte SecondsLeft { get; }
 
         public IClientPlayer ClientPlayer { get; }
 

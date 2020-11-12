@@ -5,6 +5,6 @@ namespace Impostor.Api.Events.Player
         /// <summary>
         ///     Gets the current time of the start counter.
         /// </summary>
-        byte Value { get; }
+        byte SecondsLeft { get; }
     }
 }
