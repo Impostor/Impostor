@@ -174,10 +174,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
             player.Tasks = new List<ITaskInfo>(taskTypeIds.Length);
 
-            for (var i = 0; i < taskTypeIds.Length; i++)
+            foreach (var taskId in taskTypeIds.ToArray())
             {
-                var task = new TaskInfo { Id = (uint)i };
-                player.Tasks.Add(task);
+                player.Tasks.Add(new TaskInfo { Id = taskId });
             }
         }
     }
