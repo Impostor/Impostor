@@ -1,10 +1,11 @@
-﻿using Impostor.Api.Net.Messages;
+﻿using Impostor.Api.Net.Inner.Objects;
+using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
     internal partial class InnerGameData
     {
-        public class TaskInfo
+        public class TaskInfo : ITaskInfo
         {
             public uint Id { get; internal set; }
 
