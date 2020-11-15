@@ -13,7 +13,6 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 
         public DoorsSystemType(IGame game)
         {
-            // TODO: Check
             var doorCount = game.Options.Map switch
             {
                 MapTypes.Skeld => 13,

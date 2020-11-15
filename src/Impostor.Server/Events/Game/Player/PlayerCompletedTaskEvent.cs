@@ -13,8 +13,7 @@ namespace Impostor.Server.Events.Player
             Game = game;
             ClientPlayer = clientPlayer;
             PlayerControl = playerControl;
-            TaskID = taskID;
-            Task = (TaskTypes)TaskID;
+            Task = (TaskTypes)taskID;
         }
 
         public IGame Game { get; }
@@ -22,8 +21,6 @@ namespace Impostor.Server.Events.Player
         public IClientPlayer ClientPlayer { get; }
 
         public IInnerPlayerControl PlayerControl { get; }
-
-        public uint TaskID { get; }
 
         public TaskTypes Task { get; }
     }
