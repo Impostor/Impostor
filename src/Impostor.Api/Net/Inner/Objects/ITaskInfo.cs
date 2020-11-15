@@ -7,9 +7,5 @@ namespace Impostor.Api.Net.Inner.Objects
         uint Id { get; }
         
         bool Complete { get; }
-
-        void Serialize(IMessageWriter writer);
-
-        void Deserialize(IMessageReader reader);
     }
 }
