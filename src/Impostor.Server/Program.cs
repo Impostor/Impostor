@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
@@ -29,12 +30,22 @@ namespace Impostor.Server
     {
         private static int Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
 #if DEBUG
-                .MinimumLevel.Verbose()
+            var logLevel = LogEventLevel.Debug;
+#else
+            var logLevel = LogEventLevel.Information;
+#endif
+
+            if (args.Contains("--verbose"))
+            {
+                logLevel = LogEventLevel.Verbose;
+            }
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Is(logLevel)
+#if DEBUG
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
 #else
-                .MinimumLevel.Information()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
 #endif
                 .Enrich.FromLogContext()
