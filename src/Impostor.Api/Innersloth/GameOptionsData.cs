@@ -27,12 +27,21 @@ namespace Impostor.Api.Innersloth
         public GameKeywords Keywords { get; set; }
 
         /// <summary>
-        /// Gets or sets the MapId selected for this lobby as per values in <see cref="Innersloth.MapId"/>.
+        /// Gets or sets the MapId selected for this lobby
         /// </summary>
         /// <remarks>
         /// Skeld = 0, MiraHQ = 1, Polus = 2.
         /// </remarks>
-        public byte MapId { get; set; }
+        internal byte MapId { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the map selected for this lobby
+        /// </summary>
+        public MapTypes Map
+        {
+            get => (MapTypes)MapId;
+            set => MapId = (byte)value;
+        }
 
         /// <summary>
         /// Gets or sets the Player speed modifier.
