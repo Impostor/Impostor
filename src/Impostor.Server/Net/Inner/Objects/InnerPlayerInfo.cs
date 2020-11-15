@@ -36,7 +36,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public DeathReason LastDeathReason { get; internal set; }
 
-        public List<InnerGameData.TaskInfo> Tasks { get; internal set; }
+        public List<ITaskInfo> Tasks { get; internal set; }
 
         public DateTimeOffset LastMurder { get; set; }
 
@@ -67,11 +67,12 @@ namespace Impostor.Server.Net.Inner.Objects
             IsImpostor = (flag & 2) > 0;
             IsDead = (flag & 4) > 0;
             var taskCount = reader.ReadByte();
-            Tasks = new List<InnerGameData.TaskInfo>();
+            Tasks = new List<ITaskInfo>();
             for (var i = 0; i < taskCount; i++)
             {
-                Tasks.Add(new InnerGameData.TaskInfo());
-                Tasks[i].Deserialize(reader);
+                var task = new InnerGameData.TaskInfo();
+                task.Deserialize(reader);
+                Tasks.Add(task);
             }
         }
     }

@@ -172,12 +172,11 @@ namespace Impostor.Server.Net.Inner.Objects
                 return;
             }
 
-            player.Tasks = new List<TaskInfo>(taskTypeIds.Length);
+            player.Tasks = new List<ITaskInfo>(taskTypeIds.Length);
 
-            for (var i = 0; i < taskTypeIds.Length; i++)
+            foreach (var taskId in taskTypeIds.ToArray())
             {
-                player.Tasks.Add(new TaskInfo());
-                player.Tasks[i].Id = (uint)i;
+                player.Tasks.Add(new TaskInfo { Id = taskId });
             }
         }
     }
