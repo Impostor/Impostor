@@ -70,8 +70,9 @@ namespace Impostor.Server.Net.Inner.Objects
             Tasks = new List<ITaskInfo>();
             for (var i = 0; i < taskCount; i++)
             {
-                Tasks.Add(new InnerGameData.TaskInfo());
-                Tasks[i].Deserialize(reader);
+                var task = new InnerGameData.TaskInfo();
+                task.Deserialize(reader);
+                Tasks.Add(task);
             }
         }
     }
