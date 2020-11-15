@@ -9,7 +9,7 @@ namespace Impostor.Api.Innersloth
         /// <summary>
         /// The latest major version of the game client.
         /// </summary>
-        public const int LatestVersion = 2;
+        public const int LatestVersion = 4;
 
         /// <summary>
         /// Gets or sets host's version of the game.
@@ -33,7 +33,7 @@ namespace Impostor.Api.Innersloth
         /// Skeld = 0, MiraHQ = 1, Polus = 2.
         /// </remarks>
         internal byte MapId { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the map selected for this lobby
         /// </summary>
@@ -192,13 +192,13 @@ namespace Impostor.Api.Innersloth
                 writer.Write((bool)VisualTasks);
             }
 
-            if (Version > 3)
+            if (version > 3)
             {
                 writer.Write((bool)AnonymousVotes);
                 writer.Write((byte)TaskBarUpdate);
             }
 
-            if (Version > 4)
+            if (version > 4)
             {
                 throw new ImpostorException($"Unknown GameOptionsData version {Version}.");
             }
