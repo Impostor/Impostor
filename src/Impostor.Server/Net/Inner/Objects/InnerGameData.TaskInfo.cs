@@ -1,4 +1,5 @@
-﻿using Impostor.Api.Net.Inner.Objects;
+﻿using Impostor.Api.Innersloth;
+using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Inner.Objects
@@ -7,19 +8,19 @@ namespace Impostor.Server.Net.Inner.Objects
     {
         public class TaskInfo : ITaskInfo
         {
-            public uint Id { get; internal set; }
+            public TaskTypes Type { get; internal set; }
 
             public bool Complete { get; internal set; }
 
             public void Serialize(IMessageWriter writer)
             {
-                writer.WritePacked(Id);
+                writer.WritePacked((uint)Type);
                 writer.Write(Complete);
             }
 
             public void Deserialize(IMessageReader reader)
             {
-                this.Id = reader.ReadPackedUInt32();
+                this.Type = (TaskTypes)reader.ReadPackedUInt32();
                 this.Complete = reader.ReadBoolean();
             }
         }

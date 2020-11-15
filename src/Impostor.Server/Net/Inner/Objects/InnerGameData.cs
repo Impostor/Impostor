@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
@@ -176,7 +177,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             foreach (var taskId in taskTypeIds.ToArray())
             {
-                player.Tasks.Add(new TaskInfo { Id = taskId });
+                player.Tasks.Add(new TaskInfo { Type = (TaskTypes)taskId });
             }
         }
     }
