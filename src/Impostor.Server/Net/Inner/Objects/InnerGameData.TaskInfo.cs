@@ -20,7 +20,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             public void Deserialize(IMessageReader reader)
             {
-                this.Type = (TaskTypes)reader.ReadPackedUInt32();
+                reader.ReadPackedUInt32();
                 this.Complete = reader.ReadBoolean();
             }
         }

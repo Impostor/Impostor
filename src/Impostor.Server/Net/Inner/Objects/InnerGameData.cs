@@ -173,7 +173,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 return;
             }
 
-            player.Tasks = new List<ITaskInfo>(taskTypeIds.Length);
+            player.Tasks = new List<TaskInfo>(taskTypeIds.Length);
 
             foreach (var taskId in taskTypeIds.ToArray())
             {
