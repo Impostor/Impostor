@@ -81,10 +81,17 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     var taskId = reader.ReadPackedUInt32();
-                    var task = PlayerInfo.Tasks[(int)taskId] ??= new InnerGameData.TaskInfo();
-                    task.Complete = true;
-                    await _eventManager.CallAsync(
-                        new PlayerCompletedTaskEvent(_game, sender, this, task));
+                    var task = PlayerInfo.Tasks[(int)taskId];
+                    if (task == null)
+                    {
+                        _logger.LogWarning($"Client sent {nameof(RpcCalls.CompleteTask)} with a taskIndex that is not in their {nameof(InnerPlayerInfo)}");
+                    }
+                    else
+                    {
+                        task.Complete = true;
+                        await _eventManager.CallAsync(
+                            new PlayerCompletedTaskEvent(_game, sender, this, task));
+                    }
                     break;
                 }
 
