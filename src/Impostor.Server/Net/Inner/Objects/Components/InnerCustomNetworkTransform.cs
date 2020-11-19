@@ -136,10 +136,10 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 _targetSyncPosition = ReadVector2(reader);
                 _targetSyncVelocity = ReadVector2(reader);
 
-                //using (var playerMovementEvent = PlayerMovementEvent.Get(_game, sender, _playerControl))
-                //{
-                //    _eventManager.CallAsync(playerMovementEvent);
-                //}
+                using (var playerMovementEvent = PlayerMovementEvent.Get(_game, sender, _playerControl))
+                {
+                    _eventManager.CallAsync(playerMovementEvent);
+                }
             }
         }
 

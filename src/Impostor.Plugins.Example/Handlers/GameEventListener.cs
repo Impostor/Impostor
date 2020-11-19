@@ -35,12 +35,6 @@ namespace Impostor.Plugins.Example.Handlers
 
                 Console.WriteLine($"- {info.PlayerName} {info.IsImpostor}");
             }
-            await Task.Delay(15 * 1000);
-            foreach(var player in e.Game.Players)
-            {
-                Console.WriteLine($"{player.Character.PlayerInfo.PlayerName} moved to {player.Character.NetworkTransform.Position}");
-
-            }
         }
 
         [EventListener]
