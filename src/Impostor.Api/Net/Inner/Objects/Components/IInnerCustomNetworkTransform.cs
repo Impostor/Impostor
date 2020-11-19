@@ -11,5 +11,11 @@ namespace Impostor.Api.Net.Inner.Objects.Components
         /// <param name="position">The target position.</param>
         /// <returns>Task that must be awaited.</returns>
         ValueTask SnapToAsync(Vector2 position);
+
+        /// <summary>
+        ///     Gets the current position <see cref="IInnerPlayerControl"/>.
+        /// </summary>
+        /// <returns>The target's position.</returns>
+        Vector2 GetPosition();
     }
 }

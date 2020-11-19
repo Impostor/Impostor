@@ -21,5 +21,10 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 await _game.FinishRpcAsync(writer);
             }
         }
+
+        public Vector2 GetPosition()
+        {
+            return _targetSyncPosition;
+        }
     }
 }
