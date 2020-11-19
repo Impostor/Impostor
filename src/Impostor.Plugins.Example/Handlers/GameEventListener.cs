@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Threading.Tasks;
 using Impostor.Api.Events;
 
 namespace Impostor.Plugins.Example.Handlers
@@ -24,7 +25,7 @@ namespace Impostor.Plugins.Example.Handlers
         }
 
         [EventListener]
-        public void OnGameStarted(IGameStartedEvent e)
+        public async void OnGameStarted(IGameStartedEvent e)
         {
             Console.WriteLine("Game > started");
 
@@ -33,6 +34,12 @@ namespace Impostor.Plugins.Example.Handlers
                 var info = player.Character.PlayerInfo;
 
                 Console.WriteLine($"- {info.PlayerName} {info.IsImpostor}");
+            }
+            await Task.Delay(15 * 1000);
+            foreach(var player in e.Game.Players)
+            {
+                Console.WriteLine($"{player.Character.PlayerInfo.PlayerName} moved to {player.Character.NetworkTransform.Position}");
+
             }
         }
 

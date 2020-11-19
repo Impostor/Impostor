@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
@@ -95,6 +95,12 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnPlayerReportedBodyEvent(IPlayerReportedBodyEvent e)
         {
             _logger.LogDebug("Player reported body");
+        }
+
+        [EventListener]
+        public void OnPLayerMovementEvent(IPlayerMovementEvent e)
+        {
+            Console.WriteLine($"{e.ClientPlayer.Character.PlayerInfo.PlayerName} moved to {e.PlayerControl.NetworkTransform.Position}");
         }
     }
 }

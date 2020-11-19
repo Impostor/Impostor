@@ -1,10 +1,12 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.State;
+using Impostor.Server.Events.Player;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Inner.Objects.Components
@@ -17,16 +19,18 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly ILogger<InnerCustomNetworkTransform> _logger;
         private readonly InnerPlayerControl _playerControl;
         private readonly Game _game;
+        private readonly IEventManager _eventManager;
 
         private ushort _lastSequenceId;
         private Vector2 _targetSyncPosition;
         private Vector2 _targetSyncVelocity;
 
-        public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game)
+        public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game, IEventManager eventManager)
         {
             _logger = logger;
             _playerControl = playerControl;
             _game = game;
+            _eventManager = eventManager;
         }
 
         private static bool SidGreaterThan(ushort newSid, ushort prevSid)
@@ -97,6 +101,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             writer.Write(_lastSequenceId);
             WriteVector2(writer, _targetSyncPosition);
             WriteVector2(writer, _targetSyncVelocity);
+
             return true;
         }
 
@@ -130,6 +135,11 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 _lastSequenceId = sequenceId;
                 _targetSyncPosition = ReadVector2(reader);
                 _targetSyncVelocity = ReadVector2(reader);
+
+                //using (var playerMovementEvent = PlayerMovementEvent.Get(_game, sender, _playerControl))
+                //{
+                //    _eventManager.CallAsync(playerMovementEvent);
+                //}
             }
         }
 

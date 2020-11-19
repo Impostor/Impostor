@@ -5,11 +5,14 @@ namespace Impostor.Api.Net.Inner.Objects.Components
 {
     public interface IInnerCustomNetworkTransform : IInnerNetObject
     {
+        Vector2 Position { get; }
+
         /// <summary>
         ///     Snaps the current to the given position <see cref="IInnerPlayerControl"/>.
         /// </summary>
         /// <param name="position">The target position.</param>
         /// <returns>Task that must be awaited.</returns>
         ValueTask SnapToAsync(Vector2 position);
+
     }
 }
