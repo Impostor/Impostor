@@ -4,12 +4,12 @@ Some information about all the possible configurations. Click [here](https://git
 
 ## Options
 
-### Server
+### Server (You probably want to change these ones)
 
 | Key | Default | Description |
 |-|-|-|
-| **PublicIp** | `127.0.0.1` | This needs to the IPv4 address of the server, what you give to others to connect. You can find the your IPv4 address [here](http://whatismyip.host/). Since 1.2.2 it is also possible to use hostnames instead of IPv4 addresses, these must resolve to a valid IPv4 address. |
-| **PublicPort** | `22023` | The public port of the server, what you give to others to  connect. Usually `22023`. |
+| **PublicIp** | `127.0.0.1` | This needs to the IPv4 address of the server, what you give to others to connect. You can find the your IPv4 address [here](http://whatismyip.host/). **Unless you are not exposing this machine to anyone (either privately, in your local network or publicly, in the internet.) You should change this to your public ip. You can still set this to your private ip or "0.0.0.0" (the one you get on `ipconfig`) if you are only exposing this in your local network or you are using a VPS.** Since 1.2.2 it is also possible to use hostnames instead of IPv4 addresses, these must resolve to a valid IPv4 address. |
+| **PublicPort** | `22023` | The public port of the server, what you give to others to connect. (**This is the external port you set within the router when portforwarding.**) Usually `22023`. |
 | **ListenIp** | `0.0.0.0` | The network interface to listen on. If you do not know what to put here, use `0.0.0.0`. Since 1.2.2 it is also possible to use hostnames instead of IPv4 addresses, these must resolve to a valid IPv4 address. |
 | **ListenPort** | `22023` | The listen port of the server, usually `22023`. |
 
@@ -17,9 +17,9 @@ Some information about all the possible configurations. Click [here](https://git
 
 | Key | Default | Value |
 |-|-|-|
-| **BanIpFromGame** | `true` | When a player is caught hacking, he will be kicked from the server. If this value is set to `true`, the player will also be banned and can not rejoin that specific game. |
+| **BanIpFromGame** | `true` | When a player is caught hacking, he will be kicked from the server. If this value is set to `true`, the player will also be banned and can not rejoin that specific game. (Setting this to false does not disable anticheat) |
 
-### ServerRedirector
+### ServerRedirector (only for multiple server purposes)
 
 | Key | Default | Value |
 |-|-|-|
