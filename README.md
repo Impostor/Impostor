@@ -44,7 +44,7 @@ If you do not wish to execute any programs. Follow the instructions in [this web
 
 ##### Android 11.
 1. Connect your phone to a computer. Go to [this website](https://impostor.github.io/Impostor) in your computer to generate a file named `regioninfo.dat`.
-2. Instead of following the website instructions please go to `/sdcard/Android/data/com.innersloth.spacemafia` from the computer's file explorer and paste the file there.
+2. Instead of following the website instructions please go to `/sdcard/Android/data/com.innersloth.spacemafia`(NOTE: `/sdcard/` in this case is your internal phone storage) from the computer's file explorer and paste the file there.
 
 #### IOS
 
