@@ -34,6 +34,8 @@ If you just want to play on a server hosted by someone else, you need to follow 
 
 ![Client](docs/images/client.jpg)
 
+If you do not wish to execute any program. Follow the instructions in [this website](https://impostor.github.io/Impostor)
+
 #### Android
 
 ##### Android 10 and less.
@@ -51,6 +53,10 @@ Needs to be jailbroken, we don't provide instructions on this.
 ### Server
 
 See the [docs](docs/Running-the-server.md) for instructions on how to set it up.
+
+## Troubleshooting
+
+See [TROUBLESHOOTING](docs/TROUBLESHOOTING.md) to solve issues with both the client and the server
 
 ## Contributing
 
