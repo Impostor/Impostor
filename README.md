@@ -34,12 +34,12 @@ If you just want to play on a server hosted by someone else, you need to follow 
 
 ![Client](docs/images/client.jpg)
 
-If you do not wish to execute any program. Follow the instructions in [this website](https://impostor.github.io/Impostor)
+If you do not wish to execute any programs. Follow the instructions in [this website](https://impostor.github.io/Impostor)
 
 #### Android
 
-##### Android 10 and less.
-1. Go to [this website](https://impostor.github.io/Impostor) **(IN YOUR MOBILE DEVICE)**
+##### Android 10 and below.
+1. Go to [this website](https://impostor.github.io/Impostor) **(ON YOUR MOBILE DEVICE)**
 2. Follow its instructions.
 
 ##### Android 11.
