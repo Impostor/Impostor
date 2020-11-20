@@ -36,12 +36,13 @@ If you just want to play on a server hosted by someone else, you need to follow 
 
 #### Android
 
-Android 10 and less
-Go to [this website](https://impostor.github.io/Impostor) (IN YOUR MOBILE DEVICE) and follow its instructions
+##### Android 10 and less.
+1. Go to [this website](https://impostor.github.io/Impostor) **(IN YOUR MOBILE DEVICE)**
+2. Follow its instructions.
 
-Android 11
-Connect your phone to a computer. Go to [this website](https://impostor.github.io/Impostor) in your computer to generate a file named `regioninfo.dat`.
-Instead of following the website instructions please go to `/sdcard/Android/data/com.innersloth.spacemafia` from the computer's file explorer and paste the file there.
+##### Android 11.
+1. Connect your phone to a computer. Go to [this website](https://impostor.github.io/Impostor) in your computer to generate a file named `regioninfo.dat`.
+2. Instead of following the website instructions please go to `/sdcard/Android/data/com.innersloth.spacemafia` from the computer's file explorer and paste the file there.
 
 #### IOS
 
