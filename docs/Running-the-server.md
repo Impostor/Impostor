@@ -12,7 +12,7 @@ There are currently two modes to run the Impostor server in. The first way is th
 2. Find the [latest dev release](https://ci.appveyor.com/project/Impostor/Impostor/branch/dev/artifacts).
 3. Download either the Windows or the Linux version.
 4. Extract the zip.
-5. Modify `config.json` according to your needs. Docs can be found [here](Server-configuration.md)*(this step is mandatory to whoever wants to expose this server to other machines)*
+5. Modify `config.json` according to your needs. Docs can be found [here](Server-configuration.md)* (this step is mandatory to whoever wants to expose this server to other machines)*
 6. Run `Impostor.Server.exe` (Windows) / `Impostor.Server` (Linux)
 
 ### Using docker
