@@ -4,7 +4,7 @@ Some information about all the possible configurations. Click [here](https://git
 
 ## Options
 
-### Server (You probably want to change these ones)
+### Required Server Parameters
 
 | Key | Default | Description |
 |-|-|-|
@@ -19,8 +19,8 @@ Some information about all the possible configurations. Click [here](https://git
 |-|-|-|
 | **BanIpFromGame** | `true` | When a player is caught hacking, he will be kicked from the server. If this value is set to `true`, the player will also be banned and can not rejoin that specific game. (Setting this to false does not disable anticheat) |
 
-### ServerRedirector (only for multiple server purposes)
-
+### ServerRedirector
+In a multi-node setup these need to be specified.
 | Key | Default | Value |
 |-|-|-|
 | **Enabled** | `false` | Whether the server runs in multi-node setup. If this is `false`, all other options in this section do not have any effect. |
