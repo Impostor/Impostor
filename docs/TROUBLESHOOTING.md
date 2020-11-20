@@ -1,6 +1,6 @@
 # Troubleshooting
 If you're reading this, something went wrong.
-Don't worry though, as this is the most thorough guide to help you~~(and to help us)~~!
+Don't worry though, as this is the most thorough guide to help you ~~(and to help us)~~!
 
 ## `./Impostor.Server: line 1: ELF: not found` (plus other errors)
 No idea where you got that system. But we clearly do **NOT** support it.
