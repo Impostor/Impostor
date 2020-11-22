@@ -33,6 +33,9 @@ services:
     container_name: impostor
     ports:
       - 22023:22023/udp
+    volumes:
+      - /path/to/local/config.json:/app/config.json # For easy editing of the config
+      - /path/to/local/plugins:/app/plugins # Only needed if using plugins
 ```
 
 ## Multiple servers
