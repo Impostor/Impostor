@@ -24,6 +24,18 @@ There are currently two modes to run the Impostor server in. The first way is th
 docker run -p 22023:22023/udp aeonlucid/impostor:nightly
 ```
 
+### Using docker-compose
+```
+version: '3.4'
+
+services:
+  impostor:
+    image: aeonlucid/impostor:nightly
+    container_name: impostor
+    ports:
+      - 22023:22023/udp
+```
+
 ## Multiple servers
 
 Follow the steps from the single server on two or more servers.
