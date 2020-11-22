@@ -20,7 +20,7 @@ Make sure you got the latest working version of Impostor (probably in AppVeyor, 
 
 ## `You disconnected from the server. Reliable Packet 1 ...`
 Please check that you have followed the [Server Configuration](Server-configuration.md).  
-**REMEMBER: Your public ip does not start with `127` nor *192***  
+**REMEMBER: Your public ip does not start with `127` nor `192`**  
 Also check if the firewall has the port Impostor is listening on *unlocked* and that you port-forwarded with UDP (can be TCP/UDP, doesnt matter.)  
 
 ## `Could not load file or assembly...`
