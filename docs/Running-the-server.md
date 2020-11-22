@@ -18,7 +18,6 @@ There are currently two modes to run the Impostor server in. The first way is th
 ### Using docker
 
 [![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor?sort=semver)](https://hub.docker.com/repository/docker/aeonlucid/impostor)
-[![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor/edge)](https://hub.docker.com/repository/docker/aeonlucid/impostor)
 
 ```
 docker run -p 22023:22023/udp aeonlucid/impostor:nightly
