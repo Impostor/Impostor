@@ -5,9 +5,9 @@ using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Events.Player
 {
-    public class PlayerReportedBodyEvent : IPlayerReportedBodyEvent
+    public class PlayerStartMeetingEvent : IPlayerStartMeetingEvent
     {
-        public PlayerReportedBodyEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, IInnerPlayerControl? body)
+        public PlayerStartMeetingEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, IInnerPlayerControl? body)
         {
             Game = game;
             ClientPlayer = clientPlayer;
