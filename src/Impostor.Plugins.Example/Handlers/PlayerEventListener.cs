@@ -96,5 +96,11 @@ namespace Impostor.Plugins.Example.Handlers
         {
             _logger.LogDebug("Player reported body");
         }
+
+        [EventListener]
+        public void OnPlayerVoted(IPlayerVotedEvent e)
+        {
+            _logger.LogDebug($"Player {e.PlayerControl.PlayerInfo.PlayerName} voted for " + (e.VotedFor == null ? "skip" : "player " + e.VotedFor.PlayerInfo.PlayerName));
+        }
     }
 }
