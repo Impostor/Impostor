@@ -35,7 +35,8 @@ services:
       - 22023:22023/udp
     volumes:
       - /path/to/local/config.json:/app/config.json # For easy editing of the config
-      - /path/to/local/plugins:/app/plugins # Only needed if using plugins
+      - /path/to/local/plugins:/app/plugins         # Only needed if using plugins
+      - /path/to/local/libraries:/app/libraries     # Only needed if using external libraries
 ```
 
 ## Multiple servers
