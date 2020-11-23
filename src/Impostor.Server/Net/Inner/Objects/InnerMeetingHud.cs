@@ -168,6 +168,21 @@ namespace Impostor.Server.Net.Inner.Objects
                     if ((num & 1 << i) != 0)
                     {
                         _playerStates[i].Deserialize(reader);
+                        var playerState = _playerStates[i];
+
+                        if (playerState.DidVote)
+                        {
+                            var player = _game.GameNet.GameData.GetPlayerById(playerState.TargetPlayerId);
+                            if (player != null)
+                            {
+                                var clientPlayer = _game.GetClientPlayer(player.Controller.OwnerId);
+                                InnerPlayerControl? VotedForPlayer = (playerState.VotedFor >= 0)
+                                    ? _game.GameNet.GameData.GetPlayerById((byte)playerState.VotedFor)?.Controller
+                                    : null; // voted skip
+
+                                _eventManager.CallAsync(new PlayerVotedEvent(_game, clientPlayer, player.Controller, VotedForPlayer));
+                            }
+                        }
                     }
                 }
             }
