@@ -40,6 +40,10 @@ namespace Impostor.Server
             {
                 logLevel = LogEventLevel.Verbose;
             }
+            else if (args.Contains("--errors-only"))
+            {
+                logLevel = LogEventLevel.Error;
+            }
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Is(logLevel)
