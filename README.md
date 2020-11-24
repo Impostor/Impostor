@@ -5,7 +5,7 @@
 
 Impostor is one of the first **Among Us** private servers, written in C#. 
 
-We support steam, itch, android and iOS. The latest version supported is `2020.9.22`, the `dev` build currently supports `2020.10.22`.
+We support Steam, Itch, Android and iOS. The latest version supported is `2020.9.22`, the `dev` build currently supports `2020.11.17`.
 
 | Impostor version | Among Us version | Experimental | Download |
 |-|-|-|-|
