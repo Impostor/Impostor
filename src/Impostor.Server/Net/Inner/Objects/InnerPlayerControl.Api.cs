@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth.Customization;
+using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Inner.Objects.Components;
 
@@ -100,6 +101,14 @@ namespace Impostor.Server.Net.Inner.Objects
         public async ValueTask SetMurderedAsync()
         {
             using var writer = _game.StartRpc(NetId, RpcCalls.MurderPlayer);
+            writer.Write((byte)NetId);
+            await _game.FinishRpcAsync(writer);
+        }
+
+        public async ValueTask SetMurderedByAsync(IClientPlayer impostor)
+        {
+            var impostorNetId = impostor.Character.NetId;
+            using var writer = _game.StartRpc(impostorNetId, RpcCalls.MurderPlayer);
             writer.Write((byte)NetId);
             await _game.FinishRpcAsync(writer);
         }
