@@ -1,8 +1,10 @@
 using System.Threading.Tasks;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Inner.Objects.Components;
+using Impostor.Server.Events.Player;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
@@ -111,6 +113,12 @@ namespace Impostor.Server.Net.Inner.Objects
             using var writer = _game.StartRpc(impostorNetId, RpcCalls.MurderPlayer);
             writer.Write((byte)NetId);
             await _game.FinishRpcAsync(writer);
+
+            if (!PlayerInfo.IsDead)
+            {
+                Die(DeathReason.Kill);
+                await _eventManager.CallAsync(new PlayerMurderEvent(_game, impostor, impostor.Character, this));
+            }
         }
     }
 }
