@@ -1,4 +1,6 @@
 ﻿using System;
+using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.Threading.Tasks;
 using Impostor.Patcher.Shared;
 using Impostor.Patcher.Shared.Events;
@@ -9,27 +11,43 @@ namespace Impostor.Patcher.Cli
     {
         private static readonly AmongUsModifier Modifier = new AmongUsModifier();
 
-        /// <param name="address">IP Address of the server, will prompt if not specified</param>
-        /// <param name="name">Name for server region</param>
-        private static Task Main(string address = null, string name = AmongUsModifier.DefaultRegionName)
+        internal static Task<int> Main(string[] args)
         {
-            Modifier.RegionName = name;
-            Modifier.Error += ModifierOnError;
-            Modifier.Saved += ModifierOnSaved;
-
-            Console.WriteLine("Welcome to Impostor");
-
-            if (Modifier.TryLoadRegionInfo(out var regionInfo))
+            var rootCommand = new RootCommand
             {
-                Console.WriteLine($"Currently selected region: {regionInfo.Name} ({regionInfo.Ping}, {regionInfo.Servers.Count} server(s))");
-            }
+                new Option<string>(
+                    "--address",
+                    "IP Address of the server, will prompt if not specified"
+                ),
+                new Option<string>(
+                    "--name",
+                    () => AmongUsModifier.DefaultRegionName,
+                    "Name for server region"
+                )
+            };
 
-            if (address != null)
+            rootCommand.Handler = CommandHandler.Create<string, string>((address, name) =>
             {
-                return Modifier.SaveIpAsync(address);
-            }
+                Modifier.RegionName = name;
+                Modifier.Error += ModifierOnError;
+                Modifier.Saved += ModifierOnSaved;
 
-            return PromptAsync();
+                Console.WriteLine("Welcome to Impostor");
+
+                if (Modifier.TryLoadRegionInfo(out var regionInfo))
+                {
+                    Console.WriteLine($"Currently selected region: {regionInfo.Name} ({regionInfo.Ping}, {regionInfo.Servers.Count} server(s))");
+                }
+
+                if (address != null)
+                {
+                    return Modifier.SaveIpAsync(address);
+                }
+
+                return PromptAsync();
+            });
+
+            return rootCommand.InvokeAsync(args);
         }
 
         private static void ModifierOnSaved(object sender, SavedEventArgs e)
