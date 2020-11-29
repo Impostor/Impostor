@@ -96,5 +96,11 @@ namespace Impostor.Plugins.Example.Handlers
         {
             _logger.LogDebug("Player reported body");
         }
+
+        [EventListener]
+        public void OnPlayerWatchingCamera(IPlayerWatchingCameraEvent e)
+        {
+            _logger.LogDebug($"Player {e.PlayerControl.PlayerInfo.PlayerName} {(e.Started ? "started" : "stopped")} watching security camera");
+        }
     }
 }
