@@ -30,7 +30,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 [SystemTypes.MedBay] = new MedScanSystem(),
                 [SystemTypes.Reactor] = new ReactorSystemType(),
                 [SystemTypes.LifeSupp] = new LifeSuppSystemType(),
-                [SystemTypes.Security] = new SecurityCameraSystemType(),
+                [SystemTypes.Security] = new SecurityCameraSystemType(_game),
                 [SystemTypes.Comms] = new HudOverrideSystemType(),
                 [SystemTypes.Doors] = new DoorsSystemType(_game),
             };
