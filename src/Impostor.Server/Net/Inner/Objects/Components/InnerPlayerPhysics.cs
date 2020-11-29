@@ -12,6 +12,12 @@ namespace Impostor.Server.Net.Inner.Objects.Components
     {
         private readonly ILogger<InnerPlayerPhysics> _logger;
         private readonly InnerPlayerControl _playerControl;
+        private bool _isWatchingCamera;
+        public bool IsWatchingCamera { get {return _isWatchingCamera; }
+            internal set {
+                _isWatchingCamera = value;
+            }
+        }
 
         public InnerPlayerPhysics(ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl)
         {
