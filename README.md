@@ -57,7 +57,7 @@ See the [docs](docs/Running-the-server.md) for instructions on how to set it up.
 
 ## Troubleshooting
 
-See [TROUBLESHOOTING](docs/TROUBLESHOOTING.md) to solve issues with both the client and the server
+See [TROUBLESHOOTING](docs/TROUBLESHOOTING.md) to solve issues the Impostor client or the server.
 
 ## Contributing
 
