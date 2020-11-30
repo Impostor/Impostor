@@ -25,4 +25,4 @@ Also check if the port Impostor is listening on is *unlocked* in your firewall a
 
 ## `Could not load file or assembly...`
 Please check that you only have **working** plugins in the `plugins` folder.  
-Both "not-plugins" and badly written plugins will cause this error.
+This error can be caused by non-plugin files or plugins that are not working correctly.
