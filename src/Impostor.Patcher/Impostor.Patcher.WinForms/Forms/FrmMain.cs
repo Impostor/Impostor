@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Windows.Forms;
 using Impostor.Patcher.Shared;
@@ -46,10 +46,15 @@ namespace Impostor.Patcher.WinForms.Forms
                 ? e.IpAddress
                 : $"{e.IpAddress}:{e.Port}";
 
+            if (!string.IsNullOrEmpty(e.Host))
+            {
+                ipText = e.Host;
+            }
+
             comboIp.Text = ipText;
             comboIp.Enabled = true;
             buttonLaunch.Enabled = true;
-
+            
             _config.AddIp(ipText);
             _config.Save();
 

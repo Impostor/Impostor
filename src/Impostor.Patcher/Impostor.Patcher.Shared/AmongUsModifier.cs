@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -101,6 +101,7 @@ namespace Impostor.Patcher.Shared
             // Only IPv4 is supported so just do it simple.
             var ip = string.Empty;
             var port = DefaultPort;
+            var host = string.Empty;
 
             var parts = input.Split(':');
             if (parts.Length >= 1)
@@ -125,9 +126,11 @@ namespace Impostor.Patcher.Shared
                         OnError("Invalid IP Address entered");
                         return false;
                     }
-
+                    
                     // Use first IPv4 result.
                     ipAddress = hostAddresses.First(x => x.AddressFamily == AddressFamily.InterNetwork);
+                    // Set host to ip, since they used a hostname
+                    host = ip;
                 }
                 catch (SocketException)
                 {
@@ -143,7 +146,7 @@ namespace Impostor.Patcher.Shared
                 return false;
             }
 
-            return WriteIp(ipAddress, port);
+            return WriteIp(ipAddress, port, host);
         }
 
         /// <summary>
@@ -151,7 +154,7 @@ namespace Impostor.Patcher.Shared
         /// </summary>
         /// <param name="ipAddress">The IPv4 address to write.</param>
         /// <param name="port"></param>
-        private bool WriteIp(IPAddress ipAddress, ushort port)
+        private bool WriteIp(IPAddress ipAddress, ushort port, string host)
         {
             if (ipAddress == null ||
                 ipAddress.AddressFamily != AddressFamily.InterNetwork)
@@ -176,7 +179,7 @@ namespace Impostor.Patcher.Shared
 
                 region.Serialize(writer);
 
-                OnSaved(ip, port);
+                OnSaved(ip, port, host);
                 return true;
             }
         }
@@ -236,9 +239,9 @@ namespace Impostor.Patcher.Shared
             Error?.Invoke(this, new ErrorEventArgs(message));
         }
 
-        private void OnSaved(string ipAddress, ushort port)
+        private void OnSaved(string ipAddress, ushort port, string host)
         {
-            Saved?.Invoke(this, new SavedEventArgs(ipAddress, port));
+            Saved?.Invoke(this, new SavedEventArgs(ipAddress, port, host));
         }
 
         public event EventHandler<ErrorEventArgs> Error;
