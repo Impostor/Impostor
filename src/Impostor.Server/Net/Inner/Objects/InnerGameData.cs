@@ -177,7 +177,10 @@ namespace Impostor.Server.Net.Inner.Objects
 
             foreach (var taskId in taskTypeIds.ToArray())
             {
-                player.Tasks.Add(new TaskInfo { Type = (TaskTypes)taskId });
+                player.Tasks.Add(new TaskInfo
+                {
+                    Id = taskId,
+                });
             }
         }
     }

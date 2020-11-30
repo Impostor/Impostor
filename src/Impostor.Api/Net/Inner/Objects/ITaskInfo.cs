@@ -5,7 +5,7 @@ namespace Impostor.Api.Net.Inner.Objects
 {
     public interface ITaskInfo
     {
-        uint TaskIndex { get; }
+        uint Id { get; }
 
         TaskTypes Type { get; }
 
