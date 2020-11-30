@@ -51,8 +51,6 @@ If you do not wish to execute any programs. Follow the instructions in [this web
 
 iOS devices need to be jailbroken in order to connect to Impostor servers. 
 
-If someone knows how to connect to Impostor servers from iOS devices, please send a pull request with updated instructions.
-
 ### Server
 
 See the [docs](docs/Running-the-server.md) for instructions on how to set it up.
