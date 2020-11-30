@@ -92,9 +92,9 @@ namespace Impostor.Plugins.Example.Handlers
         }
 
         [EventListener]
-        public void OnPlayerReportedBodyEvent(IPlayerReportedBodyEvent e)
+        public void OnPlayerStartMeetingEvent(IPlayerStartMeetingEvent e)
         {
-            _logger.LogDebug("Player reported body");
+            _logger.LogDebug($"Player {e.PlayerControl.PlayerInfo.PlayerName} start meeting, reason: " + (e.Body==null ? "Emergency call button" : "Found the body of the player "+e.Body.PlayerInfo.PlayerName));
         }
     }
 }
