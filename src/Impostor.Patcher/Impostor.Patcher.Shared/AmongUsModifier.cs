@@ -154,6 +154,7 @@ namespace Impostor.Patcher.Shared
         /// </summary>
         /// <param name="ipAddress">The IPv4 address to write.</param>
         /// <param name="port"></param>
+        /// <param name="host">The hostname if is resolved to the ipAdress. Empty otherwise/</param>
         private bool WriteIp(IPAddress ipAddress, ushort port, string host)
         {
             if (ipAddress == null ||
