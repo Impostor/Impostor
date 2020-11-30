@@ -1,6 +1,6 @@
 # Troubleshooting
 If you're reading this, something went wrong.
-Don't worry though, as this is the most thorough guide to help you ~~(and to help us)~~!
+Don't worry though, as this is the most thorough guide to help you!
 
 ## `./Impostor.Server: line 1: ELF: not found` (plus other errors)
 No idea where you got that system. But we clearly do **NOT** support it.
@@ -21,7 +21,7 @@ Make sure you got the latest working version of Impostor (probably in AppVeyor, 
 ## `You disconnected from the server. Reliable Packet 1 ...`
 Please double-check that you have followed the [Server Configuration](Server-configuration.md) correctly.  
 **NOTE: Your public ip does not start with `127` nor `192`**  
-Also check if the port Impostor is listening on is *unlocked* in your firewall and that you correctly port-forwarded it with UDP (can be TCP/UDP, doesn't matter.)  
+Also check if the port Impostor is listening on is *opened* in your firewall and that you correctly port-forwarded it with UDP (can be TCP/UDP, doesn't matter.)  
 
 ## `Could not load file or assembly...`
 Please check that you only have **working** plugins in the `plugins` folder.  
