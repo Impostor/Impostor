@@ -89,9 +89,9 @@ namespace Impostor.Server.Net.Inner.Objects
                     else
                     {
                         task.Complete = true;
-                        await _eventManager.CallAsync(
-                            new PlayerCompletedTaskEvent(_game, sender, this, task));
+                        await _eventManager.CallAsync(new PlayerCompletedTaskEvent(_game, sender, this, task));
                     }
+
                     break;
                 }
 
