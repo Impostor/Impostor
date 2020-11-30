@@ -10,9 +10,10 @@ Please check that you have downloaded the right version of Impostor, as we manta
 Unless you are running Impostor on a SBC (Single-Board Computer), like the Raspberry Pi, you most likely want to use the x64 version.
 
 ## `./Impostor.Server: Permission denied`
-This is an error related to Linux file permissions.  
+This is an error related to Linux file permissions.
+Some files do not hold their executable bit (the permission that allows them to run) during a download.
 You can solve this by doing: `chmod +x Impostor.Server`
-_(Note: only run `chmod` when you trust the software. Linux blocks downloaded executables by default for a reason)_
+_(Note: only run `chmod` when you trust the software. Linux requires the executable bit for a reason...)_
 
 ## `You are using an older version of the game`
 You are using an older version of Impostor. The game does not really check who is outdated and blames it on the user.  
