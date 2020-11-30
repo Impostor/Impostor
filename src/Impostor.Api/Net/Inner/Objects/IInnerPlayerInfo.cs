@@ -45,9 +45,9 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     Gets the reason why the player is dead in the current game.
         /// </summary>
         DeathReason LastDeathReason { get; }
-        
-        List<ITaskInfo> Tasks { get; }
-        
+
+        IEnumerable<ITaskInfo> Tasks { get; }
+
         DateTimeOffset LastMurder { get; }
     }
 }
