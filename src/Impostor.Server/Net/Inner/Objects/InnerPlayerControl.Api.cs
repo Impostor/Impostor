@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net;
@@ -100,18 +101,15 @@ namespace Impostor.Server.Net.Inner.Objects
             await _game.FinishRpcAsync(writer, player.OwnerId);
         }
 
-        public async ValueTask SetMurderedAsync()
-        {
-            using var writer = _game.StartRpc(NetId, RpcCalls.MurderPlayer);
-            writer.Write((byte)NetId);
-            await _game.FinishRpcAsync(writer);
-        }
-
         public async ValueTask SetMurderedByAsync(IClientPlayer impostor)
         {
-            var impostorNetId = impostor.Character.NetId;
-            using var writer = _game.StartRpc(impostorNetId, RpcCalls.MurderPlayer);
-            writer.Write((byte)NetId);
+            if (impostor.Character == null)
+            {
+                throw new ImpostorException("Character is null.");
+            }
+
+            using var writer = _game.StartRpc(impostor.Character.NetId, RpcCalls.MurderPlayer);
+            writer.WritePacked(NetId);
             await _game.FinishRpcAsync(writer);
 
             if (!PlayerInfo.IsDead)
