@@ -7,6 +7,6 @@ namespace Impostor.Api.Events.Player
         /// <summary>
         ///     Gets the type of action - Started or Stopped watching
         /// </summary>
-        bool Started { get; }
+        bool IsWatching { get; }
     }
 }

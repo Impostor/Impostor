@@ -100,7 +100,7 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnPlayerWatchingCamera(IPlayerWatchingCameraEvent e)
         {
-            _logger.LogDebug($"Player {e.PlayerControl.PlayerInfo.PlayerName} {(e.Started ? "started" : "stopped")} watching security camera");
+            _logger.LogDebug($"Player {e.PlayerControl.PlayerInfo.PlayerName} {(e.IsWatching ? "started" : "stopped")} watching security camera");
         }
     }
 }

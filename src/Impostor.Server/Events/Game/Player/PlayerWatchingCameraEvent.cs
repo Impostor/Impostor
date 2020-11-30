@@ -7,12 +7,12 @@ namespace Impostor.Server.Events.Player
 {
     public class PlayerWatchingCameraEvent : IPlayerWatchingCameraEvent
     {
-        public PlayerWatchingCameraEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, bool started)
+        public PlayerWatchingCameraEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, bool startedWatching)
         {
             Game = game;
             ClientPlayer = clientPlayer;
             PlayerControl = playerControl;
-            Started = started;
+            IsWatching = startedWatching;
         }
 
         public IGame Game { get; }
@@ -21,6 +21,6 @@ namespace Impostor.Server.Events.Player
 
         public IInnerPlayerControl PlayerControl { get; }
 
-        public bool Started { get; }
+        public bool IsWatching { get; }
     }
 }
