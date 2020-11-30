@@ -8,7 +8,7 @@ Some information about all the possible configurations. Click [here](https://git
 
 | Key | Default | Description |
 |-|-|-|
-| **PublicIp** | `127.0.0.1` | This needs to the public IPv4 address of the server which you give to others to connect. You can find your IPv4 address [on this website](http://whatismyip.host/). Unless you are only planning to use Impostor privately, on your local network, you should change this to your public ip. You can still set this to "0.0.0.0" or your private ip (can be obtained by running `ipconfig` in the command prompt) if you are only using Impostor on your local network, or you are using a VPS. Is also possible to use hostnames instead of IPv4 addresses, which will be resolved to IPv4 addresses. |
+| **PublicIp** | `127.0.0.1` | This needs to the public IPv4 address of the server which you give to others to connect. You can find your IPv4 address [on this website](http://whatismyip.host/). Unless you are only planning to use Impostor privately, on your local network, you should change this to your public ip. Is also possible to use hostnames instead of IPv4 addresses, which will be resolved to IPv4 addresses. |
 | **PublicPort** | `22023` | The public port of the server which you give to others to connect. (**This is the external port you configure on your router when port forwarding.**) Usually `22023`. |
 | **ListenIp** | `0.0.0.0` | The network interface to listen on. If you do not know what to put here, use `0.0.0.0`. Since 1.2.2 it is also possible to use hostnames instead of IPv4 addresses, these must resolve to a valid IPv4 address. |
 | **ListenPort** | `22023` | The listen port of the server, usually `22023`. |
