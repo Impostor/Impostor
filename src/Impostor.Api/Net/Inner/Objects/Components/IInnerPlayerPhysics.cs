@@ -5,6 +5,6 @@
         /// <summary>
         ///     Gets a value indicating whether the player is watching security camera
         /// </summary>
-        bool IsWatchingCamera  { get; }
+        bool IsWatchingCamera { get; }
     }
 }
