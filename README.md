@@ -40,7 +40,7 @@ If you do not wish to execute any programs. Follow the instructions in [this web
 
 ##### Android 10 and below.
 1. Go to [this website](https://impostor.github.io/Impostor) **(ON YOUR MOBILE DEVICE)**
-2. Follow its instructions.
+2. Follow the instructions listed there.
 
 ##### Android 11.
 1. Connect your phone to a computer. Go to [this website](https://impostor.github.io/Impostor) in your computer to generate a file named `regioninfo.dat`.
