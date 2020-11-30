@@ -6,8 +6,8 @@ Don't worry though, as this is the most thorough guide to help you ~~(and to hel
 No idea where you got that system. But we clearly do **NOT** support it.
 
 ## `cannot execute binary file: Exec format error`
-Please check that you have downloaded the right version of Impostor, as we mantain two CPU architectures(x64 and ARM).  
-Unless you are running Impostor on some SBC (Single-Board Computer) like the Raspberry Pi, you most likely want the x64 version.
+Please check that you have downloaded the right version of Impostor, as we mantain two CPU architectures (x64 and ARM).  
+Unless you are running Impostor on a SBC (Single-Board Computer), like the Raspberry Pi, you most likely want to use the x64 version.
 
 ## `./Impostor.Server: Permission denied`
 This is an error about Linux file permissions.  
