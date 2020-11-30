@@ -4,12 +4,12 @@ Some information about all the possible configurations. Click [here](https://git
 
 ## Options
 
-### Server
+### Required Server Configuration
 
 | Key | Default | Description |
 |-|-|-|
-| **PublicIp** | `127.0.0.1` | This needs to the IPv4 address of the server, what you give to others to connect. You can find the your IPv4 address [here](http://whatismyip.host/). Since 1.2.2 it is also possible to use hostnames instead of IPv4 addresses, these must resolve to a valid IPv4 address. |
-| **PublicPort** | `22023` | The public port of the server, what you give to others to  connect. Usually `22023`. |
+| **PublicIp** | `127.0.0.1` | This needs to the public IPv4 address of the server which you give to others to connect. You can find your IPv4 address [on this website](http://whatismyip.host/). Unless you are only planning to use Impostor privately, on your local network, you should change this to your public ip. It is also possible to use hostnames instead of IPv4 addresses, which will be resolved to IPv4 addresses. |
+| **PublicPort** | `22023` | The public port of the server which you give to others to connect. (**This is the external port you configure on your router when port forwarding.**) Usually `22023`. |
 | **ListenIp** | `0.0.0.0` | The network interface to listen on. If you do not know what to put here, use `0.0.0.0`. Since 1.2.2 it is also possible to use hostnames instead of IPv4 addresses, these must resolve to a valid IPv4 address. |
 | **ListenPort** | `22023` | The listen port of the server, usually `22023`. |
 
@@ -17,10 +17,10 @@ Some information about all the possible configurations. Click [here](https://git
 
 | Key | Default | Value |
 |-|-|-|
-| **BanIpFromGame** | `true` | When a player is caught hacking, he will be kicked from the server. If this value is set to `true`, the player will also be banned and can not rejoin that specific game. |
+| **BanIpFromGame** | `true` | When a player is caught hacking, they will be kicked from the server. If this value is set to `true`, the player will be banned instead and will not be able to rejoin that specific game. **(Setting this to false does not disable the anti-cheat!)** |
 
 ### ServerRedirector
-
+In a multi-node setup these need to be specified.
 | Key | Default | Value |
 |-|-|-|
 | **Enabled** | `false` | Whether the server runs in multi-node setup. If this is `false`, all other options in this section do not have any effect. |
