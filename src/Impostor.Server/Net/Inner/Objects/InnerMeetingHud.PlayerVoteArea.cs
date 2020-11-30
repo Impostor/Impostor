@@ -41,7 +41,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 VotedFor = (sbyte)((num & VoteMask) - 1);
                 IsDead = (num & DeadBit) > 0;
-                DidVote = (num & VotedBit) > 0 && VotedFor < VoteMask -1; // VotedFor == 15-1 means the player did not vote in time
+                DidVote = (num & VotedBit) > 0;
                 DidReport = (num & ReportedBit) > 0;
             }
         }
