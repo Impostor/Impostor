@@ -47,9 +47,11 @@ If you do not wish to execute any programs. Follow the instructions in [this web
 2. Instead of following the next steps, open the phone's internal storage on your computer and navigate to `/sdcard/Android/data/com.innersloth.spacemafia/files`.
 3. Copy the generated `regionInfo.dat` file into the `files` folder you just navigated to.
 
-#### IOS
+#### iOS
 
-Needs to be jailbroken, we don't provide instructions on this.
+iOS devices need to be jailbroken in order to connect to Impostor servers. 
+
+If someone knows how to connect to Impostor servers from iOS devices, please send a pull request with updated instructions.
 
 ### Server
 
