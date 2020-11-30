@@ -17,7 +17,7 @@ Some information about all the possible configurations. Click [here](https://git
 
 | Key | Default | Value |
 |-|-|-|
-| **BanIpFromGame** | `true` | When a player is caught hacking, they will be kicked from the server. If this value is set to `true`, the player will also be banned and can not rejoin that specific game. (Setting this to false does not disable anticheat) |
+| **BanIpFromGame** | `true` | When a player is caught hacking, they will be kicked from the server. If this value is set to `true`, the player will be banned instead and will not be able to rejoin that specific game. **(Setting this to false does not disable the anti-cheat!)** |
 
 ### ServerRedirector
 In a multi-node setup these need to be specified.
