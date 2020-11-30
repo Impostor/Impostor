@@ -4,7 +4,7 @@ Some information about all the possible configurations. Click [here](https://git
 
 ## Options
 
-### Required Server Parameters
+### Required Server Configuration
 
 | Key | Default | Description |
 |-|-|-|
