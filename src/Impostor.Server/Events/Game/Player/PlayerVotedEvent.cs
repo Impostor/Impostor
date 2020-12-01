@@ -7,11 +7,12 @@ namespace Impostor.Server.Events.Player
 {
     public class PlayerVotedEvent : IPlayerVotedEvent
     {
-        public PlayerVotedEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, IInnerPlayerControl? votedFor)
+        public PlayerVotedEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, VoteType voteType, IInnerPlayerControl? votedFor)
         {
             Game = game;
             ClientPlayer = clientPlayer;
             PlayerControl = playerControl;
+            VoteType = voteType;
             VotedFor = votedFor;
         }
 
@@ -22,5 +23,7 @@ namespace Impostor.Server.Events.Player
         public IInnerPlayerControl PlayerControl { get; }
 
         public IInnerPlayerControl? VotedFor { get; }
+
+        public VoteType VoteType { get; }
     }
 }

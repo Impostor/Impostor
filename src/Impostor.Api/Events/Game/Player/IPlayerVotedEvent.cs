@@ -8,5 +8,16 @@ namespace Impostor.Api.Events.Player
         ///     Get the player he voted for.
         /// </summary>
         IInnerPlayerControl? VotedFor { get; }
+
+        /// <summary>
+        ///     Get the Vote type
+        /// </summary>
+        VoteType VoteType { get; }
+    }
+
+    public enum VoteType : sbyte {
+        Skip = -1,
+        Player = 0,
+        None = 0xf-1
     }
 }

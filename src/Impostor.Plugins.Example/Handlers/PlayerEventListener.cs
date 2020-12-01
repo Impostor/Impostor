@@ -100,7 +100,7 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnPlayerVoted(IPlayerVotedEvent e)
         {
-            _logger.LogDebug($"Player {e.PlayerControl.PlayerInfo.PlayerName} voted for " + (e.VotedFor == null ? "skip" : "player " + e.VotedFor.PlayerInfo.PlayerName));
+            _logger.LogDebug($"Player {e.PlayerControl.PlayerInfo.PlayerName} voted for {e.VoteType} {e.VotedFor?.PlayerInfo.PlayerName}");
         }
     }
 }

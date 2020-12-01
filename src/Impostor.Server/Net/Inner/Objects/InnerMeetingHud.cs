@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
+using Impostor.Api.Events.Player;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
@@ -176,11 +177,27 @@ namespace Impostor.Server.Net.Inner.Objects
                             if (player != null)
                             {
                                 var clientPlayer = _game.GetClientPlayer(player.Controller.OwnerId);
-                                InnerPlayerControl? VotedForPlayer = (playerState.VotedFor >= 0)
-                                    ? _game.GameNet.GameData.GetPlayerById((byte)playerState.VotedFor)?.Controller
-                                    : null; // voted skip
 
-                                _eventManager.CallAsync(new PlayerVotedEvent(_game, clientPlayer, player.Controller, VotedForPlayer));
+                                VoteType voteType;
+                                InnerPlayerControl? VotedForPlayer = null;
+
+                                switch ((VoteType)playerState.VotedFor)
+                                {
+                                    case VoteType.Skip:
+                                        voteType = VoteType.Skip;
+                                        break;
+
+                                    case VoteType.None:
+                                        voteType = VoteType.None;
+                                        break;
+
+                                    default:
+                                        voteType = VoteType.Player;
+                                        VotedForPlayer = _game.GameNet.GameData.GetPlayerById((byte)playerState.VotedFor)?.Controller;
+                                        break;
+                                }
+
+                                _eventManager.CallAsync(new PlayerVotedEvent(_game, clientPlayer, player.Controller, voteType, VotedForPlayer));
                             }
                         }
                     }
