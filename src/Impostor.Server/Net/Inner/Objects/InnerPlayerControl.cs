@@ -446,5 +446,10 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerInfo.IsDead = true;
             PlayerInfo.LastDeathReason = reason;
         }
+
+        internal async ValueTask SetActivity(ActivityType activity)
+        {
+            PlayerInfo.Activity = activity;
+        }
     }
 }

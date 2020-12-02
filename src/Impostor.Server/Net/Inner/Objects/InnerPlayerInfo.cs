@@ -34,6 +34,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public bool IsDead { get; internal set; }
 
+        public ActivityType Activity { get; internal set; }
+
         public DeathReason LastDeathReason { get; internal set; }
 
         public List<ITaskInfo> Tasks { get; internal set; }
