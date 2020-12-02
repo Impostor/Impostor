@@ -98,9 +98,9 @@ namespace Impostor.Plugins.Example.Handlers
         }
 
         [EventListener]
-        public void OnPlayerWatchingCamera(IPlayerWatchingCameraEvent e)
+        public void OnPlayerActivityHasChanged(IPlayerActivityHasChangedEvent e)
         {
-            _logger.LogDebug($"Player {e.PlayerControl.PlayerInfo.PlayerName} {(e.IsWatching ? "started" : "stopped")} watching security camera");
+            _logger.LogDebug($"Player {e.PlayerControl.PlayerInfo.PlayerName} changed his activity {e.PreviousActivity} to {e.CurrentActivity}");
         }
     }
 }

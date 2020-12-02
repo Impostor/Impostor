@@ -449,6 +449,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         internal async ValueTask SetActivity(ActivityType activity)
         {
+            await _eventManager.CallAsync(new PlayerActivityHasChangedEvent(_game, _game.GetClientPlayer(OwnerId), this, PlayerInfo.Activity, activity));
             PlayerInfo.Activity = activity;
         }
     }
