@@ -171,7 +171,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         _playerStates[i].Deserialize(reader);
                         var playerState = _playerStates[i];
 
-                        if (playerState.DidVote)
+                        if (playerState.DidVote && !playerState.IsDead)
                         {
                             var player = _game.GameNet.GameData.GetPlayerById(playerState.TargetPlayerId);
                             if (player != null)
