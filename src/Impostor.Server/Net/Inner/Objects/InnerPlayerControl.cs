@@ -26,7 +26,7 @@ namespace Impostor.Server.Net.Inner.Objects
             _eventManager = eventManager;
             _game = game;
 
-            Physics = ActivatorUtilities.CreateInstance<InnerPlayerPhysics>(serviceProvider, this, _game);
+            Physics = ActivatorUtilities.CreateInstance<InnerPlayerPhysics>(serviceProvider, this);
             NetworkTransform = ActivatorUtilities.CreateInstance<InnerCustomNetworkTransform>(serviceProvider, this, _game);
 
             Components.Add(this);

@@ -39,7 +39,7 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             {
                 if(_game.GameNet.GameData.GetPlayerById(id) is InnerPlayerInfo player)
                 {
-                    player.Controller.Physics.IsWatchingCamera = true;
+                    player.Controller.SetActivity(Api.Innersloth.ActivityType.WatchingCamera);
                 }
             }
 
@@ -47,7 +47,7 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             {
                 if(_game.GameNet.GameData.GetPlayerById(id) is InnerPlayerInfo player)
                 {
-                    player.Controller.Physics.IsWatchingCamera = false;
+                    player.Controller.SetActivity(Api.Innersloth.ActivityType.Default);
                 }
             }
         }

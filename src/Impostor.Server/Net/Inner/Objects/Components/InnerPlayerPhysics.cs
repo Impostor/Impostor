@@ -5,7 +5,6 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.State;
-using Impostor.Server.Events.Player;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Inner.Objects.Components
@@ -13,23 +12,11 @@ namespace Impostor.Server.Net.Inner.Objects.Components
     internal partial class InnerPlayerPhysics : InnerNetObject
     {
         private readonly ILogger<InnerPlayerPhysics> _logger;
-        private readonly IEventManager _eventManager;
         private readonly InnerPlayerControl _playerControl;
-        private readonly Game _game;
-        private bool _isWatchingCamera;
-        public bool IsWatchingCamera { get {return _isWatchingCamera; }
-            internal set {
-                _isWatchingCamera = value;
-                _eventManager.CallAsync(new PlayerWatchingCameraEvent(_game, _game.GetClientPlayer(_playerControl.OwnerId), _playerControl, value));
-            }
-        }
-
-        public InnerPlayerPhysics(ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl, IEventManager eventManager, Game game)
+        public InnerPlayerPhysics(ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl)
         {
             _logger = logger;
             _playerControl = playerControl;
-            _eventManager = eventManager;
-            _game = game;
         }
 
         public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
