@@ -51,6 +51,14 @@ If you do not wish to execute any programs. Follow the instructions in [this web
 
 iOS devices need to be jailbroken in order to connect to Impostor servers. 
 
+1. Add Pixelomer's repo (https://repo.pixelomer.com/) to your Cydia sources.
+2. Search and install ImpostorConfig.
+3. Respring.
+4. Open the Settings app and select ImpostorConfig.
+5. Set the hostname and enable the tweak.
+
+Note: This tweak only works while you are jailbroken as it doesn't write any changes to Among us files.
+
 ### Server
 
 See the [docs](docs/Running-the-server.md) for instructions on how to set it up.
