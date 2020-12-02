@@ -7,7 +7,10 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
     internal class SecurityCameraSystemType : ISystemType
     {
         private readonly Game _game;
-        public (HashSet<byte> UsingNow, HashSet<byte> StartedWatching, HashSet<byte> StoppedWatching) Players { get; internal set; } = (new (), new (), new ());
+        public HashSet<byte> PlayersUsingNow { get; internal set; } = new ();
+        public HashSet<byte> PlayersStartedWatching { get; internal set; } = new ();
+        public HashSet<byte> PlayersStoppedWatching { get; internal set; } = new ();
+
         public SecurityCameraSystemType(Game game)
         {
             _game = game;
@@ -28,12 +31,14 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             }
 
             var startedWatching = new HashSet<byte>(nowInUseBy);
-            startedWatching.ExceptWith(Players.UsingNow);
+            startedWatching.ExceptWith(PlayersUsingNow);
 
-            var stoppedWatching = Players.UsingNow;
+            var stoppedWatching = PlayersUsingNow;
             stoppedWatching.ExceptWith(nowInUseBy);
 
-            Players = (nowInUseBy, startedWatching, stoppedWatching);
+            PlayersUsingNow = nowInUseBy;
+            PlayersStartedWatching = startedWatching;
+            PlayersStoppedWatching = stoppedWatching;
 
             foreach (var id in startedWatching)
             {
