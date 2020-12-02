@@ -81,7 +81,17 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     var taskId = reader.ReadPackedUInt32();
-                    await _eventManager.CallAsync(new PlayerCompletedTaskEvent(_game, sender, this, taskId));
+                    var task = PlayerInfo.Tasks[(int)taskId];
+                    if (task == null)
+                    {
+                        _logger.LogWarning($"Client sent {nameof(RpcCalls.CompleteTask)} with a taskIndex that is not in their {nameof(InnerPlayerInfo)}");
+                    }
+                    else
+                    {
+                        task.Complete = true;
+                        await _eventManager.CallAsync(new PlayerCompletedTaskEvent(_game, sender, this, task));
+                    }
+
                     break;
                 }
 
@@ -237,6 +247,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
 
                 // TODO: (ANTICHEAT) Location check?
+                // only called by a non-host player on to start meeting
                 case RpcCalls.ReportDeadBody:
                 {
                     if (!sender.IsOwner(this))
@@ -249,19 +260,10 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.ReportDeadBody)} to a specific player instead of broadcast");
                     }
 
-                    // deadBodyPlayerId can be byte.MaxValue.
-                    // It happens when internally PlayerInfo is null.
+
                     var deadBodyPlayerId = reader.ReadByte();
-                    var deadPlayer = deadBodyPlayerId != byte.MaxValue
-                        ? _game.GameNet.GameData.GetPlayerById(deadBodyPlayerId)?.Controller
-                        : null;
+                    // deadBodyPlayerId == byte.MaxValue -- means emergency call by button
 
-                    if (deadBodyPlayerId == byte.MaxValue)
-                    {
-                        _logger.LogWarning("deadBodyPlayerId was byte.MaxValue");
-                    }
-
-                    await _eventManager.CallAsync(new PlayerReportedBodyEvent(_game, sender, this, deadPlayer));
                     break;
                 }
 
@@ -330,10 +332,13 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.StartMeeting)} to a specific player instead of broadcast");
                     }
 
-                    var playerId = reader.ReadByte();
-                    var player = _game.GameNet.GameData.GetPlayerById(playerId);
+                    // deadBodyPlayerId == byte.MaxValue -- means emergency call by button
+                    var deadBodyPlayerId = reader.ReadByte();
+                    var deadPlayer = deadBodyPlayerId != byte.MaxValue
+                        ? _game.GameNet.GameData.GetPlayerById(deadBodyPlayerId)?.Controller
+                        : null;
 
-                    // Meeting started by "player", can also be null.
+                    await _eventManager.CallAsync(new PlayerStartMeetingEvent(_game, _game.GetClientPlayer(this.OwnerId), this, deadPlayer));
                     break;
                 }
 

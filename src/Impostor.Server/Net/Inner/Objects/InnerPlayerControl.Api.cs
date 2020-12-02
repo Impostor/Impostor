@@ -1,7 +1,11 @@
 using System.Threading.Tasks;
+using Impostor.Api;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
+using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Inner.Objects.Components;
+using Impostor.Server.Events.Player;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
@@ -97,11 +101,38 @@ namespace Impostor.Server.Net.Inner.Objects
             await _game.FinishRpcAsync(writer, player.OwnerId);
         }
 
-        public async ValueTask SetMurderedAsync()
+        public async ValueTask SetMurderedByAsync(IClientPlayer impostor)
         {
-            using var writer = _game.StartRpc(NetId, RpcCalls.MurderPlayer);
-            writer.Write((byte)NetId);
+            if (impostor.Character == null)
+            {
+                throw new ImpostorException("Character is null.");
+            }
+
+            if (!impostor.Character.PlayerInfo.IsImpostor)
+            {
+                throw new ImpostorProtocolException("Plugin tried to murder a player while the impostor specified was not an impostor.");
+            }
+
+            if (impostor.Character.PlayerInfo.IsDead)
+            {
+                throw new ImpostorProtocolException("Plugin tried to murder a player while the impostor specified was dead.");
+            }
+
+            if (PlayerInfo.IsDead)
+            {
+                return;
+            }
+
+            // Update player.
+            Die(DeathReason.Kill);
+
+            // Send RPC.
+            using var writer = _game.StartRpc(impostor.Character.NetId, RpcCalls.MurderPlayer);
+            writer.WritePacked(NetId);
             await _game.FinishRpcAsync(writer);
+
+            // Notify plugins.
+            await _eventManager.CallAsync(new PlayerMurderEvent(_game, impostor, impostor.Character, this));
         }
     }
 }

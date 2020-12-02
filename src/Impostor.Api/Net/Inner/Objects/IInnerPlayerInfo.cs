@@ -48,7 +48,7 @@ namespace Impostor.Api.Net.Inner.Objects
         /// </summary>
         DeathReason LastDeathReason { get; }
 
-        List<ITaskInfo> Tasks { get; }
+        IEnumerable<ITaskInfo> Tasks { get; }
 
         DateTimeOffset LastMurder { get; }
     }
