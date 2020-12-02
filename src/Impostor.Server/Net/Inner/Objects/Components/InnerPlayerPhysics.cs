@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Impostor.Api;
-using Impostor.Api.Events.Managers;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.State;
@@ -13,6 +12,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
     {
         private readonly ILogger<InnerPlayerPhysics> _logger;
         private readonly InnerPlayerControl _playerControl;
+
         public InnerPlayerPhysics(ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl)
         {
             _logger = logger;
