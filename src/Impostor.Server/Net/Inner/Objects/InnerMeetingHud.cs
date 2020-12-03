@@ -38,6 +38,7 @@ namespace Impostor.Server.Net.Inner.Objects
         private void PopulateButtons(byte reporter)
         {
             _playerStates = _gameNet.GameData.Players
+                .OrderBy(x => x.Value.Controller.NetId)
                 .Select(x =>
                 {
                     var area = new PlayerVoteArea(this, x.Key);
