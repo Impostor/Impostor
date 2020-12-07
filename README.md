@@ -10,7 +10,7 @@ We support Steam, Itch, Android and iOS. The latest version supported is `2020.9
 | Impostor version | Among Us version | Experimental | Download |
 |-|-|-|-|
 | 1.1.0 | 2020.09.07 - 2020.09.22 | No | [![Download](https://img.shields.io/badge/Download-v1.1.0-blue?style=flat-square)](https://github.com/Impostor/Impostor/releases/tag/v1.1.0) |
-| 1.2.2 | 2020.09.22 - 2020.11.17 | Yes | [![Download](https://img.shields.io/badge/Download-v1.2.2-blue?style=flat-square)](https://ci.appveyor.com/project/Impostor/Impostor/branch/dev/artifacts) |
+| 1.2.2 | 2020.09.22 - 2020.12.05 | Yes | [![Download](https://img.shields.io/badge/Download-v1.2.2-blue?style=flat-square)](https://ci.appveyor.com/project/Impostor/Impostor/branch/dev/artifacts) |
 
 ## Features
 
@@ -26,7 +26,7 @@ If you just want to play on a server hosted by someone else, you need to follow 
 
 #### Windows
 
-1. Find the [latest release](https://github.com/AeonLucid/Impostor/releases/latest).
+1. Find the [latest release](https://github.com/Impostor/Impostor/releases/latest).
 2. Download `Impostor-Client-win-x64.zip`.
 3. Extract the zip.
 4. Run `Impostor.Client.exe`.
