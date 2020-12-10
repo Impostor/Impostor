@@ -9,6 +9,7 @@ using Impostor.Api.Net.Messages;
 using Impostor.Hazel.Extensions;
 using Impostor.Server.Config;
 using Impostor.Server.Events;
+using Impostor.Server.Events.Player;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
@@ -190,6 +191,12 @@ namespace Impostor.Server
                         services.AddSingleton<GameManager>();
                         services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
                     }
+
+                    services.AddSingleton<ObjectPool<PlayerMovementEvent>>(serviceProvider =>
+                    {
+                        var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                        return provider.Create(new PlayerMovementEventObjectPolicy());
+                    });
 
                     services.AddHazel();
                     services.AddSingleton<IMessageWriterProvider, MessageWriterProvider>();
