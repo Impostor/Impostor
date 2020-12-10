@@ -63,12 +63,12 @@ Example configuration:
     "Master": true,
     "Locator": {
       "Redis": "",
-      "UdpMasterEndpoint": "127.0.0.1:22023"
+      "UdpMasterEndpoint": "127.0.0.1:22024"
     },
     "Nodes": [
       {
         "Ip": "127.0.0.1",
-        "Port": 22024
+        "Port": 22025
       }
     ]
   }
@@ -85,16 +85,16 @@ Example configuration:
 {
   "Server": {
     "PublicIp": "127.0.0.1",
-    "PublicPort": 22024,
+    "PublicPort": 22025,
     "ListenIp": "0.0.0.0",
-    "ListenPort": 22024
+    "ListenPort": 22025
   },
   "ServerRedirector": {
     "Enabled": true,
     "Master": false,
     "Locator": {
       "Redis": "",
-      "UdpMasterEndpoint": "127.0.0.1:22023"
+      "UdpMasterEndpoint": "127.0.0.1:22024"
     }
   }
 }
