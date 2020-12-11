@@ -314,14 +314,14 @@ Constantly copying the plugin dll to your server directory can be pretty annoyin
     "Paths": [
       "D:\\Projects\\Impostor\\src\\Impostor.Plugins.Example\\bin\\Debug\\netstandard2.1"
     ],
-    "Libraries": []
+    "LibraryPaths": []
   }
 }
 ```
 
 ### Using other libraries
 
-Sometimes you need to use libraries that the original Impostor server does not provide. The dll files of these libraries must be placed in the `libraries` folder next to the server executable. You could also provide them by modifying the `PluginLoader.Libraries` option in the `config.json`, similarly to the `PluginLoader.Paths` option.
+Sometimes you need to use libraries that the original Impostor server does not provide. The dll files of these libraries must be placed in the `libraries` folder next to the server executable. You could also provide them by modifying the `PluginLoader.LibraryPaths` option in the `config.json`, similarly to the `PluginLoader.Paths` option.
 
 ### Impostor versions
 
