@@ -192,12 +192,7 @@ namespace Impostor.Server
                         services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
                     }
 
-                    services.AddSingleton<ObjectPool<PlayerMovementEvent>>(serviceProvider =>
-                    {
-                        var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-                        return provider.Create(new PlayerMovementEventObjectPolicy());
-                    });
-
+                    services.AddEventPools();
                     services.AddHazel();
                     services.AddSingleton<IMessageWriterProvider, MessageWriterProvider>();
                     services.AddSingleton<IGameCodeFactory, GameCodeFactory>();
