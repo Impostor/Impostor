@@ -114,7 +114,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             if (initialState)
             {
                 _lastSequenceId = sequenceId;
-                _targetSyncPosition = ReadVector2(reader);
+                await SetPositionAsync(sender, ReadVector2(reader));
                 _targetSyncVelocity = ReadVector2(reader);
             }
             else
@@ -135,9 +135,14 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 }
 
                 _lastSequenceId = sequenceId;
-                _targetSyncPosition = ReadVector2(reader);
+                await SetPositionAsync(sender, ReadVector2(reader));
                 _targetSyncVelocity = ReadVector2(reader);
             }
+        }
+
+        internal async ValueTask SetPositionAsync(IClientPlayer sender, Vector2 position)
+        {
+            _targetSyncPosition = position;
 
             var playerMovementEvent = _pool.Get();
             playerMovementEvent.Reset(_game, sender, _playerControl);
