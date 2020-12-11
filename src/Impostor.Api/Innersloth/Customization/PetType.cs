@@ -1,4 +1,4 @@
-﻿namespace Impostor.Api.Innersloth.Customization
+namespace Impostor.Api.Innersloth.Customization
 {
     public enum PetType
     {
@@ -13,5 +13,6 @@
         Ellie = 8,
         Squig = 9,
         Bedcrab = 10,
+        Glitch = 11,
     }
 }
