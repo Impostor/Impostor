@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
@@ -123,10 +123,12 @@ namespace Impostor.Hazel.Udp
 
             // Write bytes to the server to tell it hi (and to punch a hole in our NAT, if present)
             // When acknowledged set the state to connected
-            await SendHello(bytes, () =>
+            InitializeKeepAliveTimer(async () =>
             {
-                State = ConnectionState.Connected;
-                InitializeKeepAliveTimer();
+                await SendHello(bytes, () =>
+                {
+                    State = ConnectionState.Connected;
+                });
             });
 
             await _connectWaitLock.WaitAsync(TimeSpan.FromSeconds(10));

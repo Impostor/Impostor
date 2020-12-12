@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
@@ -79,6 +79,12 @@ namespace Impostor.Hazel.Udp
                 keepAliveInterval,
                 keepAliveInterval
             );
+        }
+
+        protected void InitializeKeepAliveTimer(Action action)
+        {
+            InitializeKeepAliveTimer();
+            action.Invoke();
         }
 
         private async void HandleKeepAlive(object state)
