@@ -49,17 +49,5 @@ namespace Impostor.Tests
             Assert.False(validate);
 
         }
-
-        [Fact]
-        public void TestClientFactroryCreate()
-        {
-            var Ip = Impostor.Server.Utils.IpUtils("127.0.0.1");
-
-            Assert.NotNull(Ip);
-        }
-
-
-
-
     }
 }
