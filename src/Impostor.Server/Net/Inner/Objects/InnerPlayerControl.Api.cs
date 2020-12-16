@@ -26,60 +26,40 @@ namespace Impostor.Server.Net.Inner.Objects
             await _game.FinishRpcAsync(writer);
         }
 
-        public async ValueTask SetColorAsync(byte colorId)
+        public async ValueTask SetColorAsync(ColorType color)
         {
-            PlayerInfo.ColorId = colorId;
+            PlayerInfo.Color = color;
 
             using var writer = _game.StartRpc(NetId, RpcCalls.SetColor);
-            writer.Write(colorId);
+            writer.Write((byte)color);
             await _game.FinishRpcAsync(writer);
         }
 
-        public ValueTask SetColorAsync(ColorType colorType)
+        public async ValueTask SetHatAsync(HatType hat)
         {
-            return SetColorAsync((byte)colorType);
-        }
-
-        public async ValueTask SetHatAsync(uint hatId)
-        {
-            PlayerInfo.HatId = hatId;
+            PlayerInfo.Hat = hat;
 
             using var writer = _game.StartRpc(NetId, RpcCalls.SetHat);
-            writer.WritePacked(hatId);
+            writer.WritePacked((uint)hat);
             await _game.FinishRpcAsync(writer);
         }
 
-        public ValueTask SetHatAsync(HatType hatType)
+        public async ValueTask SetPetAsync(PetType pet)
         {
-            return SetHatAsync((uint)hatType);
-        }
-
-        public async ValueTask SetPetAsync(uint petId)
-        {
-            PlayerInfo.PetId = petId;
+            PlayerInfo.Pet = pet;
 
             using var writer = _game.StartRpc(NetId, RpcCalls.SetPet);
-            writer.WritePacked(petId);
+            writer.WritePacked((uint)pet);
             await _game.FinishRpcAsync(writer);
         }
 
-        public ValueTask SetPetAsync(PetType petType)
+        public async ValueTask SetSkinAsync(SkinType skin)
         {
-            return SetPetAsync((uint)petType);
-        }
-
-        public async ValueTask SetSkinAsync(uint skinId)
-        {
-            PlayerInfo.SkinId = skinId;
+            PlayerInfo.Skin = skin;
 
             using var writer = _game.StartRpc(NetId, RpcCalls.SetSkin);
-            writer.WritePacked(skinId);
+            writer.WritePacked((uint)skin);
             await _game.FinishRpcAsync(writer);
-        }
-
-        public ValueTask SetSkinAsync(SkinType skinType)
-        {
-            return SetSkinAsync((uint)skinType);
         }
 
         public async ValueTask SendChatAsync(string text)
