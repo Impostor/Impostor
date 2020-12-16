@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
@@ -52,6 +52,13 @@ namespace Impostor.Api.Games
         /// </summary>
         /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
         ValueTask SyncSettingsAsync();
+
+        /// <summary>
+        /// Sets the Game Privacy.
+        /// </summary>
+        /// <param name="privacy">Game Privacy.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        ValueTask SetGamePrivacyAsync(GamePrivacy privacy);
 
         /// <summary>
         ///     Sets the specified list as Impostor on all connected players.

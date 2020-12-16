@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -8,6 +8,8 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;
+using Impostor.Api.Net.Messages;
+using Impostor.Hazel;
 using Impostor.Server.Net.Inner;
 
 namespace Impostor.Server.Net.State
@@ -65,6 +67,18 @@ namespace Impostor.Server.Net.State
 
                 await FinishRpcAsync(writer);
             }
+        }
+
+        public async ValueTask SetGamePrivacyAsync(GamePrivacy privace)
+        {
+            IsPublic = privace == GamePrivacy.Public;
+
+            using (var writer = MessageWriter.Get(MessageType.Reliable)) {
+                WriteAlterGameMessage(writer, false, IsPublic);
+
+                await SendToAllAsync(writer);
+            }
+
         }
     }
 }
