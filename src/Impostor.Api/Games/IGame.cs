@@ -29,6 +29,11 @@ namespace Impostor.Api.Games
 
         bool IsPublic { get; }
 
+        /// <summary>
+        /// Gets or sets display name on game list.
+        /// </summary>
+        string? DisplayName { get; set; }
+
         IDictionary<object, object> Items { get; }
 
         int HostId { get; }

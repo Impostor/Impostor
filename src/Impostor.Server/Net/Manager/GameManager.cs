@@ -98,7 +98,7 @@ namespace Impostor.Server.Net.Manager
                 x.Value.PlayerCount < x.Value.Options.MaxPlayers))
             {
                 // Check for options.
-                if (!map.HasFlag((MapFlags)(1 << game.Options.MapId)))
+                if (!map.HasFlag((MapFlags)(1 << (byte)game.Options.Map)))
                 {
                     continue;
                 }
