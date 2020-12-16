@@ -60,6 +60,8 @@ namespace Impostor.Server.Net.State
 
         public bool IsPublic { get; private set; }
 
+        public string? DisplayName { get; set; }
+
         public int HostId { get; private set; }
 
         public GameStates GameState { get; private set; }

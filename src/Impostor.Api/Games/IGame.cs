@@ -24,9 +24,14 @@ namespace Impostor.Api.Games
 
         int PlayerCount { get; }
 
-        IClientPlayer Host { get; }
+        IClientPlayer? Host { get; }
 
         bool IsPublic { get; }
+
+        /// <summary>
+        /// Gets or sets display name on game list.
+        /// </summary>
+        string? DisplayName { get; set; }
 
         IDictionary<object, object> Items { get; }
 
@@ -54,6 +59,13 @@ namespace Impostor.Api.Games
         /// </summary>
         /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
         ValueTask SyncSettingsAsync();
+
+        /// <summary>
+        ///     Sets game's privacy.
+        /// </summary>
+        /// <param name="isPublic">Privacy to set.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        ValueTask SetPrivacyAsync(bool isPublic);
 
         /// <summary>
         ///     Send the message to all players.
