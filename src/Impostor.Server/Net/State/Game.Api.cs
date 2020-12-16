@@ -47,7 +47,7 @@ namespace Impostor.Server.Net.State
             }
         }
 
-        public async ValueTask SetInfectedAsync(IEnumerable<IInnerPlayerControl> players)
+        private async ValueTask SetInfectedAsync(IEnumerable<IInnerPlayerControl> players)
         {
             if (Host.Character == null)
             {
