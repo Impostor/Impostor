@@ -143,7 +143,10 @@ namespace Impostor.Patcher.Shared
                 return false;
             }
 
-            return WriteIp(ipAddress, port);
+            var result = WriteIp(ipAddress, port);
+            OnSaved(ip, port);
+
+            return result;
         }
 
         /// <summary>
@@ -176,7 +179,6 @@ namespace Impostor.Patcher.Shared
 
                 region.Serialize(writer);
 
-                OnSaved(ip, port);
                 return true;
             }
         }
