@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth.Customization;
+using Impostor.Api.Innersloth.Text;
 using Impostor.Api.Net.Inner.Objects.Components;
 
 namespace Impostor.Api.Net.Inner.Objects
@@ -35,7 +36,7 @@ namespace Impostor.Api.Net.Inner.Objects
         /// </summary>
         /// <param name="name">A name for the player.</param>
         /// <returns>Task that must be awaited.</returns>
-        ValueTask SetNameAsync(string name);
+        ValueTask SetNameAsync(Text name);
 
         /// <summary>
         ///     Sets the color of the current <see cref="IInnerPlayerControl"/>.
@@ -91,7 +92,7 @@ namespace Impostor.Api.Net.Inner.Objects
         /// </summary>
         /// <param name="text">The message to send.</param>
         /// <returns>Task that must be awaited.</returns>
-        ValueTask SendChatAsync(string text);
+        ValueTask SendChatAsync(Text text);
 
         /// <summary>
         ///     Send a chat message as the current <see cref="IInnerPlayerControl"/>.
@@ -103,7 +104,7 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     When left as null, will send message to self.
         /// </param>
         /// <returns>Task that must be awaited.</returns>
-        ValueTask SendChatToPlayerAsync(string text, IInnerPlayerControl? player = null);
+        ValueTask SendChatToPlayerAsync(Text text, IInnerPlayerControl? player = null);
 
         /// <summary>
         ///     Sets the current to be murdered by an impostor <see cref="IInnerPlayerControl"/>.

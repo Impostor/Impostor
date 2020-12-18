@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Text;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Inner.Objects
@@ -17,7 +18,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public byte PlayerId { get; }
 
-        public string PlayerName { get; internal set; }
+        public Text PlayerName { get; internal set; }
 
         public byte ColorId { get; internal set; }
 
@@ -56,7 +57,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public void Deserialize(IMessageReader reader)
         {
-            PlayerName = reader.ReadString();
+            PlayerName = Text.Parse(reader.ReadString());
             ColorId = reader.ReadByte();
             HatId = reader.ReadPackedUInt32();
             PetId = reader.ReadPackedUInt32();

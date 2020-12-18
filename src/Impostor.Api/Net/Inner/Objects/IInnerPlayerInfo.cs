@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Text;
 
 namespace Impostor.Api.Net.Inner.Objects
 {
@@ -9,7 +10,7 @@ namespace Impostor.Api.Net.Inner.Objects
         /// <summary>
         ///     Gets the name of the player as decided by the host.
         /// </summary>
-        string PlayerName { get; }
+        Text PlayerName { get; }
 
         /// <summary>
         ///     Gets the color of the player.

@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
+using Impostor.Api.Innersloth.Text;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Inner.Objects.Components;
@@ -17,7 +18,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         IInnerPlayerInfo IInnerPlayerControl.PlayerInfo => PlayerInfo;
 
-        public async ValueTask SetNameAsync(string name)
+        public async ValueTask SetNameAsync(Text name)
         {
             PlayerInfo.PlayerName = name;
 
@@ -82,14 +83,14 @@ namespace Impostor.Server.Net.Inner.Objects
             return SetSkinAsync((uint)skinType);
         }
 
-        public async ValueTask SendChatAsync(string text)
+        public async ValueTask SendChatAsync(Text text)
         {
             using var writer = _game.StartRpc(NetId, RpcCalls.SendChat);
             writer.Write(text);
             await _game.FinishRpcAsync(writer);
         }
 
-        public async ValueTask SendChatToPlayerAsync(string text, IInnerPlayerControl? player = null)
+        public async ValueTask SendChatToPlayerAsync(Text text, IInnerPlayerControl? player = null)
         {
             if (player == null)
             {
