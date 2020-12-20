@@ -10,7 +10,7 @@ We support Steam, Itch, Android and iOS. The latest version supported is `2020.9
 | Impostor version | Among Us version | Experimental | Download |
 |-|-|-|-|
 | 1.1.0 | 2020.09.07 - 2020.09.22 | No | [![Download](https://img.shields.io/badge/Download-v1.1.0-blue?style=flat-square)](https://github.com/Impostor/Impostor/releases/tag/v1.1.0) |
-| 1.2.2 | 2020.09.22 - 2020.11.17 | Yes | [![Download](https://img.shields.io/badge/Download-v1.2.2-blue?style=flat-square)](https://ci.appveyor.com/project/Impostor/Impostor/branch/dev/artifacts) |
+| 1.2.2 | 2020.09.22 - 2020.12.9 | Yes | [![Download](https://img.shields.io/badge/Download-v1.2.2-blue?style=flat-square)](https://ci.appveyor.com/project/Impostor/Impostor/branch/dev/artifacts) |
 
 ## Features
 
