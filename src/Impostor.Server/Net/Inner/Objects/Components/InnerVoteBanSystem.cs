@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
@@ -52,7 +52,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             throw new NotImplementedException();
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override ValueTask Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             if (!sender.IsHost)
             {
@@ -83,6 +83,8 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     }
                 }
             }
+
+            return default;
         }
     }
 }

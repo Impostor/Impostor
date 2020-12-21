@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -118,7 +118,7 @@ namespace Impostor.Server.Net.Inner.Objects
             throw new NotImplementedException();
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override ValueTask Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             if (!sender.IsHost)
             {
@@ -146,6 +146,8 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 throw new NotImplementedException("This shouldn't happen, according to Among Us disassembly.");
             }
+
+            return default;
         }
 
         internal void AddPlayer(InnerPlayerControl control)

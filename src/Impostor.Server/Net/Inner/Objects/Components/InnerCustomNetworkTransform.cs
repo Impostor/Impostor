@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
@@ -100,7 +100,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             return true;
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override ValueTask Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             var sequenceId = reader.ReadUInt16();
 
@@ -124,13 +124,15 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
                 if (!SidGreaterThan(sequenceId, _lastSequenceId))
                 {
-                    return;
+                    return default;
                 }
 
                 _lastSequenceId = sequenceId;
                 _targetSyncPosition = ReadVector2(reader);
                 _targetSyncVelocity = ReadVector2(reader);
             }
+
+            return default;
         }
 
         private void SnapTo(Vector2 position, ushort minSid)

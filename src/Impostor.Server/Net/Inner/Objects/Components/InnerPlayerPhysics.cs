@@ -62,7 +62,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             throw new NotImplementedException();
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override ValueTask Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             throw new NotImplementedException();
         }

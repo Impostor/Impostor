@@ -431,7 +431,7 @@ namespace Impostor.Server.Net.Inner.Objects
             throw new NotImplementedException();
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override ValueTask Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             if (!sender.IsHost)
             {
@@ -444,6 +444,8 @@ namespace Impostor.Server.Net.Inner.Objects
             }
 
             PlayerId = reader.ReadByte();
+
+            return default;
         }
 
         internal void Die(DeathReason reason)

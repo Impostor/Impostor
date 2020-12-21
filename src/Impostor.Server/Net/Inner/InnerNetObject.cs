@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
@@ -20,7 +20,7 @@ namespace Impostor.Server.Net.Inner
 
         public abstract bool Serialize(IMessageWriter writer, bool initialState);
 
-        public abstract void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState);
+        public abstract ValueTask Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState);
 
         public bool IsOwnedBy(IClientPlayer player)
         {
