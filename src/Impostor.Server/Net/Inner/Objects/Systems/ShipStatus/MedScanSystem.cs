@@ -1,13 +1,21 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Games;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 {
     public class MedScanSystem : ISystemType
     {
-        public MedScanSystem()
+        private readonly IEventManager _eventManager;
+        private readonly IGame _game;
+
+        public MedScanSystem(IEventManager eventManager, IGame game)
         {
+            _eventManager = eventManager;
+            _game = game;
+
             UsersList = new List<byte>();
         }
 

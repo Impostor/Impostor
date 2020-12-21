@@ -1,13 +1,22 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Games;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 {
     public class LifeSuppSystemType : ISystemType, IActivatable
     {
-        public LifeSuppSystemType()
+        private readonly IEventManager _eventManager;
+        private readonly IGame _game;
+
+        public LifeSuppSystemType(IEventManager eventManager, IGame game)
         {
+            _eventManager = eventManager;
+            _game = game;
+
             Countdown = 10000f;
             CompletedConsoles = new HashSet<int>();
         }

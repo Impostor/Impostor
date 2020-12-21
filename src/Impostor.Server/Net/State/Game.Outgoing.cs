@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
@@ -68,6 +68,27 @@ namespace Impostor.Server.Net.State
             return targetClientId.HasValue
                 ? SendToAsync(writer, targetClientId.Value)
                 : SendToAllAsync(writer);
+        }
+
+        internal IMessageWriter StartDataMessage(uint targetNetId, MessageType type = MessageType.Reliable)
+        {
+            var writer = MessageWriter.Get(type);
+
+            writer.StartMessage(MessageFlags.GameData);
+            writer.Write(Code);
+
+            writer.StartMessage(GameDataTag.DataFlag);
+            writer.WritePacked(targetNetId);
+
+            return writer;
+        }
+
+        internal ValueTask FinishDataMessageAsync(IMessageWriter writer)
+        {
+            writer.EndMessage();
+            writer.EndMessage();
+
+            return SendToAllAsync(writer);
         }
 
         private void WriteRemovePlayerMessage(IMessageWriter message, bool clear, int playerId, DisconnectReason reason)
