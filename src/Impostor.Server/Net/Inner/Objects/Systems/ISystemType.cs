@@ -1,4 +1,5 @@
-﻿using Impostor.Api.Net.Messages;
+using System.Threading.Tasks;
+using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems
 {
@@ -6,6 +7,6 @@ namespace Impostor.Server.Net.Inner.Objects.Systems
     {
         void Serialize(IMessageWriter writer, bool initialState);
 
-        void Deserialize(IMessageReader reader, bool initialState);
+        public ValueTask Deserialize(IMessageReader reader, bool initialState);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Impostor.Api.Net.Messages;
+using System.Threading.Tasks;
+using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 {
@@ -11,9 +12,11 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             throw new System.NotImplementedException();
         }
 
-        public void Deserialize(IMessageReader reader, bool initialState)
+        public ValueTask Deserialize(IMessageReader reader, bool initialState)
         {
             IsActive = reader.ReadBoolean();
+
+            return default;
         }
     }
 }

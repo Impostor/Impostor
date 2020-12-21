@@ -103,7 +103,7 @@ namespace Impostor.Server.Net.Inner.Objects
             throw new NotImplementedException();
         }
 
-        public override ValueTask Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             if (!sender.IsHost)
             {
@@ -122,7 +122,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 {
                     if (_systems.TryGetValue(systemType, out var system))
                     {
-                        system.Deserialize(reader, true);
+                        await system.Deserialize(reader, true);
                     }
                 }
             }
@@ -137,13 +137,11 @@ namespace Impostor.Server.Net.Inner.Objects
                     {
                         if (_systems.TryGetValue(systemType, out var system))
                         {
-                            system.Deserialize(reader, false);
+                            await system.Deserialize(reader, false);
                         }
                     }
                 }
             }
-
-            return default;
         }
     }
 }
