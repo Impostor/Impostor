@@ -24,6 +24,8 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             writer.Write(true); // state
 
             await _game.FinishDataMessageAsync(writer);
+
+            IsActive = true;
         }
 
         public async ValueTask Stop()
@@ -34,6 +36,8 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             writer.Write(false); // state
 
             await _game.FinishDataMessageAsync(writer);
+
+            IsActive = false;
         }
     }
 }

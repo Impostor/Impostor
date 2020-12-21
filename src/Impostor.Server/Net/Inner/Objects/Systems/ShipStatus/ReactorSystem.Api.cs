@@ -29,6 +29,9 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             writer.WritePacked(0); // Number of players holding buttons
 
             await _game.FinishDataMessageAsync(writer);
+
+            Countdown = time;
+            UserConsolePairs.Clear();
         }
 
         public async ValueTask Stop()
@@ -40,6 +43,9 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             writer.WritePacked(0); // Number of players holding buttons
 
             await _game.FinishDataMessageAsync(writer);
+
+            Countdown = 10000f;
+            UserConsolePairs.Clear();
         }
     }
 }
