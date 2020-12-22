@@ -34,7 +34,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 [SystemTypes.MedBay] = new MedScanSystem(_eventManager, _game),
                 [SystemTypes.Reactor] = new ReactorSystem(_eventManager, _game),
                 [SystemTypes.LifeSupp] = new LifeSuppSystemType(_eventManager, _game),
-                [SystemTypes.Security] = new SecurityCameraSystemType(_eventManager, _game),
+                [SystemTypes.Security] = new SecurityCameraSystem(_eventManager, _game),
                 [SystemTypes.Comms] = new HudOverrideSystem(_eventManager, _game),
                 [SystemTypes.Doors] = new DoorsSystemType(_eventManager, _game),
             };

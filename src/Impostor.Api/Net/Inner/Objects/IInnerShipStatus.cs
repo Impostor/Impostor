@@ -9,5 +9,7 @@ namespace Impostor.Api.Net.Inner.Objects
         IReactorSystem GetReactorSystem();
 
         ISabotageSystem GetSabotageSystem();
+
+        ISwitchSystem GetSwitchSystem();
     }
 }

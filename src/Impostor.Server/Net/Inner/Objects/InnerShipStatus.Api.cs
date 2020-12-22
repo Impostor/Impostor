@@ -25,5 +25,10 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             return (ISabotageSystem)_systems[SystemTypes.Sabotage];
         }
+
+        public ISwitchSystem GetSwitchSystem()
+        {
+            return (ISwitchSystem)_systems[SystemTypes.Electrical];
+        }
     }
 }

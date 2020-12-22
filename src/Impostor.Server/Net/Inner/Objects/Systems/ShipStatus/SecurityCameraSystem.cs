@@ -6,12 +6,12 @@ using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 {
-    public class SecurityCameraSystemType : ISystemType
+    public class SecurityCameraSystem : ISystemType
     {
         private readonly IEventManager _eventManager;
         private readonly IGame _game;
 
-        public SecurityCameraSystemType(IEventManager eventManager, IGame game)
+        public SecurityCameraSystem(IEventManager eventManager, IGame game)
         {
             _game = game;
             _eventManager = eventManager;

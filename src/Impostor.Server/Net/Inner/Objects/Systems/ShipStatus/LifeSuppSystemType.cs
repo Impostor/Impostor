@@ -38,7 +38,7 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 
             if (reader.Position >= reader.Length)
             {
-                return default; ;
+                return default;
             }
 
             CompletedConsoles.Clear(); // TODO: Thread safety

@@ -7,7 +7,7 @@ namespace Impostor.Api.Net.Inner.Objects.ShipSystems
     public interface IReactorSystem : IShipSystem, IActivable
     {
         /// <summary>
-        ///     Gets the <see cref="Time"/> left for the sabotge.
+        ///     Gets the <see cref="Countdown"/> left for the sabotge.
         /// </summary>
         float Countdown { get; }
 
