@@ -7,5 +7,7 @@ namespace Impostor.Api.Net.Inner.Objects
         ICommsSystem GetCommsSystem();
 
         IReactorSystem GetReactorSystem();
+
+        ISabotageSystem GetSabotageSystem();
     }
 }

@@ -20,5 +20,10 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             return (IReactorSystem)_systems[SystemTypes.Reactor];
         }
+
+        public ISabotageSystem GetSabotageSystem()
+        {
+            return (ISabotageSystem)_systems[SystemTypes.Sabotage];
+        }
     }
 }

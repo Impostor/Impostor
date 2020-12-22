@@ -39,13 +39,15 @@ namespace Impostor.Server.Net.Inner.Objects
                 [SystemTypes.Doors] = new DoorsSystemType(_eventManager, _game),
             };
 
-            _systems.Add(SystemTypes.Sabotage, new SabotageSystemType(new[]
+            _systems.Add(SystemTypes.Sabotage, new SabotageSystem(
+                new[]
             {
                 (IActivatable)_systems[SystemTypes.Comms],
                 (IActivatable)_systems[SystemTypes.Reactor],
                 (IActivatable)_systems[SystemTypes.LifeSupp],
                 (IActivatable)_systems[SystemTypes.Electrical],
-            }));
+            }, _eventManager,
+                _game));
 
             Components.Add(this);
         }

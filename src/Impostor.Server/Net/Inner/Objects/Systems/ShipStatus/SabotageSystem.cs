@@ -1,15 +1,22 @@
 using System.Threading.Tasks;
+using Impostor.Api.Events.Managers;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 {
-    public class SabotageSystemType : ISystemType
+    internal partial class SabotageSystem : ISystemType
     {
         private readonly IActivatable[] _specials;
 
-        public SabotageSystemType(IActivatable[] specials)
+        private readonly IEventManager _eventManager;
+        private readonly Game _game;
+
+        public SabotageSystem(IActivatable[] specials, IEventManager eventManager, Game game)
         {
             _specials = specials;
+            _eventManager = eventManager;
+            _game = game;
         }
 
         public float Timer { get; set; }
