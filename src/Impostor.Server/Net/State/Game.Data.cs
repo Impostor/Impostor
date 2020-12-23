@@ -151,6 +151,11 @@ namespace Impostor.Server.Net.State
                         player.Character = null;
                     }
 
+                    if (GameState != GameStates.Started)
+                    {
+                        GameNet.GameData.RemovePlayer(control);
+                    }
+
                     await _eventManager.CallAsync(new PlayerDestroyedEvent(this, player, control));
 
                     break;

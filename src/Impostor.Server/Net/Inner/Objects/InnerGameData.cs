@@ -159,6 +159,11 @@ namespace Impostor.Server.Net.Inner.Objects
             }
         }
 
+        internal void RemovePlayer(InnerPlayerControl control)
+        {
+            _allPlayers.TryRemove(control.PlayerInfo.PlayerId, out _);
+        }
+
         private void SetTasks(byte playerId, ReadOnlyMemory<byte> taskTypeIds)
         {
             var player = GetPlayerById(playerId);

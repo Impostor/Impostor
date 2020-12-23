@@ -96,5 +96,11 @@ namespace Impostor.Plugins.Example.Handlers
         {
             _logger.LogDebug($"Player {e.PlayerControl.PlayerInfo.PlayerName} start meeting, reason: " + (e.Body==null ? "Emergency call button" : "Found the body of the player "+e.Body.PlayerInfo.PlayerName));
         }
+
+        [EventListener]
+        public void OnPlayerVoted(IPlayerVotedEvent e)
+        {
+            _logger.LogDebug($"Player {e.PlayerControl.PlayerInfo.PlayerName} voted for {e.VoteType} {e.VotedFor?.PlayerInfo.PlayerName}");
+        }
     }
 }
