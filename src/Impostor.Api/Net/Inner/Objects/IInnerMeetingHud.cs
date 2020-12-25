@@ -1,6 +1,6 @@
 ﻿namespace Impostor.Api.Net.Inner.Objects
 {
-    public interface IInnerMeetingHud
+    public interface IInnerMeetingHud : IInnerNetObject
     {
     }
 }
