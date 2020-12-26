@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Events;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 {
@@ -10,9 +13,11 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
     {
         // TODO: AutoDoors
         private readonly Dictionary<int, bool> _doors;
+        private readonly IGame _game;
 
         public DoorsSystemType(IGame game)
         {
+            _game = game;
             var doorCount = game.Options.Map switch
             {
                 MapTypes.Skeld => 13,
@@ -34,7 +39,7 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             throw new NotImplementedException();
         }
 
-        public void Deserialize(IMessageReader reader, bool initialState)
+        public async void Deserialize(IMessageReader reader, bool initialState, IEventManager manager)
         {
             if (initialState)
             {
@@ -46,12 +51,12 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             else
             {
                 var num = reader.ReadPackedUInt32();
-
                 for (var i = 0; i < _doors.Count; i++)
                 {
                     if ((num & 1 << i) != 0)
                     {
                         _doors[i] = reader.ReadBoolean();
+                        await manager.CallAsync(new GameDoorStateChangedEvent(_game, num, _doors[i]));
                     }
                 }
             }

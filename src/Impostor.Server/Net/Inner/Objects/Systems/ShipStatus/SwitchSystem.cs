@@ -1,4 +1,5 @@
-﻿using Impostor.Api.Net.Messages;
+﻿using Impostor.Api.Events.Managers;
+using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 {
@@ -17,7 +18,7 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             throw new System.NotImplementedException();
         }
 
-        public void Deserialize(IMessageReader reader, bool initialState)
+        public void Deserialize(IMessageReader reader, bool initialState, IEventManager eventManager)
         {
             ExpectedSwitches = reader.ReadByte();
             ActualSwitches = reader.ReadByte();

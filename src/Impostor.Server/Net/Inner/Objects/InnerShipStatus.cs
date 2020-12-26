@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
@@ -17,12 +18,14 @@ namespace Impostor.Server.Net.Inner.Objects
     {
         private readonly ILogger<InnerShipStatus> _logger;
         private readonly Game _game;
+        private readonly IEventManager _eventManager;
         private readonly Dictionary<SystemTypes, ISystemType> _systems;
 
-        public InnerShipStatus(ILogger<InnerShipStatus> logger, Game game)
+        public InnerShipStatus(ILogger<InnerShipStatus> logger, Game game, IEventManager eventManager)
         {
             _logger = logger;
             _game = game;
+            _eventManager = eventManager;
 
             _systems = new Dictionary<SystemTypes, ISystemType>
             {
@@ -46,8 +49,7 @@ namespace Impostor.Server.Net.Inner.Objects
             Components.Add(this);
         }
 
-        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
-            IMessageReader reader)
+        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             switch (call)
             {
@@ -64,7 +66,6 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     var systemType = (SystemTypes)reader.ReadByte();
-
                     break;
                 }
 
@@ -122,14 +123,13 @@ namespace Impostor.Server.Net.Inner.Objects
                 {
                     if (_systems.TryGetValue(systemType, out var system))
                     {
-                        system.Deserialize(reader, true);
+                        system.Deserialize(reader, true, _eventManager);
                     }
                 }
             }
             else
             {
                 var count = reader.ReadPackedUInt32();
-
                 foreach (var systemType in SystemTypeHelpers.AllTypes)
                 {
                     // TODO: Not sure what is going on here, check.
@@ -137,7 +137,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     {
                         if (_systems.TryGetValue(systemType, out var system))
                         {
-                            system.Deserialize(reader, false);
+                            system.Deserialize(reader, false, _eventManager);
                         }
                     }
                 }

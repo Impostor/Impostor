@@ -134,5 +134,36 @@ namespace Impostor.Server.Net.Inner.Objects
             // Notify plugins.
             await _eventManager.CallAsync(new PlayerMurderEvent(_game, impostor, impostor.Character, this));
         }
+
+        public async ValueTask SetMurderedByAsyncNoEvent(IClientPlayer impostor)
+        {
+            if (impostor.Character == null)
+            {
+                throw new ImpostorException("Character is null.");
+            }
+
+            if (!impostor.Character.PlayerInfo.IsImpostor)
+            {
+                throw new ImpostorProtocolException("Plugin tried to murder a player while the impostor specified was not an impostor.");
+            }
+
+            if (impostor.Character.PlayerInfo.IsDead)
+            {
+                throw new ImpostorProtocolException("Plugin tried to murder a player while the impostor specified was dead.");
+            }
+
+            if (PlayerInfo.IsDead)
+            {
+                return;
+            }
+
+            // Update player.
+            Die(DeathReason.Kill);
+
+            // Send RPC.
+            using var writer = _game.StartRpc(impostor.Character.NetId, RpcCalls.MurderPlayer);
+            writer.WritePacked(NetId);
+            await _game.FinishRpcAsync(writer);
+        }
     }
 }
