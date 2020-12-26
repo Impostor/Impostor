@@ -13,6 +13,7 @@ using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Hazel;
 using Impostor.Hazel.Extensions;
+using Impostor.Server;
 using Impostor.Server.Events;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Factories;
@@ -99,6 +100,7 @@ namespace Impostor.Tools.ServerReplay
             services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
             services.AddSingleton<IEventManager, EventManager>();
 
+            services.AddEventPools();
             services.AddHazel();
 
             return services.BuildServiceProvider();

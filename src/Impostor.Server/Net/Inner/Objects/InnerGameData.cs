@@ -113,12 +113,12 @@ namespace Impostor.Server.Net.Inner.Objects
             return default;
         }
 
-        public override bool Serialize(IMessageWriter writer, bool initialState)
+        public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
             throw new NotImplementedException();
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             if (!sender.IsHost)
             {
@@ -146,6 +146,8 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 throw new NotImplementedException("This shouldn't happen, according to Among Us disassembly.");
             }
+
+            return ValueTask.CompletedTask;
         }
 
         internal void AddPlayer(InnerPlayerControl control)

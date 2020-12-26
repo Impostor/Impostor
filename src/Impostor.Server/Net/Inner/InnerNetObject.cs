@@ -18,9 +18,9 @@ namespace Impostor.Server.Net.Inner
 
         public abstract ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader);
 
-        public abstract bool Serialize(IMessageWriter writer, bool initialState);
+        public abstract ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState);
 
-        public abstract void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState);
+        public abstract ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState);
 
         public bool IsOwnedBy(IClientPlayer player)
         {
