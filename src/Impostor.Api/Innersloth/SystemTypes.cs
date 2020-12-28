@@ -22,6 +22,9 @@ namespace Impostor.Api.Innersloth
         ShipTasks,
         Doors,
         Sabotage,
+        /// <summary>
+        /// Decontam on Mira and bottom decontam on Polus
+        /// </summary>
         Decontamination,
         Launchpad,
         LockerRoom,
