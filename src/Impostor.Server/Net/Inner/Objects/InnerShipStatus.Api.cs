@@ -11,29 +11,14 @@ namespace Impostor.Server.Net.Inner.Objects
 {
     internal partial class InnerShipStatus : IInnerShipStatus
     {
-        public ICommsSystem GetCommsSystem()
-        {
-            return (ICommsSystem)_systems[SystemTypes.Comms];
-        }
+        public ICommsSystem CommsSystem => (ICommsSystem)_systems[SystemTypes.Comms];
 
-        public IOxygenSystem GetOxygenSystem()
-        {
-            return (IOxygenSystem)_systems[SystemTypes.LifeSupp];
-        }
+        public IReactorSystem ReactorSystem => (IReactorSystem)_systems[SystemTypes.Reactor];
 
-        public IReactorSystem GetReactorSystem()
-        {
-            return (IReactorSystem)_systems[SystemTypes.Reactor];
-        }
+        public ISabotageSystem SabotageSystem => (ISabotageSystem)_systems[SystemTypes.Sabotage];
 
-        public ISabotageSystem GetSabotageSystem()
-        {
-            return (ISabotageSystem)_systems[SystemTypes.Sabotage];
-        }
+        public ISwitchSystem SwitchSystem => (ISwitchSystem)_systems[SystemTypes.Electrical];
 
-        public ISwitchSystem GetSwitchSystem()
-        {
-            return (ISwitchSystem)_systems[SystemTypes.Electrical];
-        }
+        public IOxygenSystem OxygenSystem => (IOxygenSystem)_systems[SystemTypes.LifeSupp];
     }
 }

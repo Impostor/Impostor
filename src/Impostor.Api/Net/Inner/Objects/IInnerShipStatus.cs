@@ -4,14 +4,14 @@ namespace Impostor.Api.Net.Inner.Objects
 {
     public interface IInnerShipStatus : IInnerNetObject
     {
-        ICommsSystem GetCommsSystem();
+        ICommsSystem CommsSystem { get; }
 
-        IReactorSystem GetReactorSystem();
+        IReactorSystem ReactorSystem { get; }
 
-        ISabotageSystem GetSabotageSystem();
+        ISabotageSystem SabotageSystem { get; }
 
-        ISwitchSystem GetSwitchSystem();
+        ISwitchSystem SwitchSystem { get; }
 
-        IOxygenSystem GetOxygenSystem();
+        IOxygenSystem OxygenSystem { get; }
     }
 }

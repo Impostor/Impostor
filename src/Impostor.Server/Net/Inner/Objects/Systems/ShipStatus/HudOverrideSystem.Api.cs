@@ -17,7 +17,7 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 
         public async ValueTask Start()
         {
-            await _game.GameNet.ShipStatus.GetSabotageSystem().SetCooldown(30.0f);
+            await _game.GameNet.ShipStatus.SabotageSystem.SetCooldown(30.0f);
 
             // TODO: Use serialize (?)
             using var writer = _game.StartDataMessage(_game.GameNet.ShipStatus.NetId);
