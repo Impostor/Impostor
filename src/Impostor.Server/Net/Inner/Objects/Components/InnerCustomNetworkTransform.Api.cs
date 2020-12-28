@@ -6,6 +6,8 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 {
     internal partial class InnerCustomNetworkTransform : IInnerCustomNetworkTransform
     {
+        public Vector2 Position => _targetSyncPosition;
+
         public async ValueTask SnapToAsync(Vector2 position)
         {
             var minSid = (ushort)(_lastSequenceId + 5U);

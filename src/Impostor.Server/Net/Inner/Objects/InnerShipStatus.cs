@@ -156,12 +156,12 @@ namespace Impostor.Server.Net.Inner.Objects
             }
         }
 
-        public override bool Serialize(IMessageWriter writer, bool initialState)
+        public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
             throw new NotImplementedException();
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             if (!sender.IsHost)
             {
@@ -200,6 +200,8 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
                 }
             }
+
+            return ValueTask.CompletedTask;
         }
     }
 }

@@ -1,11 +1,14 @@
 ﻿using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Events.Player;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Impostor.Server.Net.Inner.Objects.Components
 {
@@ -17,16 +20,20 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly ILogger<InnerCustomNetworkTransform> _logger;
         private readonly InnerPlayerControl _playerControl;
         private readonly Game _game;
+        private readonly IEventManager _eventManager;
+        private readonly ObjectPool<PlayerMovementEvent> _pool;
 
         private ushort _lastSequenceId;
         private Vector2 _targetSyncPosition;
         private Vector2 _targetSyncVelocity;
 
-        public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game)
+        public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool)
         {
             _logger = logger;
             _playerControl = playerControl;
             _game = game;
+            _eventManager = eventManager;
+            _pool = pool;
         }
 
         private static bool SidGreaterThan(ushort newSid, ushort prevSid)
@@ -81,14 +88,14 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             return default;
         }
 
-        public override bool Serialize(IMessageWriter writer, bool initialState)
+        public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
             if (initialState)
             {
                 writer.Write(_lastSequenceId);
                 WriteVector2(writer, _targetSyncPosition);
                 WriteVector2(writer, _targetSyncVelocity);
-                return true;
+                return ValueTask.FromResult(true);
             }
 
             // TODO: DirtyBits == 0 return false.
@@ -97,17 +104,17 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             writer.Write(_lastSequenceId);
             WriteVector2(writer, _targetSyncPosition);
             WriteVector2(writer, _targetSyncVelocity);
-            return true;
+            return ValueTask.FromResult(true);
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             var sequenceId = reader.ReadUInt16();
 
             if (initialState)
             {
                 _lastSequenceId = sequenceId;
-                _targetSyncPosition = ReadVector2(reader);
+                await SetPositionAsync(sender, ReadVector2(reader));
                 _targetSyncVelocity = ReadVector2(reader);
             }
             else
@@ -128,9 +135,19 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 }
 
                 _lastSequenceId = sequenceId;
-                _targetSyncPosition = ReadVector2(reader);
+                await SetPositionAsync(sender, ReadVector2(reader));
                 _targetSyncVelocity = ReadVector2(reader);
             }
+        }
+
+        internal async ValueTask SetPositionAsync(IClientPlayer sender, Vector2 position)
+        {
+            _targetSyncPosition = position;
+
+            var playerMovementEvent = _pool.Get();
+            playerMovementEvent.Reset(_game, sender, _playerControl);
+            await _eventManager.CallAsync(playerMovementEvent);
+            _pool.Return(playerMovementEvent);
         }
 
         private void SnapTo(Vector2 position, ushort minSid)
