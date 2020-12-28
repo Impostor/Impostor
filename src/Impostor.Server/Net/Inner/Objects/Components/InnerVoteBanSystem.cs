@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
@@ -21,7 +21,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             _votes = new Dictionary<int, int[]>();
         }
 
-        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader, Action<bool> cancelEvent)
         {
             if (call != RpcCalls.AddVote)
             {

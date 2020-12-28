@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
@@ -47,7 +47,7 @@ namespace Impostor.Server.Net.Inner.Objects
         }
 
         public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
-            IMessageReader reader)
+            IMessageReader reader, Action<bool> cancelEvent)
         {
             switch (call)
             {

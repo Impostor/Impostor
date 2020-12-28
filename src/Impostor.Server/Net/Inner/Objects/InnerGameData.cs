@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,7 +25,7 @@ namespace Impostor.Server.Net.Inner.Objects
             _logger = logger;
             _game = game;
             _allPlayers = new ConcurrentDictionary<byte, InnerPlayerInfo>();
-
+            
             Components.Add(this);
             Components.Add(ActivatorUtilities.CreateInstance<InnerVoteBanSystem>(serviceProvider));
         }
@@ -44,7 +44,7 @@ namespace Impostor.Server.Net.Inner.Objects
             return _allPlayers.TryGetValue(id, out var player) ? player : null;
         }
 
-        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader, Action<bool> cancelEvent)
         {
             switch (call)
             {
@@ -128,7 +128,7 @@ namespace Impostor.Server.Net.Inner.Objects
             if (initialState)
             {
                 var num = reader.ReadPackedInt32();
-
+                
                 for (var i = 0; i < num; i++)
                 {
                     var playerId = reader.ReadByte();

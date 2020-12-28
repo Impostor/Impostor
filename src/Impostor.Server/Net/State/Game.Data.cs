@@ -190,7 +190,7 @@ namespace Impostor.Server.Net.State
             }
         }
 
-        public async ValueTask<bool> HandleGameDataAsync(IMessageReader parent, ClientPlayer sender, bool toPlayer)
+        public async ValueTask<bool> HandleGameDataAsync(IMessageReader parent, ClientPlayer sender, bool toPlayer, Action<bool> cancelEvent)
         {
             // Find target player.
             ClientPlayer target = null;
@@ -246,7 +246,7 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
-                            await obj.HandleRpc(sender, target, (RpcCalls) reader.ReadByte(), reader);
+                            await obj.HandleRpc(sender, target, (RpcCalls) reader.ReadByte(), reader, cancelEvent);
                         }
                         else
                         {

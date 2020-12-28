@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+using System;
+using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
@@ -16,7 +17,7 @@ namespace Impostor.Server.Net.Inner
 
         public SpawnFlags SpawnFlags { get; internal set; }
 
-        public abstract ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader);
+        public abstract ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader, Action<bool> cancelEvent);
 
         public abstract bool Serialize(IMessageWriter writer, bool initialState);
 
