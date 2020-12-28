@@ -21,15 +21,15 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 
         public byte Percentage { get; internal set; } = byte.MaxValue;
 
-        public async ValueTask Start()
+        public async ValueTask Start(byte startingPosition, byte expectedPosition)
         {
             await _game.GameNet.ShipStatus.GetSabotageSystem().SetCooldown(30f);
 
             using var writer = _game.StartDataMessage(_game.GameNet.ShipStatus.NetId);
 
             writer.WritePacked(1 << (int)SystemTypes.Electrical); // electrical
-            writer.Write((byte)0b11111); // expected
-            writer.Write((byte)0); // current
+            writer.Write(expectedPosition); // expected
+            writer.Write(startingPosition); // current
             writer.Write((byte)0); // % complete
 
             IsActive = true;

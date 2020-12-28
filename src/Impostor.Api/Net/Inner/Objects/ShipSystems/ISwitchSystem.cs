@@ -17,8 +17,10 @@ namespace Impostor.Api.Net.Inner.Objects.ShipSystems
         /// <summary>
         ///     Starts the sabotage.
         /// </summary>
+        /// <param name="startingPosition">Initial state of the switches. (bit mask)</param>
+        /// <param name="expectedPosition">Expected state of the switches. (bit mask)</param>
         /// <returns>Task that must be awaited.</returns>
-        ValueTask Start();
+        ValueTask Start(byte startingPosition = 0, byte expectedPosition = 0b11111);
 
         /// <summary>
         ///     Stops the sabotage.
