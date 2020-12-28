@@ -21,6 +21,15 @@ namespace Impostor.Plugins.Example
         public override ValueTask EnableAsync()
         {
             _logger.LogInformation("Example is being enabled.");
+
+            _cancel = new[]
+            {
+                //_eventManager.RegisterListener(new GameEventListener()),
+                //_eventManager.RegisterListener(new PlayerEventListener()),
+                //_eventManager.RegisterListener(new MeetingEventListener()),
+                //_eventManager.RegisterListener(new ShipEventListener())
+            };
+
             return default;
         }
 

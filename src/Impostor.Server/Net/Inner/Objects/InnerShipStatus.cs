@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Events.Ship;
 using Impostor.Server.Net.Inner.Objects.Systems;
 using Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 using Impostor.Server.Net.State;
@@ -13,15 +15,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
-    internal class InnerShipStatus : InnerNetObject, IInnerShipStatus
+    internal partial class InnerShipStatus : InnerNetObject
     {
         private readonly ILogger<InnerShipStatus> _logger;
+        private readonly IEventManager _eventManager;
         private readonly Game _game;
         private readonly Dictionary<SystemTypes, ISystemType> _systems;
 
-        public InnerShipStatus(ILogger<InnerShipStatus> logger, Game game)
+        public InnerShipStatus(ILogger<InnerShipStatus> logger, IEventManager eventManager, Game game)
         {
             _logger = logger;
+            _eventManager = eventManager;
             _game = game;
 
             _systems = new Dictionary<SystemTypes, ISystemType>
@@ -46,8 +50,7 @@ namespace Impostor.Server.Net.Inner.Objects
             Components.Add(this);
         }
 
-        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
-            IMessageReader reader)
+        public override async ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             switch (call)
             {
@@ -64,7 +67,8 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     var systemType = (SystemTypes)reader.ReadByte();
-
+                    
+                    await _eventManager.CallAsync(new ShipDoorsCloseEvent(_game, this, sender, systemType));
                     break;
                 }
 
@@ -74,7 +78,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     {
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.RepairSystem)} to wrong destinition, must be host");
                     }
-
+                    
                     var systemType = (SystemTypes)reader.ReadByte();
                     if (systemType == SystemTypes.Sabotage && !sender.Character.PlayerInfo.IsImpostor)
                     {
@@ -82,9 +86,65 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     var player = reader.ReadNetObject<InnerPlayerControl>(_game);
-                    var amount = reader.ReadByte();
+                    var flag = reader.ReadByte();
+                    
+                    Console.WriteLine(systemType + " " + flag);
+                    Console.WriteLine(player.NetId);
+                    
+                    switch (systemType)
+                    {
+                        case SystemTypes.Sabotage:
 
-                    // TODO: Modify data (?)
+                            if (!new List<SystemTypes>
+                            {
+                                SystemTypes.Reactor, SystemTypes.Electrical, SystemTypes.LifeSupp, SystemTypes.Comms, SystemTypes.Laboratory
+                            }.Contains((SystemTypes)flag))
+                            {
+                                _logger.LogWarning("{0}: Unknown sabotage type {1}", nameof(InnerShipStatus), flag);
+                                break;
+                            }
+                            
+                            await _eventManager.CallAsync(new ShipSabotageEvent(_game, this, sender, (SystemTypes)flag));
+                            break;
+                        
+                        case SystemTypes.Doors:
+
+                            if (_game.Options.MapId != 2)
+                            {
+                                _logger.LogWarning($"{nameof(InnerShipStatus)}: Client sent {nameof(RpcCalls.RepairSystem)} for {nameof(SystemTypes.Doors)} on map {_game.Options.MapId}");
+                                break;
+                            }
+                            
+                            if (flag < 64 || flag > 75)
+                            {
+                                _logger.LogWarning("{0}: Unknown polus door {1}", nameof(InnerShipStatus), flag);
+                                break;
+                            }
+                            
+                            await _eventManager.CallAsync(new ShipPolusDoorOpenEvent(_game, this, sender, (PolusDoors)flag));
+
+                            break;
+                        
+                        case SystemTypes.Decontamination:
+                        case SystemTypes.TopDecontaminationPolus:
+
+                            if (_game.Options.MapId == 0)
+                            {
+                                _logger.LogWarning($"{nameof(InnerShipStatus)}: Client sent {nameof(RpcCalls.RepairSystem)} for {systemType} on map {_game.Options.MapId}");
+                                break;
+                            }
+                            
+                            if (flag < 1 || flag > 4)
+                            {
+                                _logger.LogWarning("{0}: Unknown decontamination door {1}", nameof(InnerShipStatus), flag);
+                                break;
+                            }
+
+                            await _eventManager.CallAsync(new ShipDecontamDoorOpenEvent(_game, this, sender, systemType, flag));
+                            
+                            break;
+                    }
+                    
                     break;
                 }
 
@@ -94,8 +154,6 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
                 }
             }
-
-            return default;
         }
 
         public override bool Serialize(IMessageWriter writer, bool initialState)
