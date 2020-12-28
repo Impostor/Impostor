@@ -3,16 +3,17 @@ using System.Threading.Tasks;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Events.Ship;
 using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 {
-    public class LifeSuppSystemType : ISystemType, IActivatable
+    internal partial class LifeSuppSystemType : ISystemType, IActivatable
     {
         private readonly IEventManager _eventManager;
-        private readonly IGame _game;
+        private readonly Game _game;
 
-        public LifeSuppSystemType(IEventManager eventManager, IGame game)
+        public LifeSuppSystemType(IEventManager eventManager, Game game)
         {
             _eventManager = eventManager;
             _game = game;
@@ -21,24 +22,20 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             CompletedConsoles = new HashSet<int>();
         }
 
-        public float Countdown { get; private set; }
-
         public HashSet<int> CompletedConsoles { get; }
-
-        public bool IsActive => Countdown < 10000.0;
 
         public void Serialize(IMessageWriter writer, bool initialState)
         {
             throw new System.NotImplementedException();
         }
 
-        public ValueTask Deserialize(IMessageReader reader, bool initialState)
+        public async ValueTask Deserialize(IMessageReader reader, bool initialState)
         {
             Countdown = reader.ReadSingle();
 
             if (reader.Position >= reader.Length)
             {
-                return default;
+                return;
             }
 
             CompletedConsoles.Clear(); // TODO: Thread safety
@@ -50,7 +47,7 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
                 CompletedConsoles.Add(reader.ReadPackedInt32());
             }
 
-            return default;
+            await _eventManager.CallAsync(new ShipOxygenStateChangedEvent(_game, this));
         }
     }
 }

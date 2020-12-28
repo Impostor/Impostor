@@ -5,12 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
-using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects.ShipSystems;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 {
-    internal partial class ReactorSystem : IReactorSystem
+    internal partial class LifeSuppSystemType : IOxygenSystem
     {
         IGame IShipSystem.Game => _game;
 
@@ -18,7 +17,7 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 
         public float Countdown { get; private set; }
 
-        IEnumerable<Tuple<IClientPlayer, byte>> IReactorSystem.UserConsolePairs => UserConsolePairs;
+        IEnumerable<int> IOxygenSystem.CompletedConsoles => CompletedConsoles;
 
         public async ValueTask Start(float time)
         {
@@ -26,28 +25,28 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 
             using var writer = _game.StartDataMessage(_game.GameNet.ShipStatus.NetId);
 
-            writer.WritePacked(1 << (int)SystemTypes.Reactor);
-            writer.Write(time); // time
-            writer.WritePacked(0); // Number of players holding buttons
+            writer.WritePacked(1 << (int)SystemTypes.LifeSupp); // oxygen
+            writer.Write(time); // state
+            writer.WritePacked(0); // Number of completed consoles
 
             await _game.FinishDataMessageAsync(writer);
 
             Countdown = time;
-            UserConsolePairs.Clear();
+            CompletedConsoles.Clear();
         }
 
         public async ValueTask Stop()
         {
             using var writer = _game.StartDataMessage(_game.GameNet.ShipStatus.NetId);
 
-            writer.WritePacked(1 << (int)SystemTypes.Reactor);
-            writer.Write(10000f); // time
-            writer.WritePacked(0); // Number of players holding buttons
+            writer.WritePacked(1 << (int)SystemTypes.LifeSupp); // oxygen
+            writer.Write(10000f); // state
+            writer.WritePacked(0); // Number of completed consoles
 
             await _game.FinishDataMessageAsync(writer);
 
             Countdown = 10000f;
-            UserConsolePairs.Clear();
+            CompletedConsoles.Clear();
         }
     }
 }

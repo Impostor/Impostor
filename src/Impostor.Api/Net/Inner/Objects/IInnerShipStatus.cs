@@ -11,5 +11,7 @@ namespace Impostor.Api.Net.Inner.Objects
         ISabotageSystem GetSabotageSystem();
 
         ISwitchSystem GetSwitchSystem();
+
+        IOxygenSystem GetOxygenSystem();
     }
 }

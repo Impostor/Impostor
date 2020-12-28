@@ -16,6 +16,11 @@ namespace Impostor.Server.Net.Inner.Objects
             return (ICommsSystem)_systems[SystemTypes.Comms];
         }
 
+        public IOxygenSystem GetOxygenSystem()
+        {
+            return (IOxygenSystem)_systems[SystemTypes.LifeSupp];
+        }
+
         public IReactorSystem GetReactorSystem()
         {
             return (IReactorSystem)_systems[SystemTypes.Reactor];
