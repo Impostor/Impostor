@@ -15,10 +15,10 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 case SystemTypes.Reactor:
 
-                    if (_game.Options.MapId > 1)
+                    if ((byte)_game.Options.Map > 1)
                     {
                         _logger.LogWarning("{0}: {1} is not a valid sabotage on map {2}", nameof(InnerShipStatus),
-                            systemType, _game.Options.MapId);
+                            systemType, (byte)_game.Options.Map);
                         return;
                     }
 
@@ -29,10 +29,10 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case SystemTypes.LifeSupp:
 
-                    if (_game.Options.MapId > 1)
+                    if ((byte)_game.Options.Map > 1)
                     {
                         _logger.LogWarning("{0}: {1} is not a valid sabotage on map {2}", nameof(InnerShipStatus),
-                            systemType, _game.Options.MapId);
+                            systemType, (byte)_game.Options.Map);
                         return;
                     }
 
@@ -43,10 +43,10 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case SystemTypes.Laboratory:
 
-                    if (_game.Options.MapId != 2)
+                    if ((byte)_game.Options.Map != 2)
                     {
                         _logger.LogWarning("{0}: {1} is not a valid sabotage on map {2}", nameof(InnerShipStatus),
-                            systemType, _game.Options.MapId);
+                            systemType, (byte)_game.Options.Map);
                         return;
                     }
 

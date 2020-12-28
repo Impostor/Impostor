@@ -8,7 +8,7 @@
             if (MapId == 0 || MapId > 2) return DecontamDoors.None;
 
             byte offset = 0;
-            
+
             if (MapId == 1 && SystemType != SystemTypes.Decontamination) return DecontamDoors.None;
             if (MapId == 2)
             {

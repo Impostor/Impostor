@@ -109,9 +109,9 @@ namespace Impostor.Server.Net.Inner.Objects
                         
                         case SystemTypes.Doors:
 
-                            if (_game.Options.MapId != 2)
+                            if ((byte)_game.Options.Map != 2)
                             {
-                                _logger.LogWarning($"{nameof(InnerShipStatus)}: Client sent {nameof(RpcCalls.RepairSystem)} for {nameof(SystemTypes.Doors)} on map {_game.Options.MapId}");
+                                _logger.LogWarning($"{nameof(InnerShipStatus)}: Client sent {nameof(RpcCalls.RepairSystem)} for {nameof(SystemTypes.Doors)} on map {(byte)_game.Options.Map}");
                                 break;
                             }
                             
@@ -128,9 +128,9 @@ namespace Impostor.Server.Net.Inner.Objects
                         case SystemTypes.Decontamination:
                         case SystemTypes.TopDecontaminationPolus:
 
-                            if (_game.Options.MapId == 0)
+                            if ((byte)_game.Options.Map == 0)
                             {
-                                _logger.LogWarning($"{nameof(InnerShipStatus)}: Client sent {nameof(RpcCalls.RepairSystem)} for {systemType} on map {_game.Options.MapId}");
+                                _logger.LogWarning($"{nameof(InnerShipStatus)}: Client sent {nameof(RpcCalls.RepairSystem)} for {systemType} on map {(byte)_game.Options.Map}");
                                 break;
                             }
                             

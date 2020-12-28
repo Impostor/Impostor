@@ -15,7 +15,7 @@ namespace Impostor.Server.Events.Ship
             ClientPlayer = clientPlayer;
             SystemType = systemType;
             DoorId = doorId;
-            DecontamDoor = DecontamDoorsParser.Parse(game.Options.MapId, systemType, doorId);
+            DecontamDoor = DecontamDoorsParser.Parse((byte)game.Options.Map, systemType, doorId);
         }
         
         public IGame Game { get; }
