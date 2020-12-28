@@ -101,38 +101,30 @@ namespace Impostor.Server.Net.Inner.Objects
             await _game.FinishRpcAsync(writer, player.OwnerId);
         }
 
-        public async ValueTask SetMurderedByAsync(IClientPlayer impostor)
+        public async ValueTask MurderPlayerAsync(IInnerPlayerControl target)
         {
-            if (impostor.Character == null)
+            if (!PlayerInfo.IsImpostor)
             {
-                throw new ImpostorException("Character is null.");
-            }
-
-            if (!impostor.Character.PlayerInfo.IsImpostor)
-            {
-                throw new ImpostorProtocolException("Plugin tried to murder a player while the impostor specified was not an impostor.");
-            }
-
-            if (impostor.Character.PlayerInfo.IsDead)
-            {
-                throw new ImpostorProtocolException("Plugin tried to murder a player while the impostor specified was dead.");
+                throw new ImpostorProtocolException("Tried to murder a player, but murderer was not the impostor.");
             }
 
             if (PlayerInfo.IsDead)
             {
-                return;
+                throw new ImpostorProtocolException("Tried to murder a player, but murderer was not alive.");
             }
 
-            // Update player.
-            Die(DeathReason.Kill);
+            if (target.PlayerInfo.IsDead)
+            {
+                throw new ImpostorProtocolException("Tried to murder a player, but target was not alive.");
+            }
 
-            // Send RPC.
-            using var writer = _game.StartRpc(impostor.Character.NetId, RpcCalls.MurderPlayer);
-            writer.WritePacked(NetId);
+            ((InnerPlayerControl)target).Die(DeathReason.Kill);
+
+            using var writer = _game.StartRpc(NetId, RpcCalls.MurderPlayer);
+            writer.WritePacked(target.NetId);
             await _game.FinishRpcAsync(writer);
 
-            // Notify plugins.
-            await _eventManager.CallAsync(new PlayerMurderEvent(_game, impostor, impostor.Character, this));
+            await _eventManager.CallAsync(new PlayerMurderEvent(_game, _game.GetClientPlayer(OwnerId), this, target));
         }
     }
 }

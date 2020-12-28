@@ -106,11 +106,13 @@ namespace Impostor.Api.Net.Inner.Objects
         ValueTask SendChatToPlayerAsync(string text, IInnerPlayerControl? player = null);
 
         /// <summary>
-        ///     Sets the current to be murdered by an impostor <see cref="IInnerPlayerControl"/>.
-        ///     Visible to all players.
+        ///     Murder <paramref name="target"/> player.
         /// </summary>
-        /// /// <param name="impostor">The Impostor who kill.</param>
+        /// <param name="target">Target player to murder.</param>
+        /// <exception cref="ImpostorProtocolException">Thrown when player is not the impostor.</exception>
+        /// <exception cref="ImpostorProtocolException">Thrown when player is dead.</exception>
+        /// <exception cref="ImpostorProtocolException">Thrown when target is dead.</exception>
         /// <returns>Task that must be awaited.</returns>
-        ValueTask SetMurderedByAsync(IClientPlayer impostor);
+        ValueTask MurderPlayerAsync(IInnerPlayerControl target);
     }
 }
