@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Events.Player;
@@ -209,7 +210,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} to a specific player instead of broadcast");
                     }
 
-                    PlayerInfo.ColorId = reader.ReadByte();
+                    PlayerInfo.Color = (ColorType) reader.ReadByte();
                     break;
                 }
 
@@ -226,7 +227,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetHat)} to a specific player instead of broadcast");
                     }
 
-                    PlayerInfo.HatId = reader.ReadPackedUInt32();
+                    PlayerInfo.Hat = (HatType) reader.ReadPackedUInt32();
                     break;
                 }
 
@@ -242,7 +243,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetHat)} to a specific player instead of broadcast");
                     }
 
-                    PlayerInfo.SkinId = reader.ReadPackedUInt32();
+                    PlayerInfo.Skin = (SkinType) reader.ReadPackedUInt32();
                     break;
                 }
 
@@ -388,7 +389,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetPet)} to a specific player instead of broadcast");
                     }
 
-                    PlayerInfo.PetId = reader.ReadPackedUInt32();
+                    PlayerInfo.Pet = (PetType) reader.ReadPackedUInt32();
                     break;
                 }
 

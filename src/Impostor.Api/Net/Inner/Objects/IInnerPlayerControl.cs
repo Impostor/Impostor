@@ -41,48 +41,32 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     Sets the color of the current <see cref="IInnerPlayerControl"/>.
         ///     Visible to all players.
         /// </summary>
-        /// <param name="colorId">A color for the player.</param>
-        /// <returns>Task that must be awaited.</returns>
-        ValueTask SetColorAsync(byte colorId);
-
         /// <param name="colorType">A color for the player.</param>
-        /// <inheritdoc cref="SetColorAsync(byte)" />
+        /// <returns>Task that must be awaited.</returns>
         ValueTask SetColorAsync(ColorType colorType);
 
         /// <summary>
         ///     Sets the hat of the current <see cref="IInnerPlayerControl"/>.
         ///     Visible to all players.
         /// </summary>
-        /// <param name="hatId">An hat for the player.</param>
-        /// <returns>Task that must be awaited.</returns>
-        ValueTask SetHatAsync(uint hatId);
-
         /// <param name="hatType">An hat for the player.</param>
-        /// <inheritdoc cref="SetHatAsync(uint)" />
+        /// <returns>Task that must be awaited.</returns>
         ValueTask SetHatAsync(HatType hatType);
 
         /// <summary>
         ///     Sets the pet of the current <see cref="IInnerPlayerControl"/>.
         ///     Visible to all players.
         /// </summary>
-        /// <param name="petId">A pet for the player.</param>
-        /// <returns>Task that must be awaited.</returns>
-        ValueTask SetPetAsync(uint petId);
-
         /// <param name="petType">A pet for the player.</param>
-        /// <inheritdoc cref="SetPetAsync(uint)" />
+        /// <returns>Task that must be awaited.</returns>
         ValueTask SetPetAsync(PetType petType);
 
         /// <summary>
         ///     Sets the skin of the current <see cref="IInnerPlayerControl"/>.
         ///     Visible to all players.
         /// </summary>
-        /// <param name="skinId">A skin for the player.</param>
-        /// <returns>Task that must be awaited.</returns>
-        ValueTask SetSkinAsync(uint skinId);
-
         /// <param name="skinType">A skin for the player.</param>
-        /// <inheritdoc cref="SetSkinAsync(uint)" />
+        /// <returns>Task that must be awaited.</returns>
         ValueTask SetSkinAsync(SkinType skinType);
 
         /// <summary>

@@ -1,6 +1,6 @@
 namespace Impostor.Api.Innersloth.Customization
 {
-    public enum PetType
+    public enum PetType : uint
     {
         NoPet = 0,
         Alien = 1,
