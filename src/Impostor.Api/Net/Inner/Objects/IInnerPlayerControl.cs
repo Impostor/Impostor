@@ -98,5 +98,16 @@ namespace Impostor.Api.Net.Inner.Objects
         /// <exception cref="ImpostorProtocolException">Thrown when target is dead.</exception>
         /// <returns>Task that must be awaited.</returns>
         ValueTask MurderPlayerAsync(IInnerPlayerControl target);
+        
+        /// <summary>
+        ///     Murder <paramref name="target"/> player.
+        ///     The <see cref="IPlayerMurderEvent"/> isn't fired.
+        /// </summary>
+        /// <param name="target">Target player to murder.</param>
+        /// <exception cref="ImpostorProtocolException">Thrown when player is not the impostor.</exception>
+        /// <exception cref="ImpostorProtocolException">Thrown when player is dead.</exception>
+        /// <exception cref="ImpostorProtocolException">Thrown when target is dead.</exception>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask MurderPlayerNoEventAsync(IInnerPlayerControl target);
     }
 }
