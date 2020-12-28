@@ -81,7 +81,7 @@ namespace Impostor.Server.Net.Inner.Objects
             await _game.FinishRpcAsync(writer, player.OwnerId);
         }
 
-        public async ValueTask MurderPlayerAsync(IInnerPlayerControl target)
+        public async ValueTask MurderPlayerAsync(IInnerPlayerControl target, bool fireEvent)
         {
             if (!PlayerInfo.IsImpostor)
             {
@@ -104,7 +104,8 @@ namespace Impostor.Server.Net.Inner.Objects
             writer.WritePacked(target.NetId);
             await _game.FinishRpcAsync(writer);
 
-            await _eventManager.CallAsync(new PlayerMurderEvent(_game, _game.GetClientPlayer(OwnerId), this, target));
+            if (fireEvent)
+                await _eventManager.CallAsync(new PlayerMurderEvent(_game, _game.GetClientPlayer(OwnerId), this, target));
         }
     }
 }

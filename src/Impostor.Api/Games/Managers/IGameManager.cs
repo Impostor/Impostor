@@ -10,6 +10,6 @@ namespace Impostor.Api.Games.Managers
 
         IGame? Find(GameCode code);
 
-        ValueTask<IGame> CreateAsync(GameOptionsData options);
+        ValueTask<IGame> CreateAsync(GameOptionsData options, bool fireEvent);
     }
 }

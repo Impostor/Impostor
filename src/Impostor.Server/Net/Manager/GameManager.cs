@@ -44,14 +44,14 @@ namespace Impostor.Server.Net.Manager
 
         IGame IGameManager.Find(GameCode code) => Find(code);
 
-        public async ValueTask<IGame> CreateAsync(GameOptionsData options)
+        public async ValueTask<IGame> CreateAsync(GameOptionsData options, bool fireEvent)
         {
             // TODO: Prevent duplicates when using server redirector using INodeProvider.
-            var (success, game) = await TryCreateAsync(options);
+            var (success, game) = await TryCreateAsync(options, fireEvent);
 
             for (int i = 0; i < 10 && !success; i++)
             {
-                (success, game) = await TryCreateAsync(options);
+                (success, game) = await TryCreateAsync(options, fireEvent);
             }
 
             if (!success)
@@ -62,7 +62,7 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        private async ValueTask<(bool success, Game game)> TryCreateAsync(GameOptionsData options)
+        private async ValueTask<(bool success, Game game)> TryCreateAsync(GameOptionsData options, bool fireEvent)
         {
             var gameCode = _gameCodeFactory.Create();
             var gameCodeStr = gameCode.Code;
@@ -76,7 +76,8 @@ namespace Impostor.Server.Net.Manager
             await _nodeLocator.SaveAsync(gameCodeStr, _publicIp);
             _logger.LogDebug("Created game with code {0}.", game.Code);
 
-            await _eventManager.CallAsync(new GameCreatedEvent(game));
+            if (fireEvent)
+                await _eventManager.CallAsync(new GameCreatedEvent(game));
 
             return (true, game);
         }
