@@ -54,13 +54,6 @@ namespace Impostor.Api.Games
         ValueTask SyncSettingsAsync();
 
         /// <summary>
-        ///     Sets the specified list as Impostor on all connected players.
-        /// </summary>
-        /// <param name="players">List of players to be Impostor.</param>
-        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
-        ValueTask SetInfectedAsync(IEnumerable<IInnerPlayerControl> players);
-
-        /// <summary>
         ///     Send the message to all players.
         /// </summary>
         /// <param name="writer">Message to send.</param>
