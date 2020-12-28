@@ -324,7 +324,7 @@ namespace Impostor.Server.Net
         {
             using var message = MessageWriter.Get(MessageType.Reliable);
 
-            var games = _gameManager.FindListings((MapFlags)options.MapId, options.NumImpostors, options.Keywords);
+            var games = _gameManager.FindListings((MapFlags)options.Map, options.NumImpostors, options.Keywords);
 
             var skeldGameCount = _gameManager.GetGameCount(MapFlags.Skeld);
             var miraHqGameCount = _gameManager.GetGameCount(MapFlags.MiraHQ);

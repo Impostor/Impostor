@@ -25,10 +25,10 @@ namespace Impostor.Api.Net.Messages.S2C
                 writer.Write(game.PublicIp.Address);
                 writer.Write((ushort)game.PublicIp.Port);
                 writer.Write(game.Code);
-                writer.Write(game.Host.Client.Name);
+                writer.Write(game.DisplayName ?? game.Host.Client.Name);
                 writer.Write((byte)game.PlayerCount);
                 writer.WritePacked(1); // TODO: What does Age do?
-                writer.Write((byte)game.Options.MapId);
+                writer.Write((byte)game.Options.Map);
                 writer.Write((byte)game.Options.NumImpostors);
                 writer.Write((byte)game.Options.MaxPlayers);
                 writer.EndMessage();
