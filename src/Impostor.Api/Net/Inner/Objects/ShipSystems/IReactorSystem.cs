@@ -22,7 +22,7 @@ namespace Impostor.Api.Net.Inner.Objects.ShipSystems
         /// </summary>
         /// <param name="time">Countdown for the sabotage.</param>
         /// <returns>Task that must be awaited.</returns>
-        ValueTask Start(float time = 30.0f);
+        ValueTask Start(float time = -1f);
 
         /// <summary>
         ///     Stops the reactor sabotage.

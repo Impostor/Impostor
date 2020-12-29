@@ -1,4 +1,4 @@
-﻿namespace Impostor.Api.Innersloth
+namespace Impostor.Api.Innersloth
 {
     public enum SystemTypes : byte
     {
