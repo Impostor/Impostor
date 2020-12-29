@@ -39,6 +39,8 @@ namespace Impostor.Server.Net.Inner.Objects
                 [SystemTypes.Doors] = new DoorsSystemType(_eventManager, _game),
             };
 
+            _systems.Add(SystemTypes.Laboratory, _systems[SystemTypes.Reactor]); // alias for Polus
+
             _systems.Add(SystemTypes.Sabotage, new SabotageSystem(
                 new[]
             {
@@ -46,6 +48,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 (IActivatable)_systems[SystemTypes.Reactor],
                 (IActivatable)_systems[SystemTypes.LifeSupp],
                 (IActivatable)_systems[SystemTypes.Electrical],
+                (IActivatable)_systems[SystemTypes.Laboratory],
             }, _eventManager,
                 _game));
 

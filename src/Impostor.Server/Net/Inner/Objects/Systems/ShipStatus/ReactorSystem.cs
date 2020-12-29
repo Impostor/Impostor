@@ -38,13 +38,16 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             Countdown = reader.ReadSingle();
             UserConsolePairs.Clear(); // TODO: Thread safety
 
-            var count = reader.ReadPackedInt32();
-
-            for (var i = 0; i < count; i++)
+            if (!initialState)
             {
-                var playerId = reader.ReadByte();
-                var player = _game.Players.Where((player) => player?.Character?.PlayerId == playerId).First();
-                UserConsolePairs.Add(new Tuple<IClientPlayer, byte>(player, reader.ReadByte()));
+                var count = reader.ReadPackedInt32();
+
+                for (var i = 0; i < count; i++)
+                {
+                    var playerId = reader.ReadByte();
+                    var player = _game.Players.Where((player) => player?.Character?.PlayerId == playerId).First();
+                    UserConsolePairs.Add(new Tuple<IClientPlayer, byte>(player, reader.ReadByte()));
+                }
             }
 
             await _eventManager.CallAsync(new ShipReactorStateChangedEvent(_game, this));

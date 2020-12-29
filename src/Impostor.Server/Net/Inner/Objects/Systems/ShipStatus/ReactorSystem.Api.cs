@@ -26,8 +26,17 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 
             using var writer = _game.StartDataMessage(_game.GameNet.ShipStatus.NetId);
 
-            writer.WritePacked(1 << (int)SystemTypes.Reactor);
-            writer.Write(time); // time
+            if (_game.Options.Map != MapTypes.Polus)
+            {
+                writer.WritePacked(1 << (int)SystemTypes.Reactor);
+                writer.Write(time < 0 ? 30.0f : time); // time
+            }
+            else
+            {
+                writer.WritePacked(1 << (int)SystemTypes.Laboratory);
+                writer.Write(time < 0 ? 60.0f : time); // time
+            }
+
             writer.WritePacked(0); // Number of players holding buttons
 
             await _game.FinishDataMessageAsync(writer);
