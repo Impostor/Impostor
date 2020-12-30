@@ -52,6 +52,13 @@ namespace Impostor.Api.Games
         void BanIp(IPAddress ipAddress);
 
         /// <summary>
+        /// Sets the Game Privacy.
+        /// </summary>
+        /// <param name="privacy">Game Privacy.</param>
+        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        ValueTask SetGamePrivacyAsync(GamePrivacy privacy);
+
+        /// <summary>
         ///     Syncs the internal <see cref="GameOptionsData"/> to all players.
         ///     Necessary to do if you modified it, otherwise it won't be used.
         /// </summary>
