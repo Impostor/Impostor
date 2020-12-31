@@ -49,7 +49,16 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
         {
             using var writer = _game.StartDataMessage(_game.GameNet.ShipStatus.NetId);
 
-            writer.WritePacked(1 << (int)SystemTypes.Reactor);
+
+            if (_game.Options.Map != MapTypes.Polus)
+            {
+                writer.WritePacked(1 << (int)SystemTypes.Reactor);
+            }
+            else
+            {
+                writer.WritePacked(1 << (int)SystemTypes.Laboratory);
+            }
+
             writer.Write(10000f); // time
             writer.WritePacked(0); // Number of players holding buttons
 
