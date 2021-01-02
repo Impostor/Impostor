@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,8 +46,11 @@ namespace Impostor.Server.Net.Manager
 
         public async ValueTask<IGame> CreateAsync(GameOptionsData options)
         {
+            var beforeGameCreatedEvent = new BeforeGameCreatedEvent(_games.Keys);
+            await _eventManager.CallAsync(beforeGameCreatedEvent);
+
             // TODO: Prevent duplicates when using server redirector using INodeProvider.
-            var (success, game) = await TryCreateAsync(options);
+            var (success, game) = await TryCreateAsync(options, beforeGameCreatedEvent.GameCode);
 
             for (int i = 0; i < 10 && !success; i++)
             {
@@ -62,9 +65,9 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        private async ValueTask<(bool success, Game game)> TryCreateAsync(GameOptionsData options)
+        private async ValueTask<(bool success, Game game)> TryCreateAsync(GameOptionsData options, string? desiredGameCode = null)
         {
-            var gameCode = _gameCodeFactory.Create();
+            GameCode gameCode = desiredGameCode ?? _gameCodeFactory.Create();
             var gameCodeStr = gameCode.Code;
             var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options);
 
