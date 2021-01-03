@@ -8,16 +8,16 @@ namespace Impostor.Api.Events
     public interface IBeforeGameCreatedEvent : IEvent
     {
         /// <summary>
-        ///     Gets the game code set by this event.
+        ///     Gets the <see cref="Games.GameCode"/> set by this event.
         /// </summary>
-        string? GameCode { get; }
+        GameCode? GameCode { get; }
 
         /// <summary>
         ///     Tries to set the game code to be used. This doesn't garantee the code will be used, if another lobby has been created with the same code before this event returns for exemple.
         /// </summary>
         /// <param name="gameCode">The code to try to set.</param>
-        /// <exception cref="ArgumentException">If the argument is null, is not 6 characters long or does not contains only letters.</exception>
+        /// <exception cref="ArgumentException">If the argument is not 6 characters long or does not contains only letters.</exception>
         /// <returns>True if the code has been set. False if the code already exists.</returns>
-        bool TryToSetCode(string gameCode);
+        bool TryToSetCode(GameCode gameCode);
     }
 }

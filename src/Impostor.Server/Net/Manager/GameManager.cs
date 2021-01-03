@@ -65,9 +65,9 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        private async ValueTask<(bool success, Game game)> TryCreateAsync(GameOptionsData options, string? desiredGameCode = null)
+        private async ValueTask<(bool success, Game game)> TryCreateAsync(GameOptionsData options, GameCode? desiredGameCode = null)
         {
-            GameCode gameCode = desiredGameCode ?? _gameCodeFactory.Create();
+            var gameCode = desiredGameCode ?? _gameCodeFactory.Create();
             var gameCodeStr = gameCode.Code;
             var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options);
 
