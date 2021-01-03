@@ -96,5 +96,6 @@
         NinjaMask = 91,
         RamHorns = 92,
         Snowman2 = 93,
+        GeoffKeighley = 94,
     }
 }
