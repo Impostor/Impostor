@@ -45,8 +45,12 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
                 for (var i = 0; i < count; i++)
                 {
                     var playerId = reader.ReadByte();
-                    var player = _game.Players.Where((player) => player?.Character?.PlayerId == playerId).First();
-                    UserConsolePairs.Add(new Tuple<IClientPlayer, byte>(player, reader.ReadByte()));
+                    var player = _game.Players.Where((player) => player?.Character?.PlayerId == playerId).FirstOrDefault();
+
+                    if (player != null)
+                    {
+                        UserConsolePairs.Add(new Tuple<IClientPlayer, byte>(player, reader.ReadByte()));
+                    }
                 }
             }
 

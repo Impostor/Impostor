@@ -40,11 +40,14 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 
             CompletedConsoles.Clear(); // TODO: Thread safety
 
-            var num = reader.ReadPackedInt32();
-
-            for (var i = 0; i < num; i++)
+            if (!initialState)
             {
-                CompletedConsoles.Add(reader.ReadPackedInt32());
+                var num = reader.ReadPackedInt32();
+
+                for (var i = 0; i < num; i++)
+                {
+                    CompletedConsoles.Add(reader.ReadPackedInt32());
+                }
             }
 
             await _eventManager.CallAsync(new ShipOxygenStateChangedEvent(_game, this));
