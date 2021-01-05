@@ -112,5 +112,12 @@ namespace Impostor.Api.Net.Inner.Objects
         /// /// <param name="impostor">The Impostor who kill.</param>
         /// <returns>Task that must be awaited.</returns>
         ValueTask SetMurderedByAsync(IClientPlayer impostor);
+
+        /// <summary>
+        ///     Sets all the player's tasks as complete, if the player is a crewmate.
+        ///     Visible to all players.
+        /// </summary>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask SetAllTasksCompleteAsync();
     }
 }

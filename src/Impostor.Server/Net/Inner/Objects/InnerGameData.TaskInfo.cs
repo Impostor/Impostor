@@ -1,13 +1,24 @@
-﻿using Impostor.Api.Innersloth;
+using System.Threading.Tasks;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
     internal partial class InnerGameData
     {
-        public class TaskInfo : ITaskInfo
+        public partial class TaskInfo : ITaskInfo
         {
+            private readonly Game _game;
+            private readonly IInnerPlayerControl _player;
+
+            public TaskInfo(Game game, IInnerPlayerControl player)
+            {
+                _game = game;
+                _player = player;
+            }
+
             public uint Id { get; internal set; }
 
             public bool Complete { get; internal set; }

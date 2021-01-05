@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
-using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
@@ -85,13 +85,13 @@ namespace Impostor.Server.Net.Inner.Objects
                         var player = GetPlayerById(message.Tag);
                         if (player != null)
                         {
-                            player.Deserialize(message);
+                            player.Deserialize(message, _game);
                         }
                         else
                         {
                             var playerInfo = new InnerPlayerInfo(message.Tag);
 
-                            playerInfo.Deserialize(reader);
+                            playerInfo.Deserialize(reader, _game);
 
                             if (!_allPlayers.TryAdd(playerInfo.PlayerId, playerInfo))
                             {
@@ -134,7 +134,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     var playerId = reader.ReadByte();
                     var playerInfo = new InnerPlayerInfo(playerId);
 
-                    playerInfo.Deserialize(reader);
+                    playerInfo.Deserialize(reader, _game);
 
                     if (!_allPlayers.TryAdd(playerInfo.PlayerId, playerInfo))
                     {
@@ -177,7 +177,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             foreach (var taskId in taskTypeIds.ToArray())
             {
-                player.Tasks.Add(new TaskInfo
+                player.Tasks.Add(new TaskInfo(_game, player.Controller)
                 {
                     Id = taskId,
                 });
