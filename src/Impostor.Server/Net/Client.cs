@@ -175,6 +175,7 @@ namespace Impostor.Server.Net
                     }
                     catch (ImpostorCheatException e)
                     {
+                        if (_antiCheatConfig.DisableAntiCheat) return;
                         if (_antiCheatConfig.BanIpFromGame)
                         {
                             Player.Game.BanIp(Connection.EndPoint.Address);
