@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api.Net.Inner.Objects;
+using Impostor.Server.Events.Player;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
@@ -18,8 +19,11 @@ namespace Impostor.Server.Net.Inner.Objects
                 Complete = true;
 
                 using var writer = _game.StartRpc(_player.NetId, RpcCalls.CompleteTask);
-                writer.Write(_player.PlayerInfo.Tasks.ToList().IndexOf(this));
+                writer.Write(Id);
                 await _game.FinishRpcAsync(writer);
+
+                // Notify plugins.
+                await _eventManager.CallAsync(new PlayerCompletedTaskEvent(_game, _game.GetClientPlayer(_player.OwnerId), _player, this));
             }
         }
     }
