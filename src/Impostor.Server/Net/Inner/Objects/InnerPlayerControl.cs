@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Events.Player;
@@ -158,12 +159,34 @@ namespace Impostor.Server.Net.Inner.Objects
                 // Validates the player name at the host.
                 case RpcCalls.CheckName:
                 {
+                    if (!sender.IsOwner(this))
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckName)} to an unowned {nameof(InnerPlayerControl)}");
+                    }
+
                     if (target == null || !target.IsHost)
                     {
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckName)} to the wrong player");
                     }
 
                     var name = reader.ReadString();
+
+                    if (name.Length > 10)
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckName)} with name exceeding 10 characters");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(name) || !name.All(TextBox.IsCharAllowed))
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckName)} with name containing illegal characters");
+                    }
+
+                    if (sender.Client.Name != name)
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with name not matching his name from handshake");
+                    }
+
+                    PlayerInfo.RequestedPlayerName = name;
                     break;
                 }
 
@@ -180,19 +203,78 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} to a specific player instead of broadcast");
                     }
 
-                    PlayerInfo.PlayerName = reader.ReadString();
+                    var name = reader.ReadString();
+
+                    if (sender.IsOwner(this))
+                    {
+                        if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == name))
+                        {
+                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with a name that is already used");
+                        }
+
+                        if (sender.Client.Name != name)
+                        {
+                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with name not matching his name from handshake");
+                        }
+                    }
+                    else
+                    {
+                        if (PlayerInfo.RequestedPlayerName == null)
+                        {
+                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it");
+                        }
+
+                        var expected = PlayerInfo.RequestedPlayerName!;
+
+                        if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == expected))
+                        {
+                            var i = 1;
+                            while (true)
+                            {
+                                string text = expected + " " + i;
+
+                                if (_game.Players.All(x => x.Character == null || x.Character == this || x.Character.PlayerInfo.PlayerName != text))
+                                {
+                                    expected = text;
+                                    break;
+                                }
+
+                                i++;
+                            }
+                        }
+
+                        if (name != expected)
+                        {
+                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with incorrect name");
+                        }
+                    }
+
+                    PlayerInfo.PlayerName = name;
+                    PlayerInfo.RequestedPlayerName = null;
                     break;
                 }
 
                 // Validates the color at the host.
                 case RpcCalls.CheckColor:
                 {
+                    if (!sender.IsOwner(this))
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckColor)} to an unowned {nameof(InnerPlayerControl)}");
+                    }
+
                     if (target == null || !target.IsHost)
                     {
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckColor)} to the wrong player");
                     }
 
                     var color = reader.ReadByte();
+
+                    if (color > Enum.GetValues<ColorType>().Length)
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckColor)} with invalid color");
+                    }
+
+                    PlayerInfo.RequestedColorId = color;
                     break;
                 }
 
@@ -209,7 +291,37 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} to a specific player instead of broadcast");
                     }
 
-                    PlayerInfo.ColorId = reader.ReadByte();
+                    var color = reader.ReadByte();
+
+                    if (sender.IsOwner(this))
+                    {
+                        if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.ColorId == color))
+                        {
+                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} with a color that is already used");
+                        }
+                    }
+                    else
+                    {
+                        if (PlayerInfo.RequestedColorId == null)
+                        {
+                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} for a player that didn't request it");
+                        }
+
+                        var expected = PlayerInfo.RequestedColorId!.Value;
+
+                        while (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.ColorId == expected))
+                        {
+                            expected = (byte)((expected + 1) % Enum.GetValues<ColorType>().Length);
+                        }
+
+                        if (color != expected)
+                        {
+                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} with incorrect color");
+                        }
+                    }
+
+                    PlayerInfo.ColorId = color;
+                    PlayerInfo.RequestedColorId = null;
                     break;
                 }
 
