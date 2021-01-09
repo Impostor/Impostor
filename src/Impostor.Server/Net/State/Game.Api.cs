@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api;
@@ -56,7 +57,7 @@ namespace Impostor.Server.Net.State
 
             using (var writer = StartRpc(Host.Character.NetId, RpcCalls.SetInfected))
             {
-                writer.Write((byte)Host.Character.NetId);
+                writer.WritePacked((uint)players.Count());
 
                 foreach (var player in players)
                 {
