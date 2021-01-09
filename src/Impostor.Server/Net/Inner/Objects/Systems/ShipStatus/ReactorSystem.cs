@@ -38,21 +38,18 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             Countdown = reader.ReadSingle();
             UserConsolePairs.Clear(); // TODO: Thread safety
 
-            if (!initialState)
+            var count = reader.ReadPackedInt32();
+
+            for (var i = 0; i < count; i++)
             {
-                var count = reader.ReadPackedInt32();
+                var playerId = reader.ReadByte();
+                var consoleId = reader.ReadByte();
 
-                for (var i = 0; i < count; i++)
+                var player = _game.Players.Where((player) => player?.Character?.PlayerId == playerId).FirstOrDefault();
+
+                if (player != null)
                 {
-                    var playerId = reader.ReadByte();
-                    var consoleId = reader.ReadByte();
-
-                    var player = _game.Players.Where((player) => player?.Character?.PlayerId == playerId).FirstOrDefault();
-
-                    if (player != null)
-                    {
-                        UserConsolePairs.Add(new Tuple<IClientPlayer, byte>(player, consoleId));
-                    }
+                    UserConsolePairs.Add(new Tuple<IClientPlayer, byte>(player, consoleId));
                 }
             }
 
