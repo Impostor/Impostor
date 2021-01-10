@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
@@ -46,6 +47,10 @@ namespace Impostor.Server.Net.Inner.Objects
         public InnerCustomNetworkTransform NetworkTransform { get; }
 
         public InnerPlayerInfo PlayerInfo { get; internal set; }
+
+        internal Queue<string> RequestedPlayerName { get; } = new Queue<string>();
+
+        internal Queue<byte> RequestedColorId { get; } = new Queue<byte>();
 
         public override async ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
@@ -186,7 +191,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with name not matching his name from handshake");
                     }
 
-                    PlayerInfo.RequestedPlayerName = name;
+                    RequestedPlayerName.Enqueue(name);
                     break;
                 }
 
@@ -219,12 +224,12 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
                     else
                     {
-                        if (PlayerInfo.RequestedPlayerName == null)
+                        if (!RequestedPlayerName.Any())
                         {
                             throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it");
                         }
 
-                        var expected = PlayerInfo.RequestedPlayerName!;
+                        var expected = RequestedPlayerName.Dequeue();
 
                         if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == expected))
                         {
@@ -250,7 +255,6 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     PlayerInfo.PlayerName = name;
-                    PlayerInfo.RequestedPlayerName = null;
                     break;
                 }
 
@@ -274,7 +278,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckColor)} with invalid color");
                     }
 
-                    PlayerInfo.RequestedColorId = color;
+                    RequestedColorId.Enqueue(color);
                     break;
                 }
 
@@ -302,12 +306,12 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
                     else
                     {
-                        if (PlayerInfo.RequestedColorId == null)
+                        if (!RequestedColorId.Any())
                         {
                             throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} for a player that didn't request it");
                         }
 
-                        var expected = PlayerInfo.RequestedColorId!.Value;
+                        var expected = RequestedColorId.Dequeue();
 
                         while (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.ColorId == expected))
                         {
@@ -321,7 +325,6 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     PlayerInfo.ColorId = color;
-                    PlayerInfo.RequestedColorId = null;
                     break;
                 }
 

@@ -19,11 +19,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public string PlayerName { get; internal set; }
 
-        public string? RequestedPlayerName { get; internal set; }
-
         public byte ColorId { get; internal set; }
-
-        public byte? RequestedColorId { get; internal set; }
 
         public uint HatId { get; internal set; }
 
