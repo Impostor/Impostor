@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
-using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Events.Player;
@@ -20,6 +19,8 @@ namespace Impostor.Server.Net.Inner.Objects
         private readonly ILogger<InnerPlayerControl> _logger;
         private readonly IEventManager _eventManager;
         private readonly Game _game;
+        private int _changeNameRequests;
+        private int _changeColorRequests;
 
         public InnerPlayerControl(ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager, Game game)
         {
@@ -181,12 +182,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckName)} with name containing illegal characters");
                     }
 
-                    if (sender.Client.Name != name)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with name not matching his name from handshake");
-                    }
-
-                    PlayerInfo.RequestedPlayerName = name;
+                    _changeNameRequests++;
                     break;
                 }
 
@@ -205,52 +201,18 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     var name = reader.ReadString();
 
-                    if (sender.IsOwner(this))
+                    if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == name))
                     {
-                        if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == name))
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with a name that is already used");
-                        }
-
-                        if (sender.Client.Name != name)
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with name not matching his name from handshake");
-                        }
-                    }
-                    else
-                    {
-                        if (PlayerInfo.RequestedPlayerName == null)
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it");
-                        }
-
-                        var expected = PlayerInfo.RequestedPlayerName!;
-
-                        if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == expected))
-                        {
-                            var i = 1;
-                            while (true)
-                            {
-                                string text = expected + " " + i;
-
-                                if (_game.Players.All(x => x.Character == null || x.Character == this || x.Character.PlayerInfo.PlayerName != text))
-                                {
-                                    expected = text;
-                                    break;
-                                }
-
-                                i++;
-                            }
-                        }
-
-                        if (name != expected)
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with incorrect name");
-                        }
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with a name that is already used");
                     }
 
+                    if (!sender.IsOwner(this) && _changeNameRequests <= 0)
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it");
+                    }
+
+                    _changeNameRequests--;
                     PlayerInfo.PlayerName = name;
-                    PlayerInfo.RequestedPlayerName = null;
                     break;
                 }
 
@@ -267,14 +229,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckColor)} to the wrong player");
                     }
 
-                    var color = reader.ReadByte();
-
-                    if (color > Enum.GetValues<ColorType>().Length)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckColor)} with invalid color");
-                    }
-
-                    PlayerInfo.RequestedColorId = color;
+                    _changeColorRequests++;
                     break;
                 }
 
@@ -293,35 +248,18 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     var color = reader.ReadByte();
 
-                    if (sender.IsOwner(this))
+                    if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.ColorId == color))
                     {
-                        if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.ColorId == color))
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} with a color that is already used");
-                        }
-                    }
-                    else
-                    {
-                        if (PlayerInfo.RequestedColorId == null)
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} for a player that didn't request it");
-                        }
-
-                        var expected = PlayerInfo.RequestedColorId!.Value;
-
-                        while (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.ColorId == expected))
-                        {
-                            expected = (byte)((expected + 1) % Enum.GetValues<ColorType>().Length);
-                        }
-
-                        if (color != expected)
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} with incorrect color");
-                        }
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} with a color that is already used");
                     }
 
+                    if (!sender.IsOwner(this) && _changeColorRequests <= 0)
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} for a player that didn't request it");
+                    }
+
+                    _changeColorRequests--;
                     PlayerInfo.ColorId = color;
-                    PlayerInfo.RequestedColorId = null;
                     break;
                 }
 
