@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using Impostor.Api.Net.Messages;
-using Impostor.Api.Reactor;
 
-namespace Impostor.Server.Net.Reactor
+namespace Impostor.Api.Reactor
 {
     public static class ModList
     {
@@ -16,8 +15,9 @@ namespace Impostor.Server.Net.Reactor
             {
                 var id = reader.ReadString();
                 var version = reader.ReadString();
+                var pluginSide = (PluginSide)reader.ReadByte();
 
-                mods.Add(new Mod(id, version));
+                mods.Add(new Mod(id, version, pluginSide));
             }
         }
     }

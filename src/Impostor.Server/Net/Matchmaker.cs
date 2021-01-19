@@ -7,7 +7,6 @@ using Impostor.Hazel;
 using Impostor.Hazel.Udp;
 using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
-using Impostor.Server.Net.Reactor;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 
@@ -56,12 +55,12 @@ namespace Impostor.Server.Net
         private async ValueTask OnNewConnection(NewConnectionEventArgs e)
         {
             // Handshake.
-            ModdedHandshake.Deserialize(e.HandshakeData, out var clientVersion, out var name, out var mods);
+            ModdedHandshakeC2S.Deserialize(e.HandshakeData, out var clientVersion, out var name, out var mods);
 
             var connection = new HazelConnection(e.Connection, _connectionLogger);
 
             // Register client
-            await _clientManager.RegisterConnectionAsync(connection, name, clientVersion);
+            await _clientManager.RegisterConnectionAsync(connection, name, clientVersion, mods);
         }
     }
 }

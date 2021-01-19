@@ -4,11 +4,13 @@ namespace Impostor.Api.Reactor
     {
         public readonly string Id;
         public readonly string Version;
+        public readonly PluginSide Side;
 
-        public Mod(string id, string version)
+        public Mod(string id, string version, PluginSide side)
         {
             Id = id;
             Version = version;
+            Side = side;
         }
 
         public override string ToString()

@@ -530,6 +530,20 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
                 }
 
+                case RpcCalls.CustomRpc:
+                {
+                    var lengthOrShortId = reader.ReadPackedInt32();
+
+                    var pluginId = lengthOrShortId < 0
+                        ? _game.Host!.Client.ModIdMap[lengthOrShortId]
+                        : reader.ReadString(lengthOrShortId);
+
+                    var id = reader.ReadPackedInt32();
+
+                    // TODO pooled CustomRpc event
+                    break;
+                }
+
                 default:
                 {
                     _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerPlayerControl), call);

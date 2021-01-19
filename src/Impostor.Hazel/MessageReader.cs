@@ -123,12 +123,16 @@ namespace Impostor.Hazel
             return output;
         }
 
+        public string ReadString(int length)
+        {
+            var output = Encoding.UTF8.GetString(Buffer.AsSpan(ReadPosition, length));
+            Position += length;
+            return output;
+        }
+
         public string ReadString()
         {
-            var len = ReadPackedInt32();
-            var output = Encoding.UTF8.GetString(Buffer.AsSpan(ReadPosition, len));
-            Position += len;
-            return output;
+            return ReadString(ReadPackedInt32());
         }
 
         public ReadOnlyMemory<byte> ReadBytesAndSize()

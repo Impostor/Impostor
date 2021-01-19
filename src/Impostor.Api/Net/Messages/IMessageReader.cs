@@ -47,6 +47,8 @@ namespace Impostor.Api.Net.Messages
 
         float ReadSingle();
 
+        string ReadString(int length);
+
         string ReadString();
 
         ReadOnlyMemory<byte> ReadBytesAndSize();

@@ -33,5 +33,6 @@
         RepairSystem = 28,
         SetTasks = 29,
         UpdateGameData = 30,
+        CustomRpc = byte.MaxValue
     }
 }

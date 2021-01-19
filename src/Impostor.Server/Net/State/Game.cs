@@ -71,7 +71,7 @@ namespace Impostor.Server.Net.State
 
         public int PlayerCount => _players.Count;
 
-        public ClientPlayer Host => _players[HostId];
+        public ClientPlayer? Host => _players.GetValueOrDefault(HostId);
 
         public IEnumerable<IClientPlayer> Players => _players.Select(p => p.Value);
 
