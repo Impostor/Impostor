@@ -19,7 +19,7 @@
         </section>
         <section class="container">
             <div class="mb-4 mb-md-3">
-                <h3 class="text-center text-md-left mb-4 mb-md-3 w-100">Connect to a Server</h3>
+                <h3 class="text-center text-md-left mb-4 mb-md-3 w-100">Generate the Server file</h3>
                 <p class="text-justify text-sm-center text-md-left support-text android-support">To play on a private server, type the server IP and overwrite the <b>regionInfo.dat</b> file in <b>Internal Storage/Android/data/com.innersloth.spacemafia/files</b>.</p>
                 <p class="text-justify text-sm-center text-md-left support-text ios-support">There are two methods to play on a private server on iOS, both of which require a <a href="https://canijailbreak.com">jailbreak</a>.</p>
                 <h4 class="text-md-left mb-4 mb-md-3 w-100 support-text ios-support">1. Jailbreak tweak</h4>
@@ -32,19 +32,38 @@
                     <p class="text-justify text-sm-center text-md-left support-text ios-support">Type the server IP and overwrite the <b>regionInfo.dat</b> file in <b>/var/mobile/Containers/Data/Application/Among Us/Documents</b> using Filza.</p>
                 </div>
             </div>
-            <form id="serverFileForm" class="container p-0">
-                <div class="row justify-content-center mb-5 mb-md-4">
-                    <div class="row justify-content-center flex-nowrap" stlye="max-width: 350px">
-                        <input class="form-control form-control-lg bg-transparent text-light text-center mr-2"
-                            type="text" placeholder="Server IP" id="ip" name="ip" required
-                            pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-                            data-mask=099.099.099.099 data-mask-selectonfocus="true">
-                        <input class="form-control form-control-lg bg-transparent text-light" style="max-width: 110px"
-                            type="number" placeholder="Port" id="port" name="port" min="1" max="65535" required>
+            <form id="serverFileForm" class="container">
+                <div class="justify-content-center bg-transparent text-light font-weight-light">
+                    <div class="form-row row-cols-2 flex-nowrap mb-5 mb-md-4 form-group">
+                        <label for="ip" class="col-lg-6 col-form-label col-form-label-lg text-right">Server IP:</label>
+                        <div class="col-lg-6">
+                            <input class="form-control form-control-lg bg-transparent text-center text-light"
+                                type="text" placeholder="IP address" id="ip" name="ip" required
+                                pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                                data-mask=099.099.099.099 data-mask-selectonfocus="true" />
+                        </div>
                     </div>
-                </div>
-               <div class="row justify-content-center">
-                    <button class="btn btn-primary btn-lg">Download server file</button>
+                    <div class="form-row row-cols-2 flex-nowrap mb-5 mb-md-4 form-group">
+                        <label for="port" class="col-lg-6 col-form-label col-form-label-lg text-right">Server Port:</label>
+                        <div class="col-lg-6">
+                            <input class="form-control form-control-lg bg-transparent text-center text-light"
+                                type="number" placeholder="Port" id="port" name="port" min="1" max="65535" aria-describedby="portHelpBlock" required />
+                            <small id="portHelpBlock" class="form-text text-muted">Default: <span id="default_server_port"></span></small>
+                        </div>
+                    </div>
+                    <div class="form-row row-cols-2 flex-nowrap mb-5 mb-md-4 form-group">
+                        <label for="region_name" class="col-lg-6 col-form-label col-form-label-lg text-right">Optional custom server name:</label>
+                        <div class="col-lg-6">
+                            <input class="form-control form-control-lg bg-transparent text-center text-light"
+                                type="text" placeholder="optional..." id="region_name" name="region_name" aria-describedby="serverNameHelpBlock"
+                                pattern="^[A-Za-z0-9-_]*$" />
+                            <small id="serverNameHelpBlock" class="form-text text-muted">The name which will be shown as Region in the game. Only A-Z a-z 0-9 - and _ are allowed.<br />
+                            Default: <span id="default_server_name"></span></small>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <button class="btn btn-primary btn-lg">Download server file</button>
+                    </div>
                 </div>
             </form>
             <div class="support-text desktop-support mt-4">
