@@ -56,8 +56,8 @@
                         <div class="col-lg-6">
                             <input class="form-control form-control-lg bg-transparent text-center text-light"
                                 type="text" placeholder="optional..." id="region_name" name="region_name" aria-describedby="serverNameHelpBlock"
-                                pattern="^[A-Za-z0-9-_]*$" />
-                            <small id="serverNameHelpBlock" class="form-text text-muted">The name which will be shown as Region in the game. Only A-Z a-z 0-9 - and _ are allowed.<br />
+                                pattern="^[A-Za-z0-9-_ ]*$" maxlength="20" />
+                            <small id="serverNameHelpBlock" class="form-text text-muted">The name which will be shown as Region in the game. Only A-Z a-z 0-9 - _ and <i>space</i> are allowed. Keep it simple!<br />
                             Default: <span id="default_server_name"></span></small>
                         </div>
                     </div>

@@ -12,7 +12,8 @@ $(document).ready(function(){
         e.preventDefault();
         let serverIp = $("#ip").val();
         let serverPort = $("#port").val();
-        let serverFileBytes = generateServerFile(REGION_NAME, serverIp, serverPort);
+        let serverName = $("#region_name").val();
+        let serverFileBytes = generateServerFile((serverName.length > 0 && serverName.length <= 20) ? serverName : REGION_NAME, serverIp, serverPort);
         let blob = new Blob([serverFileBytes.buffer]);
         saveFile(blob, "regionInfo.dat");
     });
