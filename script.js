@@ -2,6 +2,8 @@ var REGION_NAME = "Impostor"
 var SERVER_PORT = 22023;
 
 $(document).ready(function(){
+    $("#default_server_port").text(SERVER_PORT);
+    $("#default_server_name").text(REGION_NAME);
     fillIPAdressUsingLocationHash();
     
     showPlatformText();
