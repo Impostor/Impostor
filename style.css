@@ -56,3 +56,13 @@ body {
 code {
     white-space: nowrap;
 }
+
+
+form label {
+    text-align: right;
+}
+@media (max-width: 576px) {
+    form label {
+        text-align: center;
+    }
+}

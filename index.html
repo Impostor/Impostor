@@ -34,26 +34,26 @@
             </div>
             <form id="serverFileForm" class="container">
                 <div class="justify-content-center bg-transparent text-light font-weight-light">
-                    <div class="form-row row-cols-2 flex-nowrap mb-5 mb-md-4 form-group">
-                        <label for="ip" class="col-lg-6 col-form-label col-form-label-lg text-right">Server IP:</label>
-                        <div class="col-lg-6">
+                    <div class="form-row mb-5 mb-md-4 form-group">
+                        <label for="ip" class="col-sm-6 col-form-label col-form-label-lg">Server IP:</label>
+                        <div class="col-sm-6">
                             <input class="form-control form-control-lg bg-transparent text-center text-light"
                                 type="text" placeholder="IP address" id="ip" name="ip" required
                                 pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
                                 data-mask=099.099.099.099 data-mask-selectonfocus="true" />
                         </div>
                     </div>
-                    <div class="form-row row-cols-2 flex-nowrap mb-5 mb-md-4 form-group">
-                        <label for="port" class="col-lg-6 col-form-label col-form-label-lg text-right">Server Port:</label>
-                        <div class="col-lg-6">
+                    <div class="form-row mb-5 mb-md-4 form-group">
+                        <label for="port" class="col-sm-6 col-form-label col-form-label-lg">Server Port:</label>
+                        <div class="col-sm-6">
                             <input class="form-control form-control-lg bg-transparent text-center text-light"
                                 type="number" placeholder="Port" id="port" name="port" min="1" max="65535" aria-describedby="portHelpBlock" required />
                             <small id="portHelpBlock" class="form-text text-muted">Default: <span id="default_server_port"></span></small>
                         </div>
                     </div>
-                    <div class="form-row row-cols-2 flex-nowrap mb-5 mb-md-4 form-group">
-                        <label for="region_name" class="col-lg-6 col-form-label col-form-label-lg text-right">Optional custom server name:</label>
-                        <div class="col-lg-6">
+                    <div class="form-row mb-5 mb-md-4 form-group">
+                        <label for="region_name" class="col-sm-6 col-form-label col-form-label-lg">Optional custom server name:</label>
+                        <div class="col-sm-6">
                             <input class="form-control form-control-lg bg-transparent text-center text-light"
                                 type="text" placeholder="optional..." id="region_name" name="region_name" aria-describedby="serverNameHelpBlock"
                                 pattern="^[A-Za-z0-9-_ ]*$" maxlength="20" />
