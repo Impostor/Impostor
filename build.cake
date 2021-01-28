@@ -3,7 +3,7 @@
 #addin "nuget:?package=Cake.FileHelpers&Version=3.3.0"
 
 
-var buildId = EnvironmentVariable("APPVEYOR_BUILD_VERSION") ?? "0";
+var buildId = EnvironmentVariable("GITHUB_RUN_NUMBER") ?? "0";
 var buildVersion = EnvironmentVariable("IMPOSTOR_VERSION") ?? "1.0.0";
 var buildBranch = EnvironmentVariable("APPVEYOR_REPO_BRANCH") ?? "dev";
 var buildDir = MakeAbsolute(Directory("./build"));
@@ -46,11 +46,7 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
         }
     }
 
-    if (runtime == "win-x64") {
-        Zip(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".zip"));
-    } else {
-        GZipCompress(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".tar.gz"));
-    }
+    Zip(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".zip"));
 }
 
 private void ImpostorPublishNF(string name, string project) {

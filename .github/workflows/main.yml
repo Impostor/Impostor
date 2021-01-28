@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.102
+
+      - name: Cake Action
+        run: |
+          dotnet tool restore
+          dotnet cake build.cake --bootstrap
+          dotnet cake build.cake --pack
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./build/*.zip

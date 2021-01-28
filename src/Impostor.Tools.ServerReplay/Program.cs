@@ -139,7 +139,7 @@ namespace Impostor.Tools.ServerReplay
                     // Create and register connection.
                     var connection = new MockHazelConnection(address);
 
-                    await _clientManager.RegisterConnectionAsync(connection, name, 50516550);
+                    await _clientManager.RegisterConnectionAsync(connection, name, 50516550, null);
 
                     // Store reference for ourselfs.
                     Connections.Add(clientId, connection);

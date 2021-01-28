@@ -57,7 +57,7 @@ namespace Impostor.Server.Net.Manager
             return clientId;
         }
 
-        public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion, ISet<Mod> mods)
+        public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion, ISet<Mod>? mods)
         {
             if (!SupportedVersions.Contains(clientVersion))
             {
@@ -83,7 +83,7 @@ namespace Impostor.Server.Net.Manager
                 return;
             }
 
-            var client = _clientFactory.Create(connection, name, clientVersion, mods);
+            var client = _clientFactory.Create(connection, name, clientVersion, mods ?? new HashSet<Mod>(0));
             var id = NextId();
 
             client.Id = id;
