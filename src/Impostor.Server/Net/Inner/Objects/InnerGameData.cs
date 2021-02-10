@@ -7,22 +7,26 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Config;
 using Impostor.Server.Net.Inner.Objects.Components;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
     internal partial class InnerGameData : InnerNetObject, IInnerGameData
     {
         private readonly ILogger<InnerGameData> _logger;
+        private readonly AntiCheatConfig _antiCheatConfig;
         private readonly Game _game;
         private readonly ConcurrentDictionary<byte, InnerPlayerInfo> _allPlayers;
 
-        public InnerGameData(ILogger<InnerGameData> logger, Game game, IServiceProvider serviceProvider)
+        public InnerGameData(ILogger<InnerGameData> logger, IOptions<AntiCheatConfig> antiCheatOptions, Game game, IServiceProvider serviceProvider)
         {
             _logger = logger;
+            _antiCheatConfig = antiCheatOptions.Value;
             _game = game;
             _allPlayers = new ConcurrentDictionary<byte, InnerPlayerInfo>();
 
@@ -50,14 +54,20 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 case RpcCalls.SetTasks:
                 {
-                    if (!sender.IsHost)
+                    // Cheat detection
+                    if (_antiCheatConfig.Enabled)
                     {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetTasks)} but was not a host");
-                    }
+                        if (!sender.IsHost)
+                        {
+                            throw new ImpostorCheatException(
+                                $"Client sent {nameof(RpcCalls.SetTasks)} but was not a host");
+                        }
 
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetTasks)} to a specific player instead of broadcast");
+                        if (target != null)
+                        {
+                            throw new ImpostorCheatException(
+                                $"Client sent {nameof(RpcCalls.SetTasks)} to a specific player instead of broadcast");
+                        }
                     }
 
                     var playerId = reader.ReadByte();
@@ -69,14 +79,20 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.UpdateGameData:
                 {
-                    if (!sender.IsHost)
+                    // Cheat detection
+                    if (_antiCheatConfig.Enabled)
                     {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetTasks)} but was not a host");
-                    }
+                        if (!sender.IsHost)
+                        {
+                            throw new ImpostorCheatException(
+                                $"Client sent {nameof(RpcCalls.SetTasks)} but was not a host");
+                        }
 
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetTasks)} to a specific player instead of broadcast");
+                        if (target != null)
+                        {
+                            throw new ImpostorCheatException(
+                                $"Client sent {nameof(RpcCalls.SetTasks)} to a specific player instead of broadcast");
+                        }
                     }
 
                     while (reader.Position < reader.Length)
@@ -120,9 +136,14 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
-            if (!sender.IsHost)
+            // Cheat detection
+            if (_antiCheatConfig.Enabled)
             {
-                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerGameData)} as non-host");
+                if (!sender.IsHost)
+                {
+                    throw new ImpostorCheatException(
+                        $"Client attempted to send data for {nameof(InnerGameData)} as non-host");
+                }
             }
 
             if (initialState)

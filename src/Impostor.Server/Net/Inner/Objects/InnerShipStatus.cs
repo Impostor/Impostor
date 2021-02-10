@@ -6,22 +6,26 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Config;
 using Impostor.Server.Net.Inner.Objects.Systems;
 using Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
     internal class InnerShipStatus : InnerNetObject, IInnerShipStatus
     {
         private readonly ILogger<InnerShipStatus> _logger;
+        private readonly AntiCheatConfig _antiCheatConfig;
         private readonly Game _game;
         private readonly Dictionary<SystemTypes, ISystemType> _systems;
 
-        public InnerShipStatus(ILogger<InnerShipStatus> logger, Game game)
+        public InnerShipStatus(ILogger<InnerShipStatus> logger, IOptions<AntiCheatConfig> antiCheatOptions, Game game)
         {
             _logger = logger;
+            _antiCheatConfig = antiCheatOptions.Value;
             _game = game;
 
             _systems = new Dictionary<SystemTypes, ISystemType>
@@ -53,14 +57,20 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 case RpcCalls.CloseDoorsOfType:
                 {
-                    if (target == null || !target.IsHost)
+                    // Cheat detection
+                    if (_antiCheatConfig.Enabled)
                     {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CloseDoorsOfType)} to wrong destinition, must be host");
-                    }
+                        if (target == null || !target.IsHost)
+                        {
+                            throw new ImpostorCheatException(
+                                $"Client sent {nameof(RpcCalls.CloseDoorsOfType)} to wrong destinition, must be host");
+                        }
 
-                    if (!sender.Character.PlayerInfo.IsImpostor)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CloseDoorsOfType)} as crewmate");
+                        if (!sender.Character.PlayerInfo.IsImpostor)
+                        {
+                            throw new ImpostorCheatException(
+                                $"Client sent {nameof(RpcCalls.CloseDoorsOfType)} as crewmate");
+                        }
                     }
 
                     var systemType = (SystemTypes)reader.ReadByte();
@@ -70,15 +80,21 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.RepairSystem:
                 {
-                    if (target == null || !target.IsHost)
+                    // Cheat detection
+                    if (_antiCheatConfig.Enabled)
                     {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.RepairSystem)} to wrong destinition, must be host");
-                    }
+                        if (target == null || !target.IsHost)
+                        {
+                            throw new ImpostorCheatException(
+                                $"Client sent {nameof(RpcCalls.RepairSystem)} to wrong destinition, must be host");
+                        }
 
-                    var systemType = (SystemTypes)reader.ReadByte();
-                    if (systemType == SystemTypes.Sabotage && !sender.Character.PlayerInfo.IsImpostor)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.RepairSystem)} for {systemType} as crewmate");
+                        var systemType = (SystemTypes)reader.ReadByte();
+                        if (systemType == SystemTypes.Sabotage && !sender.Character.PlayerInfo.IsImpostor)
+                        {
+                            throw new ImpostorCheatException(
+                                $"Client sent {nameof(RpcCalls.RepairSystem)} for {systemType} as crewmate");
+                        }
                     }
 
                     var player = reader.ReadNetObject<InnerPlayerControl>(_game);
@@ -105,14 +121,20 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
-            if (!sender.IsHost)
+            // Cheat detection
+            if (_antiCheatConfig.Enabled)
             {
-                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerShipStatus)} as non-host");
-            }
+                if (!sender.IsHost)
+                {
+                    throw new ImpostorCheatException(
+                        $"Client attempted to send data for {nameof(InnerShipStatus)} as non-host");
+                }
 
-            if (target != null)
-            {
-                throw new ImpostorCheatException($"Client attempted to send {nameof(InnerShipStatus)} data to a specific player, must be broadcast");
+                if (target != null)
+                {
+                    throw new ImpostorCheatException(
+                        $"Client attempted to send {nameof(InnerShipStatus)} data to a specific player, must be broadcast");
+                }
             }
 
             if (initialState)

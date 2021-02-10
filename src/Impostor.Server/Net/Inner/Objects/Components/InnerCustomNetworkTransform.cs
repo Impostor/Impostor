@@ -4,8 +4,10 @@ using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Impostor.Server.Config;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Inner.Objects.Components
 {
@@ -15,6 +17,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private static readonly FloatRange YRange = new FloatRange(-40f, 40f);
 
         private readonly ILogger<InnerCustomNetworkTransform> _logger;
+        private readonly AntiCheatConfig _antiCheatConfig;
         private readonly InnerPlayerControl _playerControl;
         private readonly Game _game;
 
@@ -22,9 +25,10 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private Vector2 _targetSyncPosition;
         private Vector2 _targetSyncVelocity;
 
-        public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game)
+        public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, IOptions<AntiCheatConfig> antiCheatOptions, InnerPlayerControl playerControl, Game game)
         {
             _logger = logger;
+            _antiCheatConfig = antiCheatOptions.Value;
             _playerControl = playerControl;
             _game = game;
         }
@@ -56,19 +60,25 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         {
             if (call == RpcCalls.SnapTo)
             {
-                if (!sender.IsOwner(this))
+                // Cheat detection
+                if (_antiCheatConfig.Enabled)
                 {
-                    throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SnapTo)} to an unowned {nameof(InnerPlayerControl)}");
-                }
+                    if (!sender.IsOwner(this))
+                    {
+                        throw new ImpostorCheatException(
+                            $"Client sent {nameof(RpcCalls.SnapTo)} to an unowned {nameof(InnerPlayerControl)}");
+                    }
 
-                if (target != null)
-                {
-                    throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SnapTo)} to a specific player instead of broadcast");
-                }
+                    if (target != null)
+                    {
+                        throw new ImpostorCheatException(
+                            $"Client sent {nameof(RpcCalls.SnapTo)} to a specific player instead of broadcast");
+                    }
 
-                if (!sender.Character.PlayerInfo.IsImpostor)
-                {
-                    throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SnapTo)} as crewmate");
+                    if (!sender.Character.PlayerInfo.IsImpostor)
+                    {
+                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SnapTo)} as crewmate");
+                    }
                 }
 
                 SnapTo(ReadVector2(reader), reader.ReadUInt16());
@@ -112,14 +122,20 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             }
             else
             {
-                if (!sender.IsOwner(this))
+                // Cheat detection
+                if (_antiCheatConfig.Enabled)
                 {
-                    throw new ImpostorCheatException($"Client attempted to send unowned {nameof(InnerCustomNetworkTransform)} data");
-                }
+                    if (!sender.IsOwner(this))
+                    {
+                        throw new ImpostorCheatException(
+                            $"Client attempted to send unowned {nameof(InnerCustomNetworkTransform)} data");
+                    }
 
-                if (target != null)
-                {
-                    throw new ImpostorCheatException($"Client attempted to send {nameof(InnerCustomNetworkTransform)} data to a specific player, must be broadcast");
+                    if (target != null)
+                    {
+                        throw new ImpostorCheatException(
+                            $"Client attempted to send {nameof(InnerCustomNetworkTransform)} data to a specific player, must be broadcast");
+                    }
                 }
 
                 if (!SidGreaterThan(sequenceId, _lastSequenceId))

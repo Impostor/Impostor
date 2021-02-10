@@ -258,10 +258,14 @@ namespace Impostor.Server.Net.State
 
                     case GameDataTag.SpawnFlag:
                     {
-                        // Only the host is allowed to despawn objects.
-                        if (!sender.IsHost)
+                        // Cheat detection
+                        if (_antiCheatConfig.Enabled)
                         {
-                            throw new ImpostorCheatException("Tried to send SpawnFlag as non-host.");
+                            // Only the host is allowed to despawn objects.
+                            if (!sender.IsHost)
+                            {
+                                throw new ImpostorCheatException("Tried to send SpawnFlag as non-host.");
+                            }
                         }
 
                         var objectId = reader.ReadPackedUInt32();

@@ -10,9 +10,11 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
+using Impostor.Server.Config;
 using Impostor.Server.Events;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.State
 {
@@ -20,6 +22,7 @@ namespace Impostor.Server.Net.State
     {
         private readonly ILogger<Game> _logger;
         private readonly IServiceProvider _serviceProvider;
+        private readonly AntiCheatConfig _antiCheatConfig;
         private readonly GameManager _gameManager;
         private readonly ClientManager _clientManager;
         private readonly ConcurrentDictionary<int, ClientPlayer> _players;
@@ -28,6 +31,7 @@ namespace Impostor.Server.Net.State
 
         public Game(
             ILogger<Game> logger,
+            IOptions<AntiCheatConfig> antiCheatOptions,
             IServiceProvider serviceProvider,
             GameManager gameManager,
             IPEndPoint publicIp,
@@ -38,6 +42,7 @@ namespace Impostor.Server.Net.State
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
+            _antiCheatConfig = antiCheatOptions.Value;
             _gameManager = gameManager;
             _players = new ConcurrentDictionary<int, ClientPlayer>();
             _bannedIps = new HashSet<IPAddress>();
