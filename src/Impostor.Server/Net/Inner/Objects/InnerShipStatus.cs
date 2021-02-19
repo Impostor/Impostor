@@ -89,7 +89,12 @@ namespace Impostor.Server.Net.Inner.Objects
                                 $"Client sent {nameof(RpcCalls.RepairSystem)} to wrong destinition, must be host");
                         }
 
-                        var systemType = (SystemTypes)reader.ReadByte();
+                    }
+
+                    var systemType = (SystemTypes)reader.ReadByte();
+                    // Cheat detection
+                    if (_antiCheatConfig.Enabled)
+                    {
                         if (systemType == SystemTypes.Sabotage && !sender.Character.PlayerInfo.IsImpostor)
                         {
                             throw new ImpostorCheatException(
