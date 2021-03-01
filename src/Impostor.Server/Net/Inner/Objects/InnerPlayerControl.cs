@@ -388,9 +388,11 @@ namespace Impostor.Server.Net.Inner.Objects
             return true;
         }
 
+        private static readonly byte ColorsCount = (byte)Enum.GetValues<ColorType>().Length;
+
         private async ValueTask<bool> HandleCheckColor(ClientPlayer sender, ColorType color)
         {
-            if (color > (ColorType)Enum.GetValues<ColorType>().Length)
+            if ((byte)color > ColorsCount)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, "Client sent invalid color"))
                 {
@@ -415,7 +417,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (sender.IsOwner(this))
             {
-                if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.ColorId == (byte)color))
+                if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.Color == color))
                 {
                     if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, "Client sent a color that is already used"))
                     {
@@ -433,9 +435,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 var expected = RequestedColorId.Dequeue();
 
-                while (_game.Players.Any(x => x.Character != null && x.Character != this && (ColorType)x.Character.PlayerInfo.ColorId == expected))
+                while (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.Color == expected))
                 {
-                    expected = (ColorType)(((byte)expected + 1) % Enum.GetValues<ColorType>().Length);
+                    expected = (ColorType)(((byte)expected + 1) % ColorsCount);
                 }
 
                 if (color != expected)
@@ -446,7 +448,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            PlayerInfo.ColorId = (byte)color;
+            PlayerInfo.Color = color;
 
             return true;
         }
@@ -458,7 +460,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 return false;
             }
 
-            PlayerInfo.HatId = (byte)hat;
+            PlayerInfo.Hat = hat;
 
             return true;
         }
@@ -470,7 +472,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 return false;
             }
 
-            PlayerInfo.SkinId = (byte)skin;
+            PlayerInfo.Skin = skin;
 
             return true;
         }
@@ -533,7 +535,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 return false;
             }
 
-            PlayerInfo.PetId = (byte)pet;
+            PlayerInfo.Pet = pet;
 
             return true;
         }

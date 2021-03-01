@@ -1,6 +1,6 @@
 ﻿namespace Impostor.Api.Innersloth.Customization
 {
-    public enum HatType
+    public enum HatType : uint
     {
         NoHat = 0,
         Astronaut = 1,
@@ -45,8 +45,8 @@
         ThirdEyeHat = 40,
         ToiletPaperHat = 41,
         Toppat = 42,
-        Fedora = 43,
-        Goggles2 = 44,
+        BlackFedora = 43,
+        SkiGoggles = 44,
         Headphones = 45,
         MaskHat = 46,
         PaperMask = 47,
@@ -58,7 +58,7 @@
         Cheese = 53,
         Cherry = 54,
         Egg = 55,
-        Fedora2 = 56,
+        GreenFedora = 56,
         Flamingo = 57,
         FlowerPin = 58,
         Helmet = 59,
@@ -95,6 +95,7 @@
         MiniCrewmate = 90,
         NinjaMask = 91,
         RamHorns = 92,
-        Snowman2 = 93,
+        SnowCrewmate = 93,
+        GeoffHat = 94,
     }
 }

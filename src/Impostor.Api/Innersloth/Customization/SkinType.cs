@@ -1,6 +1,6 @@
 ﻿namespace Impostor.Api.Innersloth.Customization
 {
-    public enum SkinType : byte
+    public enum SkinType : uint
     {
         None = 0,
         Astro = 1,
