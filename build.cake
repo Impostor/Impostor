@@ -105,7 +105,7 @@ Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Patch")
     .IsDependentOn("Restore")
-    .IsDependentOn("Replay")
+//     .IsDependentOn("Replay") TODO remake replays
     .Does(() => {
         // Tests.
         DotNetCoreBuild("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetCoreBuildSettings {
