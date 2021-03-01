@@ -2,7 +2,7 @@
 #addin "nuget:?package=Cake.Compression&Version=0.2.4"
 #addin "nuget:?package=Cake.FileHelpers&Version=3.3.0"
 
-var buildId = EnvironmentVariable("GITHUB_RUN_NUMBER");
+var buildId = EnvironmentVariable("GITHUB_RUN_NUMBER") ?? EnvironmentVariable("APPVEYOR_BUILD_VERSION");
 var buildVersion = FindRegexMatchGroupInFile("./src/Directory.Build.props", @"\<VersionPrefix\>(.*?)\<\/VersionPrefix\>", 1, System.Text.RegularExpressions.RegexOptions.None).Value;
 var buildDir = MakeAbsolute(Directory("./build"));
 
