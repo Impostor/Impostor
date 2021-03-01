@@ -13,6 +13,7 @@ using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner.Objects.Components;
 using Impostor.Server.Net.State;
+using Impostor.Server.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -23,6 +24,7 @@ namespace Impostor.Server.Net.Inner.Objects
         private readonly ILogger<InnerPlayerControl> _logger;
         private readonly IEventManager _eventManager;
         private readonly Game _game;
+        private readonly ServerEnvironment _serverEnvironment;
 
         private static Dictionary<RpcCalls, RpcInfo> Rpcs { get; } = new Dictionary<RpcCalls, RpcInfo>
         {
@@ -68,11 +70,12 @@ namespace Impostor.Server.Net.Inner.Objects
             [RpcCalls.SetStartCounter] = new RpcInfo(),
         };
 
-        public InnerPlayerControl(ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager, Game game)
+        public InnerPlayerControl(ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager, Game game, ServerEnvironment serverEnvironment)
         {
             _logger = logger;
             _eventManager = eventManager;
             _game = game;
+            _serverEnvironment = serverEnvironment;
 
             Physics = ActivatorUtilities.CreateInstance<InnerPlayerPhysics>(serviceProvider, this, _eventManager, _game);
             NetworkTransform = ActivatorUtilities.CreateInstance<InnerCustomNetworkTransform>(serviceProvider, this, _game);
@@ -322,7 +325,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleSetName(ClientPlayer sender, string name)
         {
-            if (_game.GameState != GameStates.NotStarted)
+            if (_game.GameState == GameStates.Started)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, "Client tried to set a name midgame"))
                 {
@@ -407,7 +410,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleSetColor(ClientPlayer sender, ColorType color)
         {
-            if (_game.GameState != GameStates.NotStarted)
+            if (_game.GameState == GameStates.Started)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, "Client tried to set a color midgame"))
                 {
@@ -455,7 +458,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleSetHat(ClientPlayer sender, HatType hat)
         {
-            if (_game.GameState != GameStates.NotStarted && await sender.Client.ReportCheatAsync(RpcCalls.SetHat, "Client tried to change hat while not in lobby"))
+            if (_game.GameState == GameStates.Started && await sender.Client.ReportCheatAsync(RpcCalls.SetHat, "Client tried to change hat while not in lobby"))
             {
                 return false;
             }
@@ -467,7 +470,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleSetSkin(ClientPlayer sender, SkinType skin)
         {
-            if (_game.GameState != GameStates.NotStarted && await sender.Client.ReportCheatAsync(RpcCalls.SetSkin, "Client tried to change skin while not in lobby"))
+            if (_game.GameState == GameStates.Started && await sender.Client.ReportCheatAsync(RpcCalls.SetSkin, "Client tried to change skin while not in lobby"))
             {
                 return false;
             }
@@ -487,7 +490,8 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            if (!PlayerInfo.CanMurder(_game))
+            // TODO record replay with timestamps
+            if (!_serverEnvironment.IsReplay && !PlayerInfo.CanMurder(_game))
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder too fast"))
                 {
@@ -530,7 +534,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleSetPet(ClientPlayer sender, PetType pet)
         {
-            if (_game.GameState != GameStates.NotStarted && await sender.Client.ReportCheatAsync(RpcCalls.SetHat, "Client tried to change pet while not in lobby"))
+            if (_game.GameState == GameStates.Started && await sender.Client.ReportCheatAsync(RpcCalls.SetPet, "Client tried to change pet while not in lobby"))
             {
                 return false;
             }

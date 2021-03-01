@@ -116,6 +116,8 @@ namespace Impostor.Server
                         .GetSection(AnnouncementsServerConfig.Section)
                         .Get<AnnouncementsServerConfig>() ?? new AnnouncementsServerConfig();
 
+                    services.AddSingleton<ServerEnvironment>();
+
                     services.Configure<DebugConfig>(host.Configuration.GetSection(DebugConfig.Section));
                     services.Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section));
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));

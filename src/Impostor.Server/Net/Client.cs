@@ -35,6 +35,8 @@ namespace Impostor.Server.Net
 
         public override async ValueTask<bool> ReportCheatAsync(CheatContext context, string message)
         {
+            _logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{Context}] {Message}", Name, Id, context.Name, message);
+
             if (!_antiCheatConfig.Enabled)
             {
                 return false;

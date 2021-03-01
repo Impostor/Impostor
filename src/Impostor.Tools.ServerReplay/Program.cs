@@ -20,6 +20,7 @@ using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Redirector;
 using Impostor.Server.Recorder;
+using Impostor.Server.Utils;
 using Impostor.Tools.ServerReplay.Mocks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -83,6 +84,11 @@ namespace Impostor.Tools.ServerReplay
         {
             var services = new ServiceCollection();
 
+            services.AddSingleton(new ServerEnvironment
+            {
+                IsReplay = true
+            });
+
             services.AddLogging(builder =>
             {
                 builder.ClearProviders();
@@ -100,7 +106,7 @@ namespace Impostor.Tools.ServerReplay
             services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
             services.AddSingleton<IEventManager, EventManager>();
 
-            services.AddEventPools(); 
+            services.AddEventPools();
             services.AddHazel();
 
             return services.BuildServiceProvider();
@@ -123,7 +129,7 @@ namespace Impostor.Tools.ServerReplay
 
         private static async Task ParsePacket(BinaryReader reader)
         {
-            var dataType = (RecordedPacketType) reader.ReadByte();
+            var dataType = (RecordedPacketType)reader.ReadByte();
 
             // Read client id.
             var clientId = reader.ReadInt32();
