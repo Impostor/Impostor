@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,11 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly IEventManager _eventManager;
         private readonly Game _game;
 
+        private static Dictionary<RpcCalls, RpcInfo> Rpcs { get; } = new Dictionary<RpcCalls, RpcInfo>
+        {
+            [RpcCalls.EnterVent] = new RpcInfo(), [RpcCalls.ExitVent] = new RpcInfo(),
+        };
+
         public InnerPlayerPhysics(ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl, IEventManager eventManager, Game game)
         {
             _logger = logger;
@@ -26,45 +32,50 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             _game = game;
         }
 
-        public override async ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
-        {
-            if (call != RpcCalls.EnterVent && call != RpcCalls.ExitVent)
-            {
-                _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerPlayerPhysics), call);
-                return;
-            }
-
-            if (!sender.IsOwner(this))
-            {
-                throw new ImpostorCheatException($"Client sent {call} to an unowned {nameof(InnerPlayerControl)}");
-            }
-
-            if (target != null)
-            {
-                throw new ImpostorCheatException($"Client sent {call} to a specific player instead of broadcast");
-            }
-
-            if (!sender.Character.PlayerInfo.IsImpostor)
-            {
-                throw new ImpostorCheatException($"Client sent {call} as crewmate");
-            }
-
-            var ventId = reader.ReadPackedUInt32();
-            var ventEnter = call == RpcCalls.EnterVent;
-
-            await _eventManager.CallAsync(new PlayerVentEvent(_game, sender, _playerControl, (VentLocation)ventId, ventEnter));
-
-            return;
-        }
-
-        public override bool Serialize(IMessageWriter writer, bool initialState)
+        public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
             throw new NotImplementedException();
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             throw new NotImplementedException();
+        }
+
+        public override async ValueTask<bool> HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        {
+            if (!await TestRpc(sender, target, call, Rpcs))
+            {
+                return false;
+            }
+
+            if (!_playerControl.PlayerInfo.IsImpostor)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.EnterVent, $"Client sent {call} as crewmate"))
+                {
+                    return false;
+                }
+            }
+
+            int ventId;
+
+            switch (call)
+            {
+                case RpcCalls.EnterVent:
+                    Rpc19EnterVent.Deserialize(reader, out ventId);
+                    break;
+
+                case RpcCalls.ExitVent:
+                    Rpc19EnterVent.Deserialize(reader, out ventId);
+                    break;
+
+                default:
+                    return false;
+            }
+
+            await _eventManager.CallAsync(new PlayerVentEvent(_game, sender, _playerControl, (VentLocation)ventId, call == RpcCalls.EnterVent));
+
+            return true;
         }
     }
 }

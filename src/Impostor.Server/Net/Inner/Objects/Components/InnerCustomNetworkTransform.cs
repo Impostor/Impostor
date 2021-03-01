@@ -1,9 +1,10 @@
-﻿using System.Numerics;
+﻿using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api;
-using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
 
@@ -11,9 +12,6 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 {
     internal partial class InnerCustomNetworkTransform : InnerNetObject
     {
-        private static readonly FloatRange XRange = new FloatRange(-40f, 40f);
-        private static readonly FloatRange YRange = new FloatRange(-40f, 40f);
-
         private readonly ILogger<InnerCustomNetworkTransform> _logger;
         private readonly InnerPlayerControl _playerControl;
         private readonly Game _game;
@@ -21,6 +19,11 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private ushort _lastSequenceId;
         private Vector2 _targetSyncPosition;
         private Vector2 _targetSyncVelocity;
+
+        private static Dictionary<RpcCalls, RpcInfo> Rpcs { get; } = new Dictionary<RpcCalls, RpcInfo>
+        {
+            [RpcCalls.SnapTo] = new RpcInfo(),
+        };
 
         public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game)
         {
@@ -31,95 +34,58 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
         private static bool SidGreaterThan(ushort newSid, ushort prevSid)
         {
-            var num = (ushort)(prevSid + (uint) short.MaxValue);
+            var num = (ushort)(prevSid + (uint)short.MaxValue);
 
-            return (int) prevSid < (int) num
+            return (int)prevSid < (int)num
                 ? newSid > prevSid && newSid <= num
                 : newSid > prevSid || newSid <= num;
         }
 
-        private static void WriteVector2(IMessageWriter writer, Vector2 vec)
-        {
-            writer.Write((ushort)(XRange.ReverseLerp(vec.X) * (double) ushort.MaxValue));
-            writer.Write((ushort)(YRange.ReverseLerp(vec.Y) * (double) ushort.MaxValue));
-        }
-
-        private static Vector2 ReadVector2(IMessageReader reader)
-        {
-            var v1 = reader.ReadUInt16() / (float) ushort.MaxValue;
-            var v2 = reader.ReadUInt16() / (float) ushort.MaxValue;
-
-            return new Vector2(XRange.Lerp(v1), YRange.Lerp(v2));
-        }
-
-        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
-        {
-            if (call == RpcCalls.SnapTo)
-            {
-                if (!sender.IsOwner(this))
-                {
-                    throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SnapTo)} to an unowned {nameof(InnerPlayerControl)}");
-                }
-
-                if (target != null)
-                {
-                    throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SnapTo)} to a specific player instead of broadcast");
-                }
-
-                if (!sender.Character.PlayerInfo.IsImpostor)
-                {
-                    throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SnapTo)} as crewmate");
-                }
-
-                SnapTo(ReadVector2(reader), reader.ReadUInt16());
-            }
-            else
-            {
-                _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerCustomNetworkTransform), call);
-            }
-
-            return default;
-        }
-
-        public override bool Serialize(IMessageWriter writer, bool initialState)
+        public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
             if (initialState)
             {
                 writer.Write(_lastSequenceId);
-                WriteVector2(writer, _targetSyncPosition);
-                WriteVector2(writer, _targetSyncVelocity);
-                return true;
+                writer.Write(_targetSyncPosition);
+                writer.Write(_targetSyncVelocity);
+                return new ValueTask<bool>(true);
             }
 
             // TODO: DirtyBits == 0 return false.
             _lastSequenceId++;
 
             writer.Write(_lastSequenceId);
-            WriteVector2(writer, _targetSyncPosition);
-            WriteVector2(writer, _targetSyncVelocity);
-            return true;
+            writer.Write(_targetSyncPosition);
+            writer.Write(_targetSyncVelocity);
+            return new ValueTask<bool>(true);
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             var sequenceId = reader.ReadUInt16();
 
             if (initialState)
             {
                 _lastSequenceId = sequenceId;
-                _targetSyncPosition = ReadVector2(reader);
-                _targetSyncVelocity = ReadVector2(reader);
+                _targetSyncPosition = reader.ReadVector2();
+                _targetSyncVelocity = reader.ReadVector2();
             }
             else
             {
                 if (!sender.IsOwner(this))
                 {
-                    throw new ImpostorCheatException($"Client attempted to send unowned {nameof(InnerCustomNetworkTransform)} data");
+                    if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client attempted to send unowned {nameof(InnerCustomNetworkTransform)} data"))
+                    {
+                        return;
+                    }
                 }
 
                 if (target != null)
                 {
-                    throw new ImpostorCheatException($"Client attempted to send {nameof(InnerCustomNetworkTransform)} data to a specific player, must be broadcast");
+                    if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client attempted to send {nameof(InnerCustomNetworkTransform)} data to a specific player, must be broadcast"))
+                    {
+                        return;
+                    }
                 }
 
                 if (!SidGreaterThan(sequenceId, _lastSequenceId))
@@ -128,9 +94,34 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 }
 
                 _lastSequenceId = sequenceId;
-                _targetSyncPosition = ReadVector2(reader);
-                _targetSyncVelocity = ReadVector2(reader);
+                _targetSyncPosition = reader.ReadVector2();
+                _targetSyncVelocity = reader.ReadVector2();
             }
+        }
+
+        public override async ValueTask<bool> HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        {
+            if (!await TestRpc(sender, target, call, Rpcs))
+            {
+                return false;
+            }
+
+            if (call == RpcCalls.SnapTo)
+            {
+                if (!_playerControl.PlayerInfo.IsImpostor)
+                {
+                    if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client sent {nameof(RpcCalls.SnapTo)} as crewmate"))
+                    {
+                        return false;
+                    }
+                }
+
+                Rpc21SnapTo.Deserialize(reader, out var position, out var minSid);
+
+                SnapTo(position, minSid);
+            }
+
+            return true;
         }
 
         private void SnapTo(Vector2 position, ushort minSid)

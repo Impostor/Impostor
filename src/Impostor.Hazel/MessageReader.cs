@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Buffers;
 using System.Buffers.Binary;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Impostor.Api;
+using Impostor.Api.Games;
+using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Unity;
 using Microsoft.Extensions.ObjectPool;
 
 namespace Impostor.Hazel
@@ -241,6 +245,19 @@ namespace Impostor.Hazel
             var reader = _pool.Get();
             reader.Update(Buffer, Offset + offset, Position, Length - offset, Tag, Parent);
             return reader;
+        }
+
+        public T ReadNetObject<T>(IGame game) where T : IInnerNetObject
+        {
+            return game.FindObjectByNetId<T>(ReadPackedUInt32());
+        }
+
+        public Vector2 ReadVector2()
+        {
+            var x = ReadUInt16() / (float) ushort.MaxValue;
+            var y = ReadUInt16() / (float) ushort.MaxValue;
+
+            return new Vector2(Mathf.Lerp(-40f, 40f, x), Mathf.Lerp(-40f, 40f, y));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

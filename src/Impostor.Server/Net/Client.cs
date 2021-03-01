@@ -33,6 +33,23 @@ namespace Impostor.Server.Net
             _gameManager = gameManager;
         }
 
+        public override async ValueTask<bool> ReportCheatAsync(CheatContext context, string message)
+        {
+            if (!_antiCheatConfig.Enabled)
+            {
+                return false;
+            }
+
+            if (_antiCheatConfig.BanIpFromGame)
+            {
+                Player?.Game.BanIp(Connection.EndPoint.Address);
+            }
+
+            await DisconnectAsync(DisconnectReason.Hacking, context.Name + ": " + message);
+
+            return true;
+        }
+
         public override async ValueTask HandleMessageAsync(IMessageReader reader, MessageType messageType)
         {
             var flag = reader.Tag;
@@ -152,37 +169,24 @@ namespace Impostor.Server.Net
                     // Handle packet.
                     using var readerCopy = reader.Copy();
 
-                    // TODO: Return value, either a bool (to cancel) or a writer (to cancel (null) or modify/overwrite).
-                    try
+                    var verified = await Player.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
+                    if (verified)
                     {
-                        var verified = await Player.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
-                        if (verified)
+                        // Broadcast packet to all other players.
+                        using (var writer = MessageWriter.Get(messageType))
                         {
-                            // Broadcast packet to all other players.
-                            using (var writer = MessageWriter.Get(messageType))
+                            if (toPlayer)
                             {
-                                if (toPlayer)
-                                {
-                                    var target = reader.ReadPackedInt32();
-                                    reader.CopyTo(writer);
-                                    await Player.Game.SendToAsync(writer, target);
-                                }
-                                else
-                                {
-                                    reader.CopyTo(writer);
-                                    await Player.Game.SendToAllExceptAsync(writer, Id);
-                                }
+                                var target = reader.ReadPackedInt32();
+                                reader.CopyTo(writer);
+                                await Player.Game.SendToAsync(writer, target);
+                            }
+                            else
+                            {
+                                reader.CopyTo(writer);
+                                await Player.Game.SendToAllExceptAsync(writer, Id);
                             }
                         }
-                    }
-                    catch (ImpostorCheatException e)
-                    {
-                        if (_antiCheatConfig.BanIpFromGame)
-                        {
-                            Player.Game.BanIp(Connection.EndPoint.Address);
-                        }
-
-                        await DisconnectAsync(DisconnectReason.Hacking, e.Message);
                     }
 
                     break;
@@ -198,7 +202,7 @@ namespace Impostor.Server.Net
                     Message08EndGameC2S.Deserialize(
                         reader,
                         out var gameOverReason);
-                    
+
                     await Player.Game.HandleEndGame(reader, gameOverReason);
                     break;
                 }

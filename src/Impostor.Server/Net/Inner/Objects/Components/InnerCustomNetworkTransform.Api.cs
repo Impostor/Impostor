@@ -16,7 +16,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             // Broadcast to all clients.
             using (var writer = _game.StartRpc(NetId, RpcCalls.SnapTo))
             {
-                WriteVector2(writer, position);
+                writer.Write(position);
                 writer.Write(_lastSequenceId);
                 await _game.FinishRpcAsync(writer);
             }

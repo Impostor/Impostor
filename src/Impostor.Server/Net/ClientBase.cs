@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
@@ -50,6 +51,11 @@ namespace Impostor.Server.Net
         public ClientPlayer? Player { get; set; }
 
         IClientPlayer? IClient.Player => Player;
+
+        public virtual ValueTask<bool> ReportCheatAsync(CheatContext context, string message)
+        {
+            return new ValueTask<bool>(false);
+        }
 
         public abstract ValueTask HandleMessageAsync(IMessageReader message, MessageType messageType);
 

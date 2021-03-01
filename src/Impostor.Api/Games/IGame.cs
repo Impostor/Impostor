@@ -35,6 +35,9 @@ namespace Impostor.Api.Games
 
         IClientPlayer GetClientPlayer(int clientId);
 
+        T? FindObjectByNetId<T>(uint netId)
+            where T : IInnerNetObject;
+
         /// <summary>
         ///     Adds an <see cref="IPAddress"/> to the ban list of this game.
         ///     Prevents all future joins from this <see cref="IPAddress"/>.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
@@ -6,6 +7,7 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Meeting;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.State;
@@ -20,6 +22,26 @@ namespace Impostor.Server.Net.Inner.Objects
         private readonly Game _game;
         private readonly GameNet _gameNet;
         private PlayerVoteArea[] _playerStates;
+
+        private static Dictionary<RpcCalls, RpcInfo> Rpcs { get; } = new Dictionary<RpcCalls, RpcInfo>
+        {
+            [RpcCalls.Close] = new RpcInfo
+            {
+                CheckOwnership = false, RequireHost = true,
+            },
+            [RpcCalls.VotingComplete] = new RpcInfo
+            {
+                CheckOwnership = false, RequireHost = true,
+            },
+            [RpcCalls.CastVote] = new RpcInfo
+            {
+                CheckOwnership = false, TargetType = RpcTargetType.Both,
+            },
+            [RpcCalls.ClearVote] = new RpcInfo
+            {
+                CheckOwnership = false, RequireHost = true,
+            },
+        };
 
         public InnerMeetingHud(ILogger<InnerMeetingHud> logger, IEventManager eventManager, Game game)
         {
@@ -46,103 +68,27 @@ namespace Impostor.Server.Net.Inner.Objects
                 .ToArray();
         }
 
-        public override async ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
-        {
-            switch (call)
-            {
-                case RpcCalls.Close:
-                {
-                    if (!sender.IsHost)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.Close)} but was not a host");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.Close)} to a specific player instead of broadcast");
-                    }
-
-                    break;
-                }
-
-                case RpcCalls.VotingComplete:
-                {
-                    if (!sender.IsHost)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.VotingComplete)} but was not a host");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.VotingComplete)} to a specific player instead of broadcast");
-                    }
-
-                    var states = reader.ReadBytesAndSize();
-                    var playerId = reader.ReadByte();
-                    var tie = reader.ReadBoolean();
-
-                    if (playerId != byte.MaxValue)
-                    {
-                        var player = _game.GameNet.GameData.GetPlayerById(playerId);
-                        if (player != null)
-                        {
-                            player.Controller.Die(DeathReason.Exile);
-                            await _eventManager.CallAsync(new PlayerExileEvent(_game, sender, player.Controller));
-                        }
-                    }
-
-                    await _eventManager.CallAsync(new MeetingEndedEvent(_game, this));
-
-                    break;
-                }
-
-                case RpcCalls.CastVote:
-                {
-                    var srcPlayerId = reader.ReadByte();
-                    if (srcPlayerId != sender.Character.PlayerId)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CastVote)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    // Host broadcasts vote to others.
-                    if (sender.IsHost && target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CastVote)} to a specific player instead of broadcast");
-                    }
-
-                    // Player sends vote to host.
-                    if (target == null || !target.IsHost)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CastVote)} to wrong destinition, must be host");
-                    }
-
-                    var targetPlayerId = reader.ReadByte();
-                    break;
-                }
-
-                default:
-                {
-                    _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerMeetingHud), call);
-                    break;
-                }
-            }
-        }
-
-        public override bool Serialize(IMessageWriter writer, bool initialState)
+        public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
             throw new NotImplementedException();
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             if (!sender.IsHost)
             {
-                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerMeetingHud)} as non-host");
+                if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client attempted to send data for {nameof(InnerMeetingHud)} as non-host"))
+                {
+                    return;
+                }
             }
 
             if (target != null)
             {
-                throw new ImpostorCheatException($"Client attempted to send {nameof(InnerMeetingHud)} data to a specific player, must be broadcast");
+                if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client attempted to send {nameof(InnerMeetingHud)} data to a specific player, must be broadcast"))
+                {
+                    return;
+                }
             }
 
             if (initialState)
@@ -171,6 +117,93 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
                 }
             }
+        }
+
+        public override async ValueTask<bool> HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        {
+            if (!await TestRpc(sender, target, call, Rpcs))
+            {
+                return false;
+            }
+
+            switch (call)
+            {
+                case RpcCalls.Close:
+                {
+                    Rpc22Close.Deserialize(reader);
+                    break;
+                }
+
+                case RpcCalls.VotingComplete:
+                {
+                    Rpc23VotingComplete.Deserialize(reader, out var states, out var playerId, out var tie);
+                    await HandleVotingComplete(sender, states, playerId, tie);
+                    break;
+                }
+
+                case RpcCalls.CastVote:
+                {
+                    Rpc24CastVote.Deserialize(reader, out var playerId, out var suspectPlayerId);
+                    return await HandleCastVote(sender, target, playerId, suspectPlayerId);
+                }
+
+                case RpcCalls.ClearVote:
+                {
+                    Rpc25ClearVote.Deserialize(reader);
+                    break;
+                }
+            }
+
+            return true;
+        }
+
+        private async ValueTask HandleVotingComplete(ClientPlayer sender, ReadOnlyMemory<byte> states, byte playerId, bool tie)
+        {
+            if (playerId != byte.MaxValue)
+            {
+                var player = _game.GameNet.GameData.GetPlayerById(playerId);
+                if (player != null)
+                {
+                    player.Controller.Die(DeathReason.Exile);
+                    await _eventManager.CallAsync(new PlayerExileEvent(_game, sender, player.Controller));
+                }
+            }
+
+            await _eventManager.CallAsync(new MeetingEndedEvent(_game, this));
+        }
+
+        private async ValueTask<bool> HandleCastVote(ClientPlayer sender, ClientPlayer? target, byte playerId, sbyte suspectPlayerId)
+        {
+            if (sender.IsHost)
+            {
+                if (target != null)
+                {
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, $"Client sent {nameof(RpcCalls.CastVote)} to a specific player instead of broadcast"))
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                if (target == null || !target.IsHost)
+                {
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, $"Client sent {nameof(RpcCalls.CastVote)} to wrong destinition, must be host"))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            if (playerId != sender.Character.PlayerId)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, $"Client sent {nameof(RpcCalls.CastVote)} to an unowned {nameof(InnerPlayerControl)}"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
