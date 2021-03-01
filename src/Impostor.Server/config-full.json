@@ -1,4 +1,4 @@
-﻿{
+{
   "Server": {
     "PublicIp": "127.0.0.1",
     "PublicPort": 22023,
@@ -11,6 +11,7 @@
     "ListenPort": 22024
   },
   "AntiCheat": {
+    "Enabled": true,
     "BanIpFromGame": true
   },
   "ServerRedirector": {
