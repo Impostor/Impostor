@@ -92,16 +92,20 @@ namespace Impostor.Server.Net.State
             return _players.TryGetValue(clientId, out var clientPlayer) ? clientPlayer : null;
         }
 
-        internal ValueTask StartedAsync()
+        internal async ValueTask StartedAsync()
         {
             if (GameState == GameStates.Starting)
             {
+                for (var i = 0; i < _players.Values.Count; i++)
+                {
+                    var player = _players.Values.ElementAt(i);
+                    await player.Character!.NetworkTransform.SetPositionAsync(player, MapSpawn.Maps[Options.Map].GetSpawnLocation(i, PlayerCount, true));
+                }
+
                 GameState = GameStates.Started;
 
-                return _eventManager.CallAsync(new GameStartedEvent(this));
+                await _eventManager.CallAsync(new GameStartedEvent(this));
             }
-
-            return default;
         }
 
         public ValueTask EndAsync()

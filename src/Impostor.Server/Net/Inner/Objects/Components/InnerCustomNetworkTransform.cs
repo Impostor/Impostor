@@ -2,11 +2,14 @@
 using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events.Managers;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.Rpcs;
+using Impostor.Server.Events.Player;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Impostor.Server.Net.Inner.Objects.Components
 {
@@ -15,6 +18,8 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly ILogger<InnerCustomNetworkTransform> _logger;
         private readonly InnerPlayerControl _playerControl;
         private readonly Game _game;
+        private readonly IEventManager _eventManager;
+        private readonly ObjectPool<PlayerMovementEvent> _pool;
 
         private ushort _lastSequenceId;
         private Vector2 _targetSyncPosition;
@@ -25,11 +30,14 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             [RpcCalls.SnapTo] = new RpcInfo(),
         };
 
-        public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game)
+        public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool)
         {
             _logger = logger;
             _playerControl = playerControl;
             _game = game;
+            _game = game;
+            _eventManager = eventManager;
+            _pool = pool;
         }
 
         private static bool SidGreaterThan(ushort newSid, ushort prevSid)
@@ -67,7 +75,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             if (initialState)
             {
                 _lastSequenceId = sequenceId;
-                _targetSyncPosition = reader.ReadVector2();
+                await SetPositionAsync(sender, reader.ReadVector2());
                 _targetSyncVelocity = reader.ReadVector2();
             }
             else
@@ -94,7 +102,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 }
 
                 _lastSequenceId = sequenceId;
-                _targetSyncPosition = reader.ReadVector2();
+                await SetPositionAsync(sender, reader.ReadVector2());
                 _targetSyncVelocity = reader.ReadVector2();
             }
         }
@@ -122,6 +130,16 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             }
 
             return true;
+        }
+
+        internal async ValueTask SetPositionAsync(IClientPlayer sender, Vector2 position)
+        {
+            _targetSyncPosition = position;
+
+            var playerMovementEvent = _pool.Get();
+            playerMovementEvent.Reset(_game, sender, _playerControl);
+            await _eventManager.CallAsync(playerMovementEvent);
+            _pool.Return(playerMovementEvent);
         }
 
         private void SnapTo(Vector2 position, ushort minSid)
