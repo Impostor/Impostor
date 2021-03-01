@@ -4,7 +4,6 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <TargetFramework>net5.0</TargetFramework>
         <DefineConstants>HAZEL_BAG</DefineConstants>
-        <Version>1.0.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
