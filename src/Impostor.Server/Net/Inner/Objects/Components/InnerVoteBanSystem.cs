@@ -29,12 +29,9 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
         public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
-            if (!sender.IsHost)
+            if (!await ValidateHost(CheatContext.Deserialize, sender))
             {
-                if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client attempted to send data for {nameof(InnerShipStatus)} as non-host"))
-                {
-                    return;
-                }
+                return;
             }
 
             var votes = _votes;

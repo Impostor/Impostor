@@ -76,20 +76,9 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             }
             else
             {
-                if (!sender.IsOwner(this))
+                if (!await ValidateOwnership(CheatContext.Deserialize, sender) || !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
                 {
-                    if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client attempted to send unowned {nameof(InnerCustomNetworkTransform)} data"))
-                    {
-                        return;
-                    }
-                }
-
-                if (target != null)
-                {
-                    if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client attempted to send {nameof(InnerCustomNetworkTransform)} data to a specific player, must be broadcast"))
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 if (!SidGreaterThan(sequenceId, _lastSequenceId))

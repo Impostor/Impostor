@@ -55,20 +55,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
-            if (!sender.IsHost)
+            if (!await ValidateHost(CheatContext.Deserialize, sender) || !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
             {
-                if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client attempted to send data for {nameof(InnerMeetingHud)} as non-host"))
-                {
-                    return;
-                }
-            }
-
-            if (target != null)
-            {
-                if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client attempted to send {nameof(InnerMeetingHud)} data to a specific player, must be broadcast"))
-                {
-                    return;
-                }
+                return;
             }
 
             if (initialState)

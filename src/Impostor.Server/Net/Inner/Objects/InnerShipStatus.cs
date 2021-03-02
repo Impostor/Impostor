@@ -51,20 +51,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
-            if (!sender.IsHost)
+            if (!await ValidateHost(CheatContext.Deserialize, sender) || !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
             {
-                if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client attempted to send data for {nameof(InnerShipStatus)} as non-host"))
-                {
-                    return;
-                }
-            }
-
-            if (target != null)
-            {
-                if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client attempted to send {nameof(InnerShipStatus)} data to a specific player, must be broadcast"))
-                {
-                    return;
-                }
+                return;
             }
 
             if (initialState)
@@ -120,12 +109,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 {
                     Rpc28RepairSystem.Deserialize(reader, _game, out var systemType, out var player, out var amount);
 
-                    if (systemType == SystemTypes.Sabotage && !sender.Character.PlayerInfo.IsImpostor)
+                    if (systemType == SystemTypes.Sabotage && !await ValidateImpostor(call, sender, sender.Character!.PlayerInfo))
                     {
-                        if (await sender.Client.ReportCheatAsync(RpcCalls.RepairSystem, $"Client sent {nameof(RpcCalls.RepairSystem)} for {systemType} as crewmate"))
-                        {
-                            return false;
-                        }
+                        return false;
                     }
 
                     break;
