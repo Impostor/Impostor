@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
@@ -99,7 +100,7 @@ namespace Impostor.Server.Net.State
                 for (var i = 0; i < _players.Values.Count; i++)
                 {
                     var player = _players.Values.ElementAt(i);
-                    await player.Character!.NetworkTransform.SetPositionAsync(player, MapSpawn.Maps[Options.Map].GetSpawnLocation(i, PlayerCount, true));
+                    await player.Character!.NetworkTransform.SetPositionAsync(player, MapSpawn.Maps[Options.Map].GetSpawnLocation(i, PlayerCount, true), Vector2.Zero);
                 }
 
                 GameState = GameStates.Started;

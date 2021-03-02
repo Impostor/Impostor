@@ -19,11 +19,6 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly IEventManager _eventManager;
         private readonly Game _game;
 
-        private static Dictionary<RpcCalls, RpcInfo> Rpcs { get; } = new Dictionary<RpcCalls, RpcInfo>
-        {
-            [RpcCalls.EnterVent] = new RpcInfo(), [RpcCalls.ExitVent] = new RpcInfo(),
-        };
-
         public InnerPlayerPhysics(ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl, IEventManager eventManager, Game game)
         {
             _logger = logger;
@@ -42,19 +37,11 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             throw new NotImplementedException();
         }
 
-        public override async ValueTask<bool> HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (!await TestRpc(sender, target, call, Rpcs))
+            if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(RpcCalls.MurderPlayer, sender, _playerControl.PlayerInfo))
             {
                 return false;
-            }
-
-            if (!_playerControl.PlayerInfo.IsImpostor)
-            {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.EnterVent, $"Client sent {call} as crewmate"))
-                {
-                    return false;
-                }
             }
 
             int ventId;
@@ -69,8 +56,11 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     Rpc19EnterVent.Deserialize(reader, out ventId);
                     break;
 
+                case RpcCalls.CustomRpc:
+                    return await HandleCustomRpc(reader, _game);
+
                 default:
-                    return false;
+                    return await UnregisteredCall(call, sender);
             }
 
             await _eventManager.CallAsync(new PlayerVentEvent(_game, sender, _playerControl, (VentLocation)ventId, call == RpcCalls.EnterVent));

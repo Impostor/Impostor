@@ -20,18 +20,6 @@ namespace Impostor.Server.Net.Inner.Objects
         private readonly Game _game;
         private readonly Dictionary<SystemTypes, ISystemType> _systems;
 
-        private static Dictionary<RpcCalls, RpcInfo> Rpcs { get; } = new Dictionary<RpcCalls, RpcInfo>
-        {
-            [RpcCalls.CloseDoorsOfType] = new RpcInfo
-            {
-                CheckOwnership = false, TargetType = RpcTargetType.Target,
-            },
-            [RpcCalls.RepairSystem] = new RpcInfo
-            {
-                CheckOwnership = false, TargetType = RpcTargetType.Target,
-            },
-        };
-
         public InnerShipStatus(ILogger<InnerShipStatus> logger, Game game)
         {
             _logger = logger;
@@ -108,9 +96,9 @@ namespace Impostor.Server.Net.Inner.Objects
             }
         }
 
-        public override async ValueTask<bool> HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (!await TestRpc(sender, target, call, Rpcs))
+            if (!await ValidateCmd(call, sender, target))
             {
                 return false;
             }
@@ -119,20 +107,9 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 case RpcCalls.CloseDoorsOfType:
                 {
-                    if (target == null || !target.IsHost)
+                    if (!await ValidateImpostor(RpcCalls.MurderPlayer, sender, sender.Character!.PlayerInfo))
                     {
-                        if (await sender.Client.ReportCheatAsync(RpcCalls.CloseDoorsOfType, $"Client sent {nameof(RpcCalls.CloseDoorsOfType)} to wrong destinition, must be host"))
-                        {
-                            return false;
-                        }
-                    }
-
-                    if (!sender.Character.PlayerInfo.IsImpostor)
-                    {
-                        if (await sender.Client.ReportCheatAsync(RpcCalls.CloseDoorsOfType, $"Client sent {nameof(RpcCalls.CloseDoorsOfType)} as crewmate"))
-                        {
-                            return false;
-                        }
+                        return false;
                     }
 
                     Rpc27CloseDoorsOfType.Deserialize(reader, out var systemType);
@@ -141,14 +118,6 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.RepairSystem:
                 {
-                    if (target == null || !target.IsHost)
-                    {
-                        if (await sender.Client.ReportCheatAsync(RpcCalls.RepairSystem, $"Client sent {nameof(RpcCalls.RepairSystem)} to wrong destinition, must be host"))
-                        {
-                            return false;
-                        }
-                    }
-
                     Rpc28RepairSystem.Deserialize(reader, _game, out var systemType, out var player, out var amount);
 
                     if (systemType == SystemTypes.Sabotage && !sender.Character.PlayerInfo.IsImpostor)
@@ -161,6 +130,12 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     break;
                 }
+
+                case RpcCalls.CustomRpc:
+                    return await HandleCustomRpc(reader, _game);
+
+                default:
+                    return await UnregisteredCall(call, sender);
             }
 
             return true;

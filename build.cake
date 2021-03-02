@@ -3,6 +3,7 @@
 #addin "nuget:?package=Cake.FileHelpers&Version=3.3.0"
 
 var buildId = EnvironmentVariable("GITHUB_RUN_NUMBER") ?? EnvironmentVariable("APPVEYOR_BUILD_VERSION");
+var buildRelease = EnvironmentVariable("APPVEYOR_REPO_TAG") == "true";
 var buildVersion = FindRegexMatchGroupInFile("./src/Directory.Build.props", @"\<VersionPrefix\>(.*?)\<\/VersionPrefix\>", 1, System.Text.RegularExpressions.RegexOptions.None).Value;
 var buildDir = MakeAbsolute(Directory("./build"));
 
@@ -11,7 +12,7 @@ var configuration = Argument("configuration", "Release");
 
 var msbuildSettings = new DotNetCoreMSBuildSettings();
 
-if (buildId != null) {
+if (!buildRelease && buildId != null) {
     msbuildSettings.Properties["VersionSuffix"] = new[] { "ci." + buildId };
     buildVersion += "-ci." + buildId;
 }

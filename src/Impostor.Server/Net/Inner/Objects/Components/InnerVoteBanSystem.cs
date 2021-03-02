@@ -16,11 +16,6 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly ILogger<InnerVoteBanSystem> _logger;
         private readonly Dictionary<int, int[]> _votes;
 
-        private static Dictionary<RpcCalls, RpcInfo> Rpcs { get; } = new Dictionary<RpcCalls, RpcInfo>
-        {
-            [RpcCalls.AddVote] = new RpcInfo(),
-        };
-
         public InnerVoteBanSystem(ILogger<InnerVoteBanSystem> logger)
         {
             _logger = logger;
@@ -68,15 +63,15 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             }
         }
 
-        public override async ValueTask<bool> HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (!await TestRpc(sender, target, call, Rpcs))
-            {
-                return false;
-            }
-
             if (call == RpcCalls.AddVote)
             {
+                if (!await ValidateOwnership(call, sender))
+                {
+                    return false;
+                }
+
                 Rpc26AddVote.Deserialize(reader, out var clientId, out var targetClientId);
 
                 if (clientId != sender.Client.Id)
@@ -86,9 +81,11 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                         return false;
                     }
                 }
+
+                return true;
             }
 
-            return true;
+            return await UnregisteredCall(call, sender);
         }
     }
 }

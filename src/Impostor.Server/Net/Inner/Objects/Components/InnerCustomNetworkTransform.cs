@@ -22,13 +22,10 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly ObjectPool<PlayerMovementEvent> _pool;
 
         private ushort _lastSequenceId;
-        private Vector2 _targetSyncPosition;
-        private Vector2 _targetSyncVelocity;
 
-        private static Dictionary<RpcCalls, RpcInfo> Rpcs { get; } = new Dictionary<RpcCalls, RpcInfo>
-        {
-            [RpcCalls.SnapTo] = new RpcInfo(),
-        };
+        public Vector2 Position { get; private set; }
+
+        public Vector2 Velocity { get; private set; }
 
         public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool)
         {
@@ -54,8 +51,8 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             if (initialState)
             {
                 writer.Write(_lastSequenceId);
-                writer.Write(_targetSyncPosition);
-                writer.Write(_targetSyncVelocity);
+                writer.Write(Position);
+                writer.Write(Velocity);
                 return new ValueTask<bool>(true);
             }
 
@@ -63,8 +60,8 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             _lastSequenceId++;
 
             writer.Write(_lastSequenceId);
-            writer.Write(_targetSyncPosition);
-            writer.Write(_targetSyncVelocity);
+            writer.Write(Position);
+            writer.Write(Velocity);
             return new ValueTask<bool>(true);
         }
 
@@ -75,8 +72,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             if (initialState)
             {
                 _lastSequenceId = sequenceId;
-                await SetPositionAsync(sender, reader.ReadVector2());
-                _targetSyncVelocity = reader.ReadVector2();
+                await SetPositionAsync(sender, reader.ReadVector2(), reader.ReadVector2());
             }
             else
             {
@@ -102,39 +98,32 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 }
 
                 _lastSequenceId = sequenceId;
-                await SetPositionAsync(sender, reader.ReadVector2());
-                _targetSyncVelocity = reader.ReadVector2();
+                await SetPositionAsync(sender, reader.ReadVector2(), reader.ReadVector2());
             }
         }
 
-        public override async ValueTask<bool> HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (!await TestRpc(sender, target, call, Rpcs))
-            {
-                return false;
-            }
-
             if (call == RpcCalls.SnapTo)
             {
-                if (!_playerControl.PlayerInfo.IsImpostor)
+                if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(RpcCalls.MurderPlayer, sender, _playerControl.PlayerInfo))
                 {
-                    if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, $"Client sent {nameof(RpcCalls.SnapTo)} as crewmate"))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
 
                 Rpc21SnapTo.Deserialize(reader, out var position, out var minSid);
 
-                SnapTo(position, minSid);
+                await SnapToAsync(sender, position, minSid);
+                return true;
             }
 
-            return true;
+            return await UnregisteredCall(call, sender);
         }
 
-        internal async ValueTask SetPositionAsync(IClientPlayer sender, Vector2 position)
+        internal async ValueTask SetPositionAsync(IClientPlayer sender, Vector2 position, Vector2 velocity)
         {
-            _targetSyncPosition = position;
+            Position = position;
+            Velocity = velocity;
 
             var playerMovementEvent = _pool.Get();
             playerMovementEvent.Reset(_game, sender, _playerControl);
@@ -142,16 +131,15 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             _pool.Return(playerMovementEvent);
         }
 
-        private void SnapTo(Vector2 position, ushort minSid)
+        private ValueTask SnapToAsync(IClientPlayer sender, Vector2 position, ushort minSid)
         {
             if (!SidGreaterThan(minSid, _lastSequenceId))
             {
-                return;
+                return default;
             }
 
             _lastSequenceId = minSid;
-            _targetSyncPosition = position;
-            _targetSyncVelocity = Vector2.Zero;
+            return SetPositionAsync(sender, position, Velocity);
         }
     }
 }

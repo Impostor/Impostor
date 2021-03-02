@@ -28,7 +28,7 @@ namespace Impostor.Server.Net.Inner.Objects
             throw new System.NotImplementedException();
         }
 
-        public override ValueTask<bool> HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
             throw new System.NotImplementedException();
         }

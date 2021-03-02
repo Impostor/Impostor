@@ -106,8 +106,8 @@ namespace Impostor.Hazel
 
         public void Write(Vector2 vector)
         {
-            Write((ushort)(ReverseLerp(vector.X) * (double) ushort.MaxValue));
-            Write((ushort)(ReverseLerp(vector.Y) * (double) ushort.MaxValue));
+            Write((ushort)(Mathf.ReverseLerp(vector.X) * (double) ushort.MaxValue));
+            Write((ushort)(Mathf.ReverseLerp(vector.Y) * (double) ushort.MaxValue));
         }
 
         ///
@@ -351,11 +351,6 @@ namespace Impostor.Hazel
         public void Dispose()
         {
             Recycle();
-        }
-        
-        private static float ReverseLerp(float t)
-        {
-            return Mathf.Clamp((t - -40f) / (40f - -40f), 0f, 1f);
         }
     }
 }

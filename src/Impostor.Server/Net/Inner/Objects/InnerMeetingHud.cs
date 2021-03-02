@@ -23,26 +23,6 @@ namespace Impostor.Server.Net.Inner.Objects
         private readonly GameNet _gameNet;
         private PlayerVoteArea[] _playerStates;
 
-        private static Dictionary<RpcCalls, RpcInfo> Rpcs { get; } = new Dictionary<RpcCalls, RpcInfo>
-        {
-            [RpcCalls.Close] = new RpcInfo
-            {
-                CheckOwnership = false, RequireHost = true,
-            },
-            [RpcCalls.VotingComplete] = new RpcInfo
-            {
-                CheckOwnership = false, RequireHost = true,
-            },
-            [RpcCalls.CastVote] = new RpcInfo
-            {
-                CheckOwnership = false, TargetType = RpcTargetType.Both,
-            },
-            [RpcCalls.ClearVote] = new RpcInfo
-            {
-                CheckOwnership = false, RequireHost = true,
-            },
-        };
-
         public InnerMeetingHud(ILogger<InnerMeetingHud> logger, IEventManager eventManager, Game game)
         {
             _logger = logger;
@@ -119,23 +99,28 @@ namespace Impostor.Server.Net.Inner.Objects
             }
         }
 
-        public override async ValueTask<bool> HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (!await TestRpc(sender, target, call, Rpcs))
-            {
-                return false;
-            }
-
             switch (call)
             {
                 case RpcCalls.Close:
                 {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc22Close.Deserialize(reader);
                     break;
                 }
 
                 case RpcCalls.VotingComplete:
                 {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc23VotingComplete.Deserialize(reader, out var states, out var playerId, out var tie);
                     await HandleVotingComplete(sender, states, playerId, tie);
                     break;
@@ -149,9 +134,20 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.ClearVote:
                 {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc25ClearVote.Deserialize(reader);
                     break;
                 }
+
+                case RpcCalls.CustomRpc:
+                    return await HandleCustomRpc(reader, _game);
+
+                default:
+                    return await UnregisteredCall(call, sender);
             }
 
             return true;
@@ -176,26 +172,20 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             if (sender.IsHost)
             {
-                if (target != null)
+                if (!await ValidateBroadcast(RpcCalls.CastVote, sender, target))
                 {
-                    if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, $"Client sent {nameof(RpcCalls.CastVote)} to a specific player instead of broadcast"))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
             else
             {
-                if (target == null || !target.IsHost)
+                if (!await ValidateCmd(RpcCalls.CastVote, sender, target))
                 {
-                    if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, $"Client sent {nameof(RpcCalls.CastVote)} to wrong destinition, must be host"))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
 
-            if (playerId != sender.Character.PlayerId)
+            if (playerId != sender.Character!.PlayerId)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, $"Client sent {nameof(RpcCalls.CastVote)} to an unowned {nameof(InnerPlayerControl)}"))
                 {

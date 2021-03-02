@@ -26,50 +26,6 @@ namespace Impostor.Server.Net.Inner.Objects
         private readonly Game _game;
         private readonly ServerEnvironment _serverEnvironment;
 
-        private static Dictionary<RpcCalls, RpcInfo> Rpcs { get; } = new Dictionary<RpcCalls, RpcInfo>
-        {
-            [RpcCalls.PlayAnimation] = new RpcInfo(),
-            [RpcCalls.CompleteTask] = new RpcInfo(),
-            [RpcCalls.SyncSettings] = new RpcInfo
-            {
-                CheckOwnership = false, RequireHost = true,
-            },
-            [RpcCalls.SetInfected] = new RpcInfo
-            {
-                RequireHost = true,
-            },
-            [RpcCalls.CheckName] = new RpcInfo
-            {
-                TargetType = RpcTargetType.Cmd,
-            },
-            [RpcCalls.SetName] = new RpcInfo
-            {
-                CheckOwnership = false, RequireHost = true,
-            },
-            [RpcCalls.CheckColor] = new RpcInfo
-            {
-                TargetType = RpcTargetType.Cmd,
-            },
-            [RpcCalls.SetColor] = new RpcInfo
-            {
-                CheckOwnership = false, RequireHost = true,
-            },
-            [RpcCalls.SetHat] = new RpcInfo(),
-            [RpcCalls.SetSkin] = new RpcInfo(),
-            [RpcCalls.CompleteTask] = new RpcInfo(),
-            [RpcCalls.ReportDeadBody] = new RpcInfo(),
-            [RpcCalls.MurderPlayer] = new RpcInfo(),
-            [RpcCalls.SendChat] = new RpcInfo(),
-            [RpcCalls.StartMeeting] = new RpcInfo
-            {
-                CheckOwnership = false, RequireHost = true,
-            },
-            [RpcCalls.SetScanner] = new RpcInfo(),
-            [RpcCalls.SendChatNote] = new RpcInfo(),
-            [RpcCalls.SetPet] = new RpcInfo(),
-            [RpcCalls.SetStartCounter] = new RpcInfo(),
-        };
-
         public InnerPlayerControl(ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager, Game game, ServerEnvironment serverEnvironment)
         {
             _logger = logger;
@@ -130,23 +86,28 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerInfo.LastDeathReason = reason;
         }
 
-        public override async ValueTask<bool> HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (!await TestRpc(sender, target, call, Rpcs))
-            {
-                return false;
-            }
-
             switch (call)
             {
                 case RpcCalls.PlayAnimation:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc00PlayAnimation.Deserialize(reader, out var task);
                     break;
                 }
 
                 case RpcCalls.CompleteTask:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc01CompleteTask.Deserialize(reader, out var taskId);
                     await HandleCompleteTask(sender, taskId);
                     break;
@@ -154,12 +115,22 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SyncSettings:
                 {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc02SyncSettings.Deserialize(reader, _game.Options);
                     break;
                 }
 
                 case RpcCalls.SetInfected:
                 {
+                    if (!await ValidateOwnership(call, sender) || !await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc03SetInfected.Deserialize(reader, out var infectedIds);
                     await HandleSetInfected(infectedIds);
                     break;
@@ -167,60 +138,110 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.CheckName:
                 {
+                    if (!await ValidateOwnership(call, sender) || !await ValidateCmd(call, sender, target))
+                    {
+                        return false;
+                    }
+
                     Rpc05CheckName.Deserialize(reader, out var name);
                     return await HandleCheckName(sender, name);
                 }
 
                 case RpcCalls.SetName:
                 {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc06SetName.Deserialize(reader, out var name);
                     return await HandleSetName(sender, name);
                 }
 
                 case RpcCalls.CheckColor:
                 {
+                    if (!await ValidateOwnership(call, sender) || !await ValidateCmd(call, sender, target))
+                    {
+                        return false;
+                    }
+
                     Rpc07CheckColor.Deserialize(reader, out var color);
                     return await HandleCheckColor(sender, color);
                 }
 
                 case RpcCalls.SetColor:
                 {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc08SetColor.Deserialize(reader, out var color);
                     return await HandleSetColor(sender, color);
                 }
 
                 case RpcCalls.SetHat:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc09SetHat.Deserialize(reader, out var hat);
                     return await HandleSetHat(sender, hat);
                 }
 
                 case RpcCalls.SetSkin:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc10SetSkin.Deserialize(reader, out var skin);
                     return await HandleSetSkin(sender, skin);
                 }
 
                 case RpcCalls.ReportDeadBody:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc11ReportDeadBody.Deserialize(reader, out var targetId);
                     break;
                 }
 
                 case RpcCalls.MurderPlayer:
                 {
+                    if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(RpcCalls.MurderPlayer, sender, PlayerInfo))
+                    {
+                        return false;
+                    }
+
                     Rpc12MurderPlayer.Deserialize(reader, _game, out var murdered);
                     return await HandleMurderPlayer(sender, murdered);
                 }
 
                 case RpcCalls.SendChat:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc13SendChat.Deserialize(reader, out var message);
                     return await HandleSendChat(sender, message);
                 }
 
                 case RpcCalls.StartMeeting:
                 {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc14StartMeeting.Deserialize(reader, out var targetId);
                     await HandleStartMeeting(targetId);
                     break;
@@ -228,33 +249,53 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetScanner:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc15SetScanner.Deserialize(reader, out var on, out var scannerCount);
                     break;
                 }
 
                 case RpcCalls.SendChatNote:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc16SendChatNote.Deserialize(reader, out var playerId, out var chatNoteType);
                     break;
                 }
 
                 case RpcCalls.SetPet:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc17SetPet.Deserialize(reader, out var pet);
                     return await HandleSetPet(sender, pet);
                 }
 
                 case RpcCalls.SetStartCounter:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc18SetStartCounter.Deserialize(reader, out var sequenceId, out var startCounter);
                     return await HandleSetStartCounter(sender, sequenceId, startCounter);
                 }
 
                 case RpcCalls.CustomRpc:
-                {
-                    await HandleCustomRpc(reader, _game);
-                    break;
-                }
+                    return await HandleCustomRpc(reader, _game);
+
+                default:
+                    return await UnregisteredCall(call, sender);
             }
 
             return true;
@@ -482,14 +523,6 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleMurderPlayer(ClientPlayer sender, IInnerPlayerControl? target)
         {
-            if (!PlayerInfo.IsImpostor)
-            {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder as a crewmate"))
-                {
-                    return false;
-                }
-            }
-
             // TODO record replay with timestamps
             if (!_serverEnvironment.IsReplay && !PlayerInfo.CanMurder(_game))
             {

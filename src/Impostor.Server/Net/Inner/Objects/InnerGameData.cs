@@ -17,23 +17,13 @@ namespace Impostor.Server.Net.Inner.Objects
     internal partial class InnerGameData : InnerNetObject, IInnerGameData
     {
         private readonly ILogger<InnerGameData> _logger;
+        private readonly Game _game;
         private readonly ConcurrentDictionary<byte, InnerPlayerInfo> _allPlayers;
-
-        private static Dictionary<RpcCalls, RpcInfo> Rpcs { get; } = new Dictionary<RpcCalls, RpcInfo>
-        {
-            [RpcCalls.SetTasks] = new RpcInfo
-            {
-                CheckOwnership = false, RequireHost = true,
-            },
-            [RpcCalls.UpdateGameData] = new RpcInfo
-            {
-                CheckOwnership = false, RequireHost = true,
-            },
-        };
 
         public InnerGameData(ILogger<InnerGameData> logger, Game game, IServiceProvider serviceProvider)
         {
             _logger = logger;
+            _game = game;
             _allPlayers = new ConcurrentDictionary<byte, InnerPlayerInfo>();
 
             Components.Add(this);
@@ -92,9 +82,9 @@ namespace Impostor.Server.Net.Inner.Objects
             }
         }
 
-        public override async ValueTask<bool> HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (!await TestRpc(sender, target, call, Rpcs))
+            if (!await ValidateHost(call, sender))
             {
                 return false;
             }
@@ -133,6 +123,12 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     break;
                 }
+
+                case RpcCalls.CustomRpc:
+                    return await HandleCustomRpc(reader, _game);
+
+                default:
+                    return await UnregisteredCall(call, sender);
             }
 
             return true;

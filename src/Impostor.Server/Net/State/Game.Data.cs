@@ -247,7 +247,7 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
-                            if (!await obj.HandleRpc(sender, target, (RpcCalls)reader.ReadByte(), reader))
+                            if (!await obj.HandleRpcAsync(sender, target, (RpcCalls)reader.ReadByte(), reader))
                             {
                                 return false;
                             }
