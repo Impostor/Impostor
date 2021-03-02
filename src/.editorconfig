@@ -228,3 +228,45 @@ csharp_preserve_single_line_statements = true
 
 # warning RS0037: PublicAPI.txt is missing '#nullable enable'
 dotnet_diagnostic.RS0037.severity = none
+
+# warning CS0414: The field 'x' is assigned but its value is never used
+dotnet_diagnostic.CS0414.severity = none
+
+# warning CS0618: 'IPAddress.Address' is obsolete: 'This property has been deprecated. It is address family dependent. Please use IPAddress.Equals method to perform comparisons. https://go.microsoft.com/fwlink/?linkid=14202'
+dotnet_diagnostic.CS0618.severity = none
+
+# warning CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.
+dotnet_diagnostic.CS4014.severity = none
+
+# warning CS8600: Converting null literal or possible null value to non-nullable type.
+dotnet_diagnostic.CS8600.severity = none
+
+# warning CS8601: Possible null reference assignment.
+dotnet_diagnostic.CS8601.severity = none
+
+# warning CS8602: Dereference of a possibly null reference.
+dotnet_diagnostic.CS8602.severity = none
+
+# warning CS8603: Possible null reference return.
+dotnet_diagnostic.CS8603.severity = none
+
+# Possible null reference argument for parameter 'x' in 'y'.
+dotnet_diagnostic.CS8604.severity = none
+
+# warning CS8618: Non-nullable property 'x' must contain a non-null value when exiting constructor. Consider declaring the property as nullable.
+dotnet_diagnostic.CS8618.severity = none
+
+# warning CS8619: Nullability of reference types in value of type 'x?' doesn't match target type 'x'
+dotnet_diagnostic.CS8619.severity = none
+
+# warning CS8622: Nullability of reference types in type of parameter 'x' of 'y(x)' doesn't match the target delegate 'z' (possibly because of nullability attributes).
+dotnet_diagnostic.CS8622.severity = none
+
+# warning CS8625: Cannot convert null literal to non-nullable reference type.
+dotnet_diagnostic.CS8625.severity = none
+
+# warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+dotnet_diagnostic.CS8632.severity = none
+
+# warning CS8767: Nullability of reference types in type of parameter 'x' of 'y(x)' doesn't match implicitly implemented member 'z' (possibly because of nullability attributes).
+dotnet_diagnostic.CS8767.severity = none

@@ -6,7 +6,7 @@
     <RuntimeIdentifiers>win-x64;linux-x64;linux-arm;linux-arm64;osx-x64</RuntimeIdentifiers>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <ApplicationIcon>icon.ico</ApplicationIcon>
-    <CodeAnalysisRuleSet>ProjectRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\ProjectRules.ruleset</CodeAnalysisRuleSet>
     <Nullable>enable</Nullable>
     <SelfContained>false</SelfContained>
   </PropertyGroup>

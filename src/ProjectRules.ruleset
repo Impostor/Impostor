@@ -1,0 +1,44 @@
+<RuleSet Name="Rules for Impostor" Description="These rules temporarily remove some style warnings from the compilation output" ToolsVersion="10.0">
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.SpecialRules">
+		<Rule Id="SA0001"  Action="None" />          <!-- XML comment analysis disabled -->
+	</Rules>
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.SpacingRules">
+		<Rule Id="SA1003"  Action="None" />          <!-- Symbols should be spaced correctly -->
+		<Rule Id="SA1008"  Action="None" />          <!-- Opening parenthesis should be spaced correctly -->
+		<Rule Id="SA1009"  Action="None" />          <!-- Closing parenthesis should be spaced correctly -->
+		<Rule Id="SA1026"  Action="None" />          <!-- Code should not contain space after new or stackalloc keyword in implicitly typed array allocation -->
+		<Rule Id="SA1028"  Action="None" />          <!-- Code should not contain trailing whitespace -->
+	</Rules>
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.ReadabilityRules">
+		<Rule Id="SA1101"  Action="None" />          <!-- Prefix local calls with this -->
+		<Rule Id="SA1103"  Action="None" />          <!-- Query clauses should be on separate lines or all on one line -->
+		<Rule Id="SA1119"  Action="None" />          <!-- Statement should not use unnecessary parenthesis -->
+		<Rule Id="SA1121"  Action="None" />          <!-- Use built-in type alias -->
+		<Rule Id="SA1128"  Action="None" />          <!-- Put constructor initializers on their own line -->
+	</Rules>
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.OrderingRules">
+		<Rule Id="SA1200"  Action="None" />          <!-- Using directives should be placed correctly -->
+		<Rule Id="SA1201"  Action="None" />          <!-- Elements should appear in the correct order -->
+		<Rule Id="SA1202"  Action="None" />          <!-- Elements should be ordered by access -->
+		<Rule Id="SA1204"  Action="None" />          <!-- Static elements should appear before instance elements -->
+	</Rules>
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.NamingRules">
+		<Rule Id="SA1309" Action="None" />           <!-- Field names should not begin with underscore -->
+	</Rules>
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.MaintainabilityRules">
+		<Rule Id="SA1407"  Action="None" />          <!-- Arithmetic expressions should declare precedence -->
+		<Rule Id="SA1413"  Action="None" />          <!-- Use trailing comma in multi-line initializers -->
+	</Rules>
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.LayoutRules">
+		<Rule Id="SA1500"  Action="None" />          <!-- Braces for multi-line statements should not share line -->
+		<Rule Id="SA1505"  Action="None" />          <!-- Opening braces should not be followed by blank line -->
+    <Rule Id="SA1507"  Action="None" />          <!-- Code should not contain multiple blank lines in a row -->
+		<Rule Id="SA1508"  Action="None" />          <!-- Closing braces should not be preceded by blank line -->
+    <Rule Id="SA1512"  Action="None" />          <!-- Single-line comments should not be followed by blank line -->
+		<Rule Id="SA1515"  Action="None" />          <!-- Single-line comment should be preceded by blank line -->
+		<Rule Id="SA1516"  Action="None" />          <!-- Elements should be separated by blank line -->
+	</Rules>
+	<Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers.DocumentationRules">
+		<Rule Id="SA1633"  Action="None" />          <!-- File should have header -->
+	</Rules>
+</RuleSet>
