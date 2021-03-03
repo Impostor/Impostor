@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Inner.Objects
@@ -19,17 +20,13 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public string PlayerName { get; internal set; }
 
-        public string? RequestedPlayerName { get; internal set; }
+        public ColorType Color { get; internal set; }
 
-        public byte ColorId { get; internal set; }
+        public HatType Hat { get; internal set; }
 
-        public byte? RequestedColorId { get; internal set; }
+        public PetType Pet { get; internal set; }
 
-        public uint HatId { get; internal set; }
-
-        public uint PetId { get; internal set; }
-
-        public uint SkinId { get; internal set; }
+        public SkinType Skin { get; internal set; }
 
         public bool Disconnected { get; internal set; }
 
@@ -61,10 +58,10 @@ namespace Impostor.Server.Net.Inner.Objects
         public void Deserialize(IMessageReader reader)
         {
             PlayerName = reader.ReadString();
-            ColorId = reader.ReadByte();
-            HatId = reader.ReadPackedUInt32();
-            PetId = reader.ReadPackedUInt32();
-            SkinId = reader.ReadPackedUInt32();
+            Color = (ColorType)reader.ReadByte();
+            Hat = (HatType)reader.ReadPackedUInt32();
+            Pet = (PetType)reader.ReadPackedUInt32();
+            Skin = (SkinType)reader.ReadPackedUInt32();
             var flag = reader.ReadByte();
             Disconnected = (flag & 1) > 0;
             IsImpostor = (flag & 2) > 0;

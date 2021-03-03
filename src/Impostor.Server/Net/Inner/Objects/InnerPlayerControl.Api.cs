@@ -2,9 +2,9 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
-using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Inner.Objects.Components;
+using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Player;
 
 namespace Impostor.Server.Net.Inner.Objects
@@ -26,60 +26,40 @@ namespace Impostor.Server.Net.Inner.Objects
             await _game.FinishRpcAsync(writer);
         }
 
-        public async ValueTask SetColorAsync(byte colorId)
+        public async ValueTask SetColorAsync(ColorType color)
         {
-            PlayerInfo.ColorId = colorId;
+            PlayerInfo.Color = color;
 
             using var writer = _game.StartRpc(NetId, RpcCalls.SetColor);
-            writer.Write(colorId);
+            Rpc08SetColor.Serialize(writer, color);
             await _game.FinishRpcAsync(writer);
         }
 
-        public ValueTask SetColorAsync(ColorType colorType)
+        public async ValueTask SetHatAsync(HatType hat)
         {
-            return SetColorAsync((byte)colorType);
-        }
-
-        public async ValueTask SetHatAsync(uint hatId)
-        {
-            PlayerInfo.HatId = hatId;
+            PlayerInfo.Hat = hat;
 
             using var writer = _game.StartRpc(NetId, RpcCalls.SetHat);
-            writer.WritePacked(hatId);
+            Rpc09SetHat.Serialize(writer, hat);
             await _game.FinishRpcAsync(writer);
         }
 
-        public ValueTask SetHatAsync(HatType hatType)
+        public async ValueTask SetPetAsync(PetType pet)
         {
-            return SetHatAsync((uint)hatType);
-        }
-
-        public async ValueTask SetPetAsync(uint petId)
-        {
-            PlayerInfo.PetId = petId;
+            PlayerInfo.Pet = pet;
 
             using var writer = _game.StartRpc(NetId, RpcCalls.SetPet);
-            writer.WritePacked(petId);
+            Rpc17SetPet.Serialize(writer, pet);
             await _game.FinishRpcAsync(writer);
         }
 
-        public ValueTask SetPetAsync(PetType petType)
+        public async ValueTask SetSkinAsync(SkinType skin)
         {
-            return SetPetAsync((uint)petType);
-        }
-
-        public async ValueTask SetSkinAsync(uint skinId)
-        {
-            PlayerInfo.SkinId = skinId;
+            PlayerInfo.Skin = skin;
 
             using var writer = _game.StartRpc(NetId, RpcCalls.SetSkin);
-            writer.WritePacked(skinId);
+            Rpc10SetSkin.Serialize(writer, skin);
             await _game.FinishRpcAsync(writer);
-        }
-
-        public ValueTask SetSkinAsync(SkinType skinType)
-        {
-            return SetSkinAsync((uint)skinType);
         }
 
         public async ValueTask SendChatAsync(string text)
@@ -101,38 +81,30 @@ namespace Impostor.Server.Net.Inner.Objects
             await _game.FinishRpcAsync(writer, player.OwnerId);
         }
 
-        public async ValueTask SetMurderedByAsync(IClientPlayer impostor)
+        public async ValueTask MurderPlayerAsync(IInnerPlayerControl target)
         {
-            if (impostor.Character == null)
+            if (!PlayerInfo.IsImpostor)
             {
-                throw new ImpostorException("Character is null.");
-            }
-
-            if (!impostor.Character.PlayerInfo.IsImpostor)
-            {
-                throw new ImpostorProtocolException("Plugin tried to murder a player while the impostor specified was not an impostor.");
-            }
-
-            if (impostor.Character.PlayerInfo.IsDead)
-            {
-                throw new ImpostorProtocolException("Plugin tried to murder a player while the impostor specified was dead.");
+                throw new ImpostorProtocolException("Tried to murder a player, but murderer was not the impostor.");
             }
 
             if (PlayerInfo.IsDead)
             {
-                return;
+                throw new ImpostorProtocolException("Tried to murder a player, but murderer was not alive.");
             }
 
-            // Update player.
-            Die(DeathReason.Kill);
+            if (target.PlayerInfo.IsDead)
+            {
+                throw new ImpostorProtocolException("Tried to murder a player, but target was not alive.");
+            }
 
-            // Send RPC.
-            using var writer = _game.StartRpc(impostor.Character.NetId, RpcCalls.MurderPlayer);
-            writer.WritePacked(NetId);
+            ((InnerPlayerControl)target).Die(DeathReason.Kill);
+
+            using var writer = _game.StartRpc(NetId, RpcCalls.MurderPlayer);
+            Rpc12MurderPlayer.Serialize(writer, target);
             await _game.FinishRpcAsync(writer);
 
-            // Notify plugins.
-            await _eventManager.CallAsync(new PlayerMurderEvent(_game, impostor, impostor.Character, this));
+            await _eventManager.CallAsync(new PlayerMurderEvent(_game, _game.GetClientPlayer(OwnerId), this, target));
         }
     }
 }

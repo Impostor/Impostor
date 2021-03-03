@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
@@ -231,7 +232,7 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
-                            obj.Deserialize(sender, target, reader, false);
+                            await obj.DeserializeAsync(sender, target, reader, false);
                         }
                         else
                         {
@@ -246,7 +247,10 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
-                            await obj.HandleRpc(sender, target, (RpcCalls) reader.ReadByte(), reader);
+                            if (!await obj.HandleRpcAsync(sender, target, (RpcCalls)reader.ReadByte(), reader))
+                            {
+                                return false;
+                            }
                         }
                         else
                         {
@@ -261,7 +265,10 @@ namespace Impostor.Server.Net.State
                         // Only the host is allowed to despawn objects.
                         if (!sender.IsHost)
                         {
-                            throw new ImpostorCheatException("Tried to send SpawnFlag as non-host.");
+                            if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), "Tried to send SpawnFlag as non-host."))
+                            {
+                                return false;
+                            }
                         }
 
                         var objectId = reader.ReadPackedUInt32();
@@ -322,7 +329,7 @@ namespace Impostor.Server.Net.State
                                 using var readerSub = reader.ReadMessage();
                                 if (readerSub.Length > 0)
                                 {
-                                    obj.Deserialize(sender, target, readerSub, true);
+                                    await obj.DeserializeAsync(sender, target, readerSub, true);
                                 }
 
                                 await OnSpawnAsync(obj);
@@ -435,15 +442,15 @@ namespace Impostor.Server.Net.State
             obj.NetId = uint.MaxValue;
         }
 
-        public T FindObjectByNetId<T>(uint netId)
-            where T : InnerNetObject
+        public T? FindObjectByNetId<T>(uint netId)
+            where T : IInnerNetObject
         {
             if (_allObjectsFast.TryGetValue(netId, out var obj))
             {
-                return (T) obj;
+                return (T)(IInnerNetObject)obj;
             }
 
-            return null;
+            return default;
         }
     }
 }

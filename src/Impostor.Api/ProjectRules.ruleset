@@ -9,7 +9,8 @@
         <Rule Id="SA1633" Action="None" />
     </Rules>
     <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.ReadabilityRules">
-        <Rule Id="SA1101" Action="None" />
+      <Rule Id="SA1101" Action="None" />
+      <Rule Id="SA1111" Action="None" />
     </Rules>
     <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.NamingRules">
         <Rule Id="SA1309" Action="None" />

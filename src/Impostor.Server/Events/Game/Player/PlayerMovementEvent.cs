@@ -2,23 +2,46 @@
 using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Impostor.Server.Events.Player
 {
-    // TODO: Finish and use event, needs to be pooled
-    public class PlayerMovementEvent : IPlayerEvent
+    public class PlayerMovementEvent : IPlayerMovementEvent
     {
-        public PlayerMovementEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl)
+#pragma warning disable 8766
+        public IGame? Game { get; private set; }
+
+        public IClientPlayer? ClientPlayer { get; private set; }
+
+        public IInnerPlayerControl? PlayerControl { get; private set; }
+#pragma warning restore 8766
+
+        public void Reset(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl)
         {
             Game = game;
             ClientPlayer = clientPlayer;
             PlayerControl = playerControl;
         }
 
-        public IGame Game { get; }
+        public void Reset()
+        {
+            Game = null;
+            ClientPlayer = null;
+            PlayerControl = null;
+        }
 
-        public IClientPlayer ClientPlayer { get; }
+        public class PlayerMovementEventObjectPolicy : IPooledObjectPolicy<PlayerMovementEvent>
+        {
+            public PlayerMovementEvent Create()
+            {
+                return new PlayerMovementEvent();
+            }
 
-        public IInnerPlayerControl PlayerControl { get; }
+            public bool Return(PlayerMovementEvent obj)
+            {
+                obj.Reset();
+                return true;
+            }
+        }
     }
 }

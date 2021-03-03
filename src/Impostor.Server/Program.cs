@@ -112,9 +112,16 @@ namespace Impostor.Server
                         .GetSection(ServerRedirectorConfig.Section)
                         .Get<ServerRedirectorConfig>() ?? new ServerRedirectorConfig();
 
+                    var announcementsServer = host.Configuration
+                        .GetSection(AnnouncementsServerConfig.Section)
+                        .Get<AnnouncementsServerConfig>() ?? new AnnouncementsServerConfig();
+
+                    services.AddSingleton<ServerEnvironment>();
+
                     services.Configure<DebugConfig>(host.Configuration.GetSection(DebugConfig.Section));
                     services.Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section));
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
+                    services.Configure<AnnouncementsServerConfig>(host.Configuration.GetSection(AnnouncementsServerConfig.Section));
                     services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));
 
                     if (redirector.Enabled)
@@ -191,12 +198,18 @@ namespace Impostor.Server
                         services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
                     }
 
+                    services.AddEventPools();
                     services.AddHazel();
                     services.AddSingleton<IMessageWriterProvider, MessageWriterProvider>();
                     services.AddSingleton<IGameCodeFactory, GameCodeFactory>();
                     services.AddSingleton<IEventManager, EventManager>();
                     services.AddSingleton<Matchmaker>();
                     services.AddHostedService<MatchmakerService>();
+
+                    if (announcementsServer.Enabled)
+                    {
+                        services.AddHostedService<AnnouncementsService>();
+                    }
                 })
                 .UseSerilog()
                 .UseConsoleLifetime()

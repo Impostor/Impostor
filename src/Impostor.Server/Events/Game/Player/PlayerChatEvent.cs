@@ -1,11 +1,12 @@
-﻿using Impostor.Api.Events.Player;
+﻿using Impostor.Api.Events;
+using Impostor.Api.Events.Player;
 using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Events.Player
 {
-    public class PlayerChatEvent : IPlayerChatEvent
+    public class PlayerChatEvent : IPlayerChatEvent, IEventCancelable
     {
         public PlayerChatEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, string message)
         {
@@ -22,5 +23,7 @@ namespace Impostor.Server.Events.Player
         public IInnerPlayerControl PlayerControl { get; }
 
         public string Message { get; }
+
+        public bool IsCancelled { get; set; }
     }
 }

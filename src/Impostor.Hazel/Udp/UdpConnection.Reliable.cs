@@ -309,9 +309,6 @@ namespace Impostor.Hazel.Udp
             //Get the ID form the packet
             var id = (ushort)((b1 << 8) + b2);
 
-            //Send an acknowledgement
-            await SendAck(id);
-
             /*
              * It gets a little complicated here (note the fact I'm actually using a multiline comment for once...)
              * 
@@ -337,6 +334,8 @@ namespace Impostor.Hazel.Udp
              * So...
              */
             
+            var result = true;
+
             lock (reliableDataPacketsMissing)
             {
                 //Calculate overwritePointer
@@ -379,12 +378,15 @@ namespace Impostor.Hazel.Udp
                     //See if we're missing it, else this packet is a duplicate as so we return false
                     if (!reliableDataPacketsMissing.Remove(id))
                     {
-                        return false;
+                        result = false;
                     }
                 }
             }
+            
+            //Send an acknowledgement
+            await SendAck(id);
 
-            return true;
+            return result;
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
@@ -6,10 +7,13 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner.Objects.Components;
 using Impostor.Server.Net.State;
+using Impostor.Server.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -20,12 +24,14 @@ namespace Impostor.Server.Net.Inner.Objects
         private readonly ILogger<InnerPlayerControl> _logger;
         private readonly IEventManager _eventManager;
         private readonly Game _game;
+        private readonly ServerEnvironment _serverEnvironment;
 
-        public InnerPlayerControl(ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager, Game game)
+        public InnerPlayerControl(ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager, Game game, ServerEnvironment serverEnvironment)
         {
             _logger = logger;
             _eventManager = eventManager;
             _game = game;
+            _serverEnvironment = serverEnvironment;
 
             Physics = ActivatorUtilities.CreateInstance<InnerPlayerPhysics>(serviceProvider, this, _eventManager, _game);
             NetworkTransform = ActivatorUtilities.CreateInstance<InnerCustomNetworkTransform>(serviceProvider, this, _game);
@@ -47,507 +53,20 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public InnerPlayerInfo PlayerInfo { get; internal set; }
 
-        public override async ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
-        {
-            switch (call)
-            {
-                // Play an animation.
-                case RpcCalls.PlayAnimation:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.PlayAnimation)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
+        internal Queue<string> RequestedPlayerName { get; } = new Queue<string>();
 
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.PlayAnimation)} to a specific player instead of broadcast");
-                    }
+        internal Queue<ColorType> RequestedColorId { get; } = new Queue<ColorType>();
 
-                    var animation = reader.ReadByte();
-                    break;
-                }
-
-                // Complete a task.
-                case RpcCalls.CompleteTask:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CompleteTask)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CompleteTask)} to a specific player instead of broadcast");
-                    }
-
-                    var taskId = reader.ReadPackedUInt32();
-                    var task = PlayerInfo.Tasks[(int)taskId];
-                    if (task == null)
-                    {
-                        _logger.LogWarning($"Client sent {nameof(RpcCalls.CompleteTask)} with a taskIndex that is not in their {nameof(InnerPlayerInfo)}");
-                    }
-                    else
-                    {
-                        task.Complete = true;
-                        await _eventManager.CallAsync(new PlayerCompletedTaskEvent(_game, sender, this, task));
-                    }
-
-                    break;
-                }
-
-                // Update GameOptions.
-                case RpcCalls.SyncSettings:
-                {
-                    if (!sender.IsHost)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SyncSettings)} but was not a host");
-                    }
-
-                    _game.Options.Deserialize(reader.ReadBytesAndSize());
-                    break;
-                }
-
-                // Set Impostors.
-                case RpcCalls.SetInfected:
-                {
-                    if (!sender.IsHost)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetInfected)} but was not a host");
-                    }
-
-                    var length = reader.ReadPackedInt32();
-
-                    for (var i = 0; i < length; i++)
-                    {
-                        var playerId = reader.ReadByte();
-                        var player = _game.GameNet.GameData.GetPlayerById(playerId);
-                        if (player != null)
-                        {
-                            player.IsImpostor = true;
-                        }
-                    }
-
-                    if (_game.GameState == GameStates.Starting)
-                    {
-                        await _game.StartedAsync();
-                    }
-
-                    break;
-                }
-
-                // Player was voted out.
-                case RpcCalls.Exiled:
-                {
-                    if (!sender.IsHost)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.Exiled)} but was not a host");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.Exiled)} to a specific player instead of broadcast");
-                    }
-
-                    // TODO: Not hit?
-                    Die(DeathReason.Exile);
-
-                    await _eventManager.CallAsync(new PlayerExileEvent(_game, sender, this));
-                    break;
-                }
-
-                // Validates the player name at the host.
-                case RpcCalls.CheckName:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckName)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    if (target == null || !target.IsHost)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckName)} to the wrong player");
-                    }
-
-                    var name = reader.ReadString();
-
-                    if (name.Length > 10)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckName)} with name exceeding 10 characters");
-                    }
-
-                    if (string.IsNullOrWhiteSpace(name) || !name.All(TextBox.IsCharAllowed))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckName)} with name containing illegal characters");
-                    }
-
-                    if (sender.Client.Name != name)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with name not matching his name from handshake");
-                    }
-
-                    PlayerInfo.RequestedPlayerName = name;
-                    break;
-                }
-
-                // Update the name of a player.
-                case RpcCalls.SetName:
-                {
-                    if (!sender.IsHost)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} but was not a host");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} to a specific player instead of broadcast");
-                    }
-
-                    var name = reader.ReadString();
-
-                    if (sender.IsOwner(this))
-                    {
-                        if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == name))
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with a name that is already used");
-                        }
-
-                        if (sender.Client.Name != name)
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with name not matching his name from handshake");
-                        }
-                    }
-                    else
-                    {
-                        if (PlayerInfo.RequestedPlayerName == null)
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it");
-                        }
-
-                        var expected = PlayerInfo.RequestedPlayerName!;
-
-                        if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == expected))
-                        {
-                            var i = 1;
-                            while (true)
-                            {
-                                string text = expected + " " + i;
-
-                                if (_game.Players.All(x => x.Character == null || x.Character == this || x.Character.PlayerInfo.PlayerName != text))
-                                {
-                                    expected = text;
-                                    break;
-                                }
-
-                                i++;
-                            }
-                        }
-
-                        if (name != expected)
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetName)} with incorrect name");
-                        }
-                    }
-
-                    PlayerInfo.PlayerName = name;
-                    PlayerInfo.RequestedPlayerName = null;
-                    break;
-                }
-
-                // Validates the color at the host.
-                case RpcCalls.CheckColor:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckColor)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    if (target == null || !target.IsHost)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckColor)} to the wrong player");
-                    }
-
-                    var color = reader.ReadByte();
-
-                    if (color > Enum.GetValues<ColorType>().Length)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CheckColor)} with invalid color");
-                    }
-
-                    PlayerInfo.RequestedColorId = color;
-                    break;
-                }
-
-                // Update the color of a player.
-                case RpcCalls.SetColor:
-                {
-                    if (!sender.IsHost)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} but was not a host");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} to a specific player instead of broadcast");
-                    }
-
-                    var color = reader.ReadByte();
-
-                    if (sender.IsOwner(this))
-                    {
-                        if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.ColorId == color))
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} with a color that is already used");
-                        }
-                    }
-                    else
-                    {
-                        if (PlayerInfo.RequestedColorId == null)
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} for a player that didn't request it");
-                        }
-
-                        var expected = PlayerInfo.RequestedColorId!.Value;
-
-                        while (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.ColorId == expected))
-                        {
-                            expected = (byte)((expected + 1) % Enum.GetValues<ColorType>().Length);
-                        }
-
-                        if (color != expected)
-                        {
-                            throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetColor)} with incorrect color");
-                        }
-                    }
-
-                    PlayerInfo.ColorId = color;
-                    PlayerInfo.RequestedColorId = null;
-                    break;
-                }
-
-                // Update the hat of a player.
-                case RpcCalls.SetHat:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetHat)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetHat)} to a specific player instead of broadcast");
-                    }
-
-                    PlayerInfo.HatId = reader.ReadPackedUInt32();
-                    break;
-                }
-
-                case RpcCalls.SetSkin:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetSkin)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetHat)} to a specific player instead of broadcast");
-                    }
-
-                    PlayerInfo.SkinId = reader.ReadPackedUInt32();
-                    break;
-                }
-
-                // TODO: (ANTICHEAT) Location check?
-                // only called by a non-host player on to start meeting
-                case RpcCalls.ReportDeadBody:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.ReportDeadBody)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.ReportDeadBody)} to a specific player instead of broadcast");
-                    }
-
-
-                    var deadBodyPlayerId = reader.ReadByte();
-                    // deadBodyPlayerId == byte.MaxValue -- means emergency call by button
-
-                    break;
-                }
-
-                // TODO: (ANTICHEAT) Cooldown check?
-                case RpcCalls.MurderPlayer:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.MurderPlayer)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.MurderPlayer)} to a specific player instead of broadcast");
-                    }
-
-                    if (!sender.Character.PlayerInfo.IsImpostor)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.MurderPlayer)} as crewmate");
-                    }
-
-                    if (!sender.Character.PlayerInfo.CanMurder(_game))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.MurderPlayer)} too fast");
-                    }
-
-                    sender.Character.PlayerInfo.LastMurder = DateTimeOffset.UtcNow;
-
-                    var player = reader.ReadNetObject<InnerPlayerControl>(_game);
-                    if (!player.PlayerInfo.IsDead)
-                    {
-                        player.Die(DeathReason.Kill);
-                        await _eventManager.CallAsync(new PlayerMurderEvent(_game, sender, this, player));
-                    }
-
-                    break;
-                }
-
-                case RpcCalls.SendChat:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SendChat)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SendChat)} to a specific player instead of broadcast");
-                    }
-
-                    var chat = reader.ReadString();
-
-                    await _eventManager.CallAsync(new PlayerChatEvent(_game, sender, this, chat));
-                    break;
-                }
-
-                case RpcCalls.StartMeeting:
-                {
-                    if (!sender.IsHost)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.StartMeeting)} but was not a host");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.StartMeeting)} to a specific player instead of broadcast");
-                    }
-
-                    // deadBodyPlayerId == byte.MaxValue -- means emergency call by button
-                    var deadBodyPlayerId = reader.ReadByte();
-                    var deadPlayer = deadBodyPlayerId != byte.MaxValue
-                        ? _game.GameNet.GameData.GetPlayerById(deadBodyPlayerId)?.Controller
-                        : null;
-
-                    await _eventManager.CallAsync(new PlayerStartMeetingEvent(_game, _game.GetClientPlayer(this.OwnerId), this, deadPlayer));
-                    break;
-                }
-
-                case RpcCalls.SetScanner:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetScanner)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetScanner)} to a specific player instead of broadcast");
-                    }
-
-                    var on = reader.ReadBoolean();
-                    var count = reader.ReadByte();
-                    break;
-                }
-
-                case RpcCalls.SendChatNote:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SendChatNote)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SendChatNote)} to a specific player instead of broadcast");
-                    }
-
-                    var playerId = reader.ReadByte();
-                    var chatNote = (ChatNoteType)reader.ReadByte();
-                    break;
-                }
-
-                case RpcCalls.SetPet:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetPet)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetPet)} to a specific player instead of broadcast");
-                    }
-
-                    PlayerInfo.PetId = reader.ReadPackedUInt32();
-                    break;
-                }
-
-                // TODO: Understand this RPC
-                case RpcCalls.SetStartCounter:
-                {
-                    if (!sender.IsOwner(this))
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetStartCounter)} to an unowned {nameof(InnerPlayerControl)}");
-                    }
-
-                    if (target != null)
-                    {
-                        throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.SetStartCounter)} to a specific player instead of broadcast");
-                    }
-
-                    // Used to compare with LastStartCounter.
-                    var startCounter = reader.ReadPackedUInt32();
-
-                    // Is either start countdown or byte.MaxValue
-                    var secondsLeft = reader.ReadByte();
-                    if (secondsLeft < byte.MaxValue)
-                    {
-                        await _eventManager.CallAsync(new PlayerSetStartCounterEvent(_game, sender, this, secondsLeft));
-                    }
-
-                    break;
-                }
-
-                default:
-                {
-                    _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerPlayerControl), call);
-                    break;
-                }
-            }
-        }
-
-        public override bool Serialize(IMessageWriter writer, bool initialState)
+        public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
             throw new NotImplementedException();
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
-            if (!sender.IsHost)
+            if (!await ValidateHost(CheatContext.Deserialize, sender))
             {
-                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerPlayerControl)} as non-host");
+                return;
             }
 
             if (initialState)
@@ -562,6 +81,515 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             PlayerInfo.IsDead = true;
             PlayerInfo.LastDeathReason = reason;
+        }
+
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        {
+            switch (call)
+            {
+                case RpcCalls.PlayAnimation:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc00PlayAnimation.Deserialize(reader, out var task);
+                    break;
+                }
+
+                case RpcCalls.CompleteTask:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc01CompleteTask.Deserialize(reader, out var taskId);
+                    await HandleCompleteTask(sender, taskId);
+                    break;
+                }
+
+                case RpcCalls.SyncSettings:
+                {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc02SyncSettings.Deserialize(reader, _game.Options);
+                    break;
+                }
+
+                case RpcCalls.SetInfected:
+                {
+                    if (!await ValidateOwnership(call, sender) || !await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc03SetInfected.Deserialize(reader, out var infectedIds);
+                    await HandleSetInfected(infectedIds);
+                    break;
+                }
+
+                case RpcCalls.CheckName:
+                {
+                    if (!await ValidateOwnership(call, sender) || !await ValidateCmd(call, sender, target))
+                    {
+                        return false;
+                    }
+
+                    Rpc05CheckName.Deserialize(reader, out var name);
+                    return await HandleCheckName(sender, name);
+                }
+
+                case RpcCalls.SetName:
+                {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc06SetName.Deserialize(reader, out var name);
+                    return await HandleSetName(sender, name);
+                }
+
+                case RpcCalls.CheckColor:
+                {
+                    if (!await ValidateOwnership(call, sender) || !await ValidateCmd(call, sender, target))
+                    {
+                        return false;
+                    }
+
+                    Rpc07CheckColor.Deserialize(reader, out var color);
+                    return await HandleCheckColor(sender, color);
+                }
+
+                case RpcCalls.SetColor:
+                {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc08SetColor.Deserialize(reader, out var color);
+                    return await HandleSetColor(sender, color);
+                }
+
+                case RpcCalls.SetHat:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc09SetHat.Deserialize(reader, out var hat);
+                    return await HandleSetHat(sender, hat);
+                }
+
+                case RpcCalls.SetSkin:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc10SetSkin.Deserialize(reader, out var skin);
+                    return await HandleSetSkin(sender, skin);
+                }
+
+                case RpcCalls.ReportDeadBody:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc11ReportDeadBody.Deserialize(reader, out var targetId);
+                    break;
+                }
+
+                case RpcCalls.MurderPlayer:
+                {
+                    if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(RpcCalls.MurderPlayer, sender, PlayerInfo))
+                    {
+                        return false;
+                    }
+
+                    Rpc12MurderPlayer.Deserialize(reader, _game, out var murdered);
+                    return await HandleMurderPlayer(sender, murdered);
+                }
+
+                case RpcCalls.SendChat:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc13SendChat.Deserialize(reader, out var message);
+                    return await HandleSendChat(sender, message);
+                }
+
+                case RpcCalls.StartMeeting:
+                {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc14StartMeeting.Deserialize(reader, out var targetId);
+                    await HandleStartMeeting(targetId);
+                    break;
+                }
+
+                case RpcCalls.SetScanner:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc15SetScanner.Deserialize(reader, out var on, out var scannerCount);
+                    break;
+                }
+
+                case RpcCalls.SendChatNote:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc16SendChatNote.Deserialize(reader, out var playerId, out var chatNoteType);
+                    break;
+                }
+
+                case RpcCalls.SetPet:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc17SetPet.Deserialize(reader, out var pet);
+                    return await HandleSetPet(sender, pet);
+                }
+
+                case RpcCalls.SetStartCounter:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc18SetStartCounter.Deserialize(reader, out var sequenceId, out var startCounter);
+                    return await HandleSetStartCounter(sender, sequenceId, startCounter);
+                }
+
+                case RpcCalls.CustomRpc:
+                    return await HandleCustomRpc(reader, _game);
+
+                default:
+                    return await UnregisteredCall(call, sender);
+            }
+
+            return true;
+        }
+
+        private async ValueTask HandleCompleteTask(ClientPlayer sender, uint taskId)
+        {
+            var task = PlayerInfo.Tasks.ElementAtOrDefault((int)taskId);
+
+            if (task != null)
+            {
+                task.Complete = true;
+                await _eventManager.CallAsync(new PlayerCompletedTaskEvent(_game, sender, this, task));
+            }
+            else
+            {
+                _logger.LogWarning($"Client sent {nameof(RpcCalls.CompleteTask)} with a taskIndex that is not in their {nameof(InnerPlayerInfo)}");
+            }
+        }
+
+        private async ValueTask HandleSetInfected(ReadOnlyMemory<byte> infectedIds)
+        {
+            for (var i = 0; i < infectedIds.Length; i++)
+            {
+                var player = _game.GameNet.GameData.GetPlayerById(infectedIds.Span[i]);
+                if (player != null)
+                {
+                    player.IsImpostor = true;
+                }
+            }
+
+            if (_game.GameState == GameStates.Starting)
+            {
+                await _game.StartedAsync();
+            }
+        }
+
+        private async ValueTask<bool> HandleCheckName(ClientPlayer sender, string name)
+        {
+            if (name.Length > 10)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, "Client sent name exceeding 10 characters"))
+                {
+                    return false;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(name) || !name.All(TextBox.IsCharAllowed))
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, "Client sent name containing illegal characters"))
+                {
+                    return false;
+                }
+            }
+
+            if (sender.Client.Name != name)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, "Client sent name not matching his name from handshake"))
+                {
+                    return false;
+                }
+            }
+
+            RequestedPlayerName.Enqueue(name);
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleSetName(ClientPlayer sender, string name)
+        {
+            if (_game.GameState == GameStates.Started)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, "Client tried to set a name midgame"))
+                {
+                    return false;
+                }
+            }
+
+            if (sender.IsOwner(this))
+            {
+                if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == name))
+                {
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, "Client sent name that is already used"))
+                    {
+                        return false;
+                    }
+                }
+
+                if (sender.Client.Name != name)
+                {
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, "Client sent name not matching his name from handshake"))
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                if (!RequestedPlayerName.Any())
+                {
+                    _logger.LogWarning($"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it");
+                    return false;
+                }
+
+                var expected = RequestedPlayerName.Dequeue();
+
+                if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == expected))
+                {
+                    var i = 1;
+                    while (true)
+                    {
+                        string text = expected + " " + i;
+
+                        if (_game.Players.All(x => x.Character == null || x.Character == this || x.Character.PlayerInfo.PlayerName != text))
+                        {
+                            expected = text;
+                            break;
+                        }
+
+                        i++;
+                    }
+                }
+
+                if (name != expected)
+                {
+                    _logger.LogWarning($"Client sent {nameof(RpcCalls.SetName)} with incorrect name");
+                    await SetNameAsync(expected);
+                    return false;
+                }
+            }
+
+            PlayerInfo.PlayerName = name;
+
+            return true;
+        }
+
+        private static readonly byte ColorsCount = (byte)Enum.GetValues<ColorType>().Length;
+
+        private async ValueTask<bool> HandleCheckColor(ClientPlayer sender, ColorType color)
+        {
+            if ((byte)color > ColorsCount)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, "Client sent invalid color"))
+                {
+                    return false;
+                }
+            }
+
+            RequestedColorId.Enqueue(color);
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleSetColor(ClientPlayer sender, ColorType color)
+        {
+            if (_game.GameState == GameStates.Started)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, "Client tried to set a color midgame"))
+                {
+                    return false;
+                }
+            }
+
+            if (sender.IsOwner(this))
+            {
+                if (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.Color == color))
+                {
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, "Client sent a color that is already used"))
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                if (!RequestedColorId.Any())
+                {
+                    _logger.LogWarning($"Client sent {nameof(RpcCalls.SetColor)} for a player that didn't request it");
+                    return false;
+                }
+
+                var expected = RequestedColorId.Dequeue();
+
+                while (_game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.Color == expected))
+                {
+                    expected = (ColorType)(((byte)expected + 1) % ColorsCount);
+                }
+
+                if (color != expected)
+                {
+                    _logger.LogWarning($"Client sent {nameof(RpcCalls.SetColor)} with incorrect color");
+                    await SetColorAsync(expected);
+                    return false;
+                }
+            }
+
+            PlayerInfo.Color = color;
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleSetHat(ClientPlayer sender, HatType hat)
+        {
+            if (_game.GameState == GameStates.Started && await sender.Client.ReportCheatAsync(RpcCalls.SetHat, "Client tried to change hat while not in lobby"))
+            {
+                return false;
+            }
+
+            PlayerInfo.Hat = hat;
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleSetSkin(ClientPlayer sender, SkinType skin)
+        {
+            if (_game.GameState == GameStates.Started && await sender.Client.ReportCheatAsync(RpcCalls.SetSkin, "Client tried to change skin while not in lobby"))
+            {
+                return false;
+            }
+
+            PlayerInfo.Skin = skin;
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleMurderPlayer(ClientPlayer sender, IInnerPlayerControl? target)
+        {
+            // TODO record replay with timestamps
+            if (!_serverEnvironment.IsReplay && !PlayerInfo.CanMurder(_game))
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder too fast"))
+                {
+                    return false;
+                }
+            }
+
+            if (target == null || target.PlayerInfo.IsImpostor)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder invalid target"))
+                {
+                    return false;
+                }
+            }
+
+            PlayerInfo.LastMurder = DateTimeOffset.UtcNow;
+
+            if (!target.PlayerInfo.IsDead)
+            {
+                ((InnerPlayerControl)target).Die(DeathReason.Kill);
+                await _eventManager.CallAsync(new PlayerMurderEvent(_game, sender, this, target));
+            }
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleSendChat(ClientPlayer sender, string message)
+        {
+            var @event = new PlayerChatEvent(_game, sender, this, message);
+            await _eventManager.CallAsync(@event);
+
+            return !@event.IsCancelled;
+        }
+
+        private async ValueTask HandleStartMeeting(byte targetId)
+        {
+            var deadPlayer = _game.GameNet.GameData.GetPlayerById(targetId)?.Controller;
+            await _eventManager.CallAsync(new PlayerStartMeetingEvent(_game, _game.GetClientPlayer(this.OwnerId), this, deadPlayer));
+        }
+
+        private async ValueTask<bool> HandleSetPet(ClientPlayer sender, PetType pet)
+        {
+            if (_game.GameState == GameStates.Started && await sender.Client.ReportCheatAsync(RpcCalls.SetPet, "Client tried to change pet while not in lobby"))
+            {
+                return false;
+            }
+
+            PlayerInfo.Pet = pet;
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleSetStartCounter(ClientPlayer sender, int sequenceId, sbyte startCounter)
+        {
+            if (!sender.IsHost && startCounter != -1)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to set start counter as a non-host"))
+                {
+                    return false;
+                }
+            }
+
+            if (startCounter != -1)
+            {
+                await _eventManager.CallAsync(new PlayerSetStartCounterEvent(_game, sender, this, (byte)startCounter));
+            }
+
+            return true;
         }
     }
 }

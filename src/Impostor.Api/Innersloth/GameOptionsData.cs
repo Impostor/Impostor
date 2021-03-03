@@ -161,7 +161,7 @@ namespace Impostor.Api.Innersloth
         /// </summary>
         /// <param name="writer">The stream to write the message to.</param>
         /// <param name="version">The version of the game.</param>
-        public void Serialize(BinaryWriter writer, byte version)
+        public void Serialize(BinaryWriter writer, byte version = LatestVersion)
         {
             writer.Write((byte)version);
             writer.Write((byte)MaxPlayers);
@@ -202,6 +202,14 @@ namespace Impostor.Api.Innersloth
             {
                 throw new ImpostorException($"Unknown GameOptionsData version {Version}.");
             }
+        }
+
+        public void Serialize(IMessageWriter writer)
+        {
+            using var memory = new MemoryStream();
+            using var writerBin = new BinaryWriter(memory);
+            Serialize(writerBin);
+            writer.WriteBytesAndSize(memory.ToArray());
         }
 
         /// <summary>

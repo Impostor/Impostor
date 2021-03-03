@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
@@ -71,7 +72,7 @@ namespace Impostor.Server.Net.State
 
         public int PlayerCount => _players.Count;
 
-        public ClientPlayer Host => _players[HostId];
+        public ClientPlayer? Host => _players.GetValueOrDefault(HostId);
 
         public IEnumerable<IClientPlayer> Players => _players.Select(p => p.Value);
 
@@ -92,16 +93,20 @@ namespace Impostor.Server.Net.State
             return _players.TryGetValue(clientId, out var clientPlayer) ? clientPlayer : null;
         }
 
-        internal ValueTask StartedAsync()
+        internal async ValueTask StartedAsync()
         {
             if (GameState == GameStates.Starting)
             {
+                for (var i = 0; i < _players.Values.Count; i++)
+                {
+                    var player = _players.Values.ElementAt(i);
+                    await player.Character!.NetworkTransform.SetPositionAsync(player, MapSpawn.Maps[Options.Map].GetSpawnLocation(i, PlayerCount, true), Vector2.Zero);
+                }
+
                 GameState = GameStates.Started;
 
-                return _eventManager.CallAsync(new GameStartedEvent(this));
+                await _eventManager.CallAsync(new GameStartedEvent(this));
             }
-
-            return default;
         }
 
         public ValueTask EndAsync()
