@@ -12,7 +12,12 @@ var configuration = Argument("configuration", "Release");
 
 var msbuildSettings = new DotNetCoreMSBuildSettings();
 
-if (!buildRelease && buildId != null) {
+if (buildRelease) 
+{
+    msbuildSettings.Properties["Version"] = new[] { buildVersion };
+}
+else if (buildId != null) 
+{
     msbuildSettings.Properties["VersionSuffix"] = new[] { "ci." + buildId };
     buildVersion += "-ci." + buildId;
 }
