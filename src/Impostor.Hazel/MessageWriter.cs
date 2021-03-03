@@ -4,7 +4,10 @@ using Impostor.Api.Net.Messages;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Numerics;
 using System.Text;
+using Impostor.Api.Net.Inner;
+using Impostor.Api.Unity;
 
 namespace Impostor.Hazel
 {
@@ -87,6 +90,24 @@ namespace Impostor.Hazel
         public void Write(GameCode value)
         {
             this.Write(value.Value);
+        }
+
+        public void Write(IInnerNetObject innerNetObject)
+        {
+            if (innerNetObject == null)
+            {
+                this.Write(0);
+            }
+            else
+            {
+                this.WritePacked(innerNetObject.NetId);
+            }
+        }
+
+        public void Write(Vector2 vector)
+        {
+            Write((ushort)(Mathf.ReverseLerp(vector.X) * (double) ushort.MaxValue));
+            Write((ushort)(Mathf.ReverseLerp(vector.Y) * (double) ushort.MaxValue));
         }
 
         ///

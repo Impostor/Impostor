@@ -16,7 +16,6 @@
     <AssemblyTitle>Impostor.Server</AssemblyTitle>
     <Product>Impostor.Server</Product>
     <Copyright>Copyright © AeonLucid 2020</Copyright>
-    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,6 +34,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <!-- HACK: Some plugins depend on System.IO.Pipelines and expect the version to be 5.0.0.0, but .NET 5 only ships version 5.0.0.1. It is pretty hard to convince MSBuild to build against the correct DLL, so we special case it here. Remove once we move past .NET 5 -->
+    <PackageReference Include="System.IO.Pipelines" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

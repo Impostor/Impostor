@@ -1,12 +1,11 @@
 version: '{build}'
 
 environment:
-  IMPOSTOR_VERSION: '1.2.2'
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
 branches:
   except:
-  - gh-pages
+    - gh-pages
 
 pull_requests:
   do_not_increment_build_number: true
@@ -17,7 +16,7 @@ assembly_info:
 dotnet_csproj:
   patch: false
 
-image: Visual Studio 2019 Preview
+image: Ubuntu2004
 
 install:
   - git submodule update --init --recursive

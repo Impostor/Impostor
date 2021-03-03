@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Numerics;
+using Impostor.Api.Games;
+using Impostor.Api.Net.Inner;
 
 namespace Impostor.Api.Net.Messages
 {
@@ -47,6 +50,8 @@ namespace Impostor.Api.Net.Messages
 
         float ReadSingle();
 
+        string ReadString(int length);
+
         string ReadString();
 
         ReadOnlyMemory<byte> ReadBytesAndSize();
@@ -64,5 +69,10 @@ namespace Impostor.Api.Net.Messages
         void RemoveMessage(IMessageReader message);
 
         IMessageReader Copy(int offset = 0);
+
+        T? ReadNetObject<T>(IGame game)
+            where T : IInnerNetObject;
+
+        Vector2 ReadVector2();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Customization;
 
 namespace Impostor.Api.Net.Inner.Objects
 {
@@ -14,22 +15,22 @@ namespace Impostor.Api.Net.Inner.Objects
         /// <summary>
         ///     Gets the color of the player.
         /// </summary>
-        byte ColorId { get; }
+        ColorType Color { get; }
 
         /// <summary>
         ///     Gets the hat of the player.
         /// </summary>
-        uint HatId { get; }
+        HatType Hat { get; }
 
         /// <summary>
         ///     Gets the pet of the player.
         /// </summary>
-        uint PetId { get; }
+        PetType Pet { get; }
 
         /// <summary>
         ///     Gets the skin of the player.
         /// </summary>
-        uint SkinId { get; }
+        SkinType Skin { get; }
 
         /// <summary>
         ///     Gets a value indicating whether the player is an impostor.
@@ -45,9 +46,9 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     Gets the reason why the player is dead in the current game.
         /// </summary>
         DeathReason LastDeathReason { get; }
-        
-        List<ITaskInfo> Tasks { get; }
-        
+
+        IEnumerable<ITaskInfo> Tasks { get; }
+
         DateTimeOffset LastMurder { get; }
     }
 }

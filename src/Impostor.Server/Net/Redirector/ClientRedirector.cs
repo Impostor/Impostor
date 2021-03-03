@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
+using Impostor.Api.Reactor;
 using Impostor.Hazel;
 using Impostor.Server.Config;
 using Impostor.Server.Net.Hazel;
@@ -23,10 +25,11 @@ namespace Impostor.Server.Net.Redirector
         public ClientRedirector(
             string name,
             HazelConnection connection,
+            ISet<Mod> mods,
             ClientManager clientManager,
             INodeProvider nodeProvider,
             INodeLocator nodeLocator)
-            : base(name, connection)
+            : base(name, connection, mods)
         {
             _clientManager = clientManager;
             _nodeProvider = nodeProvider;

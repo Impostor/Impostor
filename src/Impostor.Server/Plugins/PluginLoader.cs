@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using Impostor.Api.Plugins;
-using Impostor.Server.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Hosting;
@@ -25,6 +24,8 @@ namespace Impostor.Server.Plugins
             // Add the plugins and libraries.
             var pluginPaths = new List<string>(config.Paths);
             var libraryPaths = new List<string>(config.LibraryPaths);
+            CheckPaths(pluginPaths);
+            CheckPaths(libraryPaths);
 
             var rootFolder = Directory.GetCurrentDirectory();
 
@@ -119,6 +120,17 @@ namespace Impostor.Server.Plugins
             });
 
             return builder;
+        }
+
+        private static void CheckPaths(IEnumerable<string> paths)
+        {
+            foreach (var path in paths)
+            {
+                if (!Directory.Exists(path))
+                {
+                    Logger.Warning("Path {path} was specified in the PluginLoader configuration, but this folder doesn't exist!", path);
+                }
+            }
         }
 
         private static void RegisterAssemblies(

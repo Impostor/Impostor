@@ -13,12 +13,14 @@ using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Hazel;
 using Impostor.Hazel.Extensions;
+using Impostor.Server;
 using Impostor.Server.Events;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Redirector;
 using Impostor.Server.Recorder;
+using Impostor.Server.Utils;
 using Impostor.Tools.ServerReplay.Mocks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -82,6 +84,11 @@ namespace Impostor.Tools.ServerReplay
         {
             var services = new ServiceCollection();
 
+            services.AddSingleton(new ServerEnvironment
+            {
+                IsReplay = true
+            });
+
             services.AddLogging(builder =>
             {
                 builder.ClearProviders();
@@ -99,6 +106,7 @@ namespace Impostor.Tools.ServerReplay
             services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
             services.AddSingleton<IEventManager, EventManager>();
 
+            services.AddEventPools();
             services.AddHazel();
 
             return services.BuildServiceProvider();
@@ -121,7 +129,7 @@ namespace Impostor.Tools.ServerReplay
 
         private static async Task ParsePacket(BinaryReader reader)
         {
-            var dataType = (RecordedPacketType) reader.ReadByte();
+            var dataType = (RecordedPacketType)reader.ReadByte();
 
             // Read client id.
             var clientId = reader.ReadInt32();
@@ -139,7 +147,7 @@ namespace Impostor.Tools.ServerReplay
                     // Create and register connection.
                     var connection = new MockHazelConnection(address);
 
-                    await _clientManager.RegisterConnectionAsync(connection, name, 50516550);
+                    await _clientManager.RegisterConnectionAsync(connection, name, 50516550, null);
 
                     // Store reference for ourselfs.
                     Connections.Add(clientId, connection);

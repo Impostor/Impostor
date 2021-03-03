@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
-using Impostor.Api.Net.Inner.Objects;
+using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
-    internal class InnerPlayerInfo : IInnerPlayerInfo
+    internal partial class InnerPlayerInfo
     {
         public InnerPlayerInfo(byte playerId)
         {
@@ -20,13 +20,13 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public string PlayerName { get; internal set; }
 
-        public byte ColorId { get; internal set; }
+        public ColorType Color { get; internal set; }
 
-        public uint HatId { get; internal set; }
+        public HatType Hat { get; internal set; }
 
-        public uint PetId { get; internal set; }
+        public PetType Pet { get; internal set; }
 
-        public uint SkinId { get; internal set; }
+        public SkinType Skin { get; internal set; }
 
         public bool Disconnected { get; internal set; }
 
@@ -36,7 +36,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public DeathReason LastDeathReason { get; internal set; }
 
-        public List<ITaskInfo> Tasks { get; internal set; }
+        public List<InnerGameData.TaskInfo> Tasks { get; internal set; }
 
         public DateTimeOffset LastMurder { get; set; }
 
@@ -58,21 +58,19 @@ namespace Impostor.Server.Net.Inner.Objects
         public void Deserialize(IMessageReader reader)
         {
             PlayerName = reader.ReadString();
-            ColorId = reader.ReadByte();
-            HatId = reader.ReadPackedUInt32();
-            PetId = reader.ReadPackedUInt32();
-            SkinId = reader.ReadPackedUInt32();
+            Color = (ColorType)reader.ReadByte();
+            Hat = (HatType)reader.ReadPackedUInt32();
+            Pet = (PetType)reader.ReadPackedUInt32();
+            Skin = (SkinType)reader.ReadPackedUInt32();
             var flag = reader.ReadByte();
             Disconnected = (flag & 1) > 0;
             IsImpostor = (flag & 2) > 0;
             IsDead = (flag & 4) > 0;
             var taskCount = reader.ReadByte();
-            Tasks = new List<ITaskInfo>();
             for (var i = 0; i < taskCount; i++)
             {
-                var task = new InnerGameData.TaskInfo();
-                task.Deserialize(reader);
-                Tasks.Add(task);
+                Tasks[i] ??= new InnerGameData.TaskInfo();
+                Tasks[i].Deserialize(reader);
             }
         }
     }

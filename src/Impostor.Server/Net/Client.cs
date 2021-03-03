@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Games;
@@ -7,6 +8,7 @@ using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
+using Impostor.Api.Reactor;
 using Impostor.Hazel;
 using Impostor.Server.Config;
 using Impostor.Server.Net.Manager;
@@ -22,13 +24,32 @@ namespace Impostor.Server.Net
         private readonly ClientManager _clientManager;
         private readonly GameManager _gameManager;
 
-        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, IHazelConnection connection)
-            : base(name, connection)
+        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, IHazelConnection connection, ISet<Mod> mods)
+            : base(name, connection, mods)
         {
             _logger = logger;
             _antiCheatConfig = antiCheatOptions.Value;
             _clientManager = clientManager;
             _gameManager = gameManager;
+        }
+
+        public override async ValueTask<bool> ReportCheatAsync(CheatContext context, string message)
+        {
+            _logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{Context}] {Message}", Name, Id, context.Name, message);
+
+            if (!_antiCheatConfig.Enabled)
+            {
+                return false;
+            }
+
+            if (_antiCheatConfig.BanIpFromGame)
+            {
+                Player?.Game.BanIp(Connection.EndPoint.Address);
+            }
+
+            await DisconnectAsync(DisconnectReason.Hacking, context.Name + ": " + message);
+
+            return true;
         }
 
         public override async ValueTask HandleMessageAsync(IMessageReader reader, MessageType messageType)
@@ -150,37 +171,24 @@ namespace Impostor.Server.Net
                     // Handle packet.
                     using var readerCopy = reader.Copy();
 
-                    // TODO: Return value, either a bool (to cancel) or a writer (to cancel (null) or modify/overwrite).
-                    try
+                    var verified = await Player.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
+                    if (verified)
                     {
-                        var verified = await Player.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
-                        if (verified)
+                        // Broadcast packet to all other players.
+                        using (var writer = MessageWriter.Get(messageType))
                         {
-                            // Broadcast packet to all other players.
-                            using (var writer = MessageWriter.Get(messageType))
+                            if (toPlayer)
                             {
-                                if (toPlayer)
-                                {
-                                    var target = reader.ReadPackedInt32();
-                                    reader.CopyTo(writer);
-                                    await Player.Game.SendToAsync(writer, target);
-                                }
-                                else
-                                {
-                                    reader.CopyTo(writer);
-                                    await Player.Game.SendToAllExceptAsync(writer, Id);
-                                }
+                                var target = reader.ReadPackedInt32();
+                                reader.CopyTo(writer);
+                                await Player.Game.SendToAsync(writer, target);
+                            }
+                            else
+                            {
+                                reader.CopyTo(writer);
+                                await Player.Game.SendToAllExceptAsync(writer, Id);
                             }
                         }
-                    }
-                    catch (ImpostorCheatException e)
-                    {
-                        if (_antiCheatConfig.BanIpFromGame)
-                        {
-                            Player.Game.BanIp(Connection.EndPoint.Address);
-                        }
-
-                        await DisconnectAsync(DisconnectReason.Hacking, e.Message);
                     }
 
                     break;
@@ -196,7 +204,7 @@ namespace Impostor.Server.Net
                     Message08EndGameC2S.Deserialize(
                         reader,
                         out var gameOverReason);
-                    
+
                     await Player.Game.HandleEndGame(reader, gameOverReason);
                     break;
                 }

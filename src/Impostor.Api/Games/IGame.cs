@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
-using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Games
@@ -35,6 +34,9 @@ namespace Impostor.Api.Games
 
         IClientPlayer GetClientPlayer(int clientId);
 
+        T? FindObjectByNetId<T>(uint netId)
+            where T : IInnerNetObject;
+
         /// <summary>
         ///     Adds an <see cref="IPAddress"/> to the ban list of this game.
         ///     Prevents all future joins from this <see cref="IPAddress"/>.
@@ -52,13 +54,6 @@ namespace Impostor.Api.Games
         /// </summary>
         /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
         ValueTask SyncSettingsAsync();
-
-        /// <summary>
-        ///     Sets the specified list as Impostor on all connected players.
-        /// </summary>
-        /// <param name="players">List of players to be Impostor.</param>
-        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
-        ValueTask SetInfectedAsync(IEnumerable<IInnerPlayerControl> players);
 
         /// <summary>
         ///     Send the message to all players.

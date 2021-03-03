@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Reactor;
 using Impostor.Hazel;
 using Impostor.Server.Events;
 using Microsoft.Extensions.DependencyInjection;
@@ -77,6 +79,25 @@ namespace Impostor.Server.Net.State
             if (GameState == GameStates.Destroyed)
             {
                 return GameJoinResult.FromError(GameJoinError.GameDestroyed);
+            }
+
+            if (Host != null)
+            {
+                foreach (var hostMod in Host.Client.Mods)
+                {
+                    if (hostMod.Side == PluginSide.Both && client.Mods.All(clientMod => hostMod.Id != clientMod.Id))
+                    {
+                        return GameJoinResult.CreateCustomError($"You are missing {hostMod.Id} - {hostMod.Version}");
+                    }
+                }
+
+                foreach (var clientMod in client.Mods)
+                {
+                    if (clientMod.Side == PluginSide.Both && Host.Client.Mods.All(hostMod => clientMod.Id != hostMod.Id))
+                    {
+                        return GameJoinResult.CreateCustomError($"Host of this game is missing {clientMod.Id} - {clientMod.Version}");
+                    }
+                }
             }
 
             var isNew = false;

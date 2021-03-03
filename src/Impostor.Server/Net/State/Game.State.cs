@@ -102,6 +102,12 @@ namespace Impostor.Server.Net.State
                 return;
             }
 
+            foreach (var player in _players.Values)
+            {
+                player.Character?.RequestedPlayerName.Clear();
+                player.Character?.RequestedColorId.Clear();
+            }
+
             HostId = host.Client.Id;
             _logger.LogInformation("{0} - Assigned {1} ({2}) as new host.", Code, host.Client.Name, host.Client.Id);
 

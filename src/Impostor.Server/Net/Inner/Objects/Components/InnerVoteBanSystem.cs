@@ -5,6 +5,7 @@ using Impostor.Api;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
 
@@ -21,42 +22,16 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             _votes = new Dictionary<int, int[]>();
         }
 
-        public override ValueTask HandleRpc(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
-        {
-            if (call != RpcCalls.AddVote)
-            {
-                _logger.LogWarning("{0}: Unknown rpc call {1}", nameof(InnerVoteBanSystem), call);
-                return default;
-            }
-
-            var clientId = reader.ReadInt32();
-            if (clientId != sender.Client.Id)
-            {
-                throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.AddVote)} as other client");
-            }
-
-            if (target != null)
-            {
-                throw new ImpostorCheatException($"Client sent {nameof(RpcCalls.CastVote)} to wrong destinition, must be broadcast");
-            }
-
-            var targetClientId = reader.ReadInt32();
-
-            // TODO: Use.
-
-            return default;
-        }
-
-        public override bool Serialize(IMessageWriter writer, bool initialState)
+        public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
             throw new NotImplementedException();
         }
 
-        public override void Deserialize(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
-            if (!sender.IsHost)
+            if (!await ValidateHost(CheatContext.Deserialize, sender))
             {
-                throw new ImpostorCheatException($"Client attempted to send data for {nameof(InnerShipStatus)} as non-host");
+                return;
             }
 
             var votes = _votes;
@@ -83,6 +58,31 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     }
                 }
             }
+        }
+
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        {
+            if (call == RpcCalls.AddVote)
+            {
+                if (!await ValidateOwnership(call, sender))
+                {
+                    return false;
+                }
+
+                Rpc26AddVote.Deserialize(reader, out var clientId, out var targetClientId);
+
+                if (clientId != sender.Client.Id)
+                {
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.AddVote, $"Client sent {nameof(RpcCalls.AddVote)} as other client"))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return await UnregisteredCall(call, sender);
         }
     }
 }
