@@ -113,7 +113,7 @@ namespace Impostor.Server.Net.Inner.Objects
                                         break;
                                 }
 
-                                _eventManager.CallAsync(new PlayerVotedEvent(_game, clientPlayer, player.Controller, voteType, VotedForPlayer));
+                                await _eventManager.CallAsync(new PlayerVotedEvent(_game, clientPlayer, player.Controller, voteType, VotedForPlayer));
                             }
                         }
                     }
