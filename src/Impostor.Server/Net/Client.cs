@@ -63,7 +63,7 @@ namespace Impostor.Server.Net
                 case MessageFlags.HostGame:
                 {
                     // Read game settings.
-                    var gameInfo = Message00HostGameC2S.Deserialize(reader);
+                    var gameInfo = Message00HostGameC2S.Deserialize(reader, out _);
 
                     // Create game.
                     var game = await _gameManager.CreateAsync(gameInfo);
@@ -80,10 +80,7 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.JoinGame:
                 {
-                    Message01JoinGameC2S.Deserialize(
-                        reader,
-                        out var gameCode,
-                        out _);
+                    Message01JoinGameC2S.Deserialize(reader, out var gameCode);
 
                     var game = _gameManager.Find(gameCode);
                     if (game == null)
@@ -248,7 +245,7 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.GetGameListV2:
                 {
-                    Message16GetGameListC2S.Deserialize(reader, out var options);
+                    Message16GetGameListC2S.Deserialize(reader, out var options, out _);
                     await OnRequestGameListAsync(options);
                     break;
                 }
@@ -334,11 +331,7 @@ namespace Impostor.Server.Net
 
             var games = _gameManager.FindListings((MapFlags)options.Map, options.NumImpostors, options.Keywords);
 
-            var skeldGameCount = _gameManager.GetGameCount(MapFlags.Skeld);
-            var miraHqGameCount = _gameManager.GetGameCount(MapFlags.MiraHQ);
-            var polusGameCount = _gameManager.GetGameCount(MapFlags.Polus);
-
-            Message16GetGameListS2C.Serialize(message, skeldGameCount, miraHqGameCount, polusGameCount, games);
+            Message16GetGameListS2C.Serialize(message, games);
 
             return Connection.SendAsync(message);
         }

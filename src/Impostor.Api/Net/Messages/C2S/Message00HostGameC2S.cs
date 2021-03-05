@@ -11,9 +11,12 @@ namespace Impostor.Api.Net.Messages.C2S
             writer.EndMessage();
         }
 
-        public static GameOptionsData Deserialize(IMessageReader reader)
+        public static GameOptionsData Deserialize(IMessageReader reader, out ChatType chatType)
         {
-            return GameOptionsData.DeserializeCreate(reader);
+            var gameOptionsData = GameOptionsData.DeserializeCreate(reader);
+            chatType = (ChatType)reader.ReadByte();
+
+            return gameOptionsData;
         }
     }
 }

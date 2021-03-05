@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Impostor.Api.Net.Messages.C2S
+﻿namespace Impostor.Api.Net.Messages.C2S
 {
     public static class Message01JoinGameC2S
     {
@@ -9,12 +7,11 @@ namespace Impostor.Api.Net.Messages.C2S
             throw new System.NotImplementedException();
         }
 
-        public static void Deserialize(IMessageReader reader, out int gameCode, out byte unknown)
+        public static void Deserialize(IMessageReader reader, out int gameCode)
         {
-            var slice = reader.ReadBytes(sizeof(Int32) + sizeof(byte)).Span;
+            var slice = reader.ReadBytes(sizeof(int)).Span;
 
             gameCode = slice.ReadInt32();
-            unknown = slice.ReadByte();
         }
     }
 }

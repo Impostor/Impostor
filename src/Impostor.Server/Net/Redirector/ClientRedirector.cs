@@ -54,10 +54,7 @@ namespace Impostor.Server.Net.Redirector
 
                 case MessageFlags.JoinGame:
                 {
-                    Message01JoinGameC2S.Deserialize(
-                        reader,
-                        out var gameCode,
-                        out _);
+                    Message01JoinGameC2S.Deserialize(reader, out var gameCode);
 
                     using var packet = MessageWriter.Get(MessageType.Reliable);
                     var endpoint = await _nodeLocator.FindAsync(GameCodeParser.IntToGameName(gameCode));

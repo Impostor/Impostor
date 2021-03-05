@@ -20,9 +20,7 @@ namespace Impostor.Server.Net.Manager
     {
         private static HashSet<int> SupportedVersions { get; } = new HashSet<int>
         {
-            GameVersion.GetVersion(2020, 09, 07), // 2020.09.07 - 2020.09.22
-            GameVersion.GetVersion(2020, 10, 08), // 2020.10.08
-            GameVersion.GetVersion(2020, 11, 17), // 2020.11.17
+            GameVersion.GetVersion(2021, 3, 5), // 2021.3.5
         };
 
         private static string ServerBrand { get; } = $"Impostor {DotnetUtils.GetVersion()}";
