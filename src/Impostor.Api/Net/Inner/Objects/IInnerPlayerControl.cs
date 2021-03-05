@@ -98,5 +98,12 @@ namespace Impostor.Api.Net.Inner.Objects
         /// <exception cref="ImpostorProtocolException">Thrown when target is dead.</exception>
         /// <returns>Task that must be awaited.</returns>
         ValueTask MurderPlayerAsync(IInnerPlayerControl target);
+
+        /// <summary>
+        ///     Sets all the player's tasks as complete, if the player is a crewmate.
+        ///     Visible to all players.
+        /// </summary>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask SetAllTasksCompleteAsync();
     }
 }

@@ -106,5 +106,18 @@ namespace Impostor.Server.Net.Inner.Objects
 
             await _eventManager.CallAsync(new PlayerMurderEvent(_game, _game.GetClientPlayer(OwnerId), this, target));
         }
+
+        public async ValueTask SetAllTasksCompleteAsync()
+        {
+            if (PlayerInfo.IsImpostor)
+            {
+                return;
+            }
+
+            foreach (var task in PlayerInfo.Tasks)
+            {
+                await task.SetCompleteAsync();
+            }
+        }
     }
 }
