@@ -400,9 +400,16 @@ namespace Impostor.Server.Net.State
                         break;
                     }
 
+                    case 205:
+                    case 206:
+                    {
+                        // TODO figure out what the hell is going on here
+                        break;
+                    }
+
                     default:
                     {
-                        _logger.LogTrace("Bad GameData tag {0}", reader.Tag);
+                        _logger.LogWarning("Bad GameData tag {0}", reader.Tag);
                         break;
                     }
                 }
