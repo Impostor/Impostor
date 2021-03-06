@@ -12,6 +12,7 @@ using Impostor.Hazel.Udp;
 using Impostor.Server.Config;
 using Impostor.Server.Events.Announcements;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 
@@ -19,13 +20,15 @@ namespace Impostor.Server.Net
 {
     internal class AnnouncementsService : IHostedService
     {
+        private readonly ILogger<AnnouncementsService> _logger;
         private readonly AnnouncementsServerConfig _config;
         private readonly ObjectPool<MessageReader> _readerPool;
         private readonly IEventManager _eventManager;
         private UdpConnectionListener _connection;
 
-        public AnnouncementsService(IOptions<AnnouncementsServerConfig> config, ObjectPool<MessageReader> readerPool, IEventManager eventManager)
+        public AnnouncementsService(ILogger<AnnouncementsService> logger, IOptions<AnnouncementsServerConfig> config, ObjectPool<MessageReader> readerPool, IEventManager eventManager)
         {
+            _logger = logger;
             _config = config.Value;
             _readerPool = readerPool;
             _eventManager = eventManager;
@@ -48,16 +51,21 @@ namespace Impostor.Server.Net
             };
 
             await _connection.StartAsync();
+
+            _logger.LogInformation("Announcements server is listening on {Address}:{Port}", endpoint.Address, endpoint.Port);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
+            _logger.LogWarning("Announcements server is shutting down!");
             await _connection.DisposeAsync();
         }
 
         private async ValueTask OnNewConnection(NewConnectionEventArgs e)
         {
             MessageHello.Deserialize(e.HandshakeData, out var announcementVersion, out var id, out var language);
+
+            _logger.LogDebug("Client requested announcement (version: {Version}, id: {Id}, language: {Language})", announcementVersion, id, language);
 
             if (announcementVersion != 2)
             {
@@ -75,6 +83,8 @@ namespace Impostor.Server.Net
                 using var writer = MessageWriter.Get(MessageType.Reliable);
                 Message00UseCache.Serialize(writer);
                 await e.Connection.SendAsync(writer);
+
+                _logger.LogDebug("Sent UseCache response");
             }
 
             if (response.Announcement != null)
@@ -83,6 +93,8 @@ namespace Impostor.Server.Net
                 var announcement = response.Announcement.Value;
                 Message01Update.Serialize(writer, announcement.Id, announcement.Message);
                 await e.Connection.SendAsync(writer);
+
+                _logger.LogDebug("Sent ({Id}) {Message}", announcement.Id, announcement.Message);
             }
 
             if (response.FreeWeekendState != FreeWeekendState.NotFree)
@@ -90,6 +102,8 @@ namespace Impostor.Server.Net
                 using var writer = MessageWriter.Get(MessageType.Reliable);
                 Message02SetFreeWeekend.Serialize(writer, response.FreeWeekendState);
                 await e.Connection.SendAsync(writer);
+
+                _logger.LogDebug("Sent {FreeWeekendState} weekend state", response.FreeWeekendState);
             }
 
             await e.Connection.Disconnect(null);
