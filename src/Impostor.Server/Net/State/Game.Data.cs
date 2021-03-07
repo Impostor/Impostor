@@ -7,6 +7,7 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
+using Impostor.Api.Unity;
 using Impostor.Hazel;
 using Impostor.Server.Events.Meeting;
 using Impostor.Server.Events.Player;
@@ -357,10 +358,21 @@ namespace Impostor.Server.Net.State
                         break;
                     }
 
-                    case 205:
-                    case 206:
+                    case GameDataTag.ClientInfoFlag:
                     {
-                        // TODO figure out what the hell is going on here
+                        var clientId = reader.ReadPackedInt32();
+                        var platform = (RuntimePlatform)reader.ReadPackedInt32();
+
+                        if (clientId != sender.Client.Id)
+                        {
+                            if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.ClientInfoFlag)), "Client sent info with wrong client id"))
+                            {
+                                return false;
+                            }
+                        }
+
+                        sender.Platform = platform;
+
                         break;
                     }
 
