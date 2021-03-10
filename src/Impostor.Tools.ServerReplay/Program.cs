@@ -55,7 +55,7 @@ namespace Impostor.Tools.ServerReplay
 
             var stopwatch = Stopwatch.StartNew();
 
-            foreach (var file in Directory.GetFiles(args[0]))
+            foreach (var file in Directory.GetFiles(args[0], "*.dat"))
             {
                 // Clear.
                 Connections.Clear();
