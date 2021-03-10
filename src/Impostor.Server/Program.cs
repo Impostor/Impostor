@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
@@ -117,6 +118,7 @@ namespace Impostor.Server
                         .Get<AnnouncementsServerConfig>() ?? new AnnouncementsServerConfig();
 
                     services.AddSingleton<ServerEnvironment>();
+                    services.AddSingleton<IDateTimeProvider, RealDateTimeProvider>();
 
                     services.Configure<DebugConfig>(host.Configuration.GetSection(DebugConfig.Section));
                     services.Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section));

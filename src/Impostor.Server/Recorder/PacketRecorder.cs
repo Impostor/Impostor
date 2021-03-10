@@ -8,6 +8,7 @@ using Impostor.Api.Games;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Config;
 using Impostor.Server.Net;
+using Impostor.Server.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
@@ -20,10 +21,13 @@ namespace Impostor.Server.Recorder
     /// </summary>
     internal class PacketRecorder : BackgroundService
     {
+        private const int ProtocolVersion = 0;
+
         private readonly string _path;
         private readonly ILogger<PacketRecorder> _logger;
         private readonly ObjectPool<PacketSerializationContext> _pool;
         private readonly Channel<byte[]> _channel;
+        private DateTimeOffset _time;
 
         public PacketRecorder(ILogger<PacketRecorder> logger, IOptions<DebugConfig> options, ObjectPool<PacketSerializationContext> pool)
         {
@@ -35,16 +39,31 @@ namespace Impostor.Server.Recorder
 
             _channel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
             {
-                SingleReader = true,
-                SingleWriter = false,
+                SingleReader = true, SingleWriter = false,
             });
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _time = DateTimeOffset.UtcNow;
             _logger.LogInformation("PacketRecorder is enabled, writing packets to {0}.", _path);
 
             var writer = File.Open(_path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+
+            var context = _pool.Get();
+
+            try
+            {
+                context.Writer.Write(ProtocolVersion);
+                context.Writer.Write(_time.ToUnixTimeMilliseconds());
+                context.Writer.Write(DotnetUtils.GetVersion());
+
+                await WriteAsync(context.Stream);
+            }
+            finally
+            {
+                _pool.Return(context);
+            }
 
             // Handle messages.
             try
@@ -148,11 +167,15 @@ namespace Impostor.Server.Recorder
             }
         }
 
-        private static void WriteHeader(PacketSerializationContext context, RecordedPacketType type)
+        private void WriteHeader(PacketSerializationContext context, RecordedPacketType type)
         {
             // Length placeholder.
-            context.Writer.Write((int) 0);
-            context.Writer.Write((byte) type);
+            context.Writer.Write(0);
+
+            context.Writer.Write((int)(DateTimeOffset.UtcNow - _time).TotalMilliseconds);
+            _time = DateTimeOffset.UtcNow;
+
+            context.Writer.Write((byte)type);
         }
 
         private static void WriteClient(PacketSerializationContext context, ClientBase client, bool full)
@@ -164,18 +187,19 @@ namespace Impostor.Server.Recorder
 
             if (full)
             {
-                context.Writer.Write((byte) addressBytes.Length);
+                context.Writer.Write((byte)addressBytes.Length);
                 context.Writer.Write(addressBytes);
-                context.Writer.Write((ushort) address.Port);
+                context.Writer.Write((ushort)address.Port);
                 context.Writer.Write(client.Name);
+                context.Writer.Write(client.GameVersion);
             }
         }
 
         private static void WritePacket(PacketSerializationContext context, IMessageReader reader, MessageType messageType)
         {
-            context.Writer.Write((byte) messageType);
-            context.Writer.Write((byte) reader.Tag);
-            context.Writer.Write((int) reader.Length);
+            context.Writer.Write((byte)messageType);
+            context.Writer.Write((byte)reader.Tag);
+            context.Writer.Write((int)reader.Length);
             context.Writer.Write(reader.Buffer, reader.Offset, reader.Length);
         }
 
@@ -189,7 +213,7 @@ namespace Impostor.Server.Recorder
             var length = context.Stream.Position;
 
             context.Stream.Position = 0;
-            context.Writer.Write((int) length);
+            context.Writer.Write((int)length);
             context.Stream.Position = length;
         }
 
