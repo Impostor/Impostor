@@ -120,8 +120,8 @@ namespace Impostor.Tools.ServerReplay
 
         private static async Task ParseSession(BinaryReader reader)
         {
-            var protocolVersion = reader.ReadInt32();
-            if (protocolVersion != 0)
+            var protocolVersion = (ServerReplayVersion)reader.ReadUInt32();
+            if (protocolVersion < ServerReplayVersion.Initial || protocolVersion > ServerReplayVersion.Latest)
             {
                 throw new NotSupportedException("Session's protocol version is unsupported");
             }
@@ -139,7 +139,7 @@ namespace Impostor.Tools.ServerReplay
                 await using (var stream = new MemoryStream(data))
                 using (var readerInner = new BinaryReader(stream))
                 {
-                    _fakeDateTimeProvider.UtcNow += TimeSpan.FromMilliseconds(readerInner.ReadInt32());
+                    _fakeDateTimeProvider.UtcNow = startTime + TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
                     await ParsePacket(readerInner);
                 }
             }

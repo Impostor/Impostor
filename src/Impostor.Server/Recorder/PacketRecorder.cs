@@ -21,13 +21,11 @@ namespace Impostor.Server.Recorder
     /// </summary>
     internal class PacketRecorder : BackgroundService
     {
-        private const int ProtocolVersion = 0;
-
         private readonly string _path;
         private readonly ILogger<PacketRecorder> _logger;
         private readonly ObjectPool<PacketSerializationContext> _pool;
         private readonly Channel<byte[]> _channel;
-        private DateTimeOffset _time;
+        private DateTimeOffset _startTime;
 
         public PacketRecorder(ILogger<PacketRecorder> logger, IOptions<DebugConfig> options, ObjectPool<PacketSerializationContext> pool)
         {
@@ -39,31 +37,19 @@ namespace Impostor.Server.Recorder
 
             _channel = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
             {
-                SingleReader = true, SingleWriter = false,
+                SingleReader = true,
+                SingleWriter = false,
             });
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _time = DateTimeOffset.UtcNow;
+            _startTime = DateTimeOffset.UtcNow;
             _logger.LogInformation("PacketRecorder is enabled, writing packets to {0}.", _path);
 
             var writer = File.Open(_path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
 
-            var context = _pool.Get();
-
-            try
-            {
-                context.Writer.Write(ProtocolVersion);
-                context.Writer.Write(_time.ToUnixTimeMilliseconds());
-                context.Writer.Write(DotnetUtils.GetVersion());
-
-                await WriteAsync(context.Stream);
-            }
-            finally
-            {
-                _pool.Return(context);
-            }
+            await WriteFileHeaderAsync();
 
             // Handle messages.
             try
@@ -92,7 +78,7 @@ namespace Impostor.Server.Recorder
 
             try
             {
-                WriteHeader(context, RecordedPacketType.Connect);
+                WritePacketHeader(context, RecordedPacketType.Connect);
                 WriteClient(context, client, true);
                 WriteLength(context);
 
@@ -112,7 +98,7 @@ namespace Impostor.Server.Recorder
 
             try
             {
-                WriteHeader(context, RecordedPacketType.Disconnect);
+                WritePacketHeader(context, RecordedPacketType.Disconnect);
                 WriteClient(context, client, false);
                 context.Writer.Write(reason);
                 WriteLength(context);
@@ -133,7 +119,7 @@ namespace Impostor.Server.Recorder
 
             try
             {
-                WriteHeader(context, RecordedPacketType.Message);
+                WritePacketHeader(context, RecordedPacketType.Message);
                 WriteClient(context, client, false);
                 WritePacket(context, reader, messageType);
                 WriteLength(context);
@@ -154,7 +140,7 @@ namespace Impostor.Server.Recorder
 
             try
             {
-                WriteHeader(context, RecordedPacketType.GameCreated);
+                WritePacketHeader(context, RecordedPacketType.GameCreated);
                 WriteClient(context, client, false);
                 WriteGameCode(context, gameCode);
                 WriteLength(context);
@@ -167,13 +153,31 @@ namespace Impostor.Server.Recorder
             }
         }
 
-        private void WriteHeader(PacketSerializationContext context, RecordedPacketType type)
+        private async Task WriteFileHeaderAsync()
+        {
+            var context = _pool.Get();
+
+            try
+            {
+                context.Writer.Write((uint)ServerReplayVersion.Latest);
+                context.Writer.Write(_startTime.ToUnixTimeMilliseconds());
+                context.Writer.Write(DotnetUtils.GetVersion());
+
+                await WriteAsync(context.Stream);
+            }
+            finally
+            {
+                _pool.Return(context);
+            }
+        }
+
+        private void WritePacketHeader(PacketSerializationContext context, RecordedPacketType type)
         {
             // Length placeholder.
             context.Writer.Write(0);
 
-            context.Writer.Write((int)(DateTimeOffset.UtcNow - _time).TotalMilliseconds);
-            _time = DateTimeOffset.UtcNow;
+            // Timestamp relative to recording start time.
+            context.Writer.Write((uint)(DateTimeOffset.UtcNow - _startTime).TotalMilliseconds);
 
             context.Writer.Write((byte)type);
         }
