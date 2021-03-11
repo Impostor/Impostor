@@ -159,7 +159,7 @@ namespace Impostor.Server.Recorder
 
             try
             {
-                context.Writer.Write((uint)ServerReplayVersion.Latest);
+                context.Writer.Write((uint)ServerReplayVersion.Initial);
                 context.Writer.Write(_startTime.ToUnixTimeMilliseconds());
                 context.Writer.Write(DotnetUtils.GetVersion());
 
