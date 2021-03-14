@@ -24,12 +24,13 @@ namespace Impostor.Server.Net.Redirector
 
         public ClientRedirector(
             string name,
+            int gameVersion,
             HazelConnection connection,
             ISet<Mod> mods,
             ClientManager clientManager,
             INodeProvider nodeProvider,
             INodeLocator nodeLocator)
-            : base(name, connection, mods)
+            : base(name, gameVersion, connection, mods)
         {
             _clientManager = clientManager;
             _nodeProvider = nodeProvider;

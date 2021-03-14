@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
@@ -42,6 +43,7 @@ namespace Impostor.Tools.ServerReplay
         private static MockGameCodeFactory _gameCodeFactory;
         private static ClientManager _clientManager;
         private static GameManager _gameManager;
+        private static FakeDateTimeProvider _fakeDateTimeProvider;
 
         private static async Task Main(string[] args)
         {
@@ -53,7 +55,7 @@ namespace Impostor.Tools.ServerReplay
 
             var stopwatch = Stopwatch.StartNew();
 
-            foreach (var file in Directory.GetFiles(args[0]))
+            foreach (var file in Directory.GetFiles(args[0], "*.dat"))
             {
                 // Clear.
                 Connections.Clear();
@@ -67,6 +69,7 @@ namespace Impostor.Tools.ServerReplay
                 _gameCodeFactory = _serviceProvider.GetRequiredService<MockGameCodeFactory>();
                 _clientManager = _serviceProvider.GetRequiredService<ClientManager>();
                 _gameManager = _serviceProvider.GetRequiredService<GameManager>();
+                _fakeDateTimeProvider = _serviceProvider.GetRequiredService<FakeDateTimeProvider>();
 
                 await using (var stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read))
                 using (var reader = new BinaryReader(stream))
@@ -88,6 +91,9 @@ namespace Impostor.Tools.ServerReplay
             {
                 IsReplay = true
             });
+
+            services.AddSingleton<FakeDateTimeProvider>();
+            services.AddSingleton<IDateTimeProvider>(p => p.GetRequiredService<FakeDateTimeProvider>());
 
             services.AddLogging(builder =>
             {
@@ -114,6 +120,17 @@ namespace Impostor.Tools.ServerReplay
 
         private static async Task ParseSession(BinaryReader reader)
         {
+            var protocolVersion = (ServerReplayVersion)reader.ReadUInt32();
+            if (protocolVersion < ServerReplayVersion.Initial || protocolVersion > ServerReplayVersion.Latest)
+            {
+                throw new NotSupportedException("Session's protocol version is unsupported");
+            }
+
+            var startTime = _fakeDateTimeProvider.UtcNow = DateTimeOffset.FromUnixTimeMilliseconds(reader.ReadInt64());
+            var serverVersion = reader.ReadString();
+
+            Logger.Information("Loaded session (server: {ServerVersion}, recorded at {StartTime})", serverVersion, startTime);
+
             while (reader.BaseStream.Position < reader.BaseStream.Length)
             {
                 var dataLength = reader.ReadInt32();
@@ -122,6 +139,7 @@ namespace Impostor.Tools.ServerReplay
                 await using (var stream = new MemoryStream(data))
                 using (var readerInner = new BinaryReader(stream))
                 {
+                    _fakeDateTimeProvider.UtcNow = startTime + TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
                     await ParsePacket(readerInner);
                 }
             }
@@ -143,11 +161,12 @@ namespace Impostor.Tools.ServerReplay
                     var addressPort = reader.ReadUInt16();
                     var address = new IPEndPoint(new IPAddress(addressBytes), addressPort);
                     var name = reader.ReadString();
+                    var gameVersion = reader.ReadInt32();
 
                     // Create and register connection.
                     var connection = new MockHazelConnection(address);
 
-                    await _clientManager.RegisterConnectionAsync(connection, name, 50516550, null);
+                    await _clientManager.RegisterConnectionAsync(connection, name, gameVersion, null);
 
                     // Store reference for ourselfs.
                     Connections.Add(clientId, connection);

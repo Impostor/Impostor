@@ -18,7 +18,7 @@ namespace Impostor.Server.Net.Factories
 
         public ClientBase Create(IHazelConnection connection, string name, int clientVersion, ISet<Mod> mods)
         {
-            var client = ActivatorUtilities.CreateInstance<TClient>(_serviceProvider, name, connection, mods);
+            var client = ActivatorUtilities.CreateInstance<TClient>(_serviceProvider, name, clientVersion, connection, mods);
             connection.Client = client;
             return client;
         }
