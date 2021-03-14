@@ -177,7 +177,7 @@ namespace Impostor.Tools.ServerReplay
 
                     if (tag == MessageFlags.HostGame)
                     {
-                        GameOptions.Add(clientId, Message00HostGameC2S.Deserialize(message));
+                        GameOptions.Add(clientId, Message00HostGameC2S.Deserialize(message, out _));
                     }
                     else if (Connections.TryGetValue(clientId, out var client))
                     {

@@ -9,10 +9,11 @@ namespace Impostor.Api.Net.Messages.C2S
             throw new System.NotImplementedException();
         }
 
-        public static void Deserialize(IMessageReader reader, out GameOptionsData options)
+        public static void Deserialize(IMessageReader reader, out GameOptionsData options, out ChatType chatType)
         {
             reader.ReadPackedInt32(); // Hardcoded 0.
             options = GameOptionsData.DeserializeCreate(reader);
+            chatType = (ChatType)reader.ReadByte();
         }
     }
 }

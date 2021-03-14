@@ -7,6 +7,7 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
+using Impostor.Api.Unity;
 using Impostor.Hazel;
 using Impostor.Server.Events.Meeting;
 using Impostor.Server.Events.Player;
@@ -49,7 +50,6 @@ namespace Impostor.Server.Net.State
         private readonly Dictionary<uint, InnerNetObject> _allObjectsFast = new Dictionary<uint, InnerNetObject>();
 
         private int _gamedataInitialized;
-        private bool _gamedataFakeReceived;
 
         private async ValueTask OnSpawnAsync(InnerNetObject netObj)
         {
@@ -156,38 +156,8 @@ namespace Impostor.Server.Net.State
 
                     break;
                 }
-            }
-        }
 
-        private async ValueTask InitGameDataAsync(ClientPlayer player)
-        {
-            if (Interlocked.Exchange(ref _gamedataInitialized, 1) != 0)
-            {
-                return;
-            }
 
-            /*
-             * The Among Us client on 20.9.22i spawns some components on the host side and
-             * only spawns these on other clients when someone else connects. This means that we can't
-             * parse data until someone connects because we don't know which component belongs to the NetId.
-             *
-             * We solve this by spawning a fake player and removing the player when the spawn GameData
-             * is received in HandleGameDataAsync.
-             */
-            using (var message = MessageWriter.Get(MessageType.Reliable))
-            {
-                // Spawn a fake player.
-                Message01JoinGameS2C.SerializeJoin(message, false, Code, FakeClientId, HostId);
-
-                message.StartMessage(MessageFlags.GameData);
-                message.Write(Code);
-                message.StartMessage(GameDataTag.SceneChangeFlag);
-                message.WritePacked(FakeClientId);
-                message.Write("OnlineGame");
-                message.EndMessage();
-                message.EndMessage();
-
-                await player.Client.Connection.SendAsync(message);
             }
         }
 
@@ -199,19 +169,7 @@ namespace Impostor.Server.Net.State
             if (toPlayer)
             {
                 var targetId = parent.ReadPackedInt32();
-                if (targetId == FakeClientId && !_gamedataFakeReceived && sender.IsHost)
-                {
-                    _gamedataFakeReceived = true;
-
-                    // Remove the fake client, we received the data.
-                    using (var message = MessageWriter.Get(MessageType.Reliable))
-                    {
-                        WriteRemovePlayerMessage(message, false, FakeClientId, (byte)DisconnectReason.ExitGame);
-
-                        await sender.Client.Connection.SendAsync(message);
-                    }
-                }
-                else if (!TryGetPlayer(targetId, out target))
+                if (!TryGetPlayer(targetId, out target))
                 {
                     _logger.LogWarning("Player {0} tried to send GameData to unknown player {1}.", sender.Client.Id, targetId);
                     return false;
@@ -400,9 +358,27 @@ namespace Impostor.Server.Net.State
                         break;
                     }
 
+                    case GameDataTag.ClientInfoFlag:
+                    {
+                        var clientId = reader.ReadPackedInt32();
+                        var platform = (RuntimePlatform)reader.ReadPackedInt32();
+
+                        if (clientId != sender.Client.Id)
+                        {
+                            if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.ClientInfoFlag)), "Client sent info with wrong client id"))
+                            {
+                                return false;
+                            }
+                        }
+
+                        sender.Platform = platform;
+
+                        break;
+                    }
+
                     default:
                     {
-                        _logger.LogTrace("Bad GameData tag {0}", reader.Tag);
+                        _logger.LogWarning("Bad GameData tag {0}", reader.Tag);
                         break;
                     }
                 }
