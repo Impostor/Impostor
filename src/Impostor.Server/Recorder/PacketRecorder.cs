@@ -8,6 +8,7 @@ using Impostor.Api.Games;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Config;
 using Impostor.Server.Net;
+using Impostor.Server.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
@@ -24,6 +25,7 @@ namespace Impostor.Server.Recorder
         private readonly ILogger<PacketRecorder> _logger;
         private readonly ObjectPool<PacketSerializationContext> _pool;
         private readonly Channel<byte[]> _channel;
+        private DateTimeOffset _startTime;
 
         public PacketRecorder(ILogger<PacketRecorder> logger, IOptions<DebugConfig> options, ObjectPool<PacketSerializationContext> pool)
         {
@@ -42,9 +44,12 @@ namespace Impostor.Server.Recorder
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _startTime = DateTimeOffset.UtcNow;
             _logger.LogInformation("PacketRecorder is enabled, writing packets to {0}.", _path);
 
             var writer = File.Open(_path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+
+            await WriteFileHeaderAsync();
 
             // Handle messages.
             try
@@ -73,7 +78,7 @@ namespace Impostor.Server.Recorder
 
             try
             {
-                WriteHeader(context, RecordedPacketType.Connect);
+                WritePacketHeader(context, RecordedPacketType.Connect);
                 WriteClient(context, client, true);
                 WriteLength(context);
 
@@ -93,7 +98,7 @@ namespace Impostor.Server.Recorder
 
             try
             {
-                WriteHeader(context, RecordedPacketType.Disconnect);
+                WritePacketHeader(context, RecordedPacketType.Disconnect);
                 WriteClient(context, client, false);
                 context.Writer.Write(reason);
                 WriteLength(context);
@@ -114,7 +119,7 @@ namespace Impostor.Server.Recorder
 
             try
             {
-                WriteHeader(context, RecordedPacketType.Message);
+                WritePacketHeader(context, RecordedPacketType.Message);
                 WriteClient(context, client, false);
                 WritePacket(context, reader, messageType);
                 WriteLength(context);
@@ -135,7 +140,7 @@ namespace Impostor.Server.Recorder
 
             try
             {
-                WriteHeader(context, RecordedPacketType.GameCreated);
+                WritePacketHeader(context, RecordedPacketType.GameCreated);
                 WriteClient(context, client, false);
                 WriteGameCode(context, gameCode);
                 WriteLength(context);
@@ -148,11 +153,33 @@ namespace Impostor.Server.Recorder
             }
         }
 
-        private static void WriteHeader(PacketSerializationContext context, RecordedPacketType type)
+        private async Task WriteFileHeaderAsync()
+        {
+            var context = _pool.Get();
+
+            try
+            {
+                context.Writer.Write((uint)ServerReplayVersion.Initial);
+                context.Writer.Write(_startTime.ToUnixTimeMilliseconds());
+                context.Writer.Write(DotnetUtils.GetVersion());
+
+                await WriteAsync(context.Stream);
+            }
+            finally
+            {
+                _pool.Return(context);
+            }
+        }
+
+        private void WritePacketHeader(PacketSerializationContext context, RecordedPacketType type)
         {
             // Length placeholder.
-            context.Writer.Write((int) 0);
-            context.Writer.Write((byte) type);
+            context.Writer.Write(0);
+
+            // Timestamp relative to recording start time.
+            context.Writer.Write((uint)(DateTimeOffset.UtcNow - _startTime).TotalMilliseconds);
+
+            context.Writer.Write((byte)type);
         }
 
         private static void WriteClient(PacketSerializationContext context, ClientBase client, bool full)
@@ -164,18 +191,19 @@ namespace Impostor.Server.Recorder
 
             if (full)
             {
-                context.Writer.Write((byte) addressBytes.Length);
+                context.Writer.Write((byte)addressBytes.Length);
                 context.Writer.Write(addressBytes);
-                context.Writer.Write((ushort) address.Port);
+                context.Writer.Write((ushort)address.Port);
                 context.Writer.Write(client.Name);
+                context.Writer.Write(client.GameVersion);
             }
         }
 
         private static void WritePacket(PacketSerializationContext context, IMessageReader reader, MessageType messageType)
         {
-            context.Writer.Write((byte) messageType);
-            context.Writer.Write((byte) reader.Tag);
-            context.Writer.Write((int) reader.Length);
+            context.Writer.Write((byte)messageType);
+            context.Writer.Write((byte)reader.Tag);
+            context.Writer.Write((int)reader.Length);
             context.Writer.Write(reader.Buffer, reader.Offset, reader.Length);
         }
 
@@ -189,7 +217,7 @@ namespace Impostor.Server.Recorder
             var length = context.Stream.Position;
 
             context.Stream.Position = 0;
-            context.Writer.Write((int) length);
+            context.Writer.Write((int)length);
             context.Stream.Position = length;
         }
 

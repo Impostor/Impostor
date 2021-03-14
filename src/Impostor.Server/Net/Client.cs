@@ -24,8 +24,8 @@ namespace Impostor.Server.Net
         private readonly ClientManager _clientManager;
         private readonly GameManager _gameManager;
 
-        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, IHazelConnection connection, ISet<Mod> mods)
-            : base(name, connection, mods)
+        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, int gameVersion, IHazelConnection connection, ISet<Mod> mods)
+            : base(name, gameVersion, connection, mods)
         {
             _logger = logger;
             _antiCheatConfig = antiCheatOptions.Value;

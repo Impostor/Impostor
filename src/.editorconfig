@@ -163,7 +163,7 @@ csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true
 csharp_new_line_before_catch = true
 csharp_new_line_before_finally = true
-csharp_new_line_before_members_in_object_initializers = true
+# csharp_new_line_before_members_in_object_initializers = true TODO seems like Rider/ReSharper has the value inverted, uncomment when its fixed
 csharp_new_line_before_members_in_anonymous_types = true
 csharp_new_line_between_query_expression_clauses = true
 
@@ -228,3 +228,6 @@ csharp_preserve_single_line_statements = true
 
 # warning RS0037: PublicAPI.txt is missing '#nullable enable'
 dotnet_diagnostic.RS0037.severity = none
+
+# ReSharper properties
+resharper_trailing_comma_in_multiline_lists = true
