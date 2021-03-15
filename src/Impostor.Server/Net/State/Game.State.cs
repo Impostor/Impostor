@@ -30,7 +30,7 @@ namespace Impostor.Server.Net.State
             await _eventManager.CallAsync(new GamePlayerJoinedEvent(this, player));
         }
 
-        private async ValueTask<bool>  PlayerRemove(int playerId, bool isBan = false)
+        private async ValueTask<bool> PlayerRemove(int playerId, bool isBan = false)
         {
             if (!_players.TryRemove(playerId, out var player))
             {
@@ -64,6 +64,7 @@ namespace Impostor.Server.Net.State
             if (HostId == playerId)
             {
                 await MigrateHost();
+                await _eventManager.CallAsync(new GameHostChangedEvent(this, this.Host, player));
             }
 
             if (isBan)
@@ -121,8 +122,6 @@ namespace Impostor.Server.Net.State
                 // Pull players out of limbo.
                 await CheckLimboPlayers();
             }
-
-            await _eventManager.CallAsync(new GameHostChangeEvent(this, Host));
         }
 
         private async ValueTask CheckLimboPlayers()

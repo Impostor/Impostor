@@ -2,8 +2,10 @@
 
 namespace Impostor.Api.Events
 {
-    public interface IGameHostChangeEvent : IGameEvent
+    public interface IGameHostChangedEvent : IGameEvent
     {
         IClientPlayer Host { get; }
+
+        IClientPlayer OldHost { get; }
     }
 }

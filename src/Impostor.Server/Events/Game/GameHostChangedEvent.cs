@@ -4,16 +4,19 @@ using Impostor.Api.Net;
 
 namespace Impostor.Server.Events
 {
-    public class GameHostChangeEvent : IGameHostChangeEvent
+    public class GameHostChangedEvent : IGameHostChangedEvent
     {
-        public GameHostChangeEvent(IGame game, IClientPlayer host)
+        public GameHostChangedEvent(IGame game, IClientPlayer host, IClientPlayer oldHost)
         {
             Game = game;
             Host = host;
+            OldHost = oldHost;
         }
 
         public IGame Game { get; }
 
         public IClientPlayer Host { get; }
+
+        public IClientPlayer OldHost { get; }
     }
 }
