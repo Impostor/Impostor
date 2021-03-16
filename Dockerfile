@@ -4,7 +4,7 @@ FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 # https://github.com/containerd/containerd/blob/master/platforms/platforms.go#L17
 ARG TARGETARCH
 
-ARG VERSIONSUFFIX
+ARG VERSIONSUFFIX="docker"
 
 WORKDIR /source
 
@@ -31,6 +31,7 @@ RUN case "$TARGETARCH" in \
     arm)    NETCORE_PLATFORM='linux-arm';; \
     *) echo "unsupported architecture"; exit 1 ;; \
   esac && \
+  [[ $VERSIONSUFFIX = "none" ]] && VERSIONSUFFIX=; \
   dotnet publish -c release -o /app -r "$NETCORE_PLATFORM" -p:VersionSuffix="$VERSIONSUFFIX" --no-restore ./src/Impostor.Server/Impostor.Server.csproj
 
 # Final image.
