@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Impostor.Api.Games;
 
 namespace Impostor.Api.Net.Messages.C2S
 {
@@ -9,12 +9,9 @@ namespace Impostor.Api.Net.Messages.C2S
             throw new System.NotImplementedException();
         }
 
-        public static void Deserialize(IMessageReader reader, out int gameCode, out byte unknown)
+        public static void Deserialize(IMessageReader reader, out GameCode gameCode)
         {
-            var slice = reader.ReadBytes(sizeof(Int32) + sizeof(byte)).Span;
-
-            gameCode = slice.ReadInt32();
-            unknown = slice.ReadByte();
+            gameCode = reader.ReadInt32();
         }
     }
 }

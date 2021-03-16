@@ -5,16 +5,9 @@ namespace Impostor.Api.Net.Messages.S2C
 {
     public class Message16GetGameListS2C
     {
-        public static void Serialize(IMessageWriter writer, int skeldGameCount, int miraHqGameCount, int polusGameCount, IEnumerable<IGame> games)
+        public static void Serialize(IMessageWriter writer, IEnumerable<IGame> games)
         {
             writer.StartMessage(MessageFlags.GetGameListV2);
-
-            // Count
-            writer.StartMessage(1);
-            writer.Write(skeldGameCount); // The Skeld
-            writer.Write(miraHqGameCount); // Mira HQ
-            writer.Write(polusGameCount); // Polus
-            writer.EndMessage();
 
             // Listing
             writer.StartMessage(0);

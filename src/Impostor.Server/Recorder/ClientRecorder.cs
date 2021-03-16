@@ -18,8 +18,8 @@ namespace Impostor.Server.Recorder
         private bool _createdGame;
         private bool _recordAfter;
 
-        public ClientRecorder(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, HazelConnection connection, ISet<Mod> mods, PacketRecorder recorder)
-            : base(logger, antiCheatOptions, clientManager, gameManager, name, connection, mods)
+        public ClientRecorder(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, int gameVersion, HazelConnection connection, ISet<Mod> mods, PacketRecorder recorder)
+            : base(logger, antiCheatOptions, clientManager, gameManager, name, gameVersion, connection, mods)
         {
             _recorder = recorder;
             _isFirst = true;

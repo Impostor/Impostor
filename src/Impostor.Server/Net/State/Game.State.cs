@@ -25,7 +25,6 @@ namespace Impostor.Server.Net.State
             if (HostId == -1)
             {
                 HostId = player.Client.Id;
-                await InitGameDataAsync(player);
             }
 
             await _eventManager.CallAsync(new GamePlayerJoinedEvent(this, player));
