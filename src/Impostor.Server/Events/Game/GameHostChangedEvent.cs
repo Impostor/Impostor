@@ -6,17 +6,17 @@ namespace Impostor.Server.Events
 {
     public class GameHostChangedEvent : IGameHostChangedEvent
     {
-        public GameHostChangedEvent(IGame game, IClientPlayer host, IClientPlayer oldHost)
+        public GameHostChangedEvent(IGame game, IClientPlayer previousHost, IClientPlayer newHost)
         {
             Game = game;
-            Host = host;
-            OldHost = oldHost;
+            PreviousHost = previousHost;
+            NewHost = newHost;
         }
 
         public IGame Game { get; }
 
-        public IClientPlayer Host { get; }
+        public IClientPlayer PreviousHost { get; }
 
-        public IClientPlayer OldHost { get; }
+        public IClientPlayer NewHost { get; }
     }
 }

@@ -4,8 +4,8 @@ namespace Impostor.Api.Events
 {
     public interface IGameHostChangedEvent : IGameEvent
     {
-        IClientPlayer Host { get; }
+        IClientPlayer PreviousHost { get; }
 
-        IClientPlayer OldHost { get; }
+        IClientPlayer NewHost { get; }
     }
 }
