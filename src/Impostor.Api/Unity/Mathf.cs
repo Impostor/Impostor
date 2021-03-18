@@ -53,7 +53,9 @@
 
         public static float ReverseLerp(float t)
         {
-            return Clamp((t - -40f) / (40f - -40f), 0f, 1f);
+            const float range = 50f;
+
+            return Clamp((t - -range) / (range - -range), 0f, 1f);
         }
     }
 }

@@ -254,10 +254,12 @@ namespace Impostor.Hazel
 
         public Vector2 ReadVector2()
         {
+            const float range = 50f;
+            
             var x = ReadUInt16() / (float) ushort.MaxValue;
             var y = ReadUInt16() / (float) ushort.MaxValue;
 
-            return new Vector2(Mathf.Lerp(-40f, 40f, x), Mathf.Lerp(-40f, 40f, y));
+            return new Vector2(Mathf.Lerp(-range, range, x), Mathf.Lerp(-range, range, y));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
