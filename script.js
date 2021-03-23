@@ -1,115 +1,99 @@
-var REGION_NAME = "Impostor"
-var SERVER_PORT = 22023;
+// const DEFAULT_PORT = 22023;
 
-$(document).ready(function(){
-    fillIPAdressUsingLocationHash();
-    
-    showPlatformText();
-    
-    $("#serverFileForm").submit(function(e){
-        e.preventDefault();
-        let serverIp = $("#ip").val();
-        let serverPort = $("#port").val();
-        let serverFileBytes = generateServerFile(REGION_NAME, serverIp, serverPort);
-        let blob = new Blob([serverFileBytes.buffer]);
-        saveFile(blob, "regionInfo.dat");
-    });
+const MAPPINGS = {
+    // TODO: once 2021.3.9 rolls out across all platforms remove this selection altogether
+    "2021.3.5s": { CurrentRegionIdx: "NHKLLGFLCLM", Regions: "PBKMLNEHKHL" },
+    "2021.3.9a": { CurrentRegionIdx: "CurrentRegionIdx", Regions: "Regions" },
+    "2021.3.5o": { CurrentRegionIdx: "BBHHIMPDFMB", Regions: "GAOCJNFMKLA" },
+    "2021.3.5i": { CurrentRegionIdx: "FMCHICBDPCE", Regions: "HACEEIOGMDC" },
+    "2021.3.5e": { CurrentRegionIdx: "KCEOFOCILEP", Regions: "FHHFNNEMCJC" },
+    "2021.2.21m": { CurrentRegionIdx: "BIPBMPFJBMI", Regions: "GECPHDGCFJM" },
+};
 
-});
-
-function fillIPAdressUsingLocationHash() {
-    let urlServerAddress = document.location.hash.substr(1).split(":");
-    let serverIp = urlServerAddress[0];
-    let serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : SERVER_PORT.toString();
-    const ipPattern = $("#ip").attr("pattern");
-    
-    if (new RegExp(ipPattern).test(serverIp)) {
-        $("#ip").val(serverIp);
+function download() {
+    const serverIp = document.getElementById("ip").value;
+    // const serverPort = document.getElementById("port").value ?? DEFAULT_PORT; TODO wait for update fixing ports in DnsRegionInfo
+    const serverFqdn = document.getElementById("fqdn").value;
+    let serverName = document.getElementById("name").value;
+    if (!serverName) {
+        serverName = "Impostor";
     }
-    if (new RegExp("^[0-9]+$", "g").test(serverPort)) {
-        $("#port").val(serverPort);
+
+    const gamePlatform = document.getElementById("platform").value;
+
+    const json = generateRegionInfo(serverName, serverIp, serverFqdn, MAPPINGS[gamePlatform]);
+    const blob = new Blob([json], { type: "text/plain" });
+    saveFile(blob, "regionInfo.json");
+
+    return false;
+}
+
+const platformTexts = {
+    ".ios-support": ["o"],
+    ".android-support": ["a"],
+    ".desktop-support": ["s", "i", "e", "m"],
+}
+
+function updatePlatformText() {
+    const gamePlatform = document.getElementById("platform").value;
+
+    for (let className in platformTexts) {
+        const isVisible = platformTexts[className].some(postfix => gamePlatform.endsWith(postfix));
+        document.querySelector(className).style.display = isVisible ? "block" : "none";
     }
 }
 
-function showPlatformText() {
-    if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i)) {
-        $('.ios-support').show();
-    } else if (navigator.userAgent.match(/android/i)) {
-        $('.android-support').show();
-    } else {
-        $('.desktop-support').show();
-    }
-}
+function generateRegionInfo(name, ip, fqdn, mappings) {
+    const region = {
+        "$type": "DnsRegionInfo, Assembly-CSharp",
+        "Fqdn": fqdn,
+        "DefaultIp": ip,
+        "Name": name,
+        "TranslateName": 1003 // StringNames.NoTranslation
+    };
 
-function generateServerFile(regionName, ip, port) {
-    let bytesArray = int32(0);
-    bytesArray.push(regionName.length);
-    bytesArray = concatArrays(bytesArray, stringToBytes(regionName));
-    bytesArray.push(ip.length);
-    bytesArray = concatArrays(bytesArray, stringToBytes(ip));
-    bytesArray = concatArrays(bytesArray, int32(1));
-    
-    let serverName = regionName + "-Master-1";
+    const jsonServerData = {
+        [mappings.CurrentRegionIdx]: 0,
+        [mappings.Regions]: [region]
+    };
 
-    bytesArray.push(serverName.length);
-    bytesArray = concatArrays(bytesArray, stringToBytes(serverName));
-    bytesArray = concatArrays(bytesArray, ipAddressToBytes(ip));
-    bytesArray = concatArrays(bytesArray, int16(port));
-    bytesArray = concatArrays(bytesArray, int32(0));
-    return Uint8Array.from(bytesArray);
+    return JSON.stringify(jsonServerData);
 }
 
 function saveFile(blob, fileName) {
     let url = URL.createObjectURL(blob);
-    
+
     let a = document.createElement("a");
     document.body.appendChild(a);
-    a.style = "display: none";
+    a.style.display = "none";
     a.href = url;
     a.download = fileName;
     a.click();
-    
+
     URL.revokeObjectURL(url);
 }
 
-function stringToBytes(str) {
-    let bytes = [];
-    for (let i = 0; i < str.length; i++) {
-        bytes.push(str.charCodeAt(i));
+function fillFromLocationHash() {
+    const urlServerAddress = document.location.hash.substr(1).split(":");
+    const serverIp = urlServerAddress[0];
+    // const serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : DEFAULT_PORT.toString();
+
+    const ipPattern = document.getElementById("ip").getAttribute("pattern");
+    if (new RegExp(ipPattern).test(serverIp)) {
+        document.getElementById("ip").value = serverIp;
     }
-    return bytes;
+
+    // if (new RegExp("^[0-9]+$", "g").test(serverPort)) {
+    //     document.getElementById("port").value = serverPort;
+    // }
 }
 
-function int16(int) {
-    //Convert integer number to little-endian 16-bits int representation
-    return [(int & 0xFF), 
-            (int & 0xFF00) >> 8];
+fillFromLocationHash();
+
+if (['iPhone', 'iPad', 'iPod'].indexOf(window.navigator.platform) !== -1) {
+    document.getElementById("platform").value = "2021.3.5o";
+} else if (/Android/.test(window.navigator.userAgent)) {
+    document.getElementById("platform").value = "2021.3.9a";
 }
 
-function int32(int) {
-    //Convert integer number to little-endian 32-bits int representation
-    return [(int & 0xFF), 
-            (int & 0xFF00) >> 8, 
-            (int & 0xFF0000) >> 16, 
-            (int & 0xFF000000) >> 24];
-}
-
-function ipAddressToBytes(ipAddress) {
-    let octets = ipAddress.split(".");
-    let bytes = [];
-    for(let i = 0; i < octets.length; i++) {
-        bytes.push(parseInt(octets[i]));
-    }
-    return bytes;
-}
-
-function concatArrays(array1, array2) {
-    let newArray = [];
-    for (let i = 0; i < array1.length; i++) {
-        newArray.push(array1[i]);
-    }
-    for (let i = 0; i < array2.length; i++) {
-        newArray.push(array2[i]);
-    }
-    return newArray;
-}
+updatePlatformText();

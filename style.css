@@ -33,6 +33,19 @@ body {
     font-size: 1.6rem;
 }
 
+.form-control {
+    width: 287px;
+}
+
+select.form-control {
+    appearance: none;
+}
+
+select.form-control option {
+    background-color: #252525;
+    font-size: 16px;
+}
+
 .support-text {
     display: none;
     word-break: break-all;
