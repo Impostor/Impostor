@@ -46,7 +46,7 @@ namespace Impostor.Server.Net.Manager
 
         public async ValueTask<IGame> CreateAsync(GameOptionsData options)
         {
-            var beforeGameCreatedEvent = new BeforeGameCreatedEvent(_games.Keys);
+            var beforeGameCreatedEvent = new BeforeGameCreatedEvent(this);
             await _eventManager.CallAsync(beforeGameCreatedEvent);
 
             // TODO: Prevent duplicates when using server redirector using INodeProvider.

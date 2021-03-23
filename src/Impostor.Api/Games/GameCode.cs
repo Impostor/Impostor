@@ -21,6 +21,8 @@ namespace Impostor.Api.Games
 
         public int Value { get; }
 
+        public bool IsInvalid => Value == -1;
+
         public static implicit operator string(GameCode code) => code.Code;
 
         public static implicit operator int(GameCode code) => code.Value;

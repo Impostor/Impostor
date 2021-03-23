@@ -1,46 +1,40 @@
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Events;
 using Impostor.Api.Games;
-using Impostor.Api.Innersloth;
-using Impostor.Server.Net.Redirector;
-using Impostor.Server.Net.State;
+using Impostor.Api.Games.Managers;
 
 namespace Impostor.Server.Events
 {
     public class BeforeGameCreatedEvent : IBeforeGameCreatedEvent
     {
-        private readonly ICollection<int> _gameKeys;
+        private readonly IGameManager _gameManager;
+        private GameCode? _gameCode;
 
-        public BeforeGameCreatedEvent(ICollection<int> gameKeys)
+        public BeforeGameCreatedEvent(IGameManager gameManager)
         {
-            _gameKeys = gameKeys;
+            _gameManager = gameManager;
         }
 
-        public GameCode? GameCode { get; private set; }
-
-        public bool TryToSetCode(GameCode gameCode)
+        public GameCode? GameCode
         {
-            if (gameCode.Code.Length != 6)
+            get => _gameCode;
+            set
             {
-                throw new ArgumentException("GameCode must be 6 characters longs.");
-            }
+                if (value.HasValue)
+                {
+                    if (value.Value.IsInvalid)
+                    {
+                        throw new ImpostorException("GameCode is invalid.");
+                    }
 
-            if (!Regex.IsMatch(gameCode.Code, @"^[A-Z]+$"))
-            {
-                throw new ArgumentException("GameCode must contains only letters.");
-            }
+                    if (_gameManager.Find(value.Value) != null)
+                    {
+                        throw new ImpostorException($"GameCode [{value.Value.Code}] is already used.");
+                    }
+                }
 
-            if (_gameKeys.Contains(gameCode.Value))
-            {
-                return false;
+                _gameCode = value;
             }
-
-            GameCode = gameCode;
-            return true;
         }
     }
 }
