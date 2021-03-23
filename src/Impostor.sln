@@ -33,8 +33,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client", "Impostor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client.App", "Impostor.Client.App\Impostor.Client.App.csproj", "{3DF86F12-7099-44F6-B98B-A148213D60B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Tools.ServerReplay", "Impostor.Tools.ServerReplay\Impostor.Tools.ServerReplay.csproj", "{4DB56ADD-6D3D-4D0E-A047-9D7E7D40EF99}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Plugins.Example", "Impostor.Plugins.Example\Impostor.Plugins.Example.csproj", "{70F97BB7-12A1-4C7A-B2A5-B962D14B813E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Benchmarks", "Impostor.Benchmarks\Impostor.Benchmarks.csproj", "{EA04E386-6CCB-4C52-8C82-64F32C7EB377}"
