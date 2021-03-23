@@ -98,5 +98,12 @@ namespace Impostor.Api.Net.Inner.Objects
         /// <exception cref="ImpostorProtocolException">Thrown when target is dead.</exception>
         /// <returns>Task that must be awaited.</returns>
         ValueTask MurderPlayerAsync(IInnerPlayerControl target);
+
+        /// <summary>
+        ///     Exile the current player. This doesn't produce a body to be reported.
+        ///     Visible to all players.
+        /// </summary>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask ExileAsync();
     }
 }
