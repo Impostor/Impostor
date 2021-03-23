@@ -32,13 +32,11 @@
                     <p class="text-justify text-sm-center text-md-left support-text ios-support">Type the server IP and overwrite the <b>regionInfo.json</b> file in <b>/var/mobile/Containers/Data/Application/Among Us/Documents</b> using Filza.</p>
                 </div>
             </div>
-            <form id="serverFileForm" class="container p-0" onsubmit="download(); return false;">
+            <form id="serverFileForm" class="container p-0" onsubmit="downloadAsync(); return false;">
                 <div class="row justify-content-center mb-5 mb-md-4">
-                    <div class="row justify-content-center flex-nowrap" stlye="max-width: 350px">
+                    <div class="row justify-content-center flex-nowrap" style="max-width: 350px">
                         <input class="form-control form-control-lg bg-transparent text-light text-center mr-2"
-                            type="text" placeholder="Server IP" id="ip" name="ip" required
-                            pattern="^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-                               data-mask=099.099.099.099 data-mask-selectonfocus="true">
+                            type="text" placeholder="Server address" id="address" name="address" required>
                         <!-- Disable port input until this is fixed in Among Us -->
                         <!--<input class="form-control form-control-lg bg-transparent text-light" style="max-width: 110px"
                             type="number" placeholder="Port" id="port" name="port" min="1" max="65535" required>-->
@@ -47,13 +45,7 @@
                 <div class="row justify-content-center mb-5 mb-md-4">
                     <div class="row justify-content-center flex-nowrap">
                         <input class="form-control form-control-lg bg-transparent text-light text-center mr-2"
-                            type="text" placeholder="Server Domain (optional)" id="fqdn" name="fqdn">
-                    </div>
-                </div>
-                <div class="row justify-content-center mb-5 mb-md-4">
-                    <div class="row justify-content-center flex-nowrap">
-                        <input class="form-control form-control-lg bg-transparent text-light text-center mr-2"
-                            type="text" placeholder="Server Name (optional)" id="name" name="name">
+                            type="text" placeholder="Server name" id="name" name="name">
                     </div>
                 </div>
                 <div class="row justify-content-center mb-5 mb-md-4">

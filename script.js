@@ -1,26 +1,46 @@
 // const DEFAULT_PORT = 22023;
 
 const MAPPINGS = {
-    // TODO: once 2021.3.9 rolls out across all platforms remove this selection altogether
+    // TODO: once 2021.3.9 rolls out across all platforms make this selection affect only instructions
     "2021.3.5s": { CurrentRegionIdx: "NHKLLGFLCLM", Regions: "PBKMLNEHKHL" },
-    "2021.3.9a": { CurrentRegionIdx: "CurrentRegionIdx", Regions: "Regions" },
+    "2021.3.9a": null,
     "2021.3.5o": { CurrentRegionIdx: "BBHHIMPDFMB", Regions: "GAOCJNFMKLA" },
     "2021.3.5i": { CurrentRegionIdx: "FMCHICBDPCE", Regions: "HACEEIOGMDC" },
     "2021.3.5e": { CurrentRegionIdx: "KCEOFOCILEP", Regions: "FHHFNNEMCJC" },
-    "2021.2.21m": { CurrentRegionIdx: "BIPBMPFJBMI", Regions: "GECPHDGCFJM" },
+    "2021.2.21m": { CurrentRegionIdx: "BIPBMPFJBMI", Regions: "GECPHDGCFJM" }
 };
 
-function download() {
-    const serverIp = document.getElementById("ip").value;
-    // const serverPort = document.getElementById("port").value ?? DEFAULT_PORT; TODO wait for update fixing ports in DnsRegionInfo
-    const serverFqdn = document.getElementById("fqdn").value;
-    let serverName = document.getElementById("name").value;
-    if (!serverName) {
-        serverName = "Impostor";
+const IP_REGEX = /(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}/;
+
+async function parseAddressAsync(serverAddress) {
+    if (serverAddress === "localhost") {
+        serverAddress = "127.0.0.1";
     }
 
+    if (IP_REGEX.test(serverAddress)) {
+        // TODO: wait for update fixing StaticRegionInfo
+        return [serverAddress, serverAddress];
+    }
+
+    const dns = await (await fetch("https://dns.google/resolve?type=A&name=" + serverAddress)).json();
+
+    if (dns && dns.Status === 0 && dns.Answer.length === 1 && IP_REGEX.test(dns.Answer[0].data)) {
+        return [dns.Answer[0].data, serverAddress];
+    } else {
+        const message = "Failed DNS request for " + serverAddress;
+
+        alert(message);
+        throw Error(message);
+    }
+}
+
+async function downloadAsync() {
+    const serverAddress = document.getElementById("address").value;
+    // const serverPort = document.getElementById("port").value ?? DEFAULT_PORT; TODO wait for update fixing ports in DnsRegionInfo
+    const serverName = document.getElementById("name").value || "Impostor";
     const gamePlatform = document.getElementById("platform").value;
 
+    const [serverIp, serverFqdn] = await parseAddressAsync(serverAddress);
     const json = generateRegionInfo(serverName, serverIp, serverFqdn, MAPPINGS[gamePlatform]);
     const blob = new Blob([json], { type: "text/plain" });
     saveFile(blob, "regionInfo.json");
@@ -31,15 +51,15 @@ function download() {
 const platformTexts = {
     ".ios-support": ["o"],
     ".android-support": ["a"],
-    ".desktop-support": ["s", "i", "e", "m"],
-}
+    ".desktop-support": ["s", "i", "e", "m"]
+};
 
 function updatePlatformText() {
     const gamePlatform = document.getElementById("platform").value;
 
     for (let className in platformTexts) {
         const isVisible = platformTexts[className].some(postfix => gamePlatform.endsWith(postfix));
-        document.querySelector(className).style.display = isVisible ? "block" : "none";
+        document.querySelectorAll(className).forEach(element => element.style.display = isVisible ? "block" : "none");
     }
 }
 
@@ -53,8 +73,8 @@ function generateRegionInfo(name, ip, fqdn, mappings) {
     };
 
     const jsonServerData = {
-        [mappings.CurrentRegionIdx]: 0,
-        [mappings.Regions]: [region]
+        [mappings?.CurrentRegionIdx ?? "CurrentRegionIdx"]: 0,
+        [mappings?.Regions ?? "Regions"]: [region]
     };
 
     return JSON.stringify(jsonServerData);
@@ -75,12 +95,11 @@ function saveFile(blob, fileName) {
 
 function fillFromLocationHash() {
     const urlServerAddress = document.location.hash.substr(1).split(":");
-    const serverIp = urlServerAddress[0];
+    const serverAddress = urlServerAddress[0];
     // const serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : DEFAULT_PORT.toString();
 
-    const ipPattern = document.getElementById("ip").getAttribute("pattern");
-    if (new RegExp(ipPattern).test(serverIp)) {
-        document.getElementById("ip").value = serverIp;
+    if (serverAddress) {
+        document.getElementById("address").value = serverAddress;
     }
 
     // if (new RegExp("^[0-9]+$", "g").test(serverPort)) {
@@ -90,7 +109,7 @@ function fillFromLocationHash() {
 
 fillFromLocationHash();
 
-if (['iPhone', 'iPad', 'iPod'].indexOf(window.navigator.platform) !== -1) {
+if (["iPhone", "iPad", "iPod"].indexOf(window.navigator.platform) !== -1) {
     document.getElementById("platform").value = "2021.3.5o";
 } else if (/Android/.test(window.navigator.userAgent)) {
     document.getElementById("platform").value = "2021.3.9a";
