@@ -8,28 +8,28 @@ namespace Impostor.Tools.Proxy
         public static string HexDump(byte[] bytes, int bytesPerLine = 16)
         {
             if (bytes == null) return "<null>";
-            int bytesLength = bytes.Length;
+            var bytesLength = bytes.Length;
 
-            char[] HexChars = "0123456789ABCDEF".ToCharArray();
+            var HexChars = "0123456789ABCDEF".ToCharArray();
 
-            int firstHexColumn =
-                  8                   // 8 characters for the address
-                + 3;                  // 3 spaces
+            var firstHexColumn =
+                8 // 8 characters for the address
+                + 3; // 3 spaces
 
-            int firstCharColumn = firstHexColumn
-                + bytesPerLine * 3       // - 2 digit for the hexadecimal value and 1 space
-                + (bytesPerLine - 1) / 8 // - 1 extra space every 8 characters from the 9th
-                + 2;                  // 2 spaces 
+            var firstCharColumn = firstHexColumn
+                                  + bytesPerLine * 3 // - 2 digit for the hexadecimal value and 1 space
+                                  + (bytesPerLine - 1) / 8 // - 1 extra space every 8 characters from the 9th
+                                  + 2; // 2 spaces 
 
-            int lineLength = firstCharColumn
-                + bytesPerLine           // - characters to show the ascii value
-                + Environment.NewLine.Length; // Carriage return and line feed (should normally be 2)
+            var lineLength = firstCharColumn
+                             + bytesPerLine // - characters to show the ascii value
+                             + Environment.NewLine.Length; // Carriage return and line feed (should normally be 2)
 
-            char[] line = (new String(' ', lineLength - Environment.NewLine.Length) + Environment.NewLine).ToCharArray();
-            int expectedLines = (bytesLength + bytesPerLine - 1) / bytesPerLine;
-            StringBuilder result = new StringBuilder(expectedLines * lineLength);
+            var line = (new string(' ', lineLength - Environment.NewLine.Length) + Environment.NewLine).ToCharArray();
+            var expectedLines = (bytesLength + bytesPerLine - 1) / bytesPerLine;
+            var result = new StringBuilder(expectedLines * lineLength);
 
-            for (int i = 0; i < bytesLength; i += bytesPerLine)
+            for (var i = 0; i < bytesLength; i += bytesPerLine)
             {
                 line[0] = HexChars[(i >> 28) & 0xF];
                 line[1] = HexChars[(i >> 24) & 0xF];
@@ -40,10 +40,10 @@ namespace Impostor.Tools.Proxy
                 line[6] = HexChars[(i >> 4) & 0xF];
                 line[7] = HexChars[(i >> 0) & 0xF];
 
-                int hexColumn = firstHexColumn;
-                int charColumn = firstCharColumn;
+                var hexColumn = firstHexColumn;
+                var charColumn = firstCharColumn;
 
-                for (int j = 0; j < bytesPerLine; j++)
+                for (var j = 0; j < bytesPerLine; j++)
                 {
                     if (j > 0 && (j & 7) == 0) hexColumn++;
                     if (i + j >= bytesLength)
@@ -54,16 +54,19 @@ namespace Impostor.Tools.Proxy
                     }
                     else
                     {
-                        byte b = bytes[i + j];
+                        var b = bytes[i + j];
                         line[hexColumn] = HexChars[(b >> 4) & 0xF];
                         line[hexColumn + 1] = HexChars[b & 0xF];
                         line[charColumn] = (b < 32 ? '·' : (char)b);
                     }
+
                     hexColumn += 3;
                     charColumn++;
                 }
+
                 result.Append(line);
             }
+
             return result.ToString();
         }
     }

@@ -17,7 +17,7 @@ using Microsoft.Extensions.Options;
 namespace Impostor.Server.Recorder
 {
     /// <summary>
-    ///     Records all packets received in <see cref="ClientRecorder.HandleMessageAsync"/>.
+    ///     Records all packets received in <see cref="ClientRecorder.HandleMessageAsync" />.
     /// </summary>
     internal class PacketRecorder : BackgroundService
     {

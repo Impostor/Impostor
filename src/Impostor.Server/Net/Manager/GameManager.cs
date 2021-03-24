@@ -115,7 +115,7 @@ namespace Impostor.Server.Net.Manager
             // TODO: Prevent duplicates when using server redirector using INodeProvider.
             var (success, game) = await TryCreateAsync(options);
 
-            for (int i = 0; i < 10 && !success; i++)
+            for (var i = 0; i < 10 && !success; i++)
             {
                 (success, game) = await TryCreateAsync(options);
             }

@@ -27,7 +27,7 @@ namespace Impostor.Api.Events
         public Type? Event { get; set; }
 
         /// <summary>
-        ///     If set to true, the listener will be called regardless of the <see cref="IEventCancelable.IsCancelled"/>.
+        ///     If set to true, the listener will be called regardless of the <see cref="IEventCancelable.IsCancelled" />.
         /// </summary>
         public bool IgnoreCancelled { get; set; }
     }

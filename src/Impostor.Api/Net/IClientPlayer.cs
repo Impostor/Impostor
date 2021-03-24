@@ -6,7 +6,7 @@ using Impostor.Api.Net.Inner.Objects;
 namespace Impostor.Api.Net
 {
     /// <summary>
-    ///     Represents a player in <see cref="IGame"/>.
+    ///     Represents a player in <see cref="IGame" />.
     /// </summary>
     public interface IClientPlayer
     {
@@ -16,7 +16,7 @@ namespace Impostor.Api.Net
         IClient Client { get; }
 
         /// <summary>
-        ///     Gets the game where the <see cref="IClientPlayer"/> belongs to.
+        ///     Gets the game where the <see cref="IClientPlayer" /> belongs to.
         /// </summary>
         IGame Game { get; }
 
@@ -30,10 +30,10 @@ namespace Impostor.Api.Net
         public bool IsHost { get; }
 
         /// <summary>
-        ///     Checks if the specified <see cref="IInnerNetObject"/> is owned by <see cref="IClientPlayer"/>.
+        ///     Checks if the specified <see cref="IInnerNetObject" /> is owned by <see cref="IClientPlayer" />.
         /// </summary>
-        /// <param name="netObject">The <see cref="IInnerNetObject"/>.</param>
-        /// <returns>Returns true if owned by <see cref="IClientPlayer"/>.</returns>
+        /// <param name="netObject">The <see cref="IInnerNetObject" />.</param>
+        /// <returns>Returns true if owned by <see cref="IClientPlayer" />.</returns>
         bool IsOwner(IInnerNetObject netObject);
 
         ValueTask KickAsync();

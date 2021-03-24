@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;

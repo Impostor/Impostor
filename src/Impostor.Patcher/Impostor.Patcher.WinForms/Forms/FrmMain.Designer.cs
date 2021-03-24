@@ -81,7 +81,7 @@
             this.lblUrl.Name = "lblUrl";
             this.lblUrl.Size = new System.Drawing.Size(212, 13);
             this.lblUrl.TabIndex = 5;
-            this.lblUrl.Text = "https://github.com/AeonLucid/Impostor";
+            this.lblUrl.Text = "https://github.com/Impostor/Impostor";
             this.lblUrl.Click += new System.EventHandler(this.lblUrl_Click);
             // 
             // label3

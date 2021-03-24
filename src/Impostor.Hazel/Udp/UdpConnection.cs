@@ -34,7 +34,7 @@ namespace Impostor.Hazel.Udp
             Pipeline = Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions
             {
                 SingleReader = true,
-                SingleWriter = true
+                SingleWriter = true,
             });
         }
 
@@ -113,13 +113,13 @@ namespace Impostor.Hazel.Udp
         /// <param name="length"></param>
         protected abstract ValueTask WriteBytesToConnection(byte[] bytes, int length);
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override async ValueTask SendAsync(IMessageWriter msg)
         {
             if (this._state != ConnectionState.Connected)
                 throw new InvalidOperationException("Could not send data as this Connection is not connected. Did you disconnect?");
 
-            byte[] buffer = new byte[msg.Length];
+            var buffer = new byte[msg.Length];
             Buffer.BlockCopy(msg.Buffer, 0, buffer, 0, msg.Length);
 
             switch (msg.SendOption)
@@ -139,13 +139,13 @@ namespace Impostor.Hazel.Udp
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         /// <remarks>
         ///     <include file="DocInclude/common.xml" path="docs/item[@name='Connection_SendBytes_General']/*" />
         ///     <para>
-        ///         Udp connections can currently send messages using <see cref="SendOption.None"/> and
-        ///         <see cref="SendOption.Reliable"/>. Fragmented messages are not currently supported and will default to
-        ///         <see cref="SendOption.None"/> until implemented.
+        ///         Udp connections can currently send messages using <see cref="SendOption.None" /> and
+        ///         <see cref="SendOption.Reliable" />. Fragmented messages are not currently supported and will default to
+        ///         <see cref="SendOption.None" /> until implemented.
         ///     </para>
         /// </remarks>
         public override async ValueTask SendBytes(byte[] bytes, MessageType sendOption = MessageType.Unreliable)
@@ -153,12 +153,12 @@ namespace Impostor.Hazel.Udp
             //Add header information and send
             await HandleSend(bytes, (byte)sendOption);
         }
-        
+
         /// <summary>
         ///     Handles the reliable/fragmented sending from this connection.
         /// </summary>
         /// <param name="data">The data being sent.</param>
-        /// <param name="sendOption">The <see cref="SendOption"/> specified as its byte value.</param>
+        /// <param name="sendOption">The <see cref="SendOption" /> specified as its byte value.</param>
         /// <param name="ackCallback">The callback to invoke when this packet is acknowledged.</param>
         /// <returns>The bytes that should actually be sent.</returns>
         protected async ValueTask HandleSend(byte[] data, byte sendOption, Action ackCallback = null)
@@ -170,7 +170,7 @@ namespace Impostor.Hazel.Udp
                 case (byte)UdpSendOption.Hello:
                     await ReliableSend(sendOption, data, ackCallback);
                     break;
-                                    
+
                 //Treat all else as unreliable
                 default:
                     await UnreliableSend(sendOption, data);
@@ -226,14 +226,16 @@ namespace Impostor.Hazel.Udp
                     {
                         await DisconnectRemote("The remote sent a disconnect request", reader);
                     }
+
                     break;
-                    
+
                 //Treat everything else as unreliable
                 default:
                     using (var reader = message.Copy(1))
                     {
                         await InvokeDataReceived(reader, MessageType.Unreliable);
                     }
+
                     Statistics.LogUnreliableReceive(message.Length - 1, message.Length);
                     break;
             }
@@ -258,7 +260,7 @@ namespace Impostor.Hazel.Udp
         /// <param name="length"></param>
         async ValueTask UnreliableSend(byte sendOption, byte[] data, int offset, int length)
         {
-            byte[] bytes = new byte[length + 1];
+            var bytes = new byte[length + 1];
 
             //Add message type
             bytes[0] = sendOption;
@@ -293,8 +295,8 @@ namespace Impostor.Hazel.Udp
 
             return HandleSend(actualBytes, (byte)UdpSendOption.Hello, acknowledgeCallback);
         }
-                
-        /// <inheritdoc/>
+
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             if (disposing)

@@ -9,14 +9,14 @@ namespace Impostor.Hazel.Udp
     /// <summary>
     ///     Represents a servers's connection to a client that uses the UDP protocol.
     /// </summary>
-    /// <inheritdoc/>
+    /// <inheritdoc />
     internal sealed class UdpServerConnection : UdpConnection
     {
         /// <summary>
         ///     The connection listener that we use the socket of.
         /// </summary>
         /// <remarks>
-        ///     Udp server connections utilize the same socket in the listener for sends/receives, this is the listener that 
+        ///     Udp server connections utilize the same socket in the listener for sends/receives, this is the listener that
         ///     created this connection and is hence the listener this conenction sends and receives via.
         /// </remarks>
         public UdpConnectionListener Listener { get; private set; }
@@ -63,7 +63,7 @@ namespace Impostor.Hazel.Udp
                 if (this._state != ConnectionState.Connected) return false;
                 this._state = ConnectionState.NotConnected;
             }
-            
+
             var bytes = EmptyDisconnectBytes;
             if (data != null && data.Length > 0)
             {

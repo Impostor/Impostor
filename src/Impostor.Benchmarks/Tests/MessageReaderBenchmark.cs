@@ -4,10 +4,8 @@ using BenchmarkDotNet.Attributes;
 using Impostor.Benchmarks.Data;
 using Impostor.Benchmarks.Data.Pool;
 using Impostor.Benchmarks.Extensions;
-using Impostor.Hazel;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
-using MessageWriter = Impostor.Benchmarks.Data.MessageWriter;
 
 namespace Impostor.Benchmarks.Tests
 {
@@ -24,7 +22,7 @@ namespace Impostor.Benchmarks.Tests
             message.StartMessage(1);
             message.Write((ushort)3100);
             message.Write((byte)100);
-            message.Write((int) int.MaxValue);
+            message.Write((int)int.MaxValue);
             message.WritePacked(int.MaxValue);
             message.EndMessage();
 

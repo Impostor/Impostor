@@ -1,12 +1,11 @@
-﻿using Impostor.Api.Games;
-using Impostor.Api.Net.Messages;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Numerics;
 using System.Text;
+using Impostor.Api.Games;
 using Impostor.Api.Net.Inner;
+using Impostor.Api.Net.Messages;
 using Impostor.Api.Unity;
 
 namespace Impostor.Hazel
@@ -39,7 +38,7 @@ namespace Impostor.Hazel
         {
             if (includeHeader)
             {
-                byte[] output = new byte[this.Length];
+                var output = new byte[this.Length];
                 System.Buffer.BlockCopy(this.Buffer, 0, output, 0, this.Length);
                 return output;
             }
@@ -48,17 +47,17 @@ namespace Impostor.Hazel
                 switch (this.SendOption)
                 {
                     case MessageType.Reliable:
-                        {
-                            byte[] output = new byte[this.Length - 3];
-                            System.Buffer.BlockCopy(this.Buffer, 3, output, 0, this.Length - 3);
-                            return output;
-                        }
+                    {
+                        var output = new byte[this.Length - 3];
+                        System.Buffer.BlockCopy(this.Buffer, 3, output, 0, this.Length - 3);
+                        return output;
+                    }
                     case MessageType.Unreliable:
-                        {
-                            byte[] output = new byte[this.Length - 1];
-                            System.Buffer.BlockCopy(this.Buffer, 1, output, 0, this.Length - 1);
-                            return output;
-                        }
+                    {
+                        var output = new byte[this.Length - 1];
+                        System.Buffer.BlockCopy(this.Buffer, 1, output, 0, this.Length - 1);
+                        return output;
+                    }
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -67,7 +66,6 @@ namespace Impostor.Hazel
             throw new NotImplementedException();
         }
 
-        ///
         /// <param name="sendOption">The option specifying how the message should be sent.</param>
         public static MessageWriter Get(MessageType sendOption = MessageType.Unreliable)
         {
@@ -106,8 +104,8 @@ namespace Impostor.Hazel
 
         public void Write(Vector2 vector)
         {
-            Write((ushort)(Mathf.ReverseLerp(vector.X) * (double) ushort.MaxValue));
-            Write((ushort)(Mathf.ReverseLerp(vector.Y) * (double) ushort.MaxValue));
+            Write((ushort)(Mathf.ReverseLerp(vector.X) * (double)ushort.MaxValue));
+            Write((ushort)(Mathf.ReverseLerp(vector.Y) * (double)ushort.MaxValue));
         }
 
         ///
@@ -122,7 +120,7 @@ namespace Impostor.Hazel
         public void EndMessage()
         {
             var lastMessageStart = messageStarts.Pop();
-            ushort length = (ushort)(this.Position - lastMessageStart - 3); // Minus length and type byte
+            var length = (ushort)(this.Position - lastMessageStart - 3); // Minus length and type byte
             this.Buffer[lastMessageStart] = (byte)length;
             this.Buffer[lastMessageStart + 1] = (byte)(length >> 8);
         }
@@ -215,7 +213,7 @@ namespace Impostor.Hazel
         {
             fixed (byte* ptr = &this.Buffer[this.Position])
             {
-                byte* valuePtr = (byte*)&value;
+                var valuePtr = (byte*)&value;
 
                 *ptr = *valuePtr;
                 *(ptr + 1) = *(valuePtr + 1);
@@ -302,7 +300,7 @@ namespace Impostor.Hazel
         {
             do
             {
-                byte b = (byte)(value & 0xFF);
+                var b = (byte)(value & 0xFF);
                 if (value >= 0x80)
                 {
                     b |= 0x80;
@@ -317,7 +315,7 @@ namespace Impostor.Hazel
 
         public void Write(MessageWriter msg, bool includeHeader)
         {
-            int offset = 0;
+            var offset = 0;
             if (!includeHeader)
             {
                 switch (msg.SendOption)
@@ -340,8 +338,8 @@ namespace Impostor.Hazel
             byte b;
             unsafe
             {
-                int i = 1;
-                byte* bp = (byte*)&i;
+                var i = 1;
+                var bp = (byte*)&i;
                 b = *bp;
             }
 

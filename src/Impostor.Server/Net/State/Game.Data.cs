@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api;
-using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
-using Impostor.Api.Net.Messages.S2C;
 using Impostor.Api.Unity;
-using Impostor.Hazel;
 using Impostor.Server.Events.Meeting;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner;

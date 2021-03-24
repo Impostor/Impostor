@@ -12,17 +12,17 @@ namespace Impostor.Hazel
         ReceivedZeroBytes,
         PingsWithoutResponse,
         ReliablePacketWithoutResponse,
-        ConnectionDisconnected
+        ConnectionDisconnected,
     }
 
     /// <summary>
-    ///     Abstract base class for a <see cref="Connection"/> to a remote end point via a network protocol like TCP or UDP.
+    ///     Abstract base class for a <see cref="Connection" /> to a remote end point via a network protocol like TCP or UDP.
     /// </summary>
-    /// <threadsafety static="true" instance="true"/>
+    /// <threadsafety static="true" instance="true" />
     public abstract class NetworkConnection : Connection
     {
         /// <summary>
-        /// An event that gives us a chance to send well-formed disconnect messages to clients when an internal disconnect happens.
+        ///     An event that gives us a chance to send well-formed disconnect messages to clients when an internal disconnect happens.
         /// </summary>
         public Func<HazelInternalErrors, MessageWriter> OnInternalDisconnect;
 
@@ -30,8 +30,8 @@ namespace Impostor.Hazel
         ///     The remote end point of this connection.
         /// </summary>
         /// <remarks>
-        ///     This is the end point of the other device given as an <see cref="System.Net.EndPoint"/> rather than a generic
-        ///     <see cref="ConnectionEndPoint"/> as the base <see cref="Connection"/> does.
+        ///     This is the end point of the other device given as an <see cref="System.Net.EndPoint" /> rather than a generic
+        ///     <see cref="ConnectionEndPoint" /> as the base <see cref="Connection" /> does.
         /// </remarks>
         public IPEndPoint RemoteEndPoint { get; protected set; }
 
@@ -67,14 +67,14 @@ namespace Impostor.Hazel
         }
 
         /// <summary>
-        /// Called when socket is disconnected internally
+        ///     Called when socket is disconnected internally
         /// </summary>
         internal async ValueTask DisconnectInternal(HazelInternalErrors error, string reason)
         {
             var handler = this.OnInternalDisconnect;
             if (handler != null)
             {
-                MessageWriter messageToRemote = handler(error);
+                var messageToRemote = handler(error);
                 if (messageToRemote != null)
                 {
                     try

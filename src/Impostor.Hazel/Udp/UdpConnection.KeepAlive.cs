@@ -8,7 +8,6 @@ namespace Impostor.Hazel.Udp
 {
     partial class UdpConnection
     {
-
         /// <summary>
         ///     Class to hold packet data
         /// </summary>
@@ -58,6 +57,7 @@ namespace Impostor.Hazel.Udp
                 ResetKeepAliveTimer();
             }
         }
+
         private int keepAliveInterval = 1500;
 
         public int MissingPingsUntilDisconnect { get; set; } = 6;
@@ -109,9 +109,9 @@ namespace Impostor.Hazel.Udp
         // pings should cause a disconnect.
         private async ValueTask SendPing()
         {
-            ushort id = (ushort)Interlocked.Increment(ref lastIDAllocated);
+            var id = (ushort)Interlocked.Increment(ref lastIDAllocated);
 
-            byte[] bytes = new byte[3];
+            var bytes = new byte[3];
             bytes[0] = (byte)UdpSendOption.Ping;
             bytes[1] = (byte)(id >> 8);
             bytes[2] = (byte)id;

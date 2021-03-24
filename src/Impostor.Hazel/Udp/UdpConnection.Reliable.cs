@@ -15,25 +15,25 @@ namespace Impostor.Hazel.Udp
         /// </summary>
         /// <remarks>
         ///     <para>
-        ///         For reliable delivery data is resent at specified intervals unless an acknowledgement is received from the 
+        ///         For reliable delivery data is resent at specified intervals unless an acknowledgement is received from the
         ///         receiving device. The ResendTimeout specifies the interval between the packets being resent, each time a packet
-        ///         is resent the interval is increased for that packet until the duration exceeds the <see cref="DisconnectTimeout"/> value.
+        ///         is resent the interval is increased for that packet until the duration exceeds the <see cref="DisconnectTimeout" /> value.
         ///     </para>
         ///     <para>
-        ///         Setting this to its default of 0 will mean the timeout is 2 times the value of the average ping, usually 
+        ///         Setting this to its default of 0 will mean the timeout is 2 times the value of the average ping, usually
         ///         resulting in a more dynamic resend that responds to endpoints on slower or faster connections.
         ///     </para>
         /// </remarks>
         public volatile int ResendTimeout = 0;
 
         /// <summary>
-        /// Max number of times to resend. 0 == no limit
+        ///     Max number of times to resend. 0 == no limit
         /// </summary>
         public volatile int ResendLimit = 0;
 
         /// <summary>
-        /// A compounding multiplier to back off resend timeout.
-        /// Applied to ping before first timeout when ResendTimeout == 0.
+        ///     A compounding multiplier to back off resend timeout.
+        ///     Applied to ping before first timeout when ResendTimeout == 0.
         /// </summary>
         public volatile float ResendPingMultiplier = 2;
 
@@ -48,7 +48,7 @@ namespace Impostor.Hazel.Udp
         internal ConcurrentDictionary<ushort, Packet> reliableDataPacketsSent = new ConcurrentDictionary<ushort, Packet>();
 
         /// <summary>
-        ///     Packet ids that have not been received, but are expected. 
+        ///     Packet ids that have not been received, but are expected.
         /// </summary>
         private HashSet<ushort> reliableDataPacketsMissing = new HashSet<ushort>();
 
@@ -63,7 +63,7 @@ namespace Impostor.Hazel.Udp
         ///     Returns the average ping to this endpoint.
         /// </summary>
         /// <remarks>
-        ///     This returns the average ping for a one-way trip as calculated from the reliable packets that have been sent 
+        ///     This returns the average ping for a one-way trip as calculated from the reliable packets that have been sent
         ///     and acknowledged by the endpoint.
         /// </remarks>
         public float AveragePingMs = 500;
@@ -72,7 +72,7 @@ namespace Impostor.Hazel.Udp
         ///     The maximum times a message should be resent before marking the endpoint as disconnected.
         /// </summary>
         /// <remarks>
-        ///     Reliable packets will be resent at an interval defined in <see cref="ResendTimeout"/> for the number of times
+        ///     Reliable packets will be resent at an interval defined in <see cref="ResendTimeout" /> for the number of times
         ///     specified here. Once a packet has been retransmitted this number of times and has not been acknowledged the
         ///     connection will be marked as disconnected and the <see cref="Connection.Disconnected">Disconnected</see> event
         ///     will be invoked.
@@ -136,10 +136,10 @@ namespace Impostor.Hazel.Udp
                 var connection = this.Connection;
                 if (!this.Acknowledged && connection != null)
                 {
-                    long lifetime = this.Stopwatch.ElapsedMilliseconds;
+                    var lifetime = this.Stopwatch.ElapsedMilliseconds;
                     if (lifetime >= connection.DisconnectTimeout)
                     {
-                        if (connection.reliableDataPacketsSent.TryRemove(this.Id, out Packet self))
+                        if (connection.reliableDataPacketsSent.TryRemove(this.Id, out var self))
                         {
                             await connection.DisconnectInternal(HazelInternalErrors.ReliablePacketWithoutResponse, $"Reliable packet {self.Id} (size={this.Length}) was not ack'd after {lifetime}ms ({self.Retransmissions} resends)");
 
@@ -155,7 +155,7 @@ namespace Impostor.Hazel.Udp
                         if (connection.ResendLimit != 0
                             && this.Retransmissions > connection.ResendLimit)
                         {
-                            if (connection.reliableDataPacketsSent.TryRemove(this.Id, out Packet self))
+                            if (connection.reliableDataPacketsSent.TryRemove(this.Id, out var self))
                             {
                                 await connection.DisconnectInternal(HazelInternalErrors.ReliablePacketWithoutResponse, $"Reliable packet {self.Id} (size={this.Length}) was not ack'd after {self.Retransmissions} resends ({lifetime}ms)");
 
@@ -196,12 +196,12 @@ namespace Impostor.Hazel.Udp
 
         internal async ValueTask<int> ManageReliablePackets()
         {
-            int output = 0;
+            var output = 0;
             if (this.reliableDataPacketsSent.Count > 0)
             {
                 foreach (var kvp in this.reliableDataPacketsSent)
                 {
-                    Packet pkt = kvp.Value;
+                    var pkt = kvp.Value;
 
                     try
                     {
@@ -222,12 +222,12 @@ namespace Impostor.Hazel.Udp
         /// <param name="ackCallback">The callback to make once the packet has been acknowledged.</param>
         protected void AttachReliableID(byte[] buffer, int offset, int sendLength, Action ackCallback = null)
         {
-            ushort id = (ushort)Interlocked.Increment(ref lastIDAllocated);
+            var id = (ushort)Interlocked.Increment(ref lastIDAllocated);
 
             buffer[offset] = (byte)(id >> 8);
             buffer[offset + 1] = (byte)id;
 
-            Packet packet = Packet.GetObject();
+            var packet = Packet.GetObject();
             packet.Set(
                 id,
                 this,
@@ -260,7 +260,7 @@ namespace Impostor.Hazel.Udp
             //Inform keepalive not to send for a while
             ResetKeepAliveTimer();
 
-            byte[] bytes = new byte[data.Length + 3];
+            var bytes = new byte[data.Length + 3];
 
             //Add message type
             bytes[0] = sendOption;
@@ -333,35 +333,35 @@ namespace Impostor.Hazel.Udp
              * 
              * So...
              */
-            
+
             var result = true;
 
             lock (reliableDataPacketsMissing)
             {
                 //Calculate overwritePointer
-                ushort overwritePointer = (ushort)(reliableReceiveLast - 32768);
+                var overwritePointer = (ushort)(reliableReceiveLast - 32768);
 
                 //Calculate if it is a new packet by examining if it is within the range
                 bool isNew;
                 if (overwritePointer < reliableReceiveLast)
-                    isNew = id > reliableReceiveLast || id <= overwritePointer;     //Figure (2)
+                    isNew = id > reliableReceiveLast || id <= overwritePointer; //Figure (2)
                 else
-                    isNew = id > reliableReceiveLast && id <= overwritePointer;     //Figure (3)
-                
+                    isNew = id > reliableReceiveLast && id <= overwritePointer; //Figure (3)
+
                 //If it's new or we've not received anything yet
                 if (isNew)
                 {
                     // Mark items between the most recent receive and the id received as missing
                     if (id > reliableReceiveLast)
                     {
-                        for (ushort i = (ushort)(reliableReceiveLast + 1); i < id; i++)
+                        for (var i = (ushort)(reliableReceiveLast + 1); i < id; i++)
                         {
                             reliableDataPacketsMissing.Add(i);
                         }
                     }
                     else
                     {
-                        int cnt = (ushort.MaxValue - reliableReceiveLast) + id;
+                        var cnt = (ushort.MaxValue - reliableReceiveLast) + id;
                         for (ushort i = 1; i < cnt; ++i)
                         {
                             reliableDataPacketsMissing.Add((ushort)(i + reliableReceiveLast));
@@ -371,7 +371,7 @@ namespace Impostor.Hazel.Udp
                     //Update the most recently received
                     reliableReceiveLast = id;
                 }
-                
+
                 //Else it could be a missing packet
                 else
                 {
@@ -382,7 +382,7 @@ namespace Impostor.Hazel.Udp
                     }
                 }
             }
-            
+
             //Send an acknowledgement
             await SendAck(id);
 
@@ -397,13 +397,13 @@ namespace Impostor.Hazel.Udp
         {
             this.pingsSinceAck = 0;
 
-            ushort id = (ushort)((bytes[1] << 8) + bytes[2]);
+            var id = (ushort)((bytes[1] << 8) + bytes[2]);
             AcknowledgeMessageId(id);
 
             if (bytes.Length == 4)
             {
-                byte recentPackets = bytes[3];
-                for (int i = 1; i <= 8; ++i)
+                var recentPackets = bytes[3];
+                for (var i = 1; i <= 8; ++i)
                 {
                     if ((recentPackets & 1) != 0)
                     {
@@ -420,7 +420,7 @@ namespace Impostor.Hazel.Udp
         private void AcknowledgeMessageId(ushort id)
         {
             // Dispose of timer and remove from dictionary
-            if (reliableDataPacketsSent.TryRemove(id, out Packet packet))
+            if (reliableDataPacketsSent.TryRemove(id, out var packet))
             {
                 float rt = packet.Stopwatch.ElapsedMilliseconds;
 
@@ -432,7 +432,7 @@ namespace Impostor.Hazel.Udp
                     this.AveragePingMs = Math.Max(50, this.AveragePingMs * .7f + rt * .3f);
                 }
             }
-            else if (this.activePingPackets.TryRemove(id, out PingPacket pingPkt))
+            else if (this.activePingPackets.TryRemove(id, out var pingPkt))
             {
                 float rt = pingPkt.Stopwatch.ElapsedMilliseconds;
 
@@ -455,7 +455,7 @@ namespace Impostor.Hazel.Udp
             byte recentPackets = 0;
             lock (this.reliableDataPacketsMissing)
             {
-                for (int i = 1; i <= 8; ++i)
+                for (var i = 1; i <= 8; ++i)
                 {
                     if (!this.reliableDataPacketsMissing.Contains((ushort)(id - i)))
                     {
@@ -464,12 +464,12 @@ namespace Impostor.Hazel.Udp
                 }
             }
 
-            byte[] bytes = new byte[]
+            var bytes = new byte[]
             {
                 (byte)UdpSendOption.Acknowledgement,
                 (byte)(id >> 8),
                 (byte)(id >> 0),
-                recentPackets
+                recentPackets,
             };
 
             try

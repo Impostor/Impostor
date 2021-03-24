@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 
 namespace Impostor.Api.Net.Messages.S2C
 {
@@ -19,7 +20,7 @@ namespace Impostor.Api.Net.Messages.S2C
 
         public static void Deserialize(IMessageReader reader)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

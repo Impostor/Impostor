@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 namespace Impostor.Api
 {
     /// <summary>
-    /// Priovides a StreamReader-like api throught extensions
+    ///     Priovides a StreamReader-like api throught extensions
     /// </summary>
     public static class SpanReaderExtensions
     {
@@ -53,7 +53,7 @@ namespace Impostor.Api
         }
 
         /// <summary>
-        /// Advances the position of <see cref="input"/> by the size of <see cref="T"/>.
+        ///     Advances the position of <see cref="input" /> by the size of <see cref="T" />.
         /// </summary>
         /// <typeparam name="T">Type that will be read.</typeparam>
         /// <param name="input">input "stream"/span.</param>

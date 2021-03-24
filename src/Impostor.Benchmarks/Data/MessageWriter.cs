@@ -32,7 +32,7 @@ namespace Impostor.Benchmarks.Data
         {
             if (includeHeader)
             {
-                byte[] output = new byte[this.Length];
+                var output = new byte[this.Length];
                 System.Buffer.BlockCopy(this.Buffer, 0, output, 0, this.Length);
                 return output;
             }
@@ -41,17 +41,17 @@ namespace Impostor.Benchmarks.Data
                 switch (this.SendOption)
                 {
                     case MessageType.Reliable:
-                        {
-                            byte[] output = new byte[this.Length - 3];
-                            System.Buffer.BlockCopy(this.Buffer, 3, output, 0, this.Length - 3);
-                            return output;
-                        }
+                    {
+                        var output = new byte[this.Length - 3];
+                        System.Buffer.BlockCopy(this.Buffer, 3, output, 0, this.Length - 3);
+                        return output;
+                    }
                     case MessageType.Unreliable:
-                        {
-                            byte[] output = new byte[this.Length - 1];
-                            System.Buffer.BlockCopy(this.Buffer, 1, output, 0, this.Length - 1);
-                            return output;
-                        }
+                    {
+                        var output = new byte[this.Length - 1];
+                        System.Buffer.BlockCopy(this.Buffer, 1, output, 0, this.Length - 1);
+                        return output;
+                    }
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -87,7 +87,7 @@ namespace Impostor.Benchmarks.Data
         public void EndMessage()
         {
             var lastMessageStart = messageStarts.Pop();
-            ushort length = (ushort)(this.Position - lastMessageStart - 3); // Minus length and type byte
+            var length = (ushort)(this.Position - lastMessageStart - 3); // Minus length and type byte
             this.Buffer[lastMessageStart] = (byte)length;
             this.Buffer[lastMessageStart + 1] = (byte)(length >> 8);
         }
@@ -173,7 +173,7 @@ namespace Impostor.Benchmarks.Data
         {
             fixed (byte* ptr = &this.Buffer[this.Position])
             {
-                byte* valuePtr = (byte*)&value;
+                var valuePtr = (byte*)&value;
 
                 *ptr = *valuePtr;
                 *(ptr + 1) = *(valuePtr + 1);
@@ -260,7 +260,7 @@ namespace Impostor.Benchmarks.Data
         {
             do
             {
-                byte b = (byte)(value & 0xFF);
+                var b = (byte)(value & 0xFF);
                 if (value >= 0x80)
                 {
                     b |= 0x80;
@@ -275,7 +275,7 @@ namespace Impostor.Benchmarks.Data
 
         public void Write(MessageWriter msg, bool includeHeader)
         {
-            int offset = 0;
+            var offset = 0;
             if (!includeHeader)
             {
                 switch (msg.SendOption)
@@ -298,8 +298,8 @@ namespace Impostor.Benchmarks.Data
             byte b;
             unsafe
             {
-                int i = 1;
-                byte* bp = (byte*)&i;
+                var i = 1;
+                var bp = (byte*)&i;
                 b = *bp;
             }
 

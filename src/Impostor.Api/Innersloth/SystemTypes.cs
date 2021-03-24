@@ -39,7 +39,7 @@
         Sabotage = 17,
 
         /// <summary>
-        /// Decontam on Mira and bottom decontam on Polus
+        ///     Decontam on Mira and bottom decontam on Polus
         /// </summary>
         Decontamination = 18,
 
@@ -58,7 +58,7 @@
         Dropship = 25,
 
         /// <summary>
-        /// Top decontam on Polus
+        ///     Top decontam on Polus
         /// </summary>
         Decontamination2 = 26,
 

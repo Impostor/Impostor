@@ -159,7 +159,7 @@ namespace Impostor.Server.Events.Register
                 throw new InvalidOperationException($"The method {method.GetFriendlyName()} must return void or ValueTask.");
             }
 
-            return Expression.Lambda<Func<object?, object, IServiceProvider, ValueTask>>(invoke,  instance, eventParameter, provider)
+            return Expression.Lambda<Func<object?, object, IServiceProvider, ValueTask>>(invoke, instance, eventParameter, provider)
                 .Compile();
         }
     }

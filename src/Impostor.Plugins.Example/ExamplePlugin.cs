@@ -29,7 +29,7 @@ namespace Impostor.Plugins.Example
             var game = await _gameManager.CreateAsync(new GameOptionsData());
             game.DisplayName = "Example game";
             await game.SetPrivacyAsync(true);
-            
+
             _logger.LogInformation("Created game {0}.", game.Code.Code);
         }
 

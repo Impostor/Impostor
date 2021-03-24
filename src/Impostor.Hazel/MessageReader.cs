@@ -78,7 +78,7 @@ namespace Impostor.Hazel
 
         public bool ReadBoolean()
         {
-            byte val = FastByte();
+            var val = FastByte();
             return val != 0;
         }
 
@@ -159,13 +159,13 @@ namespace Impostor.Hazel
 
         public uint ReadPackedUInt32()
         {
-            bool readMore = true;
-            int shift = 0;
+            var readMore = true;
+            var shift = 0;
             uint output = 0;
 
             while (readMore)
             {
-                byte b = FastByte();
+                var b = FastByte();
                 if (b >= 0x80)
                 {
                     readMore = true;
@@ -185,8 +185,8 @@ namespace Impostor.Hazel
 
         public void CopyTo(IMessageWriter writer)
         {
-            writer.Write((ushort) Length);
-            writer.Write((byte) Tag);
+            writer.Write((ushort)Length);
+            writer.Write((byte)Tag);
             writer.Write(Buffer.AsMemory(Offset, Length));
         }
 
@@ -213,7 +213,7 @@ namespace Impostor.Hazel
 
             System.Buffer.BlockCopy(Buffer, offsetEnd, Buffer, offsetStart, lengthToCopy);
 
-            ((MessageReader) message).Parent.AdjustLength(message.Offset, message.Length + 3);
+            ((MessageReader)message).Parent.AdjustLength(message.Offset, message.Length + 3);
         }
 
         private void AdjustLength(int offset, int amount)
@@ -255,9 +255,9 @@ namespace Impostor.Hazel
         public Vector2 ReadVector2()
         {
             const float range = 50f;
-            
-            var x = ReadUInt16() / (float) ushort.MaxValue;
-            var y = ReadUInt16() / (float) ushort.MaxValue;
+
+            var x = ReadUInt16() / (float)ushort.MaxValue;
+            var y = ReadUInt16() / (float)ushort.MaxValue;
 
             return new Vector2(Mathf.Lerp(-range, range, x), Mathf.Lerp(-range, range, y));
         }

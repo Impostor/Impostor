@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
@@ -11,10 +10,10 @@ namespace Impostor.Tests.Events
 {
     public class EventManagerTests
     {
-        public static readonly IEnumerable<object[]> TestModes = new []
+        public static readonly IEnumerable<object[]> TestModes = new[]
         {
             new object[] { TestMode.Service },
-            new object[] { TestMode.Temporary }
+            new object[] { TestMode.Temporary },
         };
 
         [Theory]
@@ -38,14 +37,14 @@ namespace Impostor.Tests.Events
 
             await eventManager.CallAsync(new SetValueEvent(1));
 
-            Assert.Equal(new []
+            Assert.Equal(new[]
             {
                 EventPriority.Monitor,
                 EventPriority.Highest,
                 EventPriority.High,
                 EventPriority.Normal,
                 EventPriority.Low,
-                EventPriority.Lowest
+                EventPriority.Lowest,
             }, listener.Priorities);
         }
 
@@ -78,10 +77,10 @@ namespace Impostor.Tests.Events
 
             await eventManager.CallAsync(new SetValueEvent(1));
 
-            Assert.Equal(new []
+            Assert.Equal(new[]
             {
                 EventPriority.Monitor,
-                EventPriority.Highest
+                EventPriority.Highest,
             }, listener.Priorities);
         }
 
@@ -115,7 +114,7 @@ namespace Impostor.Tests.Events
         public enum TestMode
         {
             Service,
-            Temporary
+            Temporary,
         }
 
         public interface ISetValueEvent : IEventCancelable

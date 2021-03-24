@@ -89,7 +89,7 @@ namespace Impostor.Tools.ServerReplay
 
             services.AddSingleton(new ServerEnvironment
             {
-                IsReplay = true
+                IsReplay = true,
             });
 
             services.AddSingleton<FakeDateTimeProvider>();

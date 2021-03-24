@@ -4,7 +4,6 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.ObjectPool;
 using Serilog;
@@ -20,11 +19,12 @@ namespace Impostor.Hazel.Udp
         private static readonly ILogger Logger = Log.ForContext<UdpConnectionListener>();
 
         /// <summary>
-        /// A callback for early connection rejection. 
-        /// * Return false to reject connection.
-        /// * A null response is ok, we just won't send anything.
+        ///     A callback for early connection rejection.
+        ///     * Return false to reject connection.
+        ///     * A null response is ok, we just won't send anything.
         /// </summary>
         public AcceptConnectionCheck AcceptConnection;
+
         public delegate bool AcceptConnectionCheck(IPEndPoint endPoint, byte[] input, out byte[] response);
 
         private readonly UdpClient _socket;
@@ -37,7 +37,7 @@ namespace Impostor.Hazel.Udp
         private Task _executingTask;
 
         /// <summary>
-        ///     Creates a new UdpConnectionListener for the given <see cref="IPAddress"/>, port and <see cref="IPMode"/>.
+        ///     Creates a new UdpConnectionListener for the given <see cref="IPAddress" />, port and <see cref="IPMode" />.
         /// </summary>
         /// <param name="endPoint">The endpoint to listen on.</param>
         /// <param name="ipMode"></param>
@@ -72,7 +72,7 @@ namespace Impostor.Hazel.Udp
         }
 
         public int ConnectionCount => this._allConnections.Count;
-        
+
         private async void ManageReliablePackets(object state)
         {
             foreach (var kvp in _allConnections)

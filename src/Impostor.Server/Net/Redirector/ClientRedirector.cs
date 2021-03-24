@@ -10,7 +10,6 @@ using Impostor.Server.Config;
 using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
 using Serilog;
-using ILogger = Serilog.ILogger;
 
 namespace Impostor.Server.Net.Redirector
 {
