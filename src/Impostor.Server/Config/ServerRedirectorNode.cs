@@ -1,18 +1,13 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Impostor.Server.Config
 {
     public class ServerRedirectorNode
     {
-        [JsonConstructor]
-        public ServerRedirectorNode(string ip, ushort port)
-        {
-            Ip = ip;
-            Port = port;
-        }
+        [AllowNull]
+        public string Ip { get; set; }
 
-        public string Ip { get; }
-
-        public ushort Port { get; }
+        [AllowNull]
+        public ushort Port { get; set; }
     }
 }

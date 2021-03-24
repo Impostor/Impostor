@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Impostor.Server.Utils;
+﻿using Impostor.Server.Utils;
 
 namespace Impostor.Server.Config
 {
@@ -9,19 +8,11 @@ namespace Impostor.Server.Config
 
         private string? _resolvedListenIp;
 
-        [JsonConstructor]
-        public AnnouncementsServerConfig(bool enabled = true, string listenIp = "0.0.0.0", ushort listenPort = 22024)
-        {
-            Enabled = enabled;
-            ListenIp = listenIp;
-            ListenPort = listenPort;
-        }
+        public bool Enabled { get; set; } = true;
 
-        public bool Enabled { get; }
+        public string ListenIp { get; set; } = "0.0.0.0";
 
-        public string ListenIp { get; }
-
-        public ushort ListenPort { get; }
+        public ushort ListenPort { get; set; } = 22024;
 
         public string ResolveListenIp()
         {

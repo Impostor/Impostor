@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Impostor.Server.Config
 {
@@ -7,35 +7,21 @@ namespace Impostor.Server.Config
     {
         public const string Section = "ServerRedirector";
 
-        [JsonConstructor]
-        public ServerRedirectorConfig(bool enabled = false, bool master = false, NodeLocator? locator = null, List<ServerRedirectorNode>? nodes = null)
-        {
-            Enabled = enabled;
-            Master = master;
-            Locator = locator;
-            Nodes = nodes;
-        }
+        public bool Enabled { get; set; }
 
-        public bool Enabled { get; }
+        public bool Master { get; set; }
 
-        public bool Master { get; }
+        public NodeLocator? Locator { get; set; }
 
-        public NodeLocator? Locator { get; }
-
-        public List<ServerRedirectorNode>? Nodes { get; }
+        public List<ServerRedirectorNode>? Nodes { get; set; }
 
         public class NodeLocator
         {
-            [JsonConstructor]
-            public NodeLocator(string redis, string udpMasterEndpoint)
-            {
-                Redis = redis;
-                UdpMasterEndpoint = udpMasterEndpoint;
-            }
+            [AllowNull]
+            public string Redis { get; set; }
 
-            public string Redis { get; }
-
-            public string UdpMasterEndpoint { get; }
+            [AllowNull]
+            public string UdpMasterEndpoint { get; set; }
         }
     }
 }
