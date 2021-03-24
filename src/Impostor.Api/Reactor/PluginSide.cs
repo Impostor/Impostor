@@ -1,7 +1,7 @@
 namespace Impostor.Api.Reactor
 {
     /// <summary>
-    ///     Plugin side used in modded handshake
+    ///     Plugin side used in modded handshake.
     /// </summary>
     public enum PluginSide : byte
     {

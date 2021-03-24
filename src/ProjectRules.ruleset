@@ -1,6 +1,6 @@
 ﻿<RuleSet Name="Impostor" ToolsVersion="10.0">
-  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.OrderingRules">
-    <Rule Id="SA1200" Action="None" />
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
+    <Rule Id="CS1591" Action="Hidden" />
   </Rules>
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.DocumentationRules">
     <Rule Id="SA1600" Action="None" />
@@ -17,7 +17,6 @@
     <Rule Id="SA1309" Action="None" />
   </Rules>
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.SpacingRules">
-    <Rule Id="SA1003" Action="None" />
     <Rule Id="SA1009" Action="None" />
   </Rules>
 </RuleSet>

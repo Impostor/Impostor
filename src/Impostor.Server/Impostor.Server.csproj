@@ -9,6 +9,7 @@
     <CodeAnalysisRuleSet>../ProjectRules.ruleset</CodeAnalysisRuleSet>
     <Nullable>enable</Nullable>
     <SelfContained>false</SelfContained>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>

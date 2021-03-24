@@ -4,7 +4,7 @@
     {
         /// <summary>
         ///     Retrieves a <see cref="IMessageWriter" /> from the internal pool.
-        ///     Make sure to call <see cref="IMessageWriter.Dispose" /> when you are done!
+        ///     Make sure to call <see cref="System.IDisposable.Dispose" /> when you are done!.
         /// </summary>
         /// <param name="sendOption">
         ///     Whether to send the message as <see cref="MessageType.Reliable" /> or <see cref="MessageType.Unreliable" />.

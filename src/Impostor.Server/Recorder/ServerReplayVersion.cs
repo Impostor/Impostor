@@ -6,12 +6,12 @@ namespace Impostor.Server.Recorder
     public enum ServerReplayVersion
     {
         /// <summary>
-        ///     Initial version
+        ///     Initial version.
         /// </summary>
         Initial = 1,
 
         /// <summary>
-        ///     Latest version
+        ///     Latest version.
         /// </summary>
         Latest = Initial,
     }

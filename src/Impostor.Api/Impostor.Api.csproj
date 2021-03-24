@@ -18,6 +18,7 @@
     <PackageProjectUrl>https://github.com/Impostor/Impostor</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Impostor/Impostor</RepositoryUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
