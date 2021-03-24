@@ -18,7 +18,7 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
                 MapTypes.Skeld => 13,
                 MapTypes.MiraHQ => 2,
                 MapTypes.Polus => 12,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(),
             };
 
             _doors = new Dictionary<int, bool>(doorCount);

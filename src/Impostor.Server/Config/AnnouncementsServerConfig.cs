@@ -1,18 +1,27 @@
-﻿using Impostor.Server.Utils;
+﻿using System.Text.Json.Serialization;
+using Impostor.Server.Utils;
 
 namespace Impostor.Server.Config
 {
     internal class AnnouncementsServerConfig
     {
-        private string? _resolvedListenIp;
-
         public const string Section = "AnnouncementsServer";
 
-        public bool Enabled { get; set; } = true;
+        private string? _resolvedListenIp;
 
-        public string ListenIp { get; set; } = "0.0.0.0";
+        [JsonConstructor]
+        public AnnouncementsServerConfig(bool enabled = true, string listenIp = "0.0.0.0", ushort listenPort = 22024)
+        {
+            Enabled = enabled;
+            ListenIp = listenIp;
+            ListenPort = listenPort;
+        }
 
-        public ushort ListenPort { get; set; } = 22024;
+        public bool Enabled { get; }
+
+        public string ListenIp { get; }
+
+        public ushort ListenPort { get; }
 
         public string ResolveListenIp()
         {

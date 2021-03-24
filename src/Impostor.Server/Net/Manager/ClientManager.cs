@@ -18,12 +18,12 @@ namespace Impostor.Server.Net.Manager
 {
     internal partial class ClientManager
     {
-        private static HashSet<int> SupportedVersions { get; } = new HashSet<int>
+        private static readonly HashSet<int> SupportedVersions = new HashSet<int>
         {
             GameVersion.GetVersion(2021, 3, 5), // 2021.3.5
         };
 
-        private static string ServerBrand { get; } = $"Impostor {DotnetUtils.GetVersion()}";
+        private static readonly string ServerBrand = $"Impostor {DotnetUtils.GetVersion()}";
 
         private readonly ILogger<ClientManager> _logger;
         private readonly ConcurrentDictionary<int, ClientBase> _clients;

@@ -23,10 +23,6 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
         private ushort _lastSequenceId;
 
-        public Vector2 Position { get; private set; }
-
-        public Vector2 Velocity { get; private set; }
-
         public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool)
         {
             _logger = logger;
@@ -37,14 +33,9 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             _pool = pool;
         }
 
-        private static bool SidGreaterThan(ushort newSid, ushort prevSid)
-        {
-            var num = (ushort)(prevSid + (uint)short.MaxValue);
+        public Vector2 Position { get; private set; }
 
-            return (int)prevSid < (int)num
-                ? newSid > prevSid && newSid <= num
-                : newSid > prevSid || newSid <= num;
-        }
+        public Vector2 Velocity { get; private set; }
 
         public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
@@ -118,6 +109,15 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             playerMovementEvent.Reset(_game, sender, _playerControl);
             await _eventManager.CallAsync(playerMovementEvent);
             _pool.Return(playerMovementEvent);
+        }
+
+        private static bool SidGreaterThan(ushort newSid, ushort prevSid)
+        {
+            var num = (ushort)(prevSid + (uint)short.MaxValue);
+
+            return (int)prevSid < (int)num
+                ? newSid > prevSid && newSid <= num
+                : newSid > prevSid || newSid <= num;
         }
 
         private ValueTask SnapToAsync(IClientPlayer sender, Vector2 position, ushort minSid)

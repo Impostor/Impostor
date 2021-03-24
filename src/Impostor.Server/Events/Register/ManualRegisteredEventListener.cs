@@ -6,8 +6,6 @@ namespace Impostor.Server.Events.Register
 {
     internal class ManualRegisteredEventListener : IRegisteredEventListener
     {
-        public Type EventType { get; } = typeof(object);
-
         private readonly IManualEventListener _manualEventListener;
 
         public ManualRegisteredEventListener(IManualEventListener manualEventListener)
@@ -15,9 +13,11 @@ namespace Impostor.Server.Events.Register
             _manualEventListener = manualEventListener;
         }
 
+        public Type EventType { get; } = typeof(object);
+
         public EventPriority Priority => _manualEventListener.Priority;
 
-        public ValueTask InvokeAsync(object eventHandler, object @event, IServiceProvider provider)
+        public ValueTask InvokeAsync(object? eventHandler, object @event, IServiceProvider provider)
         {
             if (@event is IEvent typedEvent)
             {

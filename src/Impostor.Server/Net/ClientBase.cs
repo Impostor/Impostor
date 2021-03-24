@@ -64,7 +64,6 @@ namespace Impostor.Server.Net
 
         public abstract ValueTask HandleDisconnectAsync(string reason);
 
-
         public async ValueTask DisconnectAsync(DisconnectReason reason, string? message = null)
         {
             if (!Connection.IsConnected)

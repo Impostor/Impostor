@@ -24,7 +24,7 @@ namespace Impostor.Server.Net
         private readonly AnnouncementsServerConfig _config;
         private readonly ObjectPool<MessageReader> _readerPool;
         private readonly IEventManager _eventManager;
-        private UdpConnectionListener _connection;
+        private UdpConnectionListener? _connection;
 
         public AnnouncementsService(ILogger<AnnouncementsService> logger, IOptions<AnnouncementsServerConfig> config, ObjectPool<MessageReader> readerPool, IEventManager eventManager)
         {
@@ -42,7 +42,7 @@ namespace Impostor.Server.Net
             {
                 AddressFamily.InterNetwork => IPMode.IPv4,
                 AddressFamily.InterNetworkV6 => IPMode.IPv6,
-                _ => throw new InvalidOperationException()
+                _ => throw new InvalidOperationException(),
             };
 
             _connection = new UdpConnectionListener(endpoint, _readerPool, mode)
@@ -58,7 +58,11 @@ namespace Impostor.Server.Net
         public async Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogWarning("Announcements server is shutting down!");
-            await _connection.DisposeAsync();
+
+            if (_connection != null)
+            {
+                await _connection.DisposeAsync();
+            }
         }
 
         private async ValueTask OnNewConnection(NewConnectionEventArgs e)

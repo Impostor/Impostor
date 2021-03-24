@@ -9,8 +9,6 @@ namespace Impostor.Benchmarks.Data
 {
     public class MessageWriter
     {
-        private static int BufferSize = 64000;
-
         public MessageType SendOption { get; private set; }
 
         private Stack<int> messageStarts = new Stack<int>();

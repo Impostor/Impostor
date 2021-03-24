@@ -37,7 +37,7 @@ namespace Impostor.Api.Games
 
         int HostId { get; }
 
-        IClientPlayer GetClientPlayer(int clientId);
+        IClientPlayer? GetClientPlayer(int clientId);
 
         T? FindObjectByNetId<T>(uint netId)
             where T : IInnerNetObject;

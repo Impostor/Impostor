@@ -15,11 +15,11 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerId = playerId;
         }
 
-        public InnerPlayerControl Controller { get; internal set; }
+        public InnerPlayerControl? Controller { get; internal set; }
 
         public byte PlayerId { get; }
 
-        public string PlayerName { get; internal set; }
+        public string PlayerName { get; internal set; } = string.Empty;
 
         public ColorType Color { get; internal set; }
 
@@ -37,7 +37,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public DeathReason LastDeathReason { get; internal set; }
 
-        public List<InnerGameData.TaskInfo> Tasks { get; internal set; }
+        public List<InnerGameData.TaskInfo> Tasks { get; internal set; } = new List<InnerGameData.TaskInfo>(0);
 
         public DateTimeOffset LastMurder { get; set; }
 

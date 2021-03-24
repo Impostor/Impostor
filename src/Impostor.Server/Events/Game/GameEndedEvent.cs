@@ -13,7 +13,7 @@ namespace Impostor.Server.Events
         }
 
         public IGame Game { get; }
-        
+
         public GameOverReason GameOverReason { get; }
     }
 }

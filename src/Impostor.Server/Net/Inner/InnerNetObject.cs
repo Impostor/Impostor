@@ -29,6 +29,7 @@ namespace Impostor.Server.Net.Inner
 
         public abstract ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader);
 
+        // TODO move to Reactor.Impostor plugin
         protected ValueTask<bool> HandleCustomRpc(IMessageReader reader, Game game)
         {
             var lengthOrShortId = reader.ReadPackedInt32();
@@ -38,8 +39,6 @@ namespace Impostor.Server.Net.Inner
                 : reader.ReadString(lengthOrShortId);
 
             var id = reader.ReadPackedInt32();
-
-            // TODO handle custom rpcs
 
             return ValueTask.FromResult(true);
         }

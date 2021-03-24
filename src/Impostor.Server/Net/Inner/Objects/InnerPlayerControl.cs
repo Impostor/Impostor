@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
@@ -20,6 +21,8 @@ namespace Impostor.Server.Net.Inner.Objects
 {
     internal partial class InnerPlayerControl : InnerNetObject
     {
+        private static readonly byte ColorsCount = (byte)Enum.GetValues<ColorType>().Length;
+
         private readonly ILogger<InnerPlayerControl> _logger;
         private readonly IEventManager _eventManager;
         private readonly Game _game;
@@ -50,6 +53,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public InnerCustomNetworkTransform NetworkTransform { get; }
 
+        [AllowNull]
         public InnerPlayerInfo PlayerInfo { get; internal set; }
 
         internal Queue<string> RequestedPlayerName { get; } = new Queue<string>();
@@ -74,12 +78,6 @@ namespace Impostor.Server.Net.Inner.Objects
             }
 
             PlayerId = reader.ReadByte();
-        }
-
-        internal void Die(DeathReason reason)
-        {
-            PlayerInfo.IsDead = true;
-            PlayerInfo.LastDeathReason = reason;
         }
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
@@ -297,6 +295,12 @@ namespace Impostor.Server.Net.Inner.Objects
             return true;
         }
 
+        internal void Die(DeathReason reason)
+        {
+            PlayerInfo.IsDead = true;
+            PlayerInfo.LastDeathReason = reason;
+        }
+
         private async ValueTask HandleCompleteTask(ClientPlayer sender, uint taskId)
         {
             var task = PlayerInfo.Tasks.ElementAtOrDefault((int)taskId);
@@ -316,7 +320,7 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             for (var i = 0; i < infectedIds.Length; i++)
             {
-                var player = _game.GameNet.GameData.GetPlayerById(infectedIds.Span[i]);
+                var player = _game.GameNet.GameData!.GetPlayerById(infectedIds.Span[i]);
                 if (player != null)
                 {
                     player.IsImpostor = true;
@@ -428,8 +432,6 @@ namespace Impostor.Server.Net.Inner.Objects
             return true;
         }
 
-        private static readonly byte ColorsCount = (byte)Enum.GetValues<ColorType>().Length;
-
         private async ValueTask<bool> HandleCheckColor(ClientPlayer sender, ColorType color)
         {
             if ((byte)color > ColorsCount)
@@ -537,7 +539,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             PlayerInfo.LastMurder = _dateTimeProvider.UtcNow;
 
-            if (!target.PlayerInfo.IsDead)
+            if (target != null && !target.PlayerInfo.IsDead)
             {
                 ((InnerPlayerControl)target).Die(DeathReason.Kill);
                 await _eventManager.CallAsync(new PlayerMurderEvent(_game, sender, this, target));
@@ -556,8 +558,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask HandleStartMeeting(byte targetId)
         {
-            var deadPlayer = _game.GameNet.GameData.GetPlayerById(targetId)?.Controller;
-            await _eventManager.CallAsync(new PlayerStartMeetingEvent(_game, _game.GetClientPlayer(this.OwnerId), this, deadPlayer));
+            var deadPlayer = _game.GameNet.GameData!.GetPlayerById(targetId)?.Controller;
+            await _eventManager.CallAsync(new PlayerStartMeetingEvent(_game, _game.GetClientPlayer(this.OwnerId)!, this, deadPlayer));
         }
 
         private async ValueTask<bool> HandleSetPet(ClientPlayer sender, PetType pet)

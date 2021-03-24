@@ -1,9 +1,18 @@
-﻿namespace Impostor.Server.Config
+﻿using System.Text.Json.Serialization;
+
+namespace Impostor.Server.Config
 {
     public class ServerRedirectorNode
     {
-        public string Ip { get; set; }
+        [JsonConstructor]
+        public ServerRedirectorNode(string ip, ushort port)
+        {
+            Ip = ip;
+            Port = port;
+        }
 
-        public ushort Port { get; set; }
+        public string Ip { get; }
+
+        public ushort Port { get; }
     }
 }

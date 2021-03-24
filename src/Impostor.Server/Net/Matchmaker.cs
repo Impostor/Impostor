@@ -18,7 +18,7 @@ namespace Impostor.Server.Net
         private readonly ObjectPool<MessageReader> _readerPool;
         private readonly ILogger<Matchmaker> _logger;
         private readonly ILogger<HazelConnection> _connectionLogger;
-        private UdpConnectionListener _connection;
+        private UdpConnectionListener? _connection;
 
         public Matchmaker(
             ILogger<Matchmaker> logger,
@@ -38,18 +38,23 @@ namespace Impostor.Server.Net
             {
                 AddressFamily.InterNetwork => IPMode.IPv4,
                 AddressFamily.InterNetworkV6 => IPMode.IPv6,
-                _ => throw new InvalidOperationException()
+                _ => throw new InvalidOperationException(),
             };
 
-            _connection = new UdpConnectionListener(ipEndPoint, _readerPool, mode);
-            _connection.NewConnection = OnNewConnection;
+            _connection = new UdpConnectionListener(ipEndPoint, _readerPool, mode)
+            {
+                NewConnection = OnNewConnection,
+            };
 
             await _connection.StartAsync();
         }
 
         public async ValueTask StopAsync()
         {
-            await _connection.DisposeAsync();
+            if (_connection != null)
+            {
+                await _connection.DisposeAsync();
+            }
         }
 
         private async ValueTask OnNewConnection(NewConnectionEventArgs e)

@@ -1,11 +1,20 @@
-﻿namespace Impostor.Server.Config
+﻿using System.Text.Json.Serialization;
+
+namespace Impostor.Server.Config
 {
     public class DebugConfig
     {
         public const string Section = "Debug";
 
-        public bool GameRecorderEnabled { get; set; }
+        [JsonConstructor]
+        public DebugConfig(bool gameRecorderEnabled = false, string? gameRecorderPath = null)
+        {
+            GameRecorderEnabled = gameRecorderEnabled;
+            GameRecorderPath = gameRecorderPath;
+        }
 
-        public string GameRecorderPath { get; set; }
+        public bool GameRecorderEnabled { get; }
+
+        public string? GameRecorderPath { get; }
     }
 }
