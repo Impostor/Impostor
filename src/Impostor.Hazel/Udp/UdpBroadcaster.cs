@@ -26,7 +26,7 @@ namespace Impostor.Hazel.Udp
         ///
         public void SetData(string data)
         {
-            var len = UTF8Encoding.UTF8.GetByteCount(data);
+            int len = UTF8Encoding.UTF8.GetByteCount(data);
             this.data = new byte[len + 2];
             this.data[0] = 4;
             this.data[1] = 2;
@@ -69,15 +69,9 @@ namespace Impostor.Hazel.Udp
         {
             if (this.socket != null)
             {
-                try { this.socket.Shutdown(SocketShutdown.Both); }
-                catch { }
-
-                try { this.socket.Close(); }
-                catch { }
-
-                try { this.socket.Dispose(); }
-                catch { }
-
+                try { this.socket.Shutdown(SocketShutdown.Both); } catch { }
+                try { this.socket.Close(); } catch { }
+                try { this.socket.Dispose(); } catch { }
                 this.socket = null;
             }
         }

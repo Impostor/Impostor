@@ -8,7 +8,7 @@ namespace Impostor.Hazel
     ///     A fairly simple object pool for items that will be created a lot.
     /// </summary>
     /// <typeparam name="T">The type that is pooled.</typeparam>
-    /// <threadsafety static="true" instance="true" />
+    /// <threadsafety static="true" instance="true"/>
     public sealed class ObjectPoolCustom<T> where T : IRecyclable
     {
         private int numberCreated;
@@ -32,7 +32,7 @@ namespace Impostor.Hazel
         /// </summary>
         /// <returns></returns>
         private readonly Func<T> objectFactory;
-
+        
         /// <summary>
         ///     Internal constructor for our ObjectPool.
         /// </summary>
@@ -48,7 +48,7 @@ namespace Impostor.Hazel
         internal T GetObject()
         {
 #if HAZEL_BAG
-            if (!pool.TryTake(out var item))
+            if (!pool.TryTake(out T item))
             {
                 Interlocked.Increment(ref numberCreated);
                 item = objectFactory.Invoke();
@@ -85,7 +85,7 @@ namespace Impostor.Hazel
         /// <param name="item">The item to return.</param>
         internal void PutObject(T item)
         {
-            if (inuse.TryRemove(item, out var b))
+            if (inuse.TryRemove(item, out bool b))
             {
 #if HAZEL_BAG
                 pool.Add(item);

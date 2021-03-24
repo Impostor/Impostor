@@ -89,21 +89,21 @@ namespace Impostor.Hazel.Udp
                 return;
             }
 
-            if (numBytes < 3
+            if (numBytes < 3 
                 || buffer[0] != 4 || buffer[1] != 2)
             {
                 this.StartListen();
                 return;
             }
 
-            var ipEnd = (IPEndPoint)endpt;
-            var data = UTF8Encoding.UTF8.GetString(buffer, 2, numBytes - 2);
-            var dataHash = data.GetHashCode();
+            IPEndPoint ipEnd = (IPEndPoint)endpt;
+            string data = UTF8Encoding.UTF8.GetString(buffer, 2, numBytes - 2);
+            int dataHash = data.GetHashCode();
 
             lock (packets)
             {
-                var found = false;
-                for (var i = 0; i < this.packets.Count; ++i)
+                bool found = false;
+                for (int i = 0; i < this.packets.Count; ++i)
                 {
                     var pkt = this.packets[i];
                     if (pkt == null || pkt.Data == null)
@@ -146,15 +146,9 @@ namespace Impostor.Hazel.Udp
         {
             if (this.socket != null)
             {
-                try { this.socket.Shutdown(SocketShutdown.Both); }
-                catch { }
-
-                try { this.socket.Close(); }
-                catch { }
-
-                try { this.socket.Dispose(); }
-                catch { }
-
+                try { this.socket.Shutdown(SocketShutdown.Both); } catch { }
+                try { this.socket.Close(); } catch { }
+                try { this.socket.Dispose(); } catch { }
                 this.socket = null;
             }
         }

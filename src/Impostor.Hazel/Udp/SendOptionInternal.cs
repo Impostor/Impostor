@@ -11,7 +11,7 @@
         Hello = 8,
 
         /// <summary>
-        ///     A single byte of continued existence
+        /// A single byte of continued existence
         /// </summary>
         Ping = 12,
 

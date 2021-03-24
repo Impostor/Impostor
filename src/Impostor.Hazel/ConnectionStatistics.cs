@@ -2,13 +2,12 @@
 using System.Threading;
 
 [assembly: InternalsVisibleTo("Hazel.Tests")]
-
 namespace Impostor.Hazel
 {
     /// <summary>
-    ///     Holds statistics about the traffic through a <see cref="Connection" />.
+    ///     Holds statistics about the traffic through a <see cref="Connection"/>.
     /// </summary>
-    /// <threadsafety static="true" instance="true" />
+    /// <threadsafety static="true" instance="true"/>
     public class ConnectionStatistics
     {
         private const int ExpectedMTU = 1200;
@@ -28,8 +27,8 @@ namespace Impostor.Hazel
         ///     The number of messages sent larger than 576 bytes. This is smaller than most default MTUs.
         /// </summary>
         /// <remarks>
-        ///     This is the number of unreliable messages that were sent from the <see cref="Connection" />, incremented
-        ///     each time that LogUnreliableSend is called by the Connection. Messages that caused an error are not
+        ///     This is the number of unreliable messages that were sent from the <see cref="Connection"/>, incremented 
+        ///     each time that LogUnreliableSend is called by the Connection. Messages that caused an error are not 
         ///     counted and messages are only counted once all other operations in the send are complete.
         /// </remarks>
         public int FragmentableMessagesSent
@@ -49,8 +48,8 @@ namespace Impostor.Hazel
         ///     The number of unreliable messages sent.
         /// </summary>
         /// <remarks>
-        ///     This is the number of unreliable messages that were sent from the <see cref="Connection" />, incremented
-        ///     each time that LogUnreliableSend is called by the Connection. Messages that caused an error are not
+        ///     This is the number of unreliable messages that were sent from the <see cref="Connection"/>, incremented 
+        ///     each time that LogUnreliableSend is called by the Connection. Messages that caused an error are not 
         ///     counted and messages are only counted once all other operations in the send are complete.
         /// </remarks>
         public int UnreliableMessagesSent
@@ -70,8 +69,8 @@ namespace Impostor.Hazel
         ///     The number of reliable messages sent.
         /// </summary>
         /// <remarks>
-        ///     This is the number of reliable messages that were sent from the <see cref="Connection" />, incremented
-        ///     each time that LogReliableSend is called by the Connection. Messages that caused an error are not
+        ///     This is the number of reliable messages that were sent from the <see cref="Connection"/>, incremented 
+        ///     each time that LogReliableSend is called by the Connection. Messages that caused an error are not 
         ///     counted and messages are only counted once all other operations in the send are complete.
         /// </remarks>
         public int ReliableMessagesSent
@@ -91,8 +90,8 @@ namespace Impostor.Hazel
         ///     The number of fragmented messages sent.
         /// </summary>
         /// <remarks>
-        ///     This is the number of fragmented messages that were sent from the <see cref="Connection" />, incremented
-        ///     each time that LogFragmentedSend is called by the Connection. Messages that caused an error are not
+        ///     This is the number of fragmented messages that were sent from the <see cref="Connection"/>, incremented 
+        ///     each time that LogFragmentedSend is called by the Connection. Messages that caused an error are not 
         ///     counted and messages are only counted once all other operations in the send are complete.
         /// </remarks>
         public int FragmentedMessagesSent
@@ -112,8 +111,8 @@ namespace Impostor.Hazel
         ///     The number of acknowledgement messages sent.
         /// </summary>
         /// <remarks>
-        ///     This is the number of acknowledgements that were sent from the <see cref="Connection" />, incremented
-        ///     each time that LogAcknowledgementSend is called by the Connection. Messages that caused an error are not
+        ///     This is the number of acknowledgements that were sent from the <see cref="Connection"/>, incremented 
+        ///     each time that LogAcknowledgementSend is called by the Connection. Messages that caused an error are not 
         ///     counted and messages are only counted once all other operations in the send are complete.
         /// </remarks>
         public int AcknowledgementMessagesSent
@@ -133,8 +132,8 @@ namespace Impostor.Hazel
         ///     The number of hello messages sent.
         /// </summary>
         /// <remarks>
-        ///     This is the number of hello messages that were sent from the <see cref="Connection" />, incremented
-        ///     each time that LogHelloSend is called by the Connection. Messages that caused an error are not
+        ///     This is the number of hello messages that were sent from the <see cref="Connection"/>, incremented 
+        ///     each time that LogHelloSend is called by the Connection. Messages that caused an error are not 
         ///     counted and messages are only counted once all other operations in the send are complete.
         /// </remarks>
         public int HelloMessagesSent
@@ -155,12 +154,12 @@ namespace Impostor.Hazel
         /// </summary>
         /// <remarks>
         ///     <para>
-        ///         This is the number of bytes of data (i.e. user bytes) that were sent from the <see cref="Connection" />,
-        ///         accumulated each time that LogSend is called by the Connection. Messages that caused an error are not
+        ///         This is the number of bytes of data (i.e. user bytes) that were sent from the <see cref="Connection"/>, 
+        ///         accumulated each time that LogSend is called by the Connection. Messages that caused an error are not 
         ///         counted and messages are only counted once all other operations in the send are complete.
         ///     </para>
         ///     <para>
-        ///         For the number of bytes including protocol bytes see <see cref="TotalBytesSent" />.
+        ///         For the number of bytes including protocol bytes see <see cref="TotalBytesSent"/>.
         ///     </para>
         /// </remarks>
         public long DataBytesSent
@@ -181,13 +180,13 @@ namespace Impostor.Hazel
         /// </summary>
         /// <remarks>
         ///     <para>
-        ///         This is the total number of bytes (the data bytes plus protocol bytes) that were sent from the
-        ///         <see cref="Connection" />, accumulated each time that LogSend is called by the Connection. Messages that
-        ///         caused an error are not counted and messages are only counted once all other operations in the send are
+        ///         This is the total number of bytes (the data bytes plus protocol bytes) that were sent from the 
+        ///         <see cref="Connection"/>, accumulated each time that LogSend is called by the Connection. Messages that 
+        ///         caused an error are not counted and messages are only counted once all other operations in the send are 
         ///         complete.
         ///     </para>
         ///     <para>
-        ///         For the number of data bytes excluding protocol bytes see <see cref="DataBytesSent" />.
+        ///         For the number of data bytes excluding protocol bytes see <see cref="DataBytesSent"/>.
         ///     </para>
         /// </remarks>
         public long TotalBytesSent
@@ -213,12 +212,12 @@ namespace Impostor.Hazel
                 return UnreliableMessagesReceived + ReliableMessagesReceived + FragmentedMessagesReceived + AcknowledgementMessagesReceived + helloMessagesReceived;
             }
         }
-
+        
         /// <summary>
         ///     The number of unreliable messages received.
         /// </summary>
         /// <remarks>
-        ///     This is the number of unreliable messages that were received by the <see cref="Connection" />, incremented
+        ///     This is the number of unreliable messages that were received by the <see cref="Connection"/>, incremented
         ///     each time that LogUnreliableReceive is called by the Connection. Messages are counted before the receive event is invoked.
         /// </remarks>
         public int UnreliableMessagesReceived
@@ -238,7 +237,7 @@ namespace Impostor.Hazel
         ///     The number of reliable messages received.
         /// </summary>
         /// <remarks>
-        ///     This is the number of reliable messages that were received by the <see cref="Connection" />, incremented
+        ///     This is the number of reliable messages that were received by the <see cref="Connection"/>, incremented
         ///     each time that LogReliableReceive is called by the Connection. Messages are counted before the receive event is invoked.
         /// </remarks>
         public int ReliableMessagesReceived
@@ -258,7 +257,7 @@ namespace Impostor.Hazel
         ///     The number of fragmented messages received.
         /// </summary>
         /// <remarks>
-        ///     This is the number of fragmented messages that were received by the <see cref="Connection" />, incremented
+        ///     This is the number of fragmented messages that were received by the <see cref="Connection"/>, incremented
         ///     each time that LogFragmentedReceive is called by the Connection. Messages are counted before the receive event is invoked.
         /// </remarks>
         public int FragmentedMessagesReceived
@@ -278,7 +277,7 @@ namespace Impostor.Hazel
         ///     The number of acknowledgement messages received.
         /// </summary>
         /// <remarks>
-        ///     This is the number of acknowledgement messages that were received by the <see cref="Connection" />, incremented
+        ///     This is the number of acknowledgement messages that were received by the <see cref="Connection"/>, incremented
         ///     each time that LogAcknowledgemntReceive is called by the Connection. Messages are counted before the receive event is invoked.
         /// </remarks>
         public int AcknowledgementMessagesReceived
@@ -298,7 +297,7 @@ namespace Impostor.Hazel
         ///     The number of ping messages received.
         /// </summary>
         /// <remarks>
-        ///     This is the number of hello messages that were received by the <see cref="Connection" />, incremented
+        ///     This is the number of hello messages that were received by the <see cref="Connection"/>, incremented
         ///     each time that LogHelloReceive is called by the Connection. Messages are counted before the receive event is invoked.
         /// </remarks>
         public int PingMessagesReceived
@@ -318,7 +317,7 @@ namespace Impostor.Hazel
         ///     The number of hello messages received.
         /// </summary>
         /// <remarks>
-        ///     This is the number of hello messages that were received by the <see cref="Connection" />, incremented
+        ///     This is the number of hello messages that were received by the <see cref="Connection"/>, incremented
         ///     each time that LogHelloReceive is called by the Connection. Messages are counted before the receive event is invoked.
         /// </remarks>
         public int HelloMessagesReceived
@@ -339,12 +338,12 @@ namespace Impostor.Hazel
         /// </summary>
         /// <remarks>
         ///     <para>
-        ///         This is the number of bytes of data (i.e. user bytes) that were received by the <see cref="Connection" />,
+        ///         This is the number of bytes of data (i.e. user bytes) that were received by the <see cref="Connection"/>, 
         ///         accumulated each time that LogReceive is called by the Connection. Messages are counted before the receive
         ///         event is invoked.
         ///     </para>
         ///     <para>
-        ///         For the number of bytes including protocol bytes see <see cref="TotalBytesReceived" />.
+        ///         For the number of bytes including protocol bytes see <see cref="TotalBytesReceived"/>.
         ///     </para>
         /// </remarks>
         public long DataBytesReceived
@@ -365,12 +364,12 @@ namespace Impostor.Hazel
         /// </summary>
         /// <remarks>
         ///     <para>
-        ///         This is the total number of bytes (the data bytes plus protocol bytes) that were received by the
-        ///         <see cref="Connection" />, accumulated each time that LogReceive is called by the Connection. Messages are
+        ///         This is the total number of bytes (the data bytes plus protocol bytes) that were received by the 
+        ///         <see cref="Connection"/>, accumulated each time that LogReceive is called by the Connection. Messages are 
         ///         counted before the receive event is invoked.
         ///     </para>
         ///     <para>
-        ///         For the number of data bytes excluding protocol bytes see <see cref="DataBytesReceived" />.
+        ///         For the number of data bytes excluding protocol bytes see <see cref="DataBytesReceived"/>.
         ///     </para>
         /// </remarks>
         public long TotalBytesReceived
