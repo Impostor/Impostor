@@ -285,9 +285,6 @@ namespace Impostor.Server.Net.Inner.Objects
                     return await HandleSetStartCounter(sender, sequenceId, startCounter);
                 }
 
-                case RpcCalls.CustomRpc:
-                    return await HandleCustomRpc(reader, _game);
-
                 default:
                     return await UnregisteredCall(call, sender);
             }

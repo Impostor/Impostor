@@ -27,19 +27,5 @@ namespace Impostor.Server.Net.Inner
         public abstract ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState);
 
         public abstract ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader);
-
-        // TODO move to Reactor.Impostor plugin
-        protected ValueTask<bool> HandleCustomRpc(IMessageReader reader, Game game)
-        {
-            var lengthOrShortId = reader.ReadPackedInt32();
-
-            var pluginId = lengthOrShortId < 0
-                ? game.Host!.Client.ModIdMap[lengthOrShortId]
-                : reader.ReadString(lengthOrShortId);
-
-            var id = reader.ReadPackedInt32();
-
-            return ValueTask.FromResult(true);
-        }
     }
 }

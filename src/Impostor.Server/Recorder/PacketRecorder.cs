@@ -161,7 +161,7 @@ namespace Impostor.Server.Recorder
             {
                 context.Writer.Write((uint)ServerReplayVersion.Initial);
                 context.Writer.Write(_startTime.ToUnixTimeMilliseconds());
-                context.Writer.Write(DotnetUtils.GetVersion());
+                context.Writer.Write(DotnetUtils.Version);
 
                 await WriteAsync(context.Stream!);
             }

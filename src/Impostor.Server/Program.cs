@@ -59,7 +59,7 @@ namespace Impostor.Server
 
             try
             {
-                Log.Information("Starting Impostor v{0}", DotnetUtils.GetVersion());
+                Log.Information("Starting Impostor v{0}", DotnetUtils.Version);
                 CreateHostBuilder(args).Build().Run();
                 return 0;
             }

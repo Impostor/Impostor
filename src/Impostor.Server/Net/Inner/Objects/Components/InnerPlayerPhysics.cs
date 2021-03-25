@@ -55,9 +55,6 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     Rpc19EnterVent.Deserialize(reader, out ventId);
                     break;
 
-                case RpcCalls.CustomRpc:
-                    return await HandleCustomRpc(reader, _game);
-
                 default:
                     return await UnregisteredCall(call, sender);
             }

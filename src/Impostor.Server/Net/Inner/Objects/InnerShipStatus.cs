@@ -117,9 +117,6 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
                 }
 
-                case RpcCalls.CustomRpc:
-                    return await HandleCustomRpc(reader, _game);
-
                 default:
                     return await UnregisteredCall(call, sender);
             }
