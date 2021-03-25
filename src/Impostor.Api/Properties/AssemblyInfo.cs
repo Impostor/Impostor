@@ -1,3 +1,3 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Impostor.Server")]
+[assembly: InternalsVisibleTo("Impostor.Server")]

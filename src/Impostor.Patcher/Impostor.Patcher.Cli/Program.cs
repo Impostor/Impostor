@@ -23,7 +23,7 @@ namespace Impostor.Patcher.Cli
                     "--name",
                     () => AmongUsModifier.DefaultRegionName,
                     "Name for server region"
-                )
+                ),
             };
 
             rootCommand.Handler = CommandHandler.Create<string, string>((address, name) =>

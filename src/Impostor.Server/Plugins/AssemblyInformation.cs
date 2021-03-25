@@ -6,7 +6,7 @@ namespace Impostor.Server.Plugins
 {
     public class AssemblyInformation : IAssemblyInformation
     {
-        private Assembly _assembly;
+        private Assembly? _assembly;
 
         public AssemblyInformation(AssemblyName assemblyName, string path, bool isPlugin)
         {

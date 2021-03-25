@@ -8,9 +8,9 @@ namespace Impostor.Server.Plugins
     {
         private readonly ImpostorPluginAttribute _attribute;
 
-        public PluginInformation(IPluginStartup startup, Type pluginType)
+        public PluginInformation(IPluginStartup? startup, Type pluginType)
         {
-            _attribute = pluginType.GetCustomAttribute<ImpostorPluginAttribute>();
+            _attribute = pluginType.GetCustomAttribute<ImpostorPluginAttribute>()!;
 
             Startup = startup;
             PluginType = pluginType;
@@ -24,11 +24,11 @@ namespace Impostor.Server.Plugins
 
         public string Version => _attribute.Version;
 
-        public IPluginStartup Startup { get; }
+        public IPluginStartup? Startup { get; }
 
         public Type PluginType { get; }
 
-        public IPlugin Instance { get; set; }
+        public IPlugin? Instance { get; set; }
 
         public override string ToString()
         {

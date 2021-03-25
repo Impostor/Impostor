@@ -16,7 +16,7 @@ namespace Impostor.Server.Net.Redirector
             _cache = cache;
         }
 
-        public async ValueTask<IPEndPoint> FindAsync(string gameCode)
+        public async ValueTask<IPEndPoint?> FindAsync(string gameCode)
         {
             var entry = await _cache.GetStringAsync(gameCode);
             if (entry == null)

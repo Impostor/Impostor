@@ -27,7 +27,7 @@ namespace Impostor.Server.Events
         }
 
         /// <inheritdoc />
-        public IDisposable RegisterListener<TListener>(TListener listener, Func<Func<Task>, Task> invoker = null)
+        public IDisposable RegisterListener<TListener>(TListener listener, Func<Func<Task>, Task>? invoker = null)
             where TListener : IEventListener
         {
             if (listener == null)

@@ -5,6 +5,6 @@
         Connect = 1,
         Disconnect = 2,
         Message = 3,
-        GameCreated = 4
+        GameCreated = 4,
     }
 }

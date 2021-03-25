@@ -15,7 +15,7 @@ namespace Impostor.Server.Events.Register
         private static readonly PropertyInfo IsCancelledProperty = typeof(IEventCancelable).GetProperty(nameof(IEventCancelable.IsCancelled))!;
 
         private static readonly ConcurrentDictionary<Type, RegisteredEventListener[]> Instances = new ConcurrentDictionary<Type, RegisteredEventListener[]>();
-        private readonly Func<object, object, IServiceProvider, ValueTask> _invoker;
+        private readonly Func<object?, object, IServiceProvider, ValueTask> _invoker;
         private readonly Type _eventListenerType;
 
         public RegisteredEventListener(Type eventType, MethodInfo method, EventListenerAttribute attribute, Type eventListenerType)
@@ -38,12 +38,52 @@ namespace Impostor.Server.Events.Register
 
         public string Method { get; }
 
-        public ValueTask InvokeAsync(object eventHandler, object @event, IServiceProvider provider)
+        public static IReadOnlyList<RegisteredEventListener> FromType(Type type)
+        {
+            return Instances.GetOrAdd(type, t =>
+            {
+                return t.GetMethods()
+                    .Where(m => !m.IsStatic && m.GetCustomAttributes(typeof(EventListenerAttribute), false).Any())
+                    .SelectMany(m => FromMethod(t, m))
+                    .ToArray();
+            });
+        }
+
+        public static IEnumerable<RegisteredEventListener> FromMethod(Type listenerType, MethodInfo methodType)
+        {
+            // Get the return type.
+            var returnType = methodType.ReturnType;
+
+            if (returnType != typeof(void) && returnType != typeof(ValueTask))
+            {
+                throw new InvalidOperationException($"The method {methodType.GetFriendlyName()} does not return void or ValueTask.");
+            }
+
+            // Register the event.
+            foreach (var attribute in methodType.GetCustomAttributes<EventListenerAttribute>(false))
+            {
+                var eventType = attribute.Event;
+
+                if (eventType == null)
+                {
+                    if (methodType.GetParameters().Length == 0 || !typeof(IEvent).IsAssignableFrom(methodType.GetParameters()[0].ParameterType))
+                    {
+                        throw new InvalidOperationException($"The first parameter of the method {methodType.GetFriendlyName()} should be the type {nameof(IEvent)}.");
+                    }
+
+                    eventType = methodType.GetParameters()[0].ParameterType;
+                }
+
+                yield return new RegisteredEventListener(eventType, methodType, attribute, listenerType);
+            }
+        }
+
+        public ValueTask InvokeAsync(object? eventHandler, object @event, IServiceProvider provider)
         {
             return _invoker(eventHandler, @event, provider);
         }
 
-        private Func<object, object, IServiceProvider, ValueTask> CreateInvoker(MethodInfo method, bool ignoreCancelled)
+        private Func<object?, object, IServiceProvider, ValueTask> CreateInvoker(MethodInfo method, bool ignoreCancelled)
         {
             var instance = Expression.Parameter(typeof(object), "instance");
             var eventParameter = Expression.Parameter(typeof(object), "event");
@@ -119,48 +159,8 @@ namespace Impostor.Server.Events.Register
                 throw new InvalidOperationException($"The method {method.GetFriendlyName()} must return void or ValueTask.");
             }
 
-            return Expression.Lambda<Func<object, object, IServiceProvider, ValueTask>>(invoke,  instance, eventParameter, provider)
+            return Expression.Lambda<Func<object?, object, IServiceProvider, ValueTask>>(invoke, instance, eventParameter, provider)
                 .Compile();
-        }
-
-        public static IReadOnlyList<RegisteredEventListener> FromType(Type type)
-        {
-            return Instances.GetOrAdd(type, t =>
-            {
-                return t.GetMethods()
-                    .Where(m => !m.IsStatic && m.GetCustomAttributes(typeof(EventListenerAttribute), false).Any())
-                    .SelectMany(m => FromMethod(t, m))
-                    .ToArray();
-            });
-        }
-
-        public static IEnumerable<RegisteredEventListener> FromMethod(Type listenerType, MethodInfo methodType)
-        {
-            // Get the return type.
-            var returnType = methodType.ReturnType;
-
-            if (returnType != typeof(void) && returnType != typeof(ValueTask))
-            {
-                throw new InvalidOperationException($"The method {methodType.GetFriendlyName()} does not return void or ValueTask.");
-            }
-
-            // Register the event.
-            foreach (var attribute in methodType.GetCustomAttributes<EventListenerAttribute>(false))
-            {
-                var eventType = attribute.Event;
-
-                if (eventType == null)
-                {
-                    if (methodType.GetParameters().Length == 0 || !typeof(IEvent).IsAssignableFrom(methodType.GetParameters()[0].ParameterType))
-                    {
-                        throw new InvalidOperationException($"The first parameter of the method {methodType.GetFriendlyName()} should be the type {nameof(IEvent)}.");
-                    }
-
-                    eventType = methodType.GetParameters()[0].ParameterType;
-                }
-
-                yield return new RegisteredEventListener(eventType, methodType, attribute, listenerType);
-            }
         }
     }
 }

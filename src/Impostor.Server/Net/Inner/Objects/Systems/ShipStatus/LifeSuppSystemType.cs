@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
@@ -19,7 +20,7 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 
         public void Serialize(IMessageWriter writer, bool initialState)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void Deserialize(IMessageReader reader, bool initialState)

@@ -18,7 +18,7 @@ namespace Impostor.Api.Net.Messages
         byte[] Buffer { get; }
 
         /// <summary>
-        ///     Gets the offset of our current <see cref="IMessageReader"/> in the entire <see cref="Buffer"/>.
+        ///     Gets the offset of our current <see cref="IMessageReader" /> in the entire <see cref="Buffer" />.
         /// </summary>
         int Offset { get; }
 

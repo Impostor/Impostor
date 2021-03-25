@@ -88,7 +88,7 @@ namespace Impostor.Hazel.Udp
 
             if (disposing)
             {
-                SendDisconnect();
+                _ = SendDisconnect();
             }
 
             base.Dispose(disposing);

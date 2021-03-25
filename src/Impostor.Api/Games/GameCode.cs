@@ -48,19 +48,19 @@ namespace Impostor.Api.Games
 
         public static GameCode From(string value) => new GameCode(value);
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool Equals(GameCode other)
         {
             return Code == other.Code && Value == other.Value;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return obj is GameCode other && Equals(other);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return HashCode.Combine(Code, Value);

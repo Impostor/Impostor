@@ -4,6 +4,6 @@
     {
         Always = 0,
         Meetings = 1,
-        Never = 2
+        Never = 2,
     }
 }

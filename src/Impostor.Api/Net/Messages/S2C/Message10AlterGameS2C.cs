@@ -1,4 +1,5 @@
-﻿using Impostor.Api.Innersloth;
+﻿using System;
+using Impostor.Api.Innersloth;
 
 namespace Impostor.Api.Net.Messages.S2C
 {
@@ -20,7 +21,7 @@ namespace Impostor.Api.Net.Messages.S2C
 
         public static void Deserialize(IMessageReader reader)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

@@ -104,7 +104,7 @@ namespace Impostor.Server.Net.Inner.Objects
             Rpc12MurderPlayer.Serialize(writer, target);
             await _game.FinishRpcAsync(writer);
 
-            await _eventManager.CallAsync(new PlayerMurderEvent(_game, _game.GetClientPlayer(OwnerId), this, target));
+            await _eventManager.CallAsync(new PlayerMurderEvent(_game, _game.GetClientPlayer(OwnerId)!, this, target));
         }
 
         public async ValueTask ExileAsync()
@@ -123,7 +123,7 @@ namespace Impostor.Server.Net.Inner.Objects
             await _game.FinishRpcAsync(writer);
 
             // Notify plugins.
-            await _eventManager.CallAsync(new PlayerExileEvent(_game, _game.GetClientPlayer(OwnerId), this));
+            await _eventManager.CallAsync(new PlayerExileEvent(_game, _game.GetClientPlayer(OwnerId)!, this));
         }
     }
 }

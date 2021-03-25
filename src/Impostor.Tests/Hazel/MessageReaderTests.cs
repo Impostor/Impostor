@@ -72,7 +72,7 @@ namespace Impostor.Tests.Hazel
         public void ReadProperString()
         {
             const string Test1 = "Hello";
-            string Test2 = new string(' ', 1024);
+            var Test2 = new string(' ', 1024);
             var msg = new MessageWriter(2048);
             msg.StartMessage(1);
             msg.Write(Test1);
@@ -128,18 +128,18 @@ namespace Impostor.Tests.Hazel
             var msg = new MessageWriter(2048);
 
             msg.StartMessage(1);
-                msg.StartMessage(2);
-                    msg.Write(Test1);
-                    msg.Write(Test2);
-                    msg.StartMessage(2);
-                        msg.Write(Test1);
-                        msg.Write(Test2);
-                        msg.StartMessage(2);
-                            msg.Write(Test1);
-                            msg.Write(Test2);
-                        msg.EndMessage();
-                    msg.EndMessage();
-                msg.EndMessage();
+            msg.StartMessage(2);
+            msg.Write(Test1);
+            msg.Write(Test2);
+            msg.StartMessage(2);
+            msg.Write(Test1);
+            msg.Write(Test2);
+            msg.StartMessage(2);
+            msg.Write(Test1);
+            msg.Write(Test2);
+            msg.EndMessage();
+            msg.EndMessage();
+            msg.EndMessage();
             msg.EndMessage();
 
             // Read message.
@@ -217,7 +217,7 @@ namespace Impostor.Tests.Hazel
                 0x20, 0x6C, 0x6F, 0x6E, 0x67, 0x20, 0x70, 0x61,
                 0x63, 0x6B, 0x65, 0x74, 0x20, 0x74, 0x6F, 0x20,
                 0x74, 0x65, 0x73, 0x74, 0x20, 0x63, 0x6F, 0x70,
-                0x79, 0x69, 0x6E, 0x67, 0x2E
+                0x79, 0x69, 0x6E, 0x67, 0x2E,
             };
 
             var readerPool = CreateReaderPool();
@@ -301,15 +301,15 @@ namespace Impostor.Tests.Hazel
             var messageWriter = new MessageWriter(1024);
 
             messageWriter.StartMessage(0);
-                messageWriter.StartMessage(1);
-                    messageWriter.Write("HiTest1");
-                    messageWriter.StartMessage(2);
-                        messageWriter.Write("RemoveMe!");
-                    messageWriter.EndMessage();
-                messageWriter.EndMessage();
-                messageWriter.StartMessage(2);
-                    messageWriter.Write("HiTest2");
-                messageWriter.EndMessage();
+            messageWriter.StartMessage(1);
+            messageWriter.Write("HiTest1");
+            messageWriter.StartMessage(2);
+            messageWriter.Write("RemoveMe!");
+            messageWriter.EndMessage();
+            messageWriter.EndMessage();
+            messageWriter.StartMessage(2);
+            messageWriter.Write("HiTest2");
+            messageWriter.EndMessage();
             messageWriter.EndMessage();
 
             // Copy buffer.

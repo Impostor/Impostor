@@ -25,7 +25,7 @@ namespace Impostor.Server.Net.State
 
         public async ValueTask SyncSettingsAsync()
         {
-            if (Host.Character == null)
+            if (Host?.Character == null)
             {
                 throw new ImpostorException("Attempted to set infected when the host was not spawned.");
             }
