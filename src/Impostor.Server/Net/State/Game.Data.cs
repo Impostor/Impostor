@@ -329,16 +329,11 @@ namespace Impostor.Server.Net.State
                     player.DisableSpawnTimeout();
 
                     // Hook up InnerPlayerControl <-> InnerPlayerControl.PlayerInfo.
-                    var playerInfo = GameNet.GameData!.GetPlayerById(control.PlayerId);
+                    var playerInfo = GameNet.GameData!.GetPlayerById(control.PlayerId) ?? GameNet.GameData.AddPlayer(control);
 
                     if (playerInfo != null)
                     {
-                        playerInfo.Controller = control;
-                        control.PlayerInfo = playerInfo;
-                    }
-                    else
-                    {
-                        GameNet.GameData.AddPlayer(control);
+                        control.PlayerInfo.Controller = control;
                     }
 
                     await _eventManager.CallAsync(new PlayerSpawnedEvent(this, player, control));
