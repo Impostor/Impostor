@@ -138,7 +138,6 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (_allPlayers.TryAdd(playerId, playerInfo))
             {
-                control.PlayerInfo = playerInfo;
                 return playerInfo;
             }
 
