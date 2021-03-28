@@ -29,6 +29,74 @@ namespace Impostor.Server.Net.State
             await _eventManager.CallAsync(new GameStartingEvent(this));
         }
 
+        public async ValueTask HandleEndGame(IMessageReader message, GameOverReason gameOverReason)
+        {
+            GameState = GameStates.Ended;
+
+            // Broadcast end of the game.
+            using (var packet = MessageWriter.Get(MessageType.Reliable))
+            {
+                message.CopyTo(packet);
+                await SendToAllAsync(packet);
+            }
+
+            // Put all players in the correct limbo state.
+            foreach (var player in _players)
+            {
+                player.Value.Limbo = LimboStates.PreSpawn;
+            }
+
+            await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));
+        }
+
+        public async ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic)
+        {
+            IsPublic = isPublic;
+
+            using var packet = MessageWriter.Get(MessageType.Reliable);
+            message.CopyTo(packet);
+            await SendToAllExceptAsync(packet, sender.Client.Id);
+
+            await _eventManager.CallAsync(new GameAlterEvent(this, isPublic));
+        }
+
+        public async ValueTask HandleRemovePlayer(int playerId, DisconnectReason reason)
+        {
+            await PlayerRemove(playerId);
+
+            // It's possible that the last player was removed, so check if the game is still around.
+            if (GameState == GameStates.Destroyed)
+            {
+                return;
+            }
+
+            using var packet = MessageWriter.Get(MessageType.Reliable);
+            WriteRemovePlayerMessage(packet, false, playerId, reason);
+            await SendToAllExceptAsync(packet, playerId);
+        }
+
+        public async ValueTask HandleKickPlayer(int playerId, bool isBan)
+        {
+            _logger.LogInformation("{0} - Player {1} has left.", Code, playerId);
+
+            using var message = MessageWriter.Get(MessageType.Reliable);
+
+            // Send message to everyone that this player was kicked.
+            WriteKickPlayerMessage(message, false, playerId, isBan);
+
+            await SendToAllAsync(message);
+            await PlayerRemove(playerId, isBan);
+
+            // Remove the player from everyone's game.
+            WriteRemovePlayerMessage(
+                message,
+                true,
+                playerId,
+                isBan ? DisconnectReason.Banned : DisconnectReason.Kicked);
+
+            await SendToAllExceptAsync(message, playerId);
+        }
+
         public async ValueTask<GameJoinResult> AddClientAsync(ClientBase client)
         {
             var hasLock = false;
@@ -53,10 +121,34 @@ namespace Impostor.Server.Net.State
             return GameJoinResult.FromError(GameJoinError.InvalidClient);
         }
 
+        private async ValueTask HandleJoinGameNew(ClientPlayer sender, bool isNew)
+        {
+            _logger.LogInformation("{0} - Player {1} ({2}) is joining.", Code, sender.Client.Name, sender.Client.Id);
+
+            // Add player to the game.
+            if (isNew)
+            {
+                await PlayerAdd(sender);
+            }
+
+            sender.InitializeSpawnTimeout();
+
+            using (var message = MessageWriter.Get(MessageType.Reliable))
+            {
+                WriteJoinedGameMessage(message, false, sender);
+                WriteAlterGameMessage(message, false, IsPublic);
+
+                sender.Limbo = LimboStates.NotLimbo;
+
+                await SendToAsync(message, sender.Client.Id);
+                await BroadcastJoinMessage(message, true, sender);
+            }
+        }
+
         private async ValueTask<GameJoinResult> AddClientSafeAsync(ClientBase client)
         {
             // Check if the IP of the player is banned.
-            if (client.Connection != null && _bannedIps.Contains(client.Connection.EndPoint.Address))
+            if (_bannedIps.Contains(client.Connection.EndPoint.Address))
             {
                 return GameJoinResult.FromError(GameJoinError.Banned);
             }
@@ -130,98 +222,6 @@ namespace Impostor.Server.Net.State
 
             await HandleJoinGameNew(player, isNew);
             return GameJoinResult.CreateSuccess(player);
-        }
-
-        public async ValueTask HandleEndGame(IMessageReader message, GameOverReason gameOverReason)
-        {
-            GameState = GameStates.Ended;
-
-            // Broadcast end of the game.
-            using (var packet = MessageWriter.Get(MessageType.Reliable))
-            {
-                message.CopyTo(packet);
-                await SendToAllAsync(packet);
-            }
-
-            // Put all players in the correct limbo state.
-            foreach (var player in _players)
-            {
-                player.Value.Limbo = LimboStates.PreSpawn;
-            }
-
-            await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));
-        }
-
-        public async ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic)
-        {
-            IsPublic = isPublic;
-
-            using var packet = MessageWriter.Get(MessageType.Reliable);
-            message.CopyTo(packet);
-            await SendToAllExceptAsync(packet, sender.Client.Id);
-
-            await _eventManager.CallAsync(new GameAlterEvent(this, isPublic));
-        }
-
-        public async ValueTask HandleRemovePlayer(int playerId, DisconnectReason reason)
-        {
-            await PlayerRemove(playerId);
-
-            // It's possible that the last player was removed, so check if the game is still around.
-            if (GameState == GameStates.Destroyed)
-            {
-                return;
-            }
-
-            using var packet = MessageWriter.Get(MessageType.Reliable);
-            WriteRemovePlayerMessage(packet, false, playerId, reason);
-            await SendToAllExceptAsync(packet, playerId);
-        }
-
-        public async ValueTask HandleKickPlayer(int playerId, bool isBan)
-        {
-            _logger.LogInformation("{0} - Player {1} has left.", Code, playerId);
-
-            using var message = MessageWriter.Get(MessageType.Reliable);
-
-            // Send message to everyone that this player was kicked.
-            WriteKickPlayerMessage(message, false, playerId, isBan);
-
-            await SendToAllAsync(message);
-            await PlayerRemove(playerId, isBan);
-
-            // Remove the player from everyone's game.
-            WriteRemovePlayerMessage(
-                message,
-                true,
-                playerId,
-                isBan ? DisconnectReason.Banned : DisconnectReason.Kicked);
-
-            await SendToAllExceptAsync(message, playerId);
-        }
-
-        private async ValueTask HandleJoinGameNew(ClientPlayer sender, bool isNew)
-        {
-            _logger.LogInformation("{0} - Player {1} ({2}) is joining.", Code, sender.Client.Name, sender.Client.Id);
-
-            // Add player to the game.
-            if (isNew)
-            {
-                await PlayerAdd(sender);
-            }
-
-            sender.InitializeSpawnTimeout();
-
-            using (var message = MessageWriter.Get(MessageType.Reliable))
-            {
-                WriteJoinedGameMessage(message, false, sender);
-                WriteAlterGameMessage(message, false, IsPublic);
-
-                sender.Limbo = LimboStates.NotLimbo;
-
-                await SendToAsync(message, sender.Client.Id);
-                await BroadcastJoinMessage(message, true, sender);
-            }
         }
 
         private async ValueTask HandleJoinGameNext(ClientPlayer sender, bool isNew)

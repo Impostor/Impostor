@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
@@ -31,7 +30,7 @@ namespace Impostor.Client.App
             Message00HostGameC2S.Serialize(writeGameCreate, new GameOptionsData
             {
                 MaxPlayers = 4,
-                NumImpostors = 2
+                NumImpostors = 2,
             });
 
             // TODO: ObjectPool for MessageReaders

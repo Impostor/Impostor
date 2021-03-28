@@ -5,7 +5,7 @@ namespace Impostor.Server.Net.Redirector
 {
     public interface INodeLocator
     {
-        ValueTask<IPEndPoint> FindAsync(string gameCode);
+        ValueTask<IPEndPoint?> FindAsync(string gameCode);
 
         ValueTask SaveAsync(string gameCode, IPEndPoint endPoint);
 

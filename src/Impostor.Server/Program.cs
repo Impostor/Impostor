@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
@@ -117,6 +118,7 @@ namespace Impostor.Server
                         .Get<AnnouncementsServerConfig>() ?? new AnnouncementsServerConfig();
 
                     services.AddSingleton<ServerEnvironment>();
+                    services.AddSingleton<IDateTimeProvider, RealDateTimeProvider>();
 
                     services.Configure<DebugConfig>(host.Configuration.GetSection(DebugConfig.Section));
                     services.Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section));
@@ -126,7 +128,7 @@ namespace Impostor.Server
 
                     if (redirector.Enabled)
                     {
-                        if (!string.IsNullOrEmpty(redirector.Locator.Redis))
+                        if (!string.IsNullOrEmpty(redirector.Locator?.Redis))
                         {
                             // When joining a game, it retrieves the game server ip from redis.
                             // When a game has been created on this node, it stores the game code with its ip in redis.
@@ -139,7 +141,7 @@ namespace Impostor.Server
                                 options.InstanceName = "ImpostorRedis";
                             });
                         }
-                        else if (!string.IsNullOrEmpty(redirector.Locator.UdpMasterEndpoint))
+                        else if (!string.IsNullOrEmpty(redirector.Locator?.UdpMasterEndpoint))
                         {
                             services.AddSingleton<INodeLocator, NodeLocatorUdp>();
 

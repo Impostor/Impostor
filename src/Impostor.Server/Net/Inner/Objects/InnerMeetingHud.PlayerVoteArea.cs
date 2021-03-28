@@ -29,12 +29,6 @@ namespace Impostor.Server.Net.Inner.Objects
 
             public sbyte VotedFor { get; private set; }
 
-            internal void SetDead(bool didReport, bool isDead)
-            {
-                DidReport = didReport;
-                IsDead = isDead;
-            }
-
             public void Deserialize(IMessageReader reader)
             {
                 var num = reader.ReadByte();
@@ -43,6 +37,12 @@ namespace Impostor.Server.Net.Inner.Objects
                 IsDead = (num & DeadBit) > 0;
                 DidVote = (num & VotedBit) > 0;
                 DidReport = (num & ReportedBit) > 0;
+            }
+
+            internal void SetDead(bool didReport, bool isDead)
+            {
+                DidReport = didReport;
+                IsDead = isDead;
             }
         }
     }

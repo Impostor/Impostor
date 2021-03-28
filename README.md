@@ -1,16 +1,15 @@
 # Impostor
 
 [![Discord](https://img.shields.io/badge/Discord-chat-blue?style=flat-square)](https://discord.gg/Mk3w6Tb)
-[![AppVeyor](https://img.shields.io/appveyor/build/Impostor/Impostor/dev?style=flat-square)](https://ci.appveyor.com/project/Impostor/Impostor/branch/dev)
+[![AppVeyor](https://img.shields.io/appveyor/build/Impostor/Impostor/master?style=flat-square)](https://ci.appveyor.com/project/Impostor/Impostor/branch/master)
 
 Impostor is one of the first **Among Us** private servers, written in C#. 
-
-We support Steam, Itch, Android and iOS. The latest version supported is `2020.9.22`, the `dev` build currently supports `2020.11.17`.
 
 | Impostor version | Among Us version | Experimental | Download |
 |-|-|-|-|
 | 1.1.0 | 2020.09.07 - 2020.09.22 | No | [![Download](https://img.shields.io/badge/Download-v1.1.0-blue?style=flat-square)](https://github.com/Impostor/Impostor/releases/tag/v1.1.0) |
-| 1.2.2 | 2020.09.22 - 2020.11.17 | Yes | [![Download](https://img.shields.io/badge/Download-v1.2.2-blue?style=flat-square)](https://ci.appveyor.com/project/Impostor/Impostor/branch/dev/artifacts) |
+| 1.2.2 | 2020.09.22 - 2020.11.17 | No | [![Download](https://img.shields.io/badge/Download-v1.2.2-blue?style=flat-square)](https://github.com/Impostor/Impostor/releases/tag/v1.2.2) |
+| 1.3.0 | 2021.3.5 | Yes | [![Download](https://img.shields.io/badge/Download-master-blue?style=flat-square)](https://ci.appveyor.com/project/Impostor/Impostor/branch/master/artifacts) |
 
 ## Features
 
@@ -27,9 +26,9 @@ If you just want to play on a server hosted by someone else, you need to follow 
 #### Windows
 
 1. Find the [latest release](https://github.com/AeonLucid/Impostor/releases/latest).
-2. Download `Impostor-Client-win-x64.zip`.
+2. Download `Impostor-Patcher-win-x64.zip`.
 3. Extract the zip.
-4. Run `Impostor.Client.exe`.
+4. Run `Impostor.Patcher.exe`.
 5. Follow the instructions inside the application.
 
 ![Client](docs/images/client.jpg)

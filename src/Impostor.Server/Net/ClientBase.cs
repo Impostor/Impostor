@@ -16,9 +16,10 @@ namespace Impostor.Server.Net
 {
     internal abstract class ClientBase : IClient
     {
-        protected ClientBase(string name, IHazelConnection connection, ISet<Mod> mods)
+        protected ClientBase(string name, int gameVersion, IHazelConnection connection, ISet<Mod> mods)
         {
             Name = name;
+            GameVersion = gameVersion;
             Connection = connection;
             Mods = mods;
             Items = new ConcurrentDictionary<object, object>();
@@ -40,6 +41,8 @@ namespace Impostor.Server.Net
 
         public string Name { get; }
 
+        public int GameVersion { get; }
+
         public ISet<Mod> Mods { get; }
 
         public Dictionary<int, string> ModIdMap { get; }
@@ -60,7 +63,6 @@ namespace Impostor.Server.Net
         public abstract ValueTask HandleMessageAsync(IMessageReader message, MessageType messageType);
 
         public abstract ValueTask HandleDisconnectAsync(string reason);
-
 
         public async ValueTask DisconnectAsync(DisconnectReason reason, string? message = null)
         {

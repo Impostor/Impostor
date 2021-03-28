@@ -74,7 +74,7 @@ namespace Impostor.Api.Net.Messages
         void Write(string value);
 
         /// <summary>
-        ///     Writes a <see cref="IPAddress"/> to the message.
+        ///     Writes a <see cref="IPAddress" /> to the message.
         /// </summary>
         /// <param name="value">Value to write.</param>
         void Write(IPAddress value);

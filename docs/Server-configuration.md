@@ -17,6 +17,7 @@ Some information about all the possible configurations. Click [here](https://git
 
 | Key | Default | Value |
 |-|-|-|
+| **Enabled** | `true` | Whether the anticheat should be enabled. |
 | **BanIpFromGame** | `true` | When a player is caught hacking, they will be kicked from the server. If this value is set to `true`, the player will be banned instead and will not be able to rejoin that specific game. **(Setting this to false does not disable the anti-cheat!)** |
 
 ### ServerRedirector
@@ -45,6 +46,7 @@ Server:PublicIp=127.0.0.1
 Server:PublicPort=22023
 Server:ListenIp=0.0.0.0
 Server:ListenPort=22023
+AntiCheat:Enabled=true
 AntiCheat:BanIpFromGame=true
 ServerRedirector:Enabled=false
 ServerRedirector:Master=true
@@ -65,6 +67,7 @@ IMPOSTOR_Server__PublicIp=127.0.0.1
 IMPOSTOR_Server__PublicPort=22023
 IMPOSTOR_Server__ListenIp=0.0.0.0
 IMPOSTOR_Server__ListenPort=22023
+IMPOSTOR_AntiCheat__Enabled=true
 IMPOSTOR_AntiCheat__BanIpFromGame=true
 IMPOSTOR_ServerRedirector__Enabled=false
 IMPOSTOR_ServerRedirector__Master=true

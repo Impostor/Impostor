@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Impostor.Api;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
@@ -14,11 +15,11 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerId = playerId;
         }
 
-        public InnerPlayerControl Controller { get; internal set; }
+        public InnerPlayerControl? Controller { get; internal set; }
 
         public byte PlayerId { get; }
 
-        public string PlayerName { get; internal set; }
+        public string PlayerName { get; internal set; } = string.Empty;
 
         public ColorType Color { get; internal set; }
 
@@ -36,18 +37,18 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public DeathReason LastDeathReason { get; internal set; }
 
-        public List<InnerGameData.TaskInfo> Tasks { get; internal set; }
+        public List<InnerGameData.TaskInfo> Tasks { get; internal set; } = new List<InnerGameData.TaskInfo>(0);
 
         public DateTimeOffset LastMurder { get; set; }
 
-        public bool CanMurder(IGame game)
+        public bool CanMurder(IGame game, IDateTimeProvider dateTimeProvider)
         {
             if (!IsImpostor)
             {
                 return false;
             }
 
-            return DateTimeOffset.UtcNow.Subtract(LastMurder).TotalSeconds >= game.Options.KillCooldown;
+            return dateTimeProvider.UtcNow.Subtract(LastMurder).TotalSeconds >= game.Options.KillCooldown;
         }
 
         public void Serialize(IMessageWriter writer)

@@ -1,5 +1,4 @@
 ﻿using Impostor.Api.Innersloth;
-
 using Xunit;
 
 namespace Impostor.Tests

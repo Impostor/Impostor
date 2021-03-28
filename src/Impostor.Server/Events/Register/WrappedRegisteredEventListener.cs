@@ -19,7 +19,7 @@ namespace Impostor.Server.Events.Register
 
         public EventPriority Priority => _innerObject.Priority;
 
-        public ValueTask InvokeAsync(object eventHandler, object @event, IServiceProvider provider)
+        public ValueTask InvokeAsync(object? eventHandler, object @event, IServiceProvider provider)
         {
             return _innerObject.InvokeAsync(_object, @event, provider);
         }

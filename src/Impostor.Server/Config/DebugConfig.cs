@@ -6,6 +6,6 @@
 
         public bool GameRecorderEnabled { get; set; }
 
-        public string GameRecorderPath { get; set; }
+        public string GameRecorderPath { get; set; } = string.Empty;
     }
 }

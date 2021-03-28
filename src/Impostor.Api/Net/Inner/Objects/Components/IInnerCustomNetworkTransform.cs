@@ -16,7 +16,7 @@ namespace Impostor.Api.Net.Inner.Objects.Components
         Vector2 Velocity { get; }
 
         /// <summary>
-        ///     Snaps the current to the given position <see cref="IInnerPlayerControl"/>.
+        ///     Snaps the current to the given position <see cref="IInnerPlayerControl" />.
         /// </summary>
         /// <param name="position">The target position.</param>
         /// <returns>Task that must be awaited.</returns>

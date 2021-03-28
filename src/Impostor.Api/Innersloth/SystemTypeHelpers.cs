@@ -20,7 +20,7 @@ namespace Impostor.Api.Innersloth
                     SystemTypes.LifeSupp => "O2",
                     SystemTypes.LowerEngine => "Lower Engine",
                     SystemTypes.LockerRoom => "Locker Room",
-                    _ => x.ToString()
+                    _ => x.ToString(),
                 };
             }).ToArray();
         }

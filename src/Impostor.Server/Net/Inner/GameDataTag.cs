@@ -9,5 +9,6 @@
         public const byte SceneChangeFlag = 6;
         public const byte ReadyFlag = 7;
         public const byte ChangeSettingsFlag = 8;
+        public const byte ClientInfoFlag = 205;
     }
 }

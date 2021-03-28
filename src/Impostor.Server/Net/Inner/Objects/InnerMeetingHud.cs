@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
@@ -22,6 +22,8 @@ namespace Impostor.Server.Net.Inner.Objects
         private readonly IEventManager _eventManager;
         private readonly Game _game;
         private readonly GameNet _gameNet;
+
+        [AllowNull]
         private PlayerVoteArea[] _playerStates;
 
         public InnerMeetingHud(ILogger<InnerMeetingHud> logger, IEventManager eventManager, Game game)
@@ -36,19 +38,6 @@ namespace Impostor.Server.Net.Inner.Objects
         }
 
         public byte ReporterId { get; private set; }
-
-        private void PopulateButtons(byte reporter)
-        {
-            _playerStates = _gameNet.GameData.Players
-                .OrderBy(x => x.Value.Controller.NetId)
-                .Select(x =>
-                {
-                    var area = new PlayerVoteArea(this, x.Key);
-                    area.SetDead(x.Value.PlayerId == reporter, x.Value.Disconnected || x.Value.IsDead);
-                    return area;
-                })
-                .ToArray();
-        }
 
         public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
@@ -175,12 +164,25 @@ namespace Impostor.Server.Net.Inner.Objects
             return true;
         }
 
+        private void PopulateButtons(byte reporter)
+        {
+            _playerStates = _gameNet.GameData!.Players
+                .OrderBy(x => x.Value.Controller?.NetId)
+                .Select(x =>
+                {
+                    var area = new PlayerVoteArea(this, x.Key);
+                    area.SetDead(x.Value.PlayerId == reporter, x.Value.Disconnected || x.Value.IsDead);
+                    return area;
+                })
+                .ToArray();
+        }
+
         private async ValueTask HandleVotingComplete(ClientPlayer sender, ReadOnlyMemory<byte> states, byte playerId, bool tie)
         {
             if (playerId != byte.MaxValue)
             {
-                var player = _game.GameNet.GameData.GetPlayerById(playerId);
-                if (player != null)
+                var player = _game.GameNet.GameData!.GetPlayerById(playerId);
+                if (player?.Controller != null)
                 {
                     player.Controller.Die(DeathReason.Exile);
                     await _eventManager.CallAsync(new PlayerExileEvent(_game, sender, player.Controller));

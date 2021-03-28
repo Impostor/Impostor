@@ -8,7 +8,7 @@ namespace Impostor.Api.Games
     {
         public static int GetGameCount(this IGameManager manager, MapFlags map)
         {
-            return manager.Games.Count(game => map.HasFlag((MapFlags)(1 << game.Options.MapId)));
+            return manager.Games.Count(game => map.HasFlag((MapFlags)(1 << (byte)game.Options.Map)));
         }
     }
 }

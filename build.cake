@@ -1,6 +1,6 @@
-#addin "nuget:?package=SharpZipLib&Version=1.3.0"
-#addin "nuget:?package=Cake.Compression&Version=0.2.4"
-#addin "nuget:?package=Cake.FileHelpers&Version=3.3.0"
+#addin "nuget:?package=SharpZipLib&Version=1.3.1"
+#addin "nuget:?package=Cake.Compression&Version=0.2.6"
+#addin "nuget:?package=Cake.FileHelpers&Version=4.0.1"
 
 var buildId = EnvironmentVariable("GITHUB_RUN_NUMBER") ?? EnvironmentVariable("APPVEYOR_BUILD_VERSION");
 var buildRelease = EnvironmentVariable("APPVEYOR_REPO_TAG") == "true";

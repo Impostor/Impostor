@@ -41,7 +41,7 @@
         ///     Custom error by a plugin.
         /// </summary>
         /// <remarks>
-        ///     A custom message can be set in <see cref="GameJoinResult.Message"/>.
+        ///     A custom message can be set in <see cref="GameJoinResult.Message" />.
         /// </remarks>
         Custom,
     }
