@@ -44,6 +44,36 @@ namespace Impostor.Server.Net.Inner.Objects
             throw new NotImplementedException();
         }
 
+        private async ValueTask HandleVote(PlayerVoteArea playerState){
+            if (playerState.DidVote && !playerState.IsDead)
+            {
+                var player = _game.GameNet.GameData!.GetPlayerById(playerState.TargetPlayerId);
+                if (player != null)
+                {
+                    VoteType voteType;
+                    InnerPlayerControl? VotedForPlayer = null;
+
+                    switch ((VoteType)playerState.VotedFor)
+                    {
+                        case VoteType.Skip:
+                            voteType = VoteType.Skip;
+                            break;
+
+                        case VoteType.None:
+                            voteType = VoteType.None;
+                            break;
+
+                        default:
+                            voteType = VoteType.Player;
+                            VotedForPlayer = _game.GameNet.GameData.GetPlayerById((byte)playerState.VotedFor)?.Controller;
+                            break;
+                    }
+
+                    await _eventManager.CallAsync(new PlayerVotedEvent(_game, _game.GetClientPlayer(player.Controller!.OwnerId)!, player.Controller, voteType, VotedForPlayer));
+                }
+            }
+        }
+
         public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             if (!await ValidateHost(CheatContext.Deserialize, sender) || !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
@@ -74,37 +104,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     if ((num & 1 << i) != 0)
                     {
                         _playerStates[i].Deserialize(reader);
-                        var playerState = _playerStates[i];
-
-                        if (playerState.DidVote && !playerState.IsDead)
-                        {
-                            var player = _game.GameNet.GameData.GetPlayerById(playerState.TargetPlayerId);
-                            if (player != null)
-                            {
-                                var clientPlayer = _game.GetClientPlayer(player.Controller.OwnerId);
-
-                                VoteType voteType;
-                                InnerPlayerControl? VotedForPlayer = null;
-
-                                switch ((VoteType)playerState.VotedFor)
-                                {
-                                    case VoteType.Skip:
-                                        voteType = VoteType.Skip;
-                                        break;
-
-                                    case VoteType.None:
-                                        voteType = VoteType.None;
-                                        break;
-
-                                    default:
-                                        voteType = VoteType.Player;
-                                        VotedForPlayer = _game.GameNet.GameData.GetPlayerById((byte)playerState.VotedFor)?.Controller;
-                                        break;
-                                }
-
-                                await _eventManager.CallAsync(new PlayerVotedEvent(_game, clientPlayer, player.Controller, voteType, VotedForPlayer));
-                            }
-                        }
+                        await HandleVote(_playerStates[i]);
                     }
                 }
             }
@@ -167,7 +167,7 @@ namespace Impostor.Server.Net.Inner.Objects
         private void PopulateButtons(byte reporter)
         {
             _playerStates = _gameNet.GameData!.Players
-                .OrderBy(x => x.Value.Controller?.NetId)
+                .OrderBy(x => x.Value.Controller?.OwnerId) // The host player hold MeetingHud players list sorted by NetId/OwnerId
                 .Select(x =>
                 {
                     var area = new PlayerVoteArea(this, x.Key);
