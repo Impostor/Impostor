@@ -44,36 +44,6 @@ namespace Impostor.Server.Net.Inner.Objects
             throw new NotImplementedException();
         }
 
-        private async ValueTask HandleVote(PlayerVoteArea playerState){
-            if (playerState.DidVote && !playerState.IsDead)
-            {
-                var player = _game.GameNet.GameData!.GetPlayerById(playerState.TargetPlayerId);
-                if (player != null)
-                {
-                    VoteType voteType;
-                    InnerPlayerControl? VotedForPlayer = null;
-
-                    switch ((VoteType)playerState.VotedFor)
-                    {
-                        case VoteType.Skip:
-                            voteType = VoteType.Skip;
-                            break;
-
-                        case VoteType.None:
-                            voteType = VoteType.None;
-                            break;
-
-                        default:
-                            voteType = VoteType.Player;
-                            VotedForPlayer = _game.GameNet.GameData.GetPlayerById((byte)playerState.VotedFor)?.Controller;
-                            break;
-                    }
-
-                    await _eventManager.CallAsync(new PlayerVotedEvent(_game, _game.GetClientPlayer(player.Controller!.OwnerId)!, player.Controller, voteType, VotedForPlayer));
-                }
-            }
-        }
-
         public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             if (!await ValidateHost(CheatContext.Deserialize, sender) || !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
@@ -175,6 +145,37 @@ namespace Impostor.Server.Net.Inner.Objects
                     return area;
                 })
                 .ToArray();
+        }
+
+        private async ValueTask HandleVote(PlayerVoteArea playerState)
+        {
+            if (playerState.DidVote && !playerState.IsDead)
+            {
+                var player = _game.GameNet.GameData!.GetPlayerById(playerState.TargetPlayerId);
+                if (player != null)
+                {
+                    VoteType voteType;
+                    InnerPlayerControl? votedForPlayer = null;
+
+                    switch ((VoteType)playerState.VotedFor)
+                    {
+                        case VoteType.Skip:
+                            voteType = VoteType.Skip;
+                            break;
+
+                        case VoteType.None:
+                            voteType = VoteType.None;
+                            break;
+
+                        default:
+                            voteType = VoteType.Player;
+                            votedForPlayer = _game.GameNet.GameData.GetPlayerById((byte)playerState.VotedFor)?.Controller;
+                            break;
+                    }
+
+                    await _eventManager.CallAsync(new PlayerVotedEvent(_game, _game.GetClientPlayer(player.Controller!.OwnerId)!, player.Controller, voteType, votedForPlayer));
+                }
+            }
         }
 
         private async ValueTask HandleVotingComplete(ClientPlayer sender, ReadOnlyMemory<byte> states, byte playerId, bool tie)
