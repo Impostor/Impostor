@@ -63,7 +63,7 @@ namespace Impostor.Patcher.Shared
 
             var libraries = new List<string>
             {
-                steamApps
+                steamApps,
             };
 
             var vdf = Path.Combine(steamApps, "libraryfolders.vdf");
@@ -174,7 +174,7 @@ namespace Impostor.Patcher.Shared
                 var ip = ipAddress.ToString();
                 var region = new RegionInfo(RegionName, ip, new[]
                 {
-                    new ServerInfo($"{RegionName}-Master-1", ip, port)
+                    new ServerInfo($"{RegionName}-Master-1", ip, port),
                 });
 
                 region.Serialize(writer);

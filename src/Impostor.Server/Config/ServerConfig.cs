@@ -4,10 +4,10 @@ namespace Impostor.Server.Config
 {
     internal class ServerConfig
     {
+        public const string Section = "Server";
+
         private string? _resolvedPublicIp;
         private string? _resolvedListenIp;
-
-        public const string Section = "Server";
 
         public string PublicIp { get; set; } = "127.0.0.1";
 

@@ -95,7 +95,7 @@ namespace Impostor.Patcher.WinForms.Forms
 
         private void lblUrl_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/AeonLucid/Impostor");
+            Process.Start("https://github.com/Impostor/Impostor");
         }
 
         private void RefreshComboIps()

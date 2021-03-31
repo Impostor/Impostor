@@ -45,7 +45,7 @@ namespace Impostor.Server
         /// </summary>
         /// <param name="method">The method.</param>
         /// <param name="showParameters">True if the parameters should be included in the name.</param>
-        /// <returns>Friendly name of the method</returns>
+        /// <returns>Friendly name of the method.</returns>
         public static string GetFriendlyName(this MethodBase method, bool showParameters = true)
         {
             var str = method.Name;

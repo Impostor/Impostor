@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Impostor.Server.Events
 {
     /// <summary>
-    ///     Disposes multiple <see cref="IDisposable"/>.
+    ///     Disposes multiple <see cref="IDisposable" />.
     /// </summary>
     internal class MultiDisposable : IDisposable
     {

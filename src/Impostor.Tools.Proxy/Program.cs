@@ -18,22 +18,22 @@ namespace Impostor.Tools.Proxy
 
         private static readonly Dictionary<byte, string> TagMap = new Dictionary<byte, string>
         {
-            {0, "HostGame"},
-            {1, "JoinGame"},
-            {2, "StartGame"},
-            {3, "RemoveGame"},
-            {4, "RemovePlayer"},
-            {5, "GameData"},
-            {6, "GameDataTo"},
-            {7, "JoinedGame"},
-            {8, "EndGame"},
-            {9, "GetGameList"},
-            {10, "AlterGame"},
-            {11, "KickPlayer"},
-            {12, "WaitForHost"},
-            {13, "Redirect"},
-            {14, "ReselectServer"},
-            {16, "GetGameListV2"}
+            { 0, "HostGame" },
+            { 1, "JoinGame" },
+            { 2, "StartGame" },
+            { 3, "RemoveGame" },
+            { 4, "RemovePlayer" },
+            { 5, "GameData" },
+            { 6, "GameDataTo" },
+            { 7, "JoinedGame" },
+            { 8, "EndGame" },
+            { 9, "GetGameList" },
+            { 10, "AlterGame" },
+            { 11, "KickPlayer" },
+            { 12, "WaitForHost" },
+            { 13, "Redirect" },
+            { 14, "ReselectServer" },
+            { 16, "GetGameListV2" },
         };
 
         private static IServiceProvider _serviceProvider;
@@ -46,7 +46,7 @@ namespace Impostor.Tools.Proxy
 
             _serviceProvider = services.BuildServiceProvider();
             _readerPool = _serviceProvider.GetRequiredService<ObjectPool<MessageReader>>();
-            
+
             var devices = LivePacketDevice.AllLocalMachine;
             if (devices.Count == 0)
             {
@@ -77,7 +77,7 @@ namespace Impostor.Tools.Proxy
             var ip = packet.Ethernet.IpV4;
             var ipSrc = ip.Source.ToString();
             var udp = ip.Udp;
-            
+
             // True if this is our own packet.
             using (var stream = udp.Payload.ToMemoryStream())
             {
@@ -86,14 +86,14 @@ namespace Impostor.Tools.Proxy
                 reader.Update(stream.ToArray());
 
                 var option = reader.Buffer[0];
-                if (option == (byte) MessageType.Reliable)
+                if (option == (byte)MessageType.Reliable)
                 {
                     reader.Seek(reader.Position + 3);
                 }
-                else if (option == (byte) UdpSendOption.Acknowledgement ||
-                         option == (byte) UdpSendOption.Ping ||
-                         option == (byte) UdpSendOption.Hello ||
-                         option == (byte) UdpSendOption.Disconnect)
+                else if (option == (byte)UdpSendOption.Acknowledgement ||
+                         option == (byte)UdpSendOption.Ping ||
+                         option == (byte)UdpSendOption.Hello ||
+                         option == (byte)UdpSendOption.Disconnect)
                 {
                     return;
                 }
@@ -101,9 +101,9 @@ namespace Impostor.Tools.Proxy
                 {
                     reader.Seek(reader.Position + 1);
                 }
-                
+
                 var isSent = ipSrc.StartsWith("192.");
-                
+
                 while (true)
                 {
                     if (reader.Position >= reader.Length)
@@ -120,7 +120,7 @@ namespace Impostor.Tools.Proxy
                     {
                         HandleToClient(ipSrc, message);
                     }
-                    
+
                     if (message.Position < message.Length)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -160,6 +160,7 @@ namespace Impostor.Tools.Proxy
                     {
                         Console.WriteLine("-     PlayerId    " + packet.ReadPackedInt32());
                     }
+
                     break;
                 case 10:
                     Console.WriteLine("- GameCode        " + packet.ReadInt32());

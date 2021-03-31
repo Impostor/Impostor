@@ -9,15 +9,15 @@ namespace Impostor.Api
         {
         }
 
-        protected ImpostorProtocolException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public ImpostorProtocolException(string? message) : base(message)
         {
         }
 
         public ImpostorProtocolException(string? message, Exception? innerException) : base(message, innerException)
+        {
+        }
+
+        protected ImpostorProtocolException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

@@ -25,7 +25,6 @@ namespace Impostor.Server.Net.State
             if (HostId == -1)
             {
                 HostId = player.Client.Id;
-                await InitGameDataAsync(player);
             }
 
             await _eventManager.CallAsync(new GamePlayerJoinedEvent(this, player));
@@ -67,7 +66,7 @@ namespace Impostor.Server.Net.State
                 await MigrateHost();
             }
 
-            if (isBan && player.Client.Connection != null)
+            if (isBan)
             {
                 BanIp(player.Client.Connection.EndPoint.Address);
             }

@@ -11,7 +11,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             var minSid = (ushort)(_lastSequenceId + 5U);
 
             // Snap in the server.
-            await SnapToAsync(_game.GetClientPlayer(OwnerId), position, minSid);
+            await SnapToAsync(_game.GetClientPlayer(OwnerId)!, position, minSid);
 
             // Broadcast to all clients.
             using (var writer = _game.StartRpc(NetId, RpcCalls.SnapTo))

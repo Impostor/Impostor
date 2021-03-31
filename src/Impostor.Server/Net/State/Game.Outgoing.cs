@@ -55,7 +55,7 @@ namespace Impostor.Server.Net.State
 
             writer.StartMessage(GameDataTag.RpcFlag);
             writer.WritePacked(targetNetId);
-            writer.Write((byte) callId);
+            writer.Write((byte)callId);
 
             return writer;
         }

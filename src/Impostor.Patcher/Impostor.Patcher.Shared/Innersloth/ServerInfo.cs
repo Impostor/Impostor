@@ -15,7 +15,7 @@ namespace Impostor.Patcher.Shared.Innersloth
             Ip = ip;
             Port = port;
         }
-        
+
         public void Serialize(BinaryWriter writer)
         {
             writer.Write(Name);
@@ -30,7 +30,7 @@ namespace Impostor.Patcher.Shared.Innersloth
             var ip = new IPAddress(reader.ReadBytes(4)).ToString();
             var port = reader.ReadUInt16();
             var unknown = reader.ReadInt32();
-            
+
             return new ServerInfo(name, ip, port);
         }
     }

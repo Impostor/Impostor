@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api;
-using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
-using Impostor.Api.Net.Messages.S2C;
-using Impostor.Hazel;
+using Impostor.Api.Unity;
 using Impostor.Server.Events.Meeting;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner;
@@ -46,172 +43,29 @@ namespace Impostor.Server.Net.State
         };
 
         private readonly List<InnerNetObject> _allObjects = new List<InnerNetObject>();
+
         private readonly Dictionary<uint, InnerNetObject> _allObjectsFast = new Dictionary<uint, InnerNetObject>();
 
-        private int _gamedataInitialized;
-        private bool _gamedataFakeReceived;
-
-        private async ValueTask OnSpawnAsync(InnerNetObject netObj)
+        public T? FindObjectByNetId<T>(uint netId)
+            where T : IInnerNetObject
         {
-            switch (netObj)
+            if (_allObjectsFast.TryGetValue(netId, out var obj))
             {
-                case InnerLobbyBehaviour lobby:
-                {
-                    GameNet.LobbyBehaviour = lobby;
-                    break;
-                }
-
-                case InnerGameData data:
-                {
-                    GameNet.GameData = data;
-                    break;
-                }
-
-                case InnerVoteBanSystem voteBan:
-                {
-                    GameNet.VoteBan = voteBan;
-                    break;
-                }
-
-                case InnerShipStatus shipStatus:
-                {
-                    GameNet.ShipStatus = shipStatus;
-                    break;
-                }
-
-                case InnerPlayerControl control:
-                {
-                    // Hook up InnerPlayerControl <-> IClientPlayer.
-                    if (!TryGetPlayer(control.OwnerId, out var player))
-                    {
-                        throw new ImpostorException("Failed to find player that spawned the InnerPlayerControl");
-                    }
-
-                    player.Character = control;
-                    player.DisableSpawnTimeout();
-
-                    // Hook up InnerPlayerControl <-> InnerPlayerControl.PlayerInfo.
-                    control.PlayerInfo = GameNet.GameData.GetPlayerById(control.PlayerId)!;
-
-                    if (control.PlayerInfo == null)
-                    {
-                        GameNet.GameData.AddPlayer(control);
-                    }
-
-                    if (control.PlayerInfo != null)
-                    {
-                        control.PlayerInfo!.Controller = control;
-                    }
-
-                    await _eventManager.CallAsync(new PlayerSpawnedEvent(this, player, control));
-
-                    break;
-                }
-
-                case InnerMeetingHud meetingHud:
-                {
-                    await _eventManager.CallAsync(new MeetingStartedEvent(this, meetingHud));
-                    break;
-                }
-            }
-        }
-
-        private async ValueTask OnDestroyAsync(InnerNetObject netObj)
-        {
-            switch (netObj)
-            {
-                case InnerLobbyBehaviour:
-                {
-                    GameNet.LobbyBehaviour = null;
-                    break;
-                }
-
-                case InnerGameData:
-                {
-                    GameNet.GameData = null;
-                    break;
-                }
-
-                case InnerVoteBanSystem:
-                {
-                    GameNet.VoteBan = null;
-                    break;
-                }
-
-                case InnerShipStatus:
-                {
-                    GameNet.ShipStatus = null;
-                    break;
-                }
-
-                case InnerPlayerControl control:
-                {
-                    // Remove InnerPlayerControl <-> IClientPlayer.
-                    if (TryGetPlayer(control.OwnerId, out var player))
-                    {
-                        player.Character = null;
-                    }
-
-                    await _eventManager.CallAsync(new PlayerDestroyedEvent(this, player, control));
-
-                    break;
-                }
-            }
-        }
-
-        private async ValueTask InitGameDataAsync(ClientPlayer player)
-        {
-            if (Interlocked.Exchange(ref _gamedataInitialized, 1) != 0)
-            {
-                return;
+                return (T)(IInnerNetObject)obj;
             }
 
-            /*
-             * The Among Us client on 20.9.22i spawns some components on the host side and
-             * only spawns these on other clients when someone else connects. This means that we can't
-             * parse data until someone connects because we don't know which component belongs to the NetId.
-             *
-             * We solve this by spawning a fake player and removing the player when the spawn GameData
-             * is received in HandleGameDataAsync.
-             */
-            using (var message = MessageWriter.Get(MessageType.Reliable))
-            {
-                // Spawn a fake player.
-                Message01JoinGameS2C.SerializeJoin(message, false, Code, FakeClientId, HostId);
-
-                message.StartMessage(MessageFlags.GameData);
-                message.Write(Code);
-                message.StartMessage(GameDataTag.SceneChangeFlag);
-                message.WritePacked(FakeClientId);
-                message.Write("OnlineGame");
-                message.EndMessage();
-                message.EndMessage();
-
-                await player.Client.Connection.SendAsync(message);
-            }
+            return default;
         }
 
         public async ValueTask<bool> HandleGameDataAsync(IMessageReader parent, ClientPlayer sender, bool toPlayer)
         {
             // Find target player.
-            ClientPlayer target = null;
+            ClientPlayer? target = null;
 
             if (toPlayer)
             {
                 var targetId = parent.ReadPackedInt32();
-                if (targetId == FakeClientId && !_gamedataFakeReceived && sender.IsHost)
-                {
-                    _gamedataFakeReceived = true;
-
-                    // Remove the fake client, we received the data.
-                    using (var message = MessageWriter.Get(MessageType.Reliable))
-                    {
-                        WriteRemovePlayerMessage(message, false, FakeClientId, (byte)DisconnectReason.ExitGame);
-
-                        await sender.Client.Connection.SendAsync(message);
-                    }
-                }
-                else if (!TryGetPlayer(targetId, out target))
+                if (!TryGetPlayer(targetId, out target))
                 {
                     _logger.LogWarning("Player {0} tried to send GameData to unknown player {1}.", sender.Client.Id, targetId);
                     return false;
@@ -274,7 +128,7 @@ namespace Impostor.Server.Net.State
                         var objectId = reader.ReadPackedUInt32();
                         if (objectId < SpawnableObjects.Length)
                         {
-                            var innerNetObject = (InnerNetObject) ActivatorUtilities.CreateInstance(_serviceProvider, SpawnableObjects[objectId], this);
+                            var innerNetObject = (InnerNetObject)ActivatorUtilities.CreateInstance(_serviceProvider, SpawnableObjects[objectId], this);
                             var ownerClientId = reader.ReadPackedInt32();
 
                             // Prevent fake client from being broadcasted.
@@ -284,7 +138,7 @@ namespace Impostor.Server.Net.State
                                 return false;
                             }
 
-                            innerNetObject.SpawnFlags = (SpawnFlags) reader.ReadByte();
+                            innerNetObject.SpawnFlags = (SpawnFlags)reader.ReadByte();
 
                             var components = innerNetObject.GetComponentsInChildren<InnerNetObject>();
                             var componentsCount = reader.ReadPackedInt32();
@@ -400,9 +254,27 @@ namespace Impostor.Server.Net.State
                         break;
                     }
 
+                    case GameDataTag.ClientInfoFlag:
+                    {
+                        var clientId = reader.ReadPackedInt32();
+                        var platform = (RuntimePlatform)reader.ReadPackedInt32();
+
+                        if (clientId != sender.Client.Id)
+                        {
+                            if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.ClientInfoFlag)), "Client sent info with wrong client id"))
+                            {
+                                return false;
+                            }
+                        }
+
+                        sender.Platform = platform;
+
+                        break;
+                    }
+
                     default:
                     {
-                        _logger.LogTrace("Bad GameData tag {0}", reader.Tag);
+                        _logger.LogWarning("Bad GameData tag {0}", reader.Tag);
                         break;
                     }
                 }
@@ -415,6 +287,109 @@ namespace Impostor.Server.Net.State
             }
 
             return true;
+        }
+
+        private async ValueTask OnSpawnAsync(InnerNetObject netObj)
+        {
+            switch (netObj)
+            {
+                case InnerLobbyBehaviour lobby:
+                {
+                    GameNet.LobbyBehaviour = lobby;
+                    break;
+                }
+
+                case InnerGameData data:
+                {
+                    GameNet.GameData = data;
+                    break;
+                }
+
+                case InnerVoteBanSystem voteBan:
+                {
+                    GameNet.VoteBan = voteBan;
+                    break;
+                }
+
+                case InnerShipStatus shipStatus:
+                {
+                    GameNet.ShipStatus = shipStatus;
+                    break;
+                }
+
+                case InnerPlayerControl control:
+                {
+                    // Hook up InnerPlayerControl <-> IClientPlayer.
+                    if (!TryGetPlayer(control.OwnerId, out var player))
+                    {
+                        throw new ImpostorException("Failed to find player that spawned the InnerPlayerControl");
+                    }
+
+                    player.Character = control;
+                    player.DisableSpawnTimeout();
+
+                    // Hook up InnerPlayerControl <-> InnerPlayerControl.PlayerInfo.
+                    var playerInfo = GameNet.GameData!.GetPlayerById(control.PlayerId) ?? GameNet.GameData.AddPlayer(control);
+
+                    if (playerInfo != null)
+                    {
+                        playerInfo.Controller = control;
+                        control.PlayerInfo = playerInfo;
+                    }
+
+                    await _eventManager.CallAsync(new PlayerSpawnedEvent(this, player, control));
+
+                    break;
+                }
+
+                case InnerMeetingHud meetingHud:
+                {
+                    await _eventManager.CallAsync(new MeetingStartedEvent(this, meetingHud));
+                    break;
+                }
+            }
+        }
+
+        private async ValueTask OnDestroyAsync(InnerNetObject netObj)
+        {
+            switch (netObj)
+            {
+                case InnerLobbyBehaviour:
+                {
+                    GameNet.LobbyBehaviour = null;
+                    break;
+                }
+
+                case InnerGameData:
+                {
+                    GameNet.GameData = null;
+                    break;
+                }
+
+                case InnerVoteBanSystem:
+                {
+                    GameNet.VoteBan = null;
+                    break;
+                }
+
+                case InnerShipStatus:
+                {
+                    GameNet.ShipStatus = null;
+                    break;
+                }
+
+                case InnerPlayerControl control:
+                {
+                    // Remove InnerPlayerControl <-> IClientPlayer.
+                    if (TryGetPlayer(control.OwnerId, out var player))
+                    {
+                        player.Character = null;
+                        await _eventManager.CallAsync(new PlayerDestroyedEvent(this, player, control));
+                    }
+
+                    break;
+                }
+            }
         }
 
         private bool AddNetObject(InnerNetObject obj)
@@ -440,17 +415,6 @@ namespace Impostor.Server.Net.State
             _allObjectsFast.Remove(obj.NetId);
 
             obj.NetId = uint.MaxValue;
-        }
-
-        public T? FindObjectByNetId<T>(uint netId)
-            where T : IInnerNetObject
-        {
-            if (_allObjectsFast.TryGetValue(netId, out var obj))
-            {
-                return (T)(IInnerNetObject)obj;
-            }
-
-            return default;
         }
     }
 }

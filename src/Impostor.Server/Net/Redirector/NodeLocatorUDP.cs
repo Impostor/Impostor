@@ -14,9 +14,9 @@ namespace Impostor.Server.Net.Redirector
     {
         private readonly ILogger<NodeLocatorUdp> _logger;
         private readonly bool _isMaster;
-        private readonly IPEndPoint _server;
-        private readonly UdpClient _client;
-        private readonly ConcurrentDictionary<string, AvailableNode> _availableNodes;
+        private readonly IPEndPoint? _server;
+        private readonly UdpClient? _client;
+        private readonly ConcurrentDictionary<string, AvailableNode>? _availableNodes;
 
         public NodeLocatorUdp(ILogger<NodeLocatorUdp> logger, IOptions<ServerRedirectorConfig> config)
         {
@@ -31,7 +31,7 @@ namespace Impostor.Server.Net.Redirector
             {
                 _isMaster = false;
 
-                if (!IPEndPoint.TryParse(config.Value.Locator.UdpMasterEndpoint, out var endpoint))
+                if (!IPEndPoint.TryParse(config.Value.Locator!.UdpMasterEndpoint, out var endpoint))
                 {
                     throw new ArgumentException("UdpMasterEndpoint should be in the ip:port format.");
                 }
@@ -54,13 +54,9 @@ namespace Impostor.Server.Net.Redirector
         {
             _logger.LogDebug("Received update {0} -> {1}", gameCode, ip);
 
-            _availableNodes.AddOrUpdate(
+            _availableNodes!.AddOrUpdate(
                 gameCode,
-                s => new AvailableNode
-                {
-                    Endpoint = ip,
-                    LastUpdated = DateTimeOffset.UtcNow,
-                },
+                s => new AvailableNode(ip, DateTimeOffset.UtcNow),
                 (s, node) =>
                 {
                     node.Endpoint = ip;
@@ -78,14 +74,14 @@ namespace Impostor.Server.Net.Redirector
             }
         }
 
-        public ValueTask<IPEndPoint> FindAsync(string gameCode)
+        public ValueTask<IPEndPoint?> FindAsync(string gameCode)
         {
             if (!_isMaster)
             {
                 return ValueTask.FromResult(default(IPEndPoint));
             }
 
-            if (_availableNodes.TryGetValue(gameCode, out var node))
+            if (_availableNodes!.TryGetValue(gameCode, out var node))
             {
                 if (node.Expired)
                 {
@@ -93,7 +89,7 @@ namespace Impostor.Server.Net.Redirector
                     return ValueTask.FromResult(default(IPEndPoint));
                 }
 
-                return ValueTask.FromResult(node.Endpoint);
+                return ValueTask.FromResult(node.Endpoint)!;
             }
 
             return ValueTask.FromResult(default(IPEndPoint));
@@ -106,14 +102,14 @@ namespace Impostor.Server.Net.Redirector
                 return ValueTask.CompletedTask;
             }
 
-            _availableNodes.TryRemove(gameCode, out _);
+            _availableNodes!.TryRemove(gameCode, out _);
             return ValueTask.CompletedTask;
         }
 
         public ValueTask SaveAsync(string gameCode, IPEndPoint endPoint)
         {
             var data = Encoding.UTF8.GetBytes($"{gameCode},{endPoint}");
-            _client.Send(data, data.Length, _server);
+            _client!.Send(data, data.Length, _server);
             return ValueTask.CompletedTask;
         }
 
@@ -124,6 +120,12 @@ namespace Impostor.Server.Net.Redirector
 
         private class AvailableNode
         {
+            public AvailableNode(IPEndPoint endpoint, DateTimeOffset lastUpdated)
+            {
+                Endpoint = endpoint;
+                LastUpdated = lastUpdated;
+            }
+
             public IPEndPoint Endpoint { get; set; }
 
             public DateTimeOffset LastUpdated { get; set; }

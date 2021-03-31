@@ -37,15 +37,11 @@ namespace Impostor.Hazel
 
         public long GetIP4Address()
         {
-            if (IPMode == IPMode.IPv4)
-            {
-                return ((IPEndPoint)this.RemoteEndPoint).Address.Address;
-            }
-            else
-            {
-                var bytes = ((IPEndPoint)this.RemoteEndPoint).Address.GetAddressBytes();
-                return BitConverter.ToInt64(bytes, bytes.Length - 8);
-            }
+            var bytes = this.RemoteEndPoint.Address.GetAddressBytes();
+
+            return IPMode == IPMode.IPv4
+                ? (uint)((bytes[3] << 24 | bytes[2] << 16 | bytes[1] << 8 | bytes[0]) & 0x0FFFFFFFF)
+                : BitConverter.ToInt64(bytes, bytes.Length - 8);
         }
 
         /// <summary>

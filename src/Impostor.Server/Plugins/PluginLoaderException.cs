@@ -10,15 +10,15 @@ namespace Impostor.Server.Plugins
         {
         }
 
-        protected PluginLoaderException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public PluginLoaderException(string? message) : base(message)
         {
         }
 
         public PluginLoaderException(string? message, Exception? innerException) : base(message, innerException)
+        {
+        }
+
+        protected PluginLoaderException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

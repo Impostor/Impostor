@@ -1,4 +1,6 @@
-﻿namespace Impostor.Api.Net.Messages.S2C
+﻿using System;
+
+namespace Impostor.Api.Net.Messages.S2C
 {
     public class Message12WaitForHostS2C
     {
@@ -17,7 +19,7 @@
 
         public static void Deserialize(IMessageReader reader)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

@@ -4,10 +4,10 @@ namespace Impostor.Api.Events
 {
     public interface IManualEventListener : IEventListener
     {
+        EventPriority Priority { get; set; }
+
         public bool CanExecute<T>();
 
         public ValueTask Execute(IEvent @event);
-
-        EventPriority Priority { get; set; }
     }
 }

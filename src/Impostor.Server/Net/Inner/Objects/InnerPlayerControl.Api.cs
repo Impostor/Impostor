@@ -104,7 +104,26 @@ namespace Impostor.Server.Net.Inner.Objects
             Rpc12MurderPlayer.Serialize(writer, target);
             await _game.FinishRpcAsync(writer);
 
-            await _eventManager.CallAsync(new PlayerMurderEvent(_game, _game.GetClientPlayer(OwnerId), this, target));
+            await _eventManager.CallAsync(new PlayerMurderEvent(_game, _game.GetClientPlayer(OwnerId)!, this, target));
+        }
+
+        public async ValueTask ExileAsync()
+        {
+            if (PlayerInfo.IsDead)
+            {
+                throw new ImpostorProtocolException("Tried to exile a player, but target was not alive.");
+            }
+
+            // Update player.
+            Die(DeathReason.Exile);
+
+            // Send RPC.
+            using var writer = _game.StartRpc(NetId, RpcCalls.Exiled);
+            Rpc04Exiled.Serialize(writer);
+            await _game.FinishRpcAsync(writer);
+
+            // Notify plugins.
+            await _eventManager.CallAsync(new PlayerExileEvent(_game, _game.GetClientPlayer(OwnerId)!, this));
         }
     }
 }

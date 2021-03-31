@@ -24,8 +24,8 @@ namespace Impostor.Server.Net
         private readonly ClientManager _clientManager;
         private readonly GameManager _gameManager;
 
-        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, IHazelConnection connection, ISet<Mod> mods)
-            : base(name, connection, mods)
+        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, int gameVersion, IHazelConnection connection, ISet<Mod> mods)
+            : base(name, gameVersion, connection, mods)
         {
             _logger = logger;
             _antiCheatConfig = antiCheatOptions.Value;
@@ -63,7 +63,7 @@ namespace Impostor.Server.Net
                 case MessageFlags.HostGame:
                 {
                     // Read game settings.
-                    var gameInfo = Message00HostGameC2S.Deserialize(reader);
+                    var gameInfo = Message00HostGameC2S.Deserialize(reader, out _);
 
                     // Create game.
                     var game = await _gameManager.CreateAsync(gameInfo);
@@ -80,10 +80,7 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.JoinGame:
                 {
-                    Message01JoinGameC2S.Deserialize(
-                        reader,
-                        out var gameCode,
-                        out _);
+                    Message01JoinGameC2S.Deserialize(reader, out var gameCode);
 
                     var game = _gameManager.Find(gameCode);
                     if (game == null)
@@ -134,7 +131,7 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    await Player.Game.HandleStartGame(reader);
+                    await Player!.Game.HandleStartGame(reader);
                     break;
                 }
 
@@ -154,7 +151,7 @@ namespace Impostor.Server.Net
                         out var playerId,
                         out var reason);
 
-                    await Player.Game.HandleRemovePlayer(playerId, (DisconnectReason)reason);
+                    await Player!.Game.HandleRemovePlayer(playerId, (DisconnectReason)reason);
                     break;
                 }
 
@@ -171,7 +168,7 @@ namespace Impostor.Server.Net
                     // Handle packet.
                     using var readerCopy = reader.Copy();
 
-                    var verified = await Player.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
+                    var verified = await Player!.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
                     if (verified)
                     {
                         // Broadcast packet to all other players.
@@ -205,7 +202,7 @@ namespace Impostor.Server.Net
                         reader,
                         out var gameOverReason);
 
-                    await Player.Game.HandleEndGame(reader, gameOverReason);
+                    await Player!.Game.HandleEndGame(reader, gameOverReason);
                     break;
                 }
 
@@ -226,7 +223,7 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    await Player.Game.HandleAlterGame(reader, Player, value);
+                    await Player!.Game.HandleAlterGame(reader, Player, value);
                     break;
                 }
 
@@ -242,13 +239,13 @@ namespace Impostor.Server.Net
                         out var playerId,
                         out var isBan);
 
-                    await Player.Game.HandleKickPlayer(playerId, isBan);
+                    await Player!.Game.HandleKickPlayer(playerId, isBan);
                     break;
                 }
 
                 case MessageFlags.GetGameListV2:
                 {
-                    Message16GetGameListC2S.Deserialize(reader, out var options);
+                    Message16GetGameListC2S.Deserialize(reader, out var options, out _);
                     await OnRequestGameListAsync(options);
                     break;
                 }
@@ -334,11 +331,7 @@ namespace Impostor.Server.Net
 
             var games = _gameManager.FindListings((MapFlags)options.Map, options.NumImpostors, options.Keywords);
 
-            var skeldGameCount = _gameManager.GetGameCount(MapFlags.Skeld);
-            var miraHqGameCount = _gameManager.GetGameCount(MapFlags.MiraHQ);
-            var polusGameCount = _gameManager.GetGameCount(MapFlags.Polus);
-
-            Message16GetGameListS2C.Serialize(message, skeldGameCount, miraHqGameCount, polusGameCount, games);
+            Message16GetGameListS2C.Serialize(message, games);
 
             return Connection.SendAsync(message);
         }

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
+using Impostor.Api.Unity;
 using Impostor.Server.Net.Inner.Objects;
 using Microsoft.Extensions.Logging;
 
@@ -16,7 +17,7 @@ namespace Impostor.Server.Net.State
         public ClientPlayer(ILogger<ClientPlayer> logger, ClientBase client, Game game)
         {
             _logger = logger;
-            _spawnTimeout = new Timer(RunSpawnTimeout, null, -1, -1);
+            _spawnTimeout = new Timer(RunSpawnTimeout!, null, -1, -1);
 
             Game = game;
             Client = client;
@@ -34,7 +35,9 @@ namespace Impostor.Server.Net.State
 
         public bool IsHost => Game?.Host == this;
 
-        public string Scene { get; internal set; }
+        public string? Scene { get; internal set; }
+
+        public RuntimePlatform? Platform { get; internal set; }
 
         public void InitializeSpawnTimeout()
         {

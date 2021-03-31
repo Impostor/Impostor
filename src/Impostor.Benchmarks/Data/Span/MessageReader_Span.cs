@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers.Binary;
-using Impostor.Hazel;
 
 namespace Impostor.Benchmarks.Data.Span
 {

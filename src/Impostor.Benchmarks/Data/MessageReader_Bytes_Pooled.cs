@@ -65,7 +65,7 @@ namespace Impostor.Benchmarks.Data
 
         public bool ReadBoolean()
         {
-            byte val = FastByte();
+            var val = FastByte();
             return val != 0;
         }
 
@@ -112,7 +112,7 @@ namespace Impostor.Benchmarks.Data
             float output = 0;
             fixed (byte* bufPtr = &this.Buffer[Position])
             {
-                byte* outPtr = (byte*)&output;
+                var outPtr = (byte*)&output;
 
                 *outPtr = *bufPtr;
                 *(outPtr + 1) = *(bufPtr + 1);
@@ -158,13 +158,13 @@ namespace Impostor.Benchmarks.Data
 
         public uint ReadPackedUInt32()
         {
-            bool readMore = true;
-            int shift = 0;
+            var readMore = true;
+            var shift = 0;
             uint output = 0;
 
             while (readMore)
             {
-                byte b = FastByte();
+                var b = FastByte();
                 if (b >= 0x80)
                 {
                     readMore = true;

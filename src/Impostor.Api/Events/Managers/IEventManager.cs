@@ -16,19 +16,19 @@ namespace Impostor.Api.Events.Managers
             where TListener : IEventListener;
 
         /// <summary>
-        ///     Returns true if an event with the type <see cref="TEvent"/> is registered.
+        ///     Returns true if an event with the type <typeparamref name="TEvent" /> is registered.
         /// </summary>
-        /// <returns>True if the <see cref="TEvent"/> is registered.</returns>
+        /// <returns>True if the <typeparamref name="TEvent" /> is registered.</returns>
         /// <typeparam name="TEvent">Type of the event.</typeparam>
         bool IsRegistered<TEvent>()
             where TEvent : IEvent;
 
         /// <summary>
-        ///     Call all the event listeners for the type <see cref="TEvent"/>.
+        ///     Call all the event listeners for the type <typeparamref name="TEvent" />.
         /// </summary>
         /// <param name="event">The event argument.</param>
         /// <typeparam name="TEvent">Type of the event.</typeparam>
-        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        /// <returns>A <see cref="ValueTask" /> representing the asynchronous operation.</returns>
         ValueTask CallAsync<TEvent>(TEvent @event)
             where TEvent : IEvent;
     }
