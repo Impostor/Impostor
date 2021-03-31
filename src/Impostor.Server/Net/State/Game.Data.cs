@@ -40,6 +40,7 @@ namespace Impostor.Server.Net.State
             typeof(InnerShipStatus), // HeadQuarters
             typeof(InnerShipStatus), // PlanetMap
             typeof(InnerShipStatus), // AprilShipStatus
+            typeof(InnerShipStatus), // Airship
         };
 
         private readonly List<InnerNetObject> _allObjects = new List<InnerNetObject>();
