@@ -285,6 +285,17 @@ namespace Impostor.Server.Net.Inner.Objects
                     return await HandleSetStartCounter(sender, sequenceId, startCounter);
                 }
 
+                case RpcCalls.UsePlatform:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc32UsePlatform.Deserialize(reader);
+                    break;
+                }
+
                 default:
                     return await UnregisteredCall(call, sender);
             }
