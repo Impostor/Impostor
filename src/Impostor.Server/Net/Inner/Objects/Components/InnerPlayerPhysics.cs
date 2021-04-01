@@ -55,6 +55,10 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     Rpc19EnterVent.Deserialize(reader, out ventId);
                     break;
 
+                case RpcCalls.ClimbLadder:
+                    Rpc31ClimbLadder.Deserialize(reader, out byte ladderId, out byte lastClimbLadderSid);
+                    return true;
+
                 default:
                     return await UnregisteredCall(call, sender);
             }
