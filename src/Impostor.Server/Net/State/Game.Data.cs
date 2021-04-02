@@ -254,14 +254,14 @@ namespace Impostor.Server.Net.State
                         break;
                     }
 
-                    case GameDataTag.ClientInfoFlag:
+                    case GameDataTag.ConsoleDeclareClientPlatformFlag:
                     {
                         var clientId = reader.ReadPackedInt32();
                         var platform = (RuntimePlatform)reader.ReadPackedInt32();
 
                         if (clientId != sender.Client.Id)
                         {
-                            if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.ClientInfoFlag)), "Client sent info with wrong client id"))
+                            if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.ConsoleDeclareClientPlatformFlag)), "Client sent info with wrong client id"))
                             {
                                 return false;
                             }
