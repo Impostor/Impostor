@@ -35,21 +35,13 @@ namespace Impostor.Api
         {
             var original = Advance<float>(ref input);
 
-            // BitConverter.Int32BitsToSingle
-            // Doesn't exist in net 2.0 for some reason
-            return Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(original));
+            return BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(original));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool ReadBoolean(this ref ReadOnlySpan<byte> input)
         {
             return input.ReadByte() != 0;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe float Int32BitsToSingle(int value)
-        {
-            return *((float*)&value);
         }
 
         /// <summary>
