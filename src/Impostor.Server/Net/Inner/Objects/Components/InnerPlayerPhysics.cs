@@ -49,21 +49,21 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             {
                 case RpcCalls.EnterVent:
                     Rpc19EnterVent.Deserialize(reader, out ventId);
+                    await _eventManager.CallAsync(new PlayerVentEvent(_game, sender, _playerControl, (VentLocation)ventId, true));
                     break;
 
                 case RpcCalls.ExitVent:
                     Rpc19EnterVent.Deserialize(reader, out ventId);
+                    await _eventManager.CallAsync(new PlayerVentEvent(_game, sender, _playerControl, (VentLocation)ventId, false));
                     break;
 
                 case RpcCalls.ClimbLadder:
                     Rpc31ClimbLadder.Deserialize(reader, out byte ladderId, out byte lastClimbLadderSid);
-                    return true;
+                    break;
 
                 default:
                     return await UnregisteredCall(call, sender);
             }
-
-            await _eventManager.CallAsync(new PlayerVentEvent(_game, sender, _playerControl, (VentLocation)ventId, call == RpcCalls.EnterVent));
 
             return true;
         }
