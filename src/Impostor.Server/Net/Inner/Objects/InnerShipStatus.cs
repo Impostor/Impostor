@@ -29,7 +29,7 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 [SystemTypes.Electrical] = new SwitchSystem(),
                 [SystemTypes.MedBay] = new MedScanSystem(),
-                [SystemTypes.Reactor] = new ReactorSystemType(),
+                [SystemTypes.Reactor] = game.Options.Map == MapTypes.Airship ? new HeliSabotageSystemType() : new ReactorSystemType(),
                 [SystemTypes.LifeSupp] = new LifeSuppSystemType(),
                 [SystemTypes.Security] = new SecurityCameraSystemType(),
                 [SystemTypes.Comms] = new HudOverrideSystemType(),
