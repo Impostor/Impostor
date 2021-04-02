@@ -61,7 +61,7 @@ namespace Impostor.Server.Net
         private async ValueTask OnNewConnection(NewConnectionEventArgs e)
         {
             // Handshake.
-            HandshakeC2S.Deserialize(e.HandshakeData, out var clientVersion, out var name);
+            HandshakeC2S.Deserialize(e.HandshakeData, out var clientVersion, out var name, out _);
 
             var connection = new HazelConnection(e.Connection, _connectionLogger);
 
