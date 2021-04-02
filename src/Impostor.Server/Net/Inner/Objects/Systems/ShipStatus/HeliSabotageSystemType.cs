@@ -31,9 +31,6 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 
         public void Deserialize(IMessageReader reader, bool initialState)
         {
-            // TODO: Find out what these 2 bytes are used for
-            _ = reader.ReadByte();
-            _ = reader.ReadByte();
             Countdown = reader.ReadSingle();
             Timer = reader.ReadSingle();
             ActiveConsoles.Clear(); // TODO: Thread safety
