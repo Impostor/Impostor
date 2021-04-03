@@ -52,7 +52,7 @@ namespace Impostor.Api.Innersloth
         AirshipEngineRoom = 3,
         AirshipKitchen = 4,
         AirshipMainHallBottom = 5,
-        AirshipGapRigh = 6,
+        AirshipGapRight = 6,
         AirshipGapLeft = 7,
         AirshipMainHallTop = 8,
         AirshipShowers = 9,
