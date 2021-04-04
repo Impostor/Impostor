@@ -1,7 +1,9 @@
-﻿using System.Numerics;
+using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.Rpcs;
@@ -21,6 +23,8 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly ObjectPool<PlayerMovementEvent> _pool;
 
         private ushort _lastSequenceId;
+
+        private bool _airshipAllowSnapTo = true;
 
         public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool)
         {
@@ -85,12 +89,11 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         {
             if (call == RpcCalls.SnapTo)
             {
-                if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(RpcCalls.MurderPlayer, sender, _playerControl.PlayerInfo))
+                Rpc21SnapTo.Deserialize(reader, out var position, out var minSid);
+                if (!await IsSnapToAllowed(sender, call, position))
                 {
                     return false;
                 }
-
-                Rpc21SnapTo.Deserialize(reader, out var position, out var minSid);
 
                 await SnapToAsync(sender, position, minSid);
                 return true;
@@ -128,6 +131,36 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
             _lastSequenceId = minSid;
             return SetPositionAsync(sender, position, Velocity);
+        }
+
+        private async ValueTask<bool> IsSnapToAllowed(ClientPlayer sender, RpcCalls call, Vector2 position)
+        {
+            if (!await ValidateOwnership(call, sender))
+            {
+                return false;
+            }
+
+            // Airship has a minigame at the start where players can select their start position.
+            // When a target location is selected, the SnapTo RPC is used to move there.
+            if (_game.Options.Map == MapTypes.Airship)
+            {
+                if (_airshipAllowSnapTo == false)
+                {
+                    return false;
+                }
+
+                // As part of initial spawn, clients will snap to -25, 40
+                // The positions AU sends out are rouded, so we allow a small margin of error
+                var dX = Math.Abs(-25.0f - position.X);
+                var dY = Math.Abs(40.0f - position.Y);
+                if (dX + dY < 0.01)
+                {
+                    _airshipAllowSnapTo = false;
+                    return true;
+                }
+            }
+
+            return !await ValidateImpostor(RpcCalls.SnapTo, sender, _playerControl.PlayerInfo);
         }
     }
 }
