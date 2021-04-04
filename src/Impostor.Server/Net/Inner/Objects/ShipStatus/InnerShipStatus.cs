@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
@@ -25,6 +26,12 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
         }
 
         public abstract Dictionary<int, bool> Doors { get; }
+
+        public abstract float SpawnRadius { get; }
+
+        public abstract Vector2 InitialSpawnCenter { get; }
+
+        public abstract Vector2 MeetingSpawnCenter { get; }
 
         public override ValueTask OnSpawnAsync()
         {
@@ -101,10 +108,27 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
             return true;
         }
 
+        public virtual Vector2 GetSpawnLocation(InnerPlayerControl player, int numPlayers, bool initialSpawn)
+        {
+            var vector = new Vector2(0, 1);
+            vector = Rotate(vector, (player.PlayerId - 1) * (360f / numPlayers));
+            vector *= this.SpawnRadius;
+            return (initialSpawn ? this.InitialSpawnCenter : this.MeetingSpawnCenter) + vector + new Vector2(0f, 0.3636f);
+        }
+
         protected virtual void AddSystems(Dictionary<SystemTypes, ISystemType> systems)
         {
             systems.Add(SystemTypes.Electrical, new SwitchSystem());
             systems.Add(SystemTypes.MedBay, new MedScanSystem());
+        }
+
+        private static Vector2 Rotate(Vector2 self, float degrees)
+        {
+            var f = 0.017453292f * degrees;
+            var cos = MathF.Cos(f);
+            var sin = MathF.Sin(f);
+
+            return new Vector2((self.X * cos) - (sin * self.Y), (self.X * sin) + (cos * self.Y));
         }
     }
 }

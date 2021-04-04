@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Numerics;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner.Objects.ShipStatus;
 using Impostor.Server.Net.Inner.Objects.Systems;
@@ -14,6 +15,12 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
         }
 
         public override Dictionary<int, bool> Doors { get; } = new Dictionary<int, bool>(13);
+
+        public override float SpawnRadius => 1.6f;
+
+        public override Vector2 InitialSpawnCenter { get; } = new Vector2(-0.72f, 0.62f);
+
+        public override Vector2 MeetingSpawnCenter { get; } = new Vector2(-0.72f, 0.62f);
 
         protected override void AddSystems(Dictionary<SystemTypes, ISystemType> systems)
         {

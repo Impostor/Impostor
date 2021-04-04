@@ -346,6 +346,11 @@ namespace Impostor.Server.Net.State
 
                 case InnerMeetingHud meetingHud:
                 {
+                    foreach (var player in _players.Values)
+                    {
+                        player.Character?.NetworkTransform.OnPlayerSpawn();
+                    }
+
                     await _eventManager.CallAsync(new MeetingStartedEvent(this, meetingHud));
                     break;
                 }

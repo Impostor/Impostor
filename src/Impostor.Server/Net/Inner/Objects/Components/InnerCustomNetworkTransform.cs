@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
@@ -7,6 +8,7 @@ using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Player;
+using Impostor.Server.Net.Inner.Objects.ShipStatus;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
@@ -21,6 +23,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly ObjectPool<PlayerMovementEvent> _pool;
 
         private ushort _lastSequenceId;
+        private bool _spawnSnapAllowed;
 
         public InnerCustomNetworkTransform(Game game, ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool) : base(game)
         {
@@ -83,13 +86,34 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         {
             if (call == RpcCalls.SnapTo)
             {
-                if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(call, sender, _playerControl.PlayerInfo))
+                if (!await ValidateOwnership(call, sender))
                 {
                     return false;
                 }
 
                 Rpc21SnapTo.Deserialize(reader, out var position, out var minSid);
 
+                if (Game.GameNet.ShipStatus is InnerAirshipStatus airshipStatus)
+                {
+                    // As part of airship spawning, clients are sending snap to -25 40 for no reason(?), cancelling it works just fine
+                    if (Approximately(position, airshipStatus.PreSpawnLocation))
+                    {
+                        return false;
+                    }
+
+                    if (_spawnSnapAllowed && airshipStatus.SpawnLocations.Any(location => Approximately(position, location)))
+                    {
+                        _spawnSnapAllowed = false;
+                        return true;
+                    }
+                }
+
+                if (!await ValidateImpostor(call, sender, _playerControl.PlayerInfo))
+                {
+                    return false;
+                }
+
+                // TODO validate vent location
                 await SnapToAsync(sender, position, minSid);
                 return true;
             }
@@ -108,6 +132,11 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             _pool.Return(playerMovementEvent);
         }
 
+        internal void OnPlayerSpawn()
+        {
+            _spawnSnapAllowed = true;
+        }
+
         private static bool SidGreaterThan(ushort newSid, ushort prevSid)
         {
             var num = (ushort)(prevSid + (uint)short.MaxValue);
@@ -115,6 +144,12 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             return (int)prevSid < (int)num
                 ? newSid > prevSid && newSid <= num
                 : newSid > prevSid || newSid <= num;
+        }
+
+        private static bool Approximately(Vector2 a, Vector2 b, float tolerance = 0.1f)
+        {
+            var abs = Vector2.Abs(a - b);
+            return abs.X <= tolerance && abs.Y <= tolerance;
         }
 
         private ValueTask SnapToAsync(IClientPlayer sender, Vector2 position, ushort minSid)
