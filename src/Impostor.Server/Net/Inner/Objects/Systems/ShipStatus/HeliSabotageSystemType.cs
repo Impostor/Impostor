@@ -36,16 +36,16 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             ActiveConsoles.Clear(); // TODO: Thread safety
             CompletedConsoles.Clear(); // TODO: Thread safety
 
-            var count = reader.ReadPackedUInt32();
+            var activeCount = reader.ReadPackedUInt32();
 
-            for (var i = 0; i < count; i++)
+            for (var i = 0; i < activeCount; i++)
             {
                 ActiveConsoles.Add(new Tuple<byte, byte>(reader.ReadByte(), reader.ReadByte()));
             }
 
-            var count2 = reader.ReadPackedUInt32();
+            var completedCount = reader.ReadPackedUInt32();
 
-            for (var i = 0; i < count2; i++)
+            for (var i = 0; i < completedCount; i++)
             {
                 CompletedConsoles.Add(reader.ReadByte());
             }

@@ -58,11 +58,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
             while (reader.Position < reader.Length)
             {
-                IMessageReader msgReader = reader.ReadMessage();
-                SystemTypes type = (SystemTypes)msgReader.Tag;
+                IMessageReader messageReader = reader.ReadMessage();
+                SystemTypes type = (SystemTypes)messageReader.Tag;
                 if (_systems.TryGetValue(type, out var value))
                 {
-                    value.Deserialize(msgReader, initialState);
+                    value.Deserialize(messageReader, initialState);
                 }
             }
         }
