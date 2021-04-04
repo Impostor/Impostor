@@ -86,7 +86,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         {
             if (call == RpcCalls.SnapTo)
             {
-                if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(RpcCalls.MurderPlayer, sender, _playerControl.PlayerInfo))
+                if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(call, sender, _playerControl.PlayerInfo))
                 {
                     return false;
                 }

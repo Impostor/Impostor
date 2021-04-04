@@ -210,7 +210,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.MurderPlayer:
                 {
-                    if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(RpcCalls.MurderPlayer, sender, PlayerInfo))
+                    if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(call, sender, PlayerInfo))
                     {
                         return false;
                     }

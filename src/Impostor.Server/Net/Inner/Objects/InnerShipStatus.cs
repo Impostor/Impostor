@@ -79,7 +79,7 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 case RpcCalls.CloseDoorsOfType:
                 {
-                    if (!await ValidateImpostor(RpcCalls.MurderPlayer, sender, sender.Character!.PlayerInfo))
+                    if (!await ValidateImpostor(call, sender, sender.Character!.PlayerInfo))
                     {
                         return false;
                     }

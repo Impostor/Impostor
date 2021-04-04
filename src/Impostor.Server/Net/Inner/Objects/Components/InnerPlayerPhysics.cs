@@ -39,7 +39,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(RpcCalls.MurderPlayer, sender, _playerControl.PlayerInfo))
+            if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(call, sender, _playerControl.PlayerInfo))
             {
                 return false;
             }
