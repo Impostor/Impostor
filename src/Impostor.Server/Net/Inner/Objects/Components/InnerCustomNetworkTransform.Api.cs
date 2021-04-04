@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Threading.Tasks;
+using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects.Components;
 
 namespace Impostor.Server.Net.Inner.Objects.Components

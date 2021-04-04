@@ -1,4 +1,4 @@
-namespace Impostor.Server.Net.Inner
+﻿namespace Impostor.Api.Net.Inner
 {
     public enum RpcCalls : byte
     {
