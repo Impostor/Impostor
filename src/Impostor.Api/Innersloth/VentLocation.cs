@@ -44,5 +44,19 @@ namespace Impostor.Api.Innersloth
         PolusRightStabilizer = 9,
         PolusLeftStabilizer = 10,
         PolusOutsideAdmin = 11,
+
+        // Airship
+        AirshipVault = 0,
+        AirshipCockpit = 1,
+        AirshipViewingDeck = 2,
+        AirshipEngineRoom = 3,
+        AirshipKitchen = 4,
+        AirshipMainHallBottom = 5,
+        AirshipGapRight = 6,
+        AirshipGapLeft = 7,
+        AirshipMainHallTop = 8,
+        AirshipShowers = 9,
+        AirshipRecords = 10,
+        AirshipCargoBay = 11,
     }
 }
