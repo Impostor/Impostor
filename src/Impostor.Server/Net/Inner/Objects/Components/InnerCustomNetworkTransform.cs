@@ -17,18 +17,15 @@ namespace Impostor.Server.Net.Inner.Objects.Components
     {
         private readonly ILogger<InnerCustomNetworkTransform> _logger;
         private readonly InnerPlayerControl _playerControl;
-        private readonly Game _game;
         private readonly IEventManager _eventManager;
         private readonly ObjectPool<PlayerMovementEvent> _pool;
 
         private ushort _lastSequenceId;
 
-        public InnerCustomNetworkTransform(ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, Game game, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool)
+        public InnerCustomNetworkTransform(Game game, ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool) : base(game)
         {
             _logger = logger;
             _playerControl = playerControl;
-            _game = game;
-            _game = game;
             _eventManager = eventManager;
             _pool = pool;
         }
@@ -106,7 +103,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             Velocity = velocity;
 
             var playerMovementEvent = _pool.Get();
-            playerMovementEvent.Reset(_game, sender, _playerControl);
+            playerMovementEvent.Reset(Game, sender, _playerControl);
             await _eventManager.CallAsync(playerMovementEvent);
             _pool.Return(playerMovementEvent);
         }

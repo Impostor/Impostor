@@ -17,14 +17,12 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly ILogger<InnerPlayerPhysics> _logger;
         private readonly InnerPlayerControl _playerControl;
         private readonly IEventManager _eventManager;
-        private readonly Game _game;
 
-        public InnerPlayerPhysics(ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl, IEventManager eventManager, Game game)
+        public InnerPlayerPhysics(Game game, ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl, IEventManager eventManager) : base(game)
         {
             _logger = logger;
             _playerControl = playerControl;
             _eventManager = eventManager;
-            _game = game;
         }
 
         public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
@@ -39,27 +37,39 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(call, sender, _playerControl.PlayerInfo))
+            if (!await ValidateOwnership(call, sender))
             {
                 return false;
             }
 
-            int ventId;
-
             switch (call)
             {
                 case RpcCalls.EnterVent:
-                    Rpc19EnterVent.Deserialize(reader, out ventId);
-                    await _eventManager.CallAsync(new PlayerVentEvent(_game, sender, _playerControl, (VentLocation)ventId, true));
-                    break;
-
                 case RpcCalls.ExitVent:
-                    Rpc19EnterVent.Deserialize(reader, out ventId);
-                    await _eventManager.CallAsync(new PlayerVentEvent(_game, sender, _playerControl, (VentLocation)ventId, false));
+                    if (!await ValidateImpostor(call, sender, _playerControl.PlayerInfo))
+                    {
+                        return false;
+                    }
+
+                    int ventId;
+
+                    switch (call)
+                    {
+                        case RpcCalls.EnterVent:
+                            Rpc19EnterVent.Deserialize(reader, out ventId);
+                            break;
+                        case RpcCalls.ExitVent:
+                            Rpc20ExitVent.Deserialize(reader, out ventId);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(call), call, null);
+                    }
+
+                    await _eventManager.CallAsync(new PlayerVentEvent(Game, sender, _playerControl, (VentLocation)ventId, call == RpcCalls.EnterVent));
                     break;
 
                 case RpcCalls.ClimbLadder:
-                    Rpc31ClimbLadder.Deserialize(reader, out byte ladderId, out byte lastClimbLadderSid);
+                    Rpc31ClimbLadder.Deserialize(reader, out var ladderId, out var lastClimbLadderSid);
                     break;
 
                 default:

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
@@ -10,9 +11,18 @@ namespace Impostor.Server.Net.Inner
     {
         private const int HostInheritId = -2;
 
+        protected InnerNetObject(Game game)
+        {
+            Game = game;
+        }
+
         public uint NetId { get; internal set; }
 
         public int OwnerId { get; internal set; }
+
+        public Game Game { get; }
+
+        IGame IInnerNetObject.Game => Game;
 
         public SpawnFlags SpawnFlags { get; internal set; }
 
@@ -27,5 +37,10 @@ namespace Impostor.Server.Net.Inner
         public abstract ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState);
 
         public abstract ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader);
+
+        public virtual ValueTask OnSpawnAsync()
+        {
+            return default;
+        }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;
@@ -11,12 +10,8 @@ namespace Impostor.Server.Net.Inner.Objects
 {
     internal class InnerLobbyBehaviour : InnerNetObject, IInnerLobbyBehaviour
     {
-        private readonly IGame _game;
-
-        public InnerLobbyBehaviour(IGame game)
+        public InnerLobbyBehaviour(Game game) : base(game)
         {
-            _game = game;
-
             Components.Add(this);
         }
 

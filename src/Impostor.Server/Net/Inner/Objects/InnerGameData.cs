@@ -18,17 +18,15 @@ namespace Impostor.Server.Net.Inner.Objects
     internal partial class InnerGameData : InnerNetObject, IInnerGameData
     {
         private readonly ILogger<InnerGameData> _logger;
-        private readonly Game _game;
         private readonly ConcurrentDictionary<byte, InnerPlayerInfo> _allPlayers;
 
-        public InnerGameData(ILogger<InnerGameData> logger, Game game, IServiceProvider serviceProvider)
+        public InnerGameData(Game game, ILogger<InnerGameData> logger, IServiceProvider serviceProvider) : base(game)
         {
             _logger = logger;
-            _game = game;
             _allPlayers = new ConcurrentDictionary<byte, InnerPlayerInfo>();
 
             Components.Add(this);
-            Components.Add(ActivatorUtilities.CreateInstance<InnerVoteBanSystem>(serviceProvider));
+            Components.Add(ActivatorUtilities.CreateInstance<InnerVoteBanSystem>(serviceProvider, game));
         }
 
         public int PlayerCount => _allPlayers.Count;
@@ -76,8 +74,25 @@ namespace Impostor.Server.Net.Inner.Objects
             }
             else
             {
-                // It'll send an message per dirty player
-                // throw new NotImplementedException("This shouldn't happen, according to Among Us disassembly.");
+                while (reader.Position < reader.Length)
+                {
+                    var inner = reader.ReadMessage();
+                    var playerInfo = this.GetPlayerById(inner.Tag);
+                    if (playerInfo != null)
+                    {
+                        playerInfo.Deserialize(inner);
+                    }
+                    else
+                    {
+                        playerInfo = new InnerPlayerInfo(inner.Tag);
+                        playerInfo.Deserialize(inner);
+
+                        if (!_allPlayers.TryAdd(playerInfo.PlayerId, playerInfo))
+                        {
+                            throw new ImpostorException("Failed to add player to InnerGameData.");
+                        }
+                    }
+                }
             }
         }
 
@@ -94,32 +109,6 @@ namespace Impostor.Server.Net.Inner.Objects
                 {
                     Rpc29SetTasks.Deserialize(reader, out var playerId, out var taskTypeIds);
                     SetTasks(playerId, taskTypeIds);
-                    break;
-                }
-
-                case RpcCalls.UpdateGameData:
-                {
-                    while (reader.Position < reader.Length)
-                    {
-                        using var message = reader.ReadMessage();
-                        var player = GetPlayerById(message.Tag);
-                        if (player != null)
-                        {
-                            player.Deserialize(message);
-                        }
-                        else
-                        {
-                            var playerInfo = new InnerPlayerInfo(message.Tag);
-
-                            playerInfo.Deserialize(reader);
-
-                            if (!_allPlayers.TryAdd(playerInfo.PlayerId, playerInfo))
-                            {
-                                throw new ImpostorException("Failed to add player to InnerGameData.");
-                            }
-                        }
-                    }
-
                     break;
                 }
 

@@ -1,48 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
-using Impostor.Api.Net.Inner.Objects;
+using Impostor.Api.Net.Inner.Objects.ShipStatus;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Net.Inner.Objects.Systems;
 using Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 using Impostor.Server.Net.State;
-using Microsoft.Extensions.Logging;
 
-namespace Impostor.Server.Net.Inner.Objects
+namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 {
-    internal class InnerShipStatus : InnerNetObject, IInnerShipStatus
+    internal abstract class InnerShipStatus : InnerNetObject, IInnerShipStatus
     {
-        private readonly ILogger<InnerShipStatus> _logger;
-        private readonly Game _game;
-        private readonly Dictionary<SystemTypes, ISystemType> _systems;
+        private readonly Dictionary<SystemTypes, ISystemType> _systems = new Dictionary<SystemTypes, ISystemType>();
 
-        public InnerShipStatus(ILogger<InnerShipStatus> logger, Game game)
+        protected InnerShipStatus(Game game) : base(game)
         {
-            _logger = logger;
-            _game = game;
-
-            _systems = new Dictionary<SystemTypes, ISystemType>
-            {
-                [SystemTypes.Electrical] = new SwitchSystem(),
-                [SystemTypes.MedBay] = new MedScanSystem(),
-                [SystemTypes.Reactor] = game.Options.Map == MapTypes.Airship ? new HeliSabotageSystemType() : new ReactorSystemType(),
-                [SystemTypes.LifeSupp] = new LifeSuppSystemType(),
-                [SystemTypes.Security] = new SecurityCameraSystemType(),
-                [SystemTypes.Comms] = new HudOverrideSystemType(),
-                [SystemTypes.Doors] = new DoorsSystemType(_game),
-            };
-
-            _systems.Add(SystemTypes.Sabotage, new SabotageSystemType(new[]
-            {
-                (IActivatable)_systems[SystemTypes.Comms], (IActivatable)_systems[SystemTypes.Reactor], (IActivatable)_systems[SystemTypes.LifeSupp], (IActivatable)_systems[SystemTypes.Electrical],
-            }));
-
             Components.Add(this);
+        }
+
+        public abstract Dictionary<int, bool> Doors { get; }
+
+        public override ValueTask OnSpawnAsync()
+        {
+            for (var i = 0; i < Doors.Count; i++)
+            {
+                Doors.Add(i, false);
+            }
+
+            AddSystems(_systems);
+            _systems.Add(SystemTypes.Sabotage, new SabotageSystemType(_systems.Values.OfType<IActivatable>().ToArray()));
+
+            return base.OnSpawnAsync();
         }
 
         public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
@@ -59,8 +53,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
             while (reader.Position < reader.Length)
             {
-                IMessageReader messageReader = reader.ReadMessage();
-                SystemTypes type = (SystemTypes)messageReader.Tag;
+                var messageReader = reader.ReadMessage();
+                var type = (SystemTypes)messageReader.Tag;
                 if (_systems.TryGetValue(type, out var value))
                 {
                     value.Deserialize(messageReader, initialState);
@@ -90,7 +84,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.RepairSystem:
                 {
-                    Rpc28RepairSystem.Deserialize(reader, _game, out var systemType, out var player, out var amount);
+                    Rpc28RepairSystem.Deserialize(reader, Game, out var systemType, out var player, out var amount);
 
                     if (systemType == SystemTypes.Sabotage && !await ValidateImpostor(call, sender, sender.Character!.PlayerInfo))
                     {
@@ -105,6 +99,12 @@ namespace Impostor.Server.Net.Inner.Objects
             }
 
             return true;
+        }
+
+        protected virtual void AddSystems(Dictionary<SystemTypes, ISystemType> systems)
+        {
+            systems.Add(SystemTypes.Electrical, new SwitchSystem());
+            systems.Add(SystemTypes.MedBay, new MedScanSystem());
         }
     }
 }

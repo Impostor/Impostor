@@ -32,7 +32,6 @@
         CloseDoorsOfType = 27,
         RepairSystem = 28,
         SetTasks = 29,
-        UpdateGameData = 30,
         ClimbLadder = 31,
         UsePlatform = 32,
     }

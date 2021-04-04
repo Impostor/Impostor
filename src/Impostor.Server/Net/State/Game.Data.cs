@@ -10,6 +10,7 @@ using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner;
 using Impostor.Server.Net.Inner.Objects;
 using Impostor.Server.Net.Inner.Objects.Components;
+using Impostor.Server.Net.Inner.Objects.ShipStatus;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -32,15 +33,15 @@ namespace Impostor.Server.Net.State
 
         private static readonly Type[] SpawnableObjects =
         {
-            typeof(InnerShipStatus), // ShipStatus
+            typeof(InnerSkeldShipStatus),
             typeof(InnerMeetingHud),
             typeof(InnerLobbyBehaviour),
             typeof(InnerGameData),
             typeof(InnerPlayerControl),
-            typeof(InnerShipStatus), // HeadQuarters
-            typeof(InnerShipStatus), // PlanetMap
-            typeof(InnerShipStatus), // AprilShipStatus
-            typeof(InnerShipStatus), // Airship
+            typeof(InnerMiraShipStatus),
+            typeof(InnerPolusShipStatus),
+            typeof(InnerSkeldShipStatus), // April fools skeld
+            typeof(InnerAirshipStatus),
         };
 
         private readonly List<InnerNetObject> _allObjects = new List<InnerNetObject>();
@@ -349,6 +350,8 @@ namespace Impostor.Server.Net.State
                     break;
                 }
             }
+
+            await netObj.OnSpawnAsync();
         }
 
         private async ValueTask OnDestroyAsync(InnerNetObject netObj)
