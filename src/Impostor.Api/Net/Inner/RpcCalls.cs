@@ -1,4 +1,4 @@
-﻿namespace Impostor.Server.Net.Inner
+namespace Impostor.Server.Net.Inner
 {
     public enum RpcCalls : byte
     {
@@ -33,5 +33,7 @@
         RepairSystem = 28,
         SetTasks = 29,
         UpdateGameData = 30,
+        ClimbLadder = 31,
+        UsePlatform = 32,
     }
 }

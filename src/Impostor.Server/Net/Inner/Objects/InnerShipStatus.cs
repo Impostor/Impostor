@@ -29,7 +29,7 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 [SystemTypes.Electrical] = new SwitchSystem(),
                 [SystemTypes.MedBay] = new MedScanSystem(),
-                [SystemTypes.Reactor] = new ReactorSystemType(),
+                [SystemTypes.Reactor] = game.Options.Map == MapTypes.Airship ? new HeliSabotageSystemType() : new ReactorSystemType(),
                 [SystemTypes.LifeSupp] = new LifeSuppSystemType(),
                 [SystemTypes.Security] = new SecurityCameraSystemType(),
                 [SystemTypes.Comms] = new HudOverrideSystemType(),
@@ -56,31 +56,13 @@ namespace Impostor.Server.Net.Inner.Objects
                 return;
             }
 
-            if (initialState)
+            while (reader.Position < reader.Length)
             {
-                // TODO: (_systems[SystemTypes.Doors] as DoorsSystemType).SetDoors();
-                foreach (var systemType in SystemTypeHelpers.AllTypes)
+                IMessageReader messageReader = reader.ReadMessage();
+                SystemTypes type = (SystemTypes)messageReader.Tag;
+                if (_systems.TryGetValue(type, out var value))
                 {
-                    if (_systems.TryGetValue(systemType, out var system))
-                    {
-                        system.Deserialize(reader, true);
-                    }
-                }
-            }
-            else
-            {
-                var count = reader.ReadPackedUInt32();
-
-                foreach (var systemType in SystemTypeHelpers.AllTypes)
-                {
-                    // TODO: Not sure what is going on here, check.
-                    if ((count & 1 << (int)(systemType & (SystemTypes.ShipTasks | SystemTypes.Doors))) != 0L)
-                    {
-                        if (_systems.TryGetValue(systemType, out var system))
-                        {
-                            system.Deserialize(reader, false);
-                        }
-                    }
+                    value.Deserialize(messageReader, initialState);
                 }
             }
         }

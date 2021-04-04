@@ -18,6 +18,7 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
                 MapTypes.Skeld => 13,
                 MapTypes.MiraHQ => 2,
                 MapTypes.Polus => 12,
+                MapTypes.Airship => 21, // TODO do the toilet doors count? 21 yes, 17 no
                 _ => throw new ArgumentOutOfRangeException(),
             };
 

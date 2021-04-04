@@ -75,7 +75,8 @@ namespace Impostor.Server.Net.Inner.Objects
             }
             else
             {
-                throw new NotImplementedException("This shouldn't happen, according to Among Us disassembly.");
+                // It'll send an message per dirty player
+                // throw new NotImplementedException("This shouldn't happen, according to Among Us disassembly.");
             }
         }
 
