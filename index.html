@@ -1,100 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impostor | Among Us Private Server</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="row flex-column justify-content-center align-items-center p-0 m-0">
-    <div class="container text-light d-flex flex-column justify-content-center p-4 p-md-3" style="flex: 1;">
-        <section class="container mb-4">
-            <div class="row justify-content-center">
-                <h1 class="site-title text-center">Impostor</h1>
-            </div>
-            <div class="row justify-content-center">
-                <h2 class="site-subtitle text-center">Among Us Private Server</h2>
-            </div>
-        </section>
-        <section class="container">
-            <div class="mb-4 mb-md-3">
-                <h3 class="text-center text-md-left mb-4 mb-md-3 w-100">Connect to a Server</h3>
-                <p class="text-justify text-sm-center text-md-left support-text android-support">To play on a private server, type the server IP and overwrite the <b>regionInfo.json</b> file in <b>Internal Storage/Android/data/com.innersloth.spacemafia/files</b>.</p>
-                <p class="text-justify text-sm-center text-md-left support-text ios-support">There are two methods to play on a private server on iOS, both of which require a <a href="https://canijailbreak.com">jailbreak</a>.</p>
-                <h4 class="text-md-left mb-4 mb-md-3 w-100 support-text ios-support">1. Jailbreak tweak</h4>
-                <p class="text-justify text-md-left support-text ios-support">
-                    You can install the ImpostorConfig tweak from pixelomer's repo on your jailbroken device.
-                    <a href="cydia://url/https://cydia.saurik.com/api/share#?source=https://repo.pixelomer.com">Add to Cydia</a>
-                </p>
-                <div class="support-text ios-support mt-4">
-                    <h4 class="text-md-left mb-4 mb-md-3 w-100">2. Manual method</h4>
-                    <p class="text-justify text-sm-center text-md-left support-text ios-support">Type the server IP and overwrite the <b>regionInfo.json</b> file in <b>/var/mobile/Containers/Data/Application/Among Us/Documents</b> using Filza.</p>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Impostor | Among Us Private Server</title>
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body class="row flex-column justify-content-center align-items-center p-0 m-0">
+        <div class="container text-light d-flex flex-column justify-content-center p-4 p-md-3" style="flex: 1;">
+            <section class="container mb-4">
+                <div class="row justify-content-center">
+                    <h1 class="site-title text-center">Impostor</h1>
                 </div>
-            </div>
-            <form id="serverFileForm" class="container p-0" onsubmit="downloadAsync(); return false;">
-                <div class="row justify-content-center mb-5 mb-md-4">
-                    <div class="row justify-content-center flex-nowrap" style="max-width: 350px">
-                        <input class="form-control form-control-lg bg-transparent text-light text-center mr-2"
-                            type="text" placeholder="Server address" id="address" name="address" required>
-                        <!-- Disable port input until this is fixed in Among Us -->
-                        <!--<input class="form-control form-control-lg bg-transparent text-light" style="max-width: 110px"
-                            type="number" placeholder="Port" id="port" name="port" min="1" max="65535" required>-->
+                <div class="row justify-content-center">
+                    <h2 class="site-subtitle text-center">Among Us Private Server</h2>
+                </div>
+            </section>
+
+            <section class="container">
+                <div class="mb-4 mb-md-3">
+                    <h3 class="text-center text-md-left mb-4 mb-md-3 w-100">Connect to a Server</h3>
+                </div>
+                <form id="serverFileForm" class="container p-0" onsubmit="downloadAsync(); return false;">
+                    <div class="row justify-content-center mb-5 mb-md-4">
+                        <div class="row justify-content-center flex-nowrap" style="max-width: 350px">
+                            <input class="form-control form-control-lg bg-transparent text-light text-center mr-2"
+                                   type="text" placeholder="Server address" id="address" name="address" required>
+                            <input class="form-control form-control-lg bg-transparent text-light" style="max-width: 110px"
+                                   type="number" placeholder="Port" id="port" name="port" min="1" max="65535" required>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center mb-5 mb-md-4">
+                        <div class="row justify-content-center flex-nowrap">
+                            <input class="form-control form-control-lg bg-transparent text-light text-center mr-2"
+                                   type="text" placeholder="Server name" id="name" name="name">
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <button class="btn btn-primary btn-lg">Download server file</button>
+                    </div>
+                </form>
+                <div class="mt-4">
+                    <h3>
+                        Instructions
+                        <i id="desktop" class="platform fab fa-windows" onclick="setPlatform('desktop');"></i>
+                        <i id="android" class="platform fab fa-android" onclick="setPlatform('android');"></i>
+                        <i id="ios" class="platform fab fa-apple" onclick="setPlatform('ios');"></i>
+                    </h3>
+
+                    <div class="support-text desktop-support">
+                        To play on a private server follow the following steps:
+                        <ol>
+                            <li>Type the server IP and download click the button "Download server file".</li>
+                            <li>Make sure that the file is named <code>regionInfo.json</code> and doesn't have additional numbers (e.g. <code>regionInfo (1).json</code>) because you downloaded it multiple times.</li>
+                            <li>
+                                Press <kbd class="key"><i class="fab fa-windows"></i></kbd> + <kbd class="key">R</kbd> on your keyboard and paste the following:<br/>
+                                <div class="text-center my-2">
+                                    <code>%APPDATA%\..\LocalLow\Innersloth\Among Us</code>
+                                </div>
+                            </li>
+                            <li>Press <span class="key">Enter</span> or click "OK".</li>
+                            <li>Copy the downloaded file and paste it in the opened folder.</li>
+                            <li>You can now play on your server by opening Among Us and clicking "Online".</li>
+                        </ol>
+                        To switch back to the original servers, change the region in the bottom right corner.<br/>
+                        If you want to switch back to your server, re-do the steps above.
+                    </div>
+
+                    <div class="support-text ios-support">
+                        <p class="text-justify text-sm-center text-md-left">There are two methods to play on a private server on iOS, both of which require a <a href="https://canijailbreak.com">jailbreak</a>.</p>
+                        <h4 class="text-md-left mb-4 mb-md-3 w-100">1. Jailbreak tweak</h4>
+                        <p class="text-justify text-md-left">
+                            You can install the ImpostorConfig tweak from pixelomer's repo on your jailbroken device.
+                            <a href="cydia://url/https://cydia.saurik.com/api/share#?source=https://repo.pixelomer.com">Add to Cydia</a>
+                        </p>
+                        <div class="mt-4">
+                            <h4 class="text-md-left mb-4 mb-md-3 w-100">2. Manual method</h4>
+                            <p class="text-justify text-sm-center text-md-left">Type the server IP and overwrite the <b>regionInfo.json</b> file in <b>/var/mobile/Containers/Data/Application/Among Us/Documents</b> using Filza.</p>
+                        </div>
+                    </div>
+
+                    <div class="support-text android-support">
+                        <p class="text-justify text-sm-center text-md-left">To play on a private server, type the server IP and overwrite the <b>regionInfo.json</b> file in <b>Internal Storage/Android/data/com.innersloth.spacemafia/files</b>.</p>
                     </div>
                 </div>
-                <div class="row justify-content-center mb-5 mb-md-4">
-                    <div class="row justify-content-center flex-nowrap">
-                        <input class="form-control form-control-lg bg-transparent text-light text-center mr-2"
-                            type="text" placeholder="Server name" id="name" name="name">
-                    </div>
-                </div>
-                <div class="row justify-content-center mb-5 mb-md-4">
-                    <div class="row justify-content-center flex-nowrap">
-                        <select class="form-control form-control-lg bg-transparent text-light text-center mr-2"
-                                type="text" id="platform" name="name" onchange="updatePlatformText()">
-                            <option value="2021.3.5s">2021.3.5s (Steam)</option>
-                            <option value="2021.3.9a">2021.3.9a (Android)</option>
-                            <option value="2021.3.5o">2021.3.5o (iOS)</option>
-                            <option value="2021.3.5i">2021.3.5i (Itch)</option>
-                            <option value="2021.3.5e">2021.3.5e (Epic)</option>
-                            <option value="2021.2.21m">2021.2.21m (Microsoft Store)</option>
-                        </select>
-                    </div>
-                </div>
-               <div class="row justify-content-center">
-                    <button class="btn btn-primary btn-lg">Download server file</button>
-                </div>
-            </form>
-            <div class="support-text desktop-support mt-4">
-                <h3>Instructions</h3>
-                <p class="text-justify text-sm-center text-md-left">
-                    To play on a private server follow the following steps:
-                    <ol>
-                        <li>Type the server IP and download click the button "Download server file".</li>
-                        <li>Make sure that the file is named <code>regionInfo.json</code> and doesn't have additional numbers (e.g. <code>regionInfo (1).json</code>) because you downloaded it multiple times.</li>
-                        <li>
-                            Press <kbd class="key"><svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="windows" class="svg-inline--fa fa-windows fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M0 93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8 28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8 65.7z"></path></svg></kbd> + <kbd class="key">R</kbd> on your keyboard and paste the following:<br />
-                            <div class="text-center my-2">
-                                <code>%APPDATA%\..\LocalLow\Innersloth\Among Us</code>
-                            </div>
-                        </li>
-                        <li>Press <span class="key">Enter</span> or click "OK".</li>
-                        <li>Copy the downloaded file and paste it in the opened folder.</li>
-                        <li>You can now play on your server by opening Among Us and clicking "Online".</li>
-                    </ol>
-                    To switch back to the original servers, change the region in the bottom right corner.<br />
-                    If you want to switch back to your server, re-do the steps above.
-                </p>
-            </div>
-        </section>
+            </section>
 
+        </div>
 
-      </div>
-
-      <footer class="container text-light text-center">
+        <footer class="container text-light text-center">
             <p>To create a server, see the instructions in <a href="https://github.com/Impostor/Impostor">Github</a> project page.</p>
         </footer>
 
-    <script src="script.js"></script>
-</body>
+        <script src="https://kit.fontawesome.com/1a00236538.js" crossorigin="anonymous"></script>
+        <script src="script.js"></script>
+    </body>
 </html>

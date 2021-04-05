@@ -1,14 +1,4 @@
-// const DEFAULT_PORT = 22023;
-
-const MAPPINGS = {
-    // TODO: once 2021.3.9 rolls out across all platforms make this selection affect only instructions
-    "2021.3.5s": { CurrentRegionIdx: "NHKLLGFLCLM", Regions: "PBKMLNEHKHL" },
-    "2021.3.9a": null,
-    "2021.3.5o": { CurrentRegionIdx: "BBHHIMPDFMB", Regions: "GAOCJNFMKLA" },
-    "2021.3.5i": { CurrentRegionIdx: "FMCHICBDPCE", Regions: "HACEEIOGMDC" },
-    "2021.3.5e": { CurrentRegionIdx: "KCEOFOCILEP", Regions: "FHHFNNEMCJC" },
-    "2021.2.21m": { CurrentRegionIdx: "BIPBMPFJBMI", Regions: "GECPHDGCFJM" }
-};
+const DEFAULT_PORT = 22023;
 
 const IP_REGEX = /(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}/;
 
@@ -36,45 +26,52 @@ async function parseAddressAsync(serverAddress) {
 
 async function downloadAsync() {
     const serverAddress = document.getElementById("address").value;
-    // const serverPort = document.getElementById("port").value ?? DEFAULT_PORT; TODO wait for update fixing ports in DnsRegionInfo
+    const serverPort = document.getElementById("port").value ?? DEFAULT_PORT;
     const serverName = document.getElementById("name").value || "Impostor";
-    const gamePlatform = document.getElementById("platform").value;
 
     const [serverIp, serverFqdn] = await parseAddressAsync(serverAddress);
-    const json = generateRegionInfo(serverName, serverIp, serverFqdn, MAPPINGS[gamePlatform]);
+    const json = generateRegionInfo(serverName, serverIp, serverFqdn, serverPort);
     const blob = new Blob([json], { type: "text/plain" });
     saveFile(blob, "regionInfo.json");
 
     return false;
 }
 
-const platformTexts = {
-    ".ios-support": ["o"],
-    ".android-support": ["a"],
-    ".desktop-support": ["s", "i", "e", "m"]
-};
+let currentPlatform;
 
-function updatePlatformText() {
-    const gamePlatform = document.getElementById("platform").value;
-
-    for (let className in platformTexts) {
-        const isVisible = platformTexts[className].some(postfix => gamePlatform.endsWith(postfix));
-        document.querySelectorAll(className).forEach(element => element.style.display = isVisible ? "block" : "none");
-    }
+function setEnabled(platform, value) {
+    document.querySelector(`.${platform}-support`).style.display = value ? "block" : "none";
 }
 
-function generateRegionInfo(name, ip, fqdn, mappings) {
+function setPlatform(platform) {
+    if (currentPlatform === platform) {
+        return;
+    }
+
+    if (currentPlatform) {
+        setEnabled(currentPlatform, false);
+        document.getElementById(currentPlatform).classList.remove("text-primary");
+    }
+
+    setEnabled(platform, true);
+    document.getElementById(platform).classList.add("text-primary");
+
+    currentPlatform = platform;
+}
+
+function generateRegionInfo(name, ip, fqdn, port) {
     const region = {
         "$type": "DnsRegionInfo, Assembly-CSharp",
         "Fqdn": fqdn,
         "DefaultIp": ip,
+        "Port": port,
         "Name": name,
         "TranslateName": 1003 // StringNames.NoTranslation
     };
 
     const jsonServerData = {
-        [mappings?.CurrentRegionIdx ?? "CurrentRegionIdx"]: 0,
-        [mappings?.Regions ?? "Regions"]: [region]
+        "CurrentRegionIdx": 0,
+        "Regions": [region]
     };
 
     return JSON.stringify(jsonServerData);
@@ -96,23 +93,23 @@ function saveFile(blob, fileName) {
 function fillFromLocationHash() {
     const urlServerAddress = document.location.hash.substr(1).split(":");
     const serverAddress = urlServerAddress[0];
-    // const serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : DEFAULT_PORT.toString();
+    const serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : DEFAULT_PORT.toString();
 
     if (serverAddress) {
         document.getElementById("address").value = serverAddress;
     }
 
-    // if (new RegExp("^[0-9]+$", "g").test(serverPort)) {
-    //     document.getElementById("port").value = serverPort;
-    // }
+    if (new RegExp("^[0-9]+$", "g").test(serverPort)) {
+        document.getElementById("port").value = serverPort;
+    }
 }
 
 fillFromLocationHash();
 
 if (["iPhone", "iPad", "iPod"].indexOf(window.navigator.platform) !== -1) {
-    document.getElementById("platform").value = "2021.3.5o";
+    setPlatform("ios");
 } else if (/Android/.test(window.navigator.userAgent)) {
-    document.getElementById("platform").value = "2021.3.9a";
+    setPlatform("android");
+} else {
+    setPlatform("desktop");
 }
-
-updatePlatformText();

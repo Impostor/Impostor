@@ -69,3 +69,7 @@ select.form-control option {
 code {
     white-space: nowrap;
 }
+
+.platform {
+    cursor: pointer;
+}
