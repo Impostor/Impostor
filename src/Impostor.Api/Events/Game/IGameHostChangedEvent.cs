@@ -6,6 +6,6 @@ namespace Impostor.Api.Events
     {
         IClientPlayer PreviousHost { get; }
 
-        IClientPlayer NewHost { get; }
+        IClientPlayer? NewHost { get; }
     }
 }

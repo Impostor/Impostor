@@ -17,6 +17,6 @@ namespace Impostor.Server.Events
 
         public IClientPlayer PreviousHost { get; }
 
-        public IClientPlayer NewHost { get; }
+        public IClientPlayer? NewHost { get; }
     }
 }
