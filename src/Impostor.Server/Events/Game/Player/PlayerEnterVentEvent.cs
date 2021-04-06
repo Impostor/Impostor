@@ -6,9 +6,9 @@ using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Events.Player
 {
-    public class PlayerVentEvent : IPlayerVentEvent
+    public class PlayerEnterVentEvent : IPlayerEnterVentEvent
     {
-        public PlayerVentEvent(IGame game, IClientPlayer sender, IInnerPlayerControl innerPlayerPhysics, Vent vent)
+        public PlayerEnterVentEvent(IGame game, IClientPlayer sender, IInnerPlayerControl innerPlayerPhysics, Vent vent)
         {
             Game = game;
             ClientPlayer = sender;

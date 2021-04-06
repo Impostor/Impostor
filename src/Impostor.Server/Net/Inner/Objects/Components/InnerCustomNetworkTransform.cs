@@ -17,6 +17,8 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 {
     internal partial class InnerCustomNetworkTransform : InnerNetObject
     {
+        private static readonly Vector2 ColliderOffset = new Vector2(0f, -0.4f);
+
         private readonly ILogger<InnerCustomNetworkTransform> _logger;
         private readonly InnerPlayerControl _playerControl;
         private readonly IEventManager _eventManager;
@@ -113,7 +115,22 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     return false;
                 }
 
-                // TODO validate vent location
+                var vents = Game.GameNet.ShipStatus!.Data.Vents.Values;
+
+                var vent = vents.SingleOrDefault(x => Approximately(x.Position, position + ColliderOffset));
+
+                if (vent == null)
+                {
+                    if (await sender.Client.ReportCheatAsync(call, "Failed vent position check"))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    await _eventManager.CallAsync(new PlayerVentEvent(Game, sender, _playerControl, vent));
+                }
+
                 await SnapToAsync(sender, position, minSid);
                 return true;
             }
