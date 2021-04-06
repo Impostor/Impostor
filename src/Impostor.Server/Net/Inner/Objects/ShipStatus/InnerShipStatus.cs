@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Maps;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects.ShipStatus;
@@ -24,6 +25,8 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
         {
             Components.Add(this);
         }
+
+        public abstract MapData Data { get; }
 
         public abstract Dictionary<int, bool> Doors { get; }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Maps;
 using Impostor.Api.Net.Inner.Objects.ShipStatus;
 using Impostor.Server.Net.Inner.Objects.Systems;
 using Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
@@ -14,6 +15,8 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
         public InnerAirshipStatus(Game game) : base(game)
         {
         }
+
+        public override MapData Data => MapData.Maps[MapTypes.Airship];
 
         public override Dictionary<int, bool> Doors { get; } = new Dictionary<int, bool>(21);
 
