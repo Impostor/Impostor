@@ -20,6 +20,7 @@ namespace Impostor.Server.Net.Manager
         private static readonly HashSet<int> SupportedVersions = new HashSet<int>
         {
             GameVersion.GetVersion(2021, 3, 25), // 2021.3.31s
+            GameVersion.GetVersion(2021, 4, 2), // 2021.4.2a
         };
 
         private readonly ILogger<ClientManager> _logger;
