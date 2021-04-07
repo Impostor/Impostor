@@ -24,6 +24,12 @@ namespace Impostor.Server.Plugins
 
         public string Version => _attribute.Version;
 
+        public string[] Dependencies => _attribute.Dependencies;
+
+        public string[] SoftDependencies => _attribute.SoftDependencies;
+
+        public string[] LoadBefore => _attribute.LoadBefore;
+
         public IPluginStartup? Startup { get; }
 
         public Type PluginType { get; }

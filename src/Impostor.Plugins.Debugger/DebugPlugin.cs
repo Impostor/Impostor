@@ -6,7 +6,10 @@ namespace Impostor.Plugins.Debugger
         package: "gg.impostor.debugger",
         name: "Debugger",
         author: "Gerard",
-        version: "1.0.0")]
+        version: "1.0.0",
+        dependencies: new string[] {},
+        softDependencies: new string[] {},
+        loadBefore: new string[] {})]
     public class DebugPlugin : PluginBase
     {
     }

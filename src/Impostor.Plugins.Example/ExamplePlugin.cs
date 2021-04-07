@@ -10,7 +10,10 @@ namespace Impostor.Plugins.Example
         package: "gg.impostor.example",
         name: "Example",
         author: "AeonLucid",
-        version: "1.0.0")]
+        version: "1.0.0",
+        dependencies: new string[] {},
+        softDependencies: new string[] {},
+        loadBefore: new string[] {})]
     public class ExamplePlugin : PluginBase
     {
         private readonly ILogger<ExamplePlugin> _logger;
