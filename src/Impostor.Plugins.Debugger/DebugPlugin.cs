@@ -1,4 +1,4 @@
-﻿using Impostor.Api.Plugins;
+using Impostor.Api.Plugins;
 
 namespace Impostor.Plugins.Debugger
 {
@@ -6,10 +6,7 @@ namespace Impostor.Plugins.Debugger
         package: "gg.impostor.debugger",
         name: "Debugger",
         author: "Gerard",
-        version: "1.0.0",
-        dependencies: new string[] {},
-        softDependencies: new string[] {},
-        loadBefore: new string[] {})]
+        version: "1.0.0")]
     public class DebugPlugin : PluginBase
     {
     }

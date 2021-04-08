@@ -10,17 +10,17 @@ namespace Impostor.Api.Plugins
             string name,
             string author,
             string version,
-            string[] dependencies,
-            string[] softDependencies,
-            string[] loadBefore)
+            string[]? dependencies = null,
+            string[]? softDependencies = null,
+            string[]? loadBefore = null)
         {
             Package = package;
             Name = name;
             Author = author;
             Version = version;
-            Dependencies = dependencies;
-            SoftDependencies = softDependencies;
-            LoadBefore = loadBefore;
+            Dependencies = dependencies ?? new string[0];
+            SoftDependencies = softDependencies ?? new string[0];
+            LoadBefore = loadBefore ?? new string[0];
         }
 
         public string Package { get; }
