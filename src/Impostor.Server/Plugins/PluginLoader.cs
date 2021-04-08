@@ -104,16 +104,18 @@ namespace Impostor.Server.Plugins
                     plugin.First()));
             }
 
-            foreach (var plugin in plugins)
+            var orderedPlugins = OrderPlugins(plugins);
+
+            foreach (var plugin in orderedPlugins)
             {
                 plugin.Startup?.ConfigureHost(builder);
             }
 
             builder.ConfigureServices(services =>
             {
-                services.AddHostedService(provider => ActivatorUtilities.CreateInstance<PluginLoaderService>(provider, plugins));
+                services.AddHostedService(provider => ActivatorUtilities.CreateInstance<PluginLoaderService>(provider, orderedPlugins));
 
-                foreach (var plugin in plugins)
+                foreach (var plugin in orderedPlugins)
                 {
                     plugin.Startup?.ConfigureServices(services);
                 }
@@ -154,6 +156,88 @@ namespace Impostor.Server.Plugins
 
                 assemblyInfos.Add(new AssemblyInformation(assemblyName, path, isPlugin));
             }
+        }
+
+        private static IEnumerable<PluginInformation> OrderPlugins(IEnumerable<PluginInformation> plugins)
+        {
+            var pluginsDict = new Dictionary<string, PluginInformation>();
+            var dependencyGraph = new Dictionary<string, List<string>>();
+
+            // Create a dependency graph and a dictionary to simplify
+            foreach (var plugin in plugins)
+            {
+                pluginsDict.Add(plugin.Name, plugin);
+                dependencyGraph.Add(plugin.Name, new List<string>());
+            }
+
+            var pluginList = dependencyGraph.Keys.ToList();
+
+            // Add the dependencies to the graph
+            foreach (var plugin in plugins)
+            {
+                // Add the hard dependencies, iff one is missing give an error message.
+                foreach (var hardDepend in plugin.Dependencies)
+                {
+                    if (pluginList.Contains(hardDepend))
+                    {
+                        dependencyGraph[plugin.Name].Add(hardDepend);
+                    }
+                    else
+                    {
+                        Logger.Error($"The plugin {plugin.Name} has defined the plugin {hardDepend}" +
+                                     $" as a hard dependency but {hardDepend} is not present!");
+                    }
+                }
+
+                foreach (var softDepend in plugin.SoftDependencies)
+                {
+                    if (pluginList.Contains(softDepend))
+                    {
+                        dependencyGraph[plugin.Name].Add(softDepend);
+                    }
+                }
+
+                foreach (var loadBefore in plugin.LoadBefore)
+                {
+                    if (pluginList.Contains(loadBefore))
+                    {
+                        dependencyGraph[loadBefore].Add(plugin.Name);
+                    }
+                }
+            }
+
+            var processed = new List<string>();
+            var ordered = new List<PluginInformation>();
+            foreach (var plugin in pluginList)
+            {
+                if (!processed.Contains(plugin))
+                {
+                    RecursiveOrder(plugin, dependencyGraph, processed, ordered, pluginsDict);
+                }
+            }
+
+            return ordered;
+        }
+
+        private static void RecursiveOrder(
+            string plugin,
+            IReadOnlyDictionary<string, List<string>> dependencyGraph,
+            ICollection<string> processed,
+            ICollection<PluginInformation> ordered,
+            IReadOnlyDictionary<string, PluginInformation> pluginDict)
+        {
+            processed.Add(plugin);
+
+            foreach (var dep in dependencyGraph[plugin])
+            {
+                // First add the dependencies using a recursive call before adding itself.
+                if (!processed.Contains(dep))
+                {
+                    RecursiveOrder(dep, dependencyGraph, processed, ordered, pluginDict);
+                }
+            }
+
+            ordered.Add(pluginDict[plugin]);
         }
     }
 }

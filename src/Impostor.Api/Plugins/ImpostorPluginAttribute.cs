@@ -5,6 +5,18 @@ namespace Impostor.Api.Plugins
     [AttributeUsage(AttributeTargets.Class)]
     public class ImpostorPluginAttribute : Attribute
     {
+        public ImpostorPluginAttribute(string package, string name, string author, string version)
+        {
+            // The extra constructor ensures that older compiled plugins are still working.
+            Package = package;
+            Name = name;
+            Author = author;
+            Version = version;
+            Dependencies = new string[0];
+            SoftDependencies = new string[0];
+            LoadBefore = new string[0];
+        }
+
         public ImpostorPluginAttribute(
             string package,
             string name,
