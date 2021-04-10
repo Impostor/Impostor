@@ -2,11 +2,14 @@ using Impostor.Api.Innersloth;
 
 namespace Impostor.Api.Events.Player
 {
+    /// <summary>
+    ///     Called whenever a player moves to another vent.
+    /// </summary>
     public interface IPlayerVentEvent : IPlayerEvent
     {
         /// <summary>
-        ///     Gets get the id of the used vent.
+        ///     Gets the vent player moved to.
         /// </summary>
-        public Vent Vent { get; }
+        public IVent NewVent { get; }
     }
 }

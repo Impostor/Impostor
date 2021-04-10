@@ -8,7 +8,7 @@ namespace Impostor.Server.Events.Player
 {
     public class PlayerExitVentEvent : IPlayerExitVentEvent
     {
-        public PlayerExitVentEvent(IGame game, IClientPlayer sender, IInnerPlayerControl innerPlayerPhysics, Vent vent)
+        public PlayerExitVentEvent(IGame game, IClientPlayer sender, IInnerPlayerControl innerPlayerPhysics, IVent vent)
         {
             Game = game;
             ClientPlayer = sender;
@@ -22,6 +22,6 @@ namespace Impostor.Server.Events.Player
 
         public IInnerPlayerControl PlayerControl { get; }
 
-        public Vent Vent { get; }
+        public IVent Vent { get; }
     }
 }

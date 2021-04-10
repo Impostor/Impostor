@@ -103,13 +103,13 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnPlayerExitVentEvent(IPlayerExitVentEvent e)
         {
-            _logger.LogInformation("Player {player} exit the vent in {vent}", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name);
+            _logger.LogInformation("Player {player} exited the vent in {vent}", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name);
         }
 
         [EventListener]
         public void OnPlayerVentEvent(IPlayerVentEvent e)
         {
-            _logger.LogInformation("Player {player} vented to {vent}", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name);
+            _logger.LogInformation("Player {player} vented to {vent}", e.PlayerControl.PlayerInfo.PlayerName, e.NewVent.Name);
         }
     }
 }

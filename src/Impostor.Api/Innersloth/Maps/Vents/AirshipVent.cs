@@ -1,11 +1,25 @@
+using System;
 using System.Numerics;
 
 namespace Impostor.Api.Innersloth.Maps.Vents
 {
-    public class AirshipVent : Vent
+    public class AirshipVent : IVent
     {
-        internal AirshipVent(Ids id, Vector2 position) : base((int)id, id.ToString(), position)
+        private readonly Lazy<AirshipVent>? _left;
+
+        private readonly Lazy<AirshipVent>? _center;
+
+        private readonly Lazy<AirshipVent>? _right;
+
+        internal AirshipVent(AirshipData data, Ids id, Vector2 position, Ids? left = null, Ids? center = null, Ids? right = null)
         {
+            Id = id;
+            Name = id.ToString();
+            Position = position;
+
+            _left = left == null ? null : new Lazy<AirshipVent>(() => data.Vents[left.Value]);
+            _center = center == null ? null : new Lazy<AirshipVent>(() => data.Vents[center.Value]);
+            _right = right == null ? null : new Lazy<AirshipVent>(() => data.Vents[right.Value]);
         }
 
         public enum Ids
@@ -23,5 +37,25 @@ namespace Impostor.Api.Innersloth.Maps.Vents
             Records = 10,
             CargoBay = 11,
         }
+
+        public Ids Id { get; }
+
+        int IVent.Id => (int)Id;
+
+        public string Name { get; }
+
+        public Vector2 Position { get; }
+
+        public AirshipVent? Left => _left?.Value;
+
+        IVent? IVent.Left => Left;
+
+        public AirshipVent? Center => _center?.Value;
+
+        IVent? IVent.Center => Center;
+
+        public AirshipVent? Right => _right?.Value;
+
+        IVent? IVent.Right => Right;
     }
 }

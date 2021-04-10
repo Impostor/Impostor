@@ -26,7 +26,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
             Components.Add(this);
         }
 
-        public abstract MapData Data { get; }
+        public abstract IMapData Data { get; }
 
         public abstract Dictionary<int, bool> Doors { get; }
 

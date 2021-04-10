@@ -15,7 +15,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
         {
         }
 
-        public override MapData Data { get; } = MapData.Maps[MapTypes.Skeld];
+        public override IMapData Data { get; } = IMapData.Maps[MapTypes.Skeld];
 
         public override Dictionary<int, bool> Doors { get; } = new Dictionary<int, bool>(13);
 
