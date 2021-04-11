@@ -114,7 +114,7 @@ namespace Impostor.Server.Plugins
                     dependencies));
             }
 
-            var orderedPlugins = plugins;
+            var orderedPlugins = LoadOrderPlugins(plugins);
 
             foreach (var plugin in orderedPlugins)
             {
