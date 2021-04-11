@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj" />
-    <ProjectReference Include="..\Impostor.Hazel\Impostor.Hazel.csproj" />
+    <ProjectReference Include="..\Impostor.Hazel\Hazel\Hazel.csproj" />
   </ItemGroup>
 
 </Project>

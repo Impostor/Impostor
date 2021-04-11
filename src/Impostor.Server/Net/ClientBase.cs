@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
-using Impostor.Api.Reactor;
 using Impostor.Hazel;
 using Impostor.Server.Net.State;
 
@@ -16,25 +14,12 @@ namespace Impostor.Server.Net
 {
     internal abstract class ClientBase : IClient
     {
-        protected ClientBase(string name, int gameVersion, IHazelConnection connection, ISet<Mod> mods)
+        protected ClientBase(string name, int gameVersion, IHazelConnection connection)
         {
             Name = name;
             GameVersion = gameVersion;
             Connection = connection;
-            Mods = mods;
             Items = new ConcurrentDictionary<object, object>();
-
-            ModIdMap = new Dictionary<int, string>();
-
-            var i = -1;
-
-            foreach (var mod in mods.OrderBy(x => x.Id))
-            {
-                if (mod.Side == PluginSide.Both)
-                {
-                    ModIdMap[i--] = mod.Id;
-                }
-            }
         }
 
         public int Id { get; set; }
@@ -42,10 +27,6 @@ namespace Impostor.Server.Net
         public string Name { get; }
 
         public int GameVersion { get; }
-
-        public ISet<Mod> Mods { get; }
-
-        public Dictionary<int, string> ModIdMap { get; }
 
         public IHazelConnection Connection { get; }
 

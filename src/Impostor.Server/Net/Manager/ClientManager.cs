@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
-using Impostor.Api.Reactor;
 using Impostor.Hazel;
 using Impostor.Server.Config;
 using Impostor.Server.Net.Factories;
-using Impostor.Server.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Manager
@@ -20,10 +19,9 @@ namespace Impostor.Server.Net.Manager
     {
         private static readonly HashSet<int> SupportedVersions = new HashSet<int>
         {
-            GameVersion.GetVersion(2021, 3, 5), // 2021.3.5
+            GameVersion.GetVersion(2021, 3, 25), // 2021.3.31s
+            GameVersion.GetVersion(2021, 4, 2), // 2021.4.2a
         };
-
-        private static readonly string ServerBrand = $"Impostor {DotnetUtils.GetVersion()}";
 
         private readonly ILogger<ClientManager> _logger;
         private readonly ConcurrentDictionary<int, ClientBase> _clients;
@@ -55,7 +53,7 @@ namespace Impostor.Server.Net.Manager
             return clientId;
         }
 
-        public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion, ISet<Mod>? mods)
+        public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion)
         {
             if (!SupportedVersions.Contains(clientVersion))
             {
@@ -81,16 +79,12 @@ namespace Impostor.Server.Net.Manager
                 return;
             }
 
-            var client = _clientFactory.Create(connection, name, clientVersion, mods ?? new HashSet<Mod>(0));
+            var client = _clientFactory.Create(connection, name, clientVersion);
             var id = NextId();
 
             client.Id = id;
             _logger.LogTrace("Client connected.");
             _clients.TryAdd(id, client);
-
-            using var writer = MessageWriter.Get(MessageType.Reliable);
-            ModdedHandshakeS2C.Serialize(writer, ServerBrand);
-            await connection.SendAsync(writer);
         }
 
         public void Remove(IClient client)
