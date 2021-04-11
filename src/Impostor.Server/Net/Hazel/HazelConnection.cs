@@ -27,6 +27,8 @@ namespace Impostor.Server.Net.Hazel
 
         public IClient? Client { get; set; }
 
+        public float AveragePing => InnerConnection is NetworkConnection networkConnection ? networkConnection.AveragePingMs : 0;
+
         public ValueTask SendAsync(IMessageWriter writer)
         {
             return InnerConnection.SendAsync(writer);

@@ -25,6 +25,11 @@ namespace Impostor.Api.Net
         IClient? Client { get; set; }
 
         /// <summary>
+        ///     Gets the average ping of the client.
+        /// </summary>
+        float AveragePing { get; }
+
+        /// <summary>
         ///     Sends a message writer to the connection.
         /// </summary>
         /// <param name="writer">The message.</param>
