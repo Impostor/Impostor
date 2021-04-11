@@ -2,19 +2,22 @@
 
 namespace Impostor.Server.Utils
 {
-    internal static class DotnetUtils
+    public static class DotnetUtils
     {
-        private const string DefaultUnknownBuild = "UNKNOWN";
+        private static string? _version;
 
-        public static string GetVersion()
+        public static string Version
         {
-            var attribute = typeof(DotnetUtils).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            if (attribute != null)
+            get
             {
-                return attribute.InformationalVersion;
-            }
+                if (_version == null)
+                {
+                    var attribute = typeof(DotnetUtils).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+                    _version = attribute != null ? attribute.InformationalVersion : "UNKNOWN";
+                }
 
-            return DefaultUnknownBuild;
+                return _version;
+            }
         }
     }
 }

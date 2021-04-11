@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using Impostor.Api.Net;
-using Impostor.Api.Reactor;
+﻿using Impostor.Api.Net;
 
 namespace Impostor.Server.Net.Factories
 {
     internal interface IClientFactory
     {
-        ClientBase Create(IHazelConnection connection, string name, int clientVersion, ISet<Mod> mods);
+        ClientBase Create(IHazelConnection connection, string name, int clientVersion);
     }
 }

@@ -1,4 +1,4 @@
-using Impostor.Server.Net.Inner;
+using Impostor.Api.Net.Inner;
 
 namespace Impostor.Api
 {

@@ -1,4 +1,5 @@
 ﻿using Impostor.Api.Net.Inner.Objects;
+using Impostor.Api.Net.Inner.Objects.ShipStatus;
 
 namespace Impostor.Api.Net.Inner
 {

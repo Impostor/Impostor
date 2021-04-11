@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using Impostor.Api.Net;
-using Impostor.Api.Reactor;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Impostor.Server.Net.Factories
@@ -16,9 +14,9 @@ namespace Impostor.Server.Net.Factories
             _serviceProvider = serviceProvider;
         }
 
-        public ClientBase Create(IHazelConnection connection, string name, int clientVersion, ISet<Mod> mods)
+        public ClientBase Create(IHazelConnection connection, string name, int clientVersion)
         {
-            var client = ActivatorUtilities.CreateInstance<TClient>(_serviceProvider, name, clientVersion, connection, mods);
+            var client = ActivatorUtilities.CreateInstance<TClient>(_serviceProvider, name, clientVersion, connection);
             connection.Client = client;
             return client;
         }

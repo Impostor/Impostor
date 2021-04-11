@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Games;
@@ -8,7 +7,6 @@ using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
-using Impostor.Api.Reactor;
 using Impostor.Hazel;
 using Impostor.Server.Config;
 using Impostor.Server.Net.Manager;
@@ -24,8 +22,8 @@ namespace Impostor.Server.Net
         private readonly ClientManager _clientManager;
         private readonly GameManager _gameManager;
 
-        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, int gameVersion, IHazelConnection connection, ISet<Mod> mods)
-            : base(name, gameVersion, connection, mods)
+        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, int gameVersion, IHazelConnection connection)
+            : base(name, gameVersion, connection)
         {
             _logger = logger;
             _antiCheatConfig = antiCheatOptions.Value;

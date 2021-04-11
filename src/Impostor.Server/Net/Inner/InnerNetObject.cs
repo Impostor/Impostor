@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
@@ -10,9 +11,18 @@ namespace Impostor.Server.Net.Inner
     {
         private const int HostInheritId = -2;
 
+        protected InnerNetObject(Game game)
+        {
+            Game = game;
+        }
+
         public uint NetId { get; internal set; }
 
         public int OwnerId { get; internal set; }
+
+        public Game Game { get; }
+
+        IGame IInnerNetObject.Game => Game;
 
         public SpawnFlags SpawnFlags { get; internal set; }
 
@@ -28,18 +38,9 @@ namespace Impostor.Server.Net.Inner
 
         public abstract ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader);
 
-        // TODO move to Reactor.Impostor plugin
-        protected ValueTask<bool> HandleCustomRpc(IMessageReader reader, Game game)
+        public virtual ValueTask OnSpawnAsync()
         {
-            var lengthOrShortId = reader.ReadPackedInt32();
-
-            var pluginId = lengthOrShortId < 0
-                ? game.Host!.Client.ModIdMap[lengthOrShortId]
-                : reader.ReadString(lengthOrShortId);
-
-            var id = reader.ReadPackedInt32();
-
-            return ValueTask.FromResult(true);
+            return default;
         }
     }
 }

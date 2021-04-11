@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
+using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Inner.Objects.Components;
 using Impostor.Api.Net.Messages.Rpcs;
@@ -21,52 +22,52 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             PlayerInfo.PlayerName = name;
 
-            using var writer = _game.StartRpc(NetId, RpcCalls.SetName);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetName);
             writer.Write(name);
-            await _game.FinishRpcAsync(writer);
+            await Game.FinishRpcAsync(writer);
         }
 
         public async ValueTask SetColorAsync(ColorType color)
         {
             PlayerInfo.Color = color;
 
-            using var writer = _game.StartRpc(NetId, RpcCalls.SetColor);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetColor);
             Rpc08SetColor.Serialize(writer, color);
-            await _game.FinishRpcAsync(writer);
+            await Game.FinishRpcAsync(writer);
         }
 
         public async ValueTask SetHatAsync(HatType hat)
         {
             PlayerInfo.Hat = hat;
 
-            using var writer = _game.StartRpc(NetId, RpcCalls.SetHat);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetHat);
             Rpc09SetHat.Serialize(writer, hat);
-            await _game.FinishRpcAsync(writer);
+            await Game.FinishRpcAsync(writer);
         }
 
         public async ValueTask SetPetAsync(PetType pet)
         {
             PlayerInfo.Pet = pet;
 
-            using var writer = _game.StartRpc(NetId, RpcCalls.SetPet);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetPet);
             Rpc17SetPet.Serialize(writer, pet);
-            await _game.FinishRpcAsync(writer);
+            await Game.FinishRpcAsync(writer);
         }
 
         public async ValueTask SetSkinAsync(SkinType skin)
         {
             PlayerInfo.Skin = skin;
 
-            using var writer = _game.StartRpc(NetId, RpcCalls.SetSkin);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetSkin);
             Rpc10SetSkin.Serialize(writer, skin);
-            await _game.FinishRpcAsync(writer);
+            await Game.FinishRpcAsync(writer);
         }
 
         public async ValueTask SendChatAsync(string text)
         {
-            using var writer = _game.StartRpc(NetId, RpcCalls.SendChat);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SendChat);
             writer.Write(text);
-            await _game.FinishRpcAsync(writer);
+            await Game.FinishRpcAsync(writer);
         }
 
         public async ValueTask SendChatToPlayerAsync(string text, IInnerPlayerControl? player = null)
@@ -76,9 +77,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 player = this;
             }
 
-            using var writer = _game.StartRpc(NetId, RpcCalls.SendChat);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SendChat);
             writer.Write(text);
-            await _game.FinishRpcAsync(writer, player.OwnerId);
+            await Game.FinishRpcAsync(writer, player.OwnerId);
         }
 
         public async ValueTask MurderPlayerAsync(IInnerPlayerControl target)
@@ -100,11 +101,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
             ((InnerPlayerControl)target).Die(DeathReason.Kill);
 
-            using var writer = _game.StartRpc(NetId, RpcCalls.MurderPlayer);
+            using var writer = Game.StartRpc(NetId, RpcCalls.MurderPlayer);
             Rpc12MurderPlayer.Serialize(writer, target);
-            await _game.FinishRpcAsync(writer);
+            await Game.FinishRpcAsync(writer);
 
-            await _eventManager.CallAsync(new PlayerMurderEvent(_game, _game.GetClientPlayer(OwnerId)!, this, target));
+            await _eventManager.CallAsync(new PlayerMurderEvent(Game, Game.GetClientPlayer(OwnerId)!, this, target));
         }
 
         public async ValueTask ExileAsync()
@@ -118,12 +119,12 @@ namespace Impostor.Server.Net.Inner.Objects
             Die(DeathReason.Exile);
 
             // Send RPC.
-            using var writer = _game.StartRpc(NetId, RpcCalls.Exiled);
+            using var writer = Game.StartRpc(NetId, RpcCalls.Exiled);
             Rpc04Exiled.Serialize(writer);
-            await _game.FinishRpcAsync(writer);
+            await Game.FinishRpcAsync(writer);
 
             // Notify plugins.
-            await _eventManager.CallAsync(new PlayerExileEvent(_game, _game.GetClientPlayer(OwnerId)!, this));
+            await _eventManager.CallAsync(new PlayerExileEvent(Game, Game.GetClientPlayer(OwnerId)!, this));
         }
     }
 }
