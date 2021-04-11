@@ -52,15 +52,10 @@ namespace Impostor.Server.Net
                 return;
             }
 
-            using var packet = MessageWriter.Get(MessageType.Reliable);
-            Message01JoinGameS2C.SerializeError(packet, false, reason, message);
+            using var writer = MessageWriter.Get();
+            MessageDisconnect.Serialize(writer, true, reason, message);
 
-            await Connection.SendAsync(packet);
-
-            // Need this to show the correct message, otherwise it shows a generic disconnect message.
-            await Task.Delay(TimeSpan.FromMilliseconds(250));
-
-            await Connection.DisconnectAsync(message ?? reason.ToString());
+            await Connection.DisconnectAsync(message ?? reason.ToString(), writer);
         }
     }
 }
