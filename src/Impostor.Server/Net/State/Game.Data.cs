@@ -428,8 +428,6 @@ namespace Impostor.Server.Net.State
             }
 
             _allObjectsFast.Remove(obj.NetId);
-
-            obj.NetId = uint.MaxValue;
         }
     }
 }
