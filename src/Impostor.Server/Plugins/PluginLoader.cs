@@ -167,5 +167,103 @@ namespace Impostor.Server.Plugins
                 assemblyInfos.Add(new AssemblyInformation(assemblyName, path, isPlugin));
             }
         }
+
+        private static List<PluginInformation> LoadOrderPlugins(IEnumerable<PluginInformation> plugins)
+        {
+            var pluginDict = new Dictionary<string, PluginInformation>();
+            var hardDependencies = new Dictionary<string, List<string>>();
+
+            foreach (var plugin in plugins)
+            {
+                pluginDict[plugin.Name] = plugin;
+                hardDependencies[plugin.Name] = plugin
+                    .Dependencies
+                    .Where(p => p.DependencyType == DependencyType.HardDependency)
+                    .Select(p => p.Name)
+                    .ToList();
+            }
+
+            var presentPlugins = pluginDict.Keys.ToList();
+
+            // Check whether the Hard Dependencies are present and remove those without.
+            var checkedPlugins = CheckHardDependencies(presentPlugins, hardDependencies);
+
+            var dependencyGraph = checkedPlugins.ToDictionary(p => p, _ => new List<string>());
+
+            foreach (var plugin in checkedPlugins)
+            {
+                foreach (var dependency in pluginDict[plugin].Dependencies.Where(d => checkedPlugins.Contains(d.Name)))
+                {
+                    if (dependency.DependencyType == DependencyType.LoadBefore)
+                    {
+                        dependencyGraph[dependency.Name].Add(plugin);
+                    }
+                    else
+                    {
+                        dependencyGraph[plugin].Add(dependency.Name);
+                    }
+                }
+            }
+
+            var processed = new List<string>();
+            var ordered = new List<PluginInformation>();
+            foreach (var plugin in checkedPlugins)
+            {
+                if (!processed.Contains(plugin))
+                {
+                    RecursiveOrder(plugin, dependencyGraph, processed, ordered, pluginDict);
+                }
+            }
+
+            return ordered;
+        }
+
+        private static List<string> CheckHardDependencies(
+            List<string> plugins,
+            IReadOnlyDictionary<string, List<string>> hardDependencies)
+        {
+            foreach (var plugin in plugins)
+            {
+                if (!hardDependencies.ContainsKey(plugin))
+                {
+                    continue;
+                }
+
+                foreach (var dependency in hardDependencies[plugin].Where(dependency => !plugins.Contains(dependency)))
+                {
+                    Logger.Error($"The plugin {plugin} has defined the plugin {dependency}" +
+                                 $" as a hard dependency but {dependency} is not present! {plugin} will not start.");
+
+                    // Remove the plugin from the plugins to load.
+                    plugins.Remove(plugin);
+
+                    // Since other plugins might have defined the removed plugin as a hard dependency a recheck is necessary.
+                    return CheckHardDependencies(plugins, hardDependencies);
+                }
+            }
+
+            return plugins;
+        }
+
+        private static void RecursiveOrder(
+            string plugin,
+            IReadOnlyDictionary<string, List<string>> dependencyGraph,
+            ICollection<string> processed,
+            ICollection<PluginInformation> ordered,
+            IReadOnlyDictionary<string, PluginInformation> pluginDict)
+        {
+            processed.Add(plugin);
+
+            foreach (var dep in dependencyGraph[plugin])
+            {
+                // First add the dependencies using a recursive call before adding itself.
+                if (!processed.Contains(dep))
+                {
+                    RecursiveOrder(dep, dependencyGraph, processed, ordered, pluginDict);
+                }
+            }
+
+            ordered.Add(pluginDict[plugin]);
+        }
     }
 }
