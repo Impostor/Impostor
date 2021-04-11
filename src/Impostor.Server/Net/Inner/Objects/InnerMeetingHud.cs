@@ -145,7 +145,7 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             if (playerState.DidVote && !playerState.IsDead)
             {
-                var player = _game.GameNet.GameData!.GetPlayerById(playerState.TargetPlayerId);
+                var player = Game.GameNet.GameData!.GetPlayerById(playerState.TargetPlayerId);
                 if (player != null)
                 {
                     VoteType voteType;
@@ -163,11 +163,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
                         default:
                             voteType = VoteType.Player;
-                            votedForPlayer = _game.GameNet.GameData.GetPlayerById((byte)playerState.VotedFor)?.Controller;
+                            votedForPlayer = Game.GameNet.GameData.GetPlayerById((byte)playerState.VotedFor)?.Controller;
                             break;
                     }
 
-                    await _eventManager.CallAsync(new PlayerVotedEvent(_game, _game.GetClientPlayer(player.Controller!.OwnerId)!, player.Controller, voteType, votedForPlayer));
+                    await _eventManager.CallAsync(new PlayerVotedEvent(Game, Game.GetClientPlayer(player.Controller!.OwnerId)!, player.Controller, voteType, votedForPlayer));
                 }
             }
         }
