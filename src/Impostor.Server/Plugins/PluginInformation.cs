@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Impostor.Api.Plugins;
 
@@ -8,9 +10,10 @@ namespace Impostor.Server.Plugins
     {
         private readonly ImpostorPluginAttribute _attribute;
 
-        public PluginInformation(IPluginStartup? startup, Type pluginType)
+        public PluginInformation(IPluginStartup? startup, Type pluginType, List<Type> dependencies)
         {
             _attribute = pluginType.GetCustomAttribute<ImpostorPluginAttribute>()!;
+            Dependencies = dependencies.Select(t => new DependencyInformation(t)).ToList();
 
             Startup = startup;
             PluginType = pluginType;
@@ -24,11 +27,7 @@ namespace Impostor.Server.Plugins
 
         public string Version => _attribute.Version;
 
-        public string[] Dependencies => _attribute.Dependencies;
-
-        public string[] SoftDependencies => _attribute.SoftDependencies;
-
-        public string[] LoadBefore => _attribute.LoadBefore;
+        public List<DependencyInformation> Dependencies { get; }
 
         public IPluginStartup? Startup { get; }
 
