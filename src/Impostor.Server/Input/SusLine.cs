@@ -263,12 +263,7 @@ namespace Impostor.Server.Input
                     var position = Prefix.Length + Position;
                     var (lines, line) = CalculateLines(input.Length, position);
 
-                    Console.SetCursorPosition(position % Console.WindowWidth, Console.CursorTop + (lines - line));
-
-                    if (Console.CursorLeft == 0 && lines > 3)
-                    {
-                        Console.CursorTop++;
-                    }
+                    Console.SetCursorPosition(position % Console.WindowWidth, Console.CursorTop + (line - lines));
 
                     _lastPosition = position;
                     _lastLength = input.Length;
@@ -298,7 +293,12 @@ namespace Impostor.Server.Input
                     Console.CursorVisible = false;
 
                     var (lines, line) = CalculateLines(_lastLength.Value, _lastPosition.Value);
-                    var start = Console.CursorTop - lines;
+                    var start = Console.CursorTop - line;
+
+                    if (_lastLength.Value % Console.WindowWidth == 0)
+                    {
+                        start++;
+                    }
 
                     for (var i = 0; i <= lines; i++)
                     {
