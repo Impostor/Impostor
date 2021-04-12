@@ -96,11 +96,6 @@ namespace Impostor.Server.Net.State
             return _players.TryGetValue(clientId, out var clientPlayer) ? clientPlayer : null;
         }
 
-        public ValueTask EndAsync()
-        {
-            return _gameManager.RemoveAsync(Code);
-        }
-
         internal async ValueTask StartedAsync()
         {
             if (GameState == GameStates.Starting)

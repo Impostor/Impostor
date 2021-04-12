@@ -50,6 +50,17 @@ namespace Impostor.Plugins.Example.Handlers
         }
 
         [EventListener]
+        public void OnGameHostChanged(IGameHostChangedEvent e)
+        {
+            _logger.LogInformation(
+                "Game {code} > changed host from {previous} to {new}",
+                e.Game.Code,
+                e.PreviousHost.Character?.PlayerInfo.PlayerName,
+                e.NewHost != null ? e.NewHost.Character?.PlayerInfo.PlayerName : "none"
+            );
+        }
+
+        [EventListener]
         public void OnPlayerJoined(IGamePlayerJoinedEvent e)
         {
             _logger.LogInformation("Game {code} > {player} joined", e.Game.Code, e.Player.Client.Name);
