@@ -6,7 +6,7 @@ namespace Impostor.Server.Events
 {
     public class GameHostChangedEvent : IGameHostChangedEvent
     {
-        public GameHostChangedEvent(IGame game, IClientPlayer previousHost, IClientPlayer newHost)
+        public GameHostChangedEvent(IGame game, IClientPlayer previousHost, IClientPlayer? newHost)
         {
             Game = game;
             PreviousHost = previousHost;
