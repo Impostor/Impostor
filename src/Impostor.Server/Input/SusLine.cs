@@ -295,6 +295,8 @@ namespace Impostor.Server.Input
 
                 if (Console.CursorLeft != 0 || Console.CursorTop != 0)
                 {
+                    Console.CursorVisible = false;
+
                     var (lines, line) = CalculateLines(_lastLength.Value, _lastPosition.Value);
                     var start = Console.CursorTop - lines;
 
@@ -304,6 +306,8 @@ namespace Impostor.Server.Input
                     }
 
                     Console.SetCursorPosition(0, start);
+
+                    Console.CursorVisible = true;
                 }
 
                 _lastLength = null;
