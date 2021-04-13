@@ -95,23 +95,13 @@ namespace Impostor.Server.Plugins
                     continue;
                 }
 
-                // Find dependencies
-                var dependencies = assembly
-                    .GetTypes()
-                    .Where(t => typeof(IPlugin).IsAssignableFrom(t)
-                                && t.IsClass
-                                && !t.IsAbstract
-                                && t.GetCustomAttribute<ImpostorDependencyAttribute>() != null)
-                    .ToList();
-
                 // Save plugin.
                 plugins.Add(new PluginInformation(
                     pluginStartup
                         .Select(Activator.CreateInstance)
                         .Cast<IPluginStartup>()
                         .FirstOrDefault(),
-                    plugin.First(),
-                    dependencies));
+                    plugin.Single()));
             }
 
             var orderedPlugins = LoadOrderPlugins(plugins);

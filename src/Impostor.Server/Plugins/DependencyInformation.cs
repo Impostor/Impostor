@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using Impostor.Api.Plugins;
+﻿using Impostor.Api.Plugins;
 
 namespace Impostor.Server.Plugins
 {
@@ -8,9 +6,9 @@ namespace Impostor.Server.Plugins
     {
         private readonly ImpostorDependencyAttribute _attribute;
 
-        public DependencyInformation(Type dependencyType)
+        public DependencyInformation(ImpostorDependencyAttribute attribute)
         {
-            _attribute = dependencyType.GetCustomAttribute<ImpostorDependencyAttribute>()!;
+            _attribute = attribute;
         }
 
         public string Name => _attribute.Name;

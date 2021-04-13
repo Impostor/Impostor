@@ -2,7 +2,7 @@
 
 namespace Impostor.Api.Plugins
 {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class ImpostorDependencyAttribute : Attribute
     {
         public ImpostorDependencyAttribute(string name, DependencyType type)
@@ -11,8 +11,8 @@ namespace Impostor.Api.Plugins
             DependencyType = type;
         }
 
-        public DependencyType DependencyType { get; }
-
         public string Name { get; }
+
+        public DependencyType DependencyType { get; }
     }
 }

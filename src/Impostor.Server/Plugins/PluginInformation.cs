@@ -10,11 +10,11 @@ namespace Impostor.Server.Plugins
     {
         private readonly ImpostorPluginAttribute _attribute;
 
-        public PluginInformation(IPluginStartup? startup, Type pluginType, List<Type> dependencies)
+        public PluginInformation(IPluginStartup? startup, Type pluginType)
         {
             _attribute = pluginType.GetCustomAttribute<ImpostorPluginAttribute>()!;
-            Dependencies = dependencies.Select(t => new DependencyInformation(t)).ToList();
 
+            Dependencies = pluginType.GetCustomAttributes<ImpostorDependencyAttribute>().Select(t => new DependencyInformation(t)).ToList();
             Startup = startup;
             PluginType = pluginType;
         }
