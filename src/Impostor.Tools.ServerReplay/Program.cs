@@ -209,7 +209,7 @@ namespace Impostor.Tools.ServerReplay
                 case RecordedPacketType.GameCreated:
                     _gameCodeFactory.Result = GameCode.From(reader.ReadString());
 
-                    await _gameManager.CreateAsync(GameOptions[clientId]);
+                    await _gameManager.CreateAsync(Connections[clientId].Client, GameOptions[clientId]);
 
                     GameOptions.Remove(clientId);
                     break;

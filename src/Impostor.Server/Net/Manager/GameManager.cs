@@ -9,6 +9,7 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Net;
 using Impostor.Server.Config;
 using Impostor.Server.Events;
 using Impostor.Server.Net.Redirector;
@@ -110,10 +111,18 @@ namespace Impostor.Server.Net.Manager
             await _eventManager.CallAsync(new GameDestroyedEvent(game));
         }
 
-        public async ValueTask<IGame> CreateAsync(GameOptionsData options)
+        public async ValueTask<IGame?> CreateAsync(IClient? owner, GameOptionsData options)
         {
+            var @event = new GameCreationEvent(this, owner);
+            await _eventManager.CallAsync(@event);
+
+            if (@event.IsCancelled)
+            {
+                return null;
+            }
+
             // TODO: Prevent duplicates when using server redirector using INodeProvider.
-            var (success, game) = await TryCreateAsync(options);
+            var (success, game) = await TryCreateAsync(options, @event.GameCode);
 
             for (var i = 0; i < 10 && !success; i++)
             {
@@ -128,9 +137,14 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(GameOptionsData options)
+        public ValueTask<IGame?> CreateAsync(GameOptionsData options)
         {
-            var gameCode = _gameCodeFactory.Create();
+            return CreateAsync(null, options);
+        }
+
+        private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(GameOptionsData options, GameCode? desiredGameCode = null)
+        {
+            var gameCode = desiredGameCode ?? _gameCodeFactory.Create();
             var gameCodeStr = gameCode.Code;
             var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options);
 
