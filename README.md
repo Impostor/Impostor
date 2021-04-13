@@ -9,7 +9,8 @@ Impostor is one of the first **Among Us** private servers, written in C#.
 |-|-|-|-|
 | 1.1.0 | 2020.09.07 - 2020.09.22 | No | [![Download](https://img.shields.io/badge/Download-v1.1.0-blue?style=flat-square)](https://github.com/Impostor/Impostor/releases/tag/v1.1.0) |
 | 1.2.2 | 2020.09.22 - 2020.11.17 | No | [![Download](https://img.shields.io/badge/Download-v1.2.2-blue?style=flat-square)](https://github.com/Impostor/Impostor/releases/tag/v1.2.2) |
-| 1.3.0 | 2021.3.5 | Yes | [![Download](https://img.shields.io/badge/Download-master-blue?style=flat-square)](https://ci.appveyor.com/project/Impostor/Impostor/branch/master/artifacts) |
+| 1.3.0 | 2021.3.5 | No | [![Download](https://img.shields.io/badge/Download-v1.3.0-blue?style=flat-square)](https://github.com/Impostor/Impostor/releases/tag/v1.3.0) |
+| 1.4.0 | 2021.3.31 - 2021.4.2 | Yes | [![Download](https://img.shields.io/badge/Download-master-blue?style=flat-square)](https://ci.appveyor.com/project/Impostor/Impostor/branch/master/artifacts) |
 
 ## Features
 

@@ -32,9 +32,9 @@ namespace Impostor.Server.Net.Hazel
             return InnerConnection.SendAsync(writer);
         }
 
-        public ValueTask DisconnectAsync(string? reason)
+        public ValueTask DisconnectAsync(string? reason, IMessageWriter? writer = null)
         {
-            return InnerConnection.Disconnect(reason);
+            return InnerConnection.Disconnect(reason, writer as MessageWriter);
         }
 
         public void DisposeInnerConnection()

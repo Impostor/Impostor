@@ -96,19 +96,14 @@ namespace Impostor.Server.Net.State
             return _players.TryGetValue(clientId, out var clientPlayer) ? clientPlayer : null;
         }
 
-        public ValueTask EndAsync()
-        {
-            return _gameManager.RemoveAsync(Code);
-        }
-
         internal async ValueTask StartedAsync()
         {
             if (GameState == GameStates.Starting)
             {
-                for (var i = 0; i < _players.Values.Count; i++)
+                foreach (var player in _players.Values)
                 {
-                    var player = _players.Values.ElementAt(i);
-                    await player.Character!.NetworkTransform.SetPositionAsync(player, MapSpawn.Maps[Options.Map].GetSpawnLocation(i, PlayerCount, true), Vector2.Zero);
+                    player.Character?.NetworkTransform.OnPlayerSpawn();
+                    await player.Character!.NetworkTransform.SetPositionAsync(player, GameNet.ShipStatus!.GetSpawnLocation(player.Character, PlayerCount, true), Vector2.Zero);
                 }
 
                 GameState = GameStates.Started;

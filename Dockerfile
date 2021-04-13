@@ -11,7 +11,7 @@ WORKDIR /source
 # Copy csproj and restore.
 COPY src/Impostor.Server/Impostor.Server.csproj ./src/Impostor.Server/Impostor.Server.csproj
 COPY src/Impostor.Api/Impostor.Api.csproj ./src/Impostor.Api/Impostor.Api.csproj
-COPY src/Impostor.Hazel/Impostor.Hazel.csproj ./src/Impostor.Hazel/Impostor.Hazel.csproj
+COPY src/Impostor.Hazel/Hazel/Hazel.csproj ./src/Impostor.Hazel/Hazel/Hazel.csproj
 
 RUN case "$TARGETARCH" in \
     amd64)  NETCORE_PLATFORM='linux-x64';; \
@@ -21,7 +21,7 @@ RUN case "$TARGETARCH" in \
   esac && \
   dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Server/Impostor.Server.csproj && \
   dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Api/Impostor.Api.csproj && \
-  dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Hazel/Impostor.Hazel.csproj
+  dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Hazel/Hazel/Hazel.csproj
 
 # Copy everything else.
 COPY src/. ./src/

@@ -25,7 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{36AA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Plugins.Debugger", "Impostor.Plugins.Debugger\Impostor.Plugins.Debugger.csproj", "{ECBCAA3B-B974-41CF-AFFC-6F5AA4C42FA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Hazel", "Impostor.Hazel\Impostor.Hazel.csproj", "{671B753B-31AE-4C36-AD71-09CF00FA17CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Hazel", "Impostor.Hazel\Hazel\Hazel.csproj", "{671B753B-31AE-4C36-AD71-09CF00FA17CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{9F1919B0-915B-4749-9944-697DF7E7F67F}"
 EndProject

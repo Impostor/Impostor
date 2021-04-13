@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Messages;
-using Impostor.Api.Reactor;
 
 namespace Impostor.Api.Net
 {
@@ -27,11 +26,6 @@ namespace Impostor.Api.Net
         ///     The name is provided by the player and should not be used to store persisted data.
         /// </remarks>
         string Name { get; }
-
-        /// <summary>
-        ///     Gets mods sent by client in modded handshake.
-        /// </summary>
-        ISet<Mod> Mods { get; }
 
         /// <summary>
         ///     Gets the connection of the client.

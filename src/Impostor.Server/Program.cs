@@ -59,7 +59,7 @@ namespace Impostor.Server
 
             try
             {
-                Log.Information("Starting Impostor v{0}", DotnetUtils.GetVersion());
+                Log.Information("Starting Impostor v{0}", DotnetUtils.Version);
                 CreateHostBuilder(args).Build().Run();
                 return 0;
             }
@@ -78,6 +78,7 @@ namespace Impostor.Server
         {
             var configurationBuilder = new ConfigurationBuilder();
 
+            configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
             configurationBuilder.AddJsonFile("config.json", true);
             configurationBuilder.AddJsonFile("config.Development.json", true);
             configurationBuilder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
@@ -117,6 +118,10 @@ namespace Impostor.Server
                         .GetSection(AnnouncementsServerConfig.Section)
                         .Get<AnnouncementsServerConfig>() ?? new AnnouncementsServerConfig();
 
+                    var authServer = host.Configuration
+                        .GetSection(AuthServerConfig.Section)
+                        .Get<AuthServerConfig>() ?? new AuthServerConfig();
+
                     services.AddSingleton<ServerEnvironment>();
                     services.AddSingleton<IDateTimeProvider, RealDateTimeProvider>();
 
@@ -124,6 +129,7 @@ namespace Impostor.Server
                     services.Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section));
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                     services.Configure<AnnouncementsServerConfig>(host.Configuration.GetSection(AnnouncementsServerConfig.Section));
+                    services.Configure<AuthServerConfig>(host.Configuration.GetSection(AuthServerConfig.Section));
                     services.Configure<ServerRedirectorConfig>(host.Configuration.GetSection(ServerRedirectorConfig.Section));
 
                     if (redirector.Enabled)
@@ -211,6 +217,11 @@ namespace Impostor.Server
                     if (announcementsServer.Enabled)
                     {
                         services.AddHostedService<AnnouncementsService>();
+                    }
+
+                    if (authServer.Enabled)
+                    {
+                        services.AddHostedService<AuthService>();
                     }
                 })
                 .UseSerilog()
