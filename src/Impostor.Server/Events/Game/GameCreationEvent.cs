@@ -2,18 +2,22 @@ using Impostor.Api;
 using Impostor.Api.Events;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
+using Impostor.Api.Net;
 
 namespace Impostor.Server.Events
 {
-    public class BeforeGameCreatedEvent : IBeforeGameCreatedEvent
+    public class GameCreationEvent : IGameCreationEvent
     {
         private readonly IGameManager _gameManager;
         private GameCode? _gameCode;
 
-        public BeforeGameCreatedEvent(IGameManager gameManager)
+        public GameCreationEvent(IGameManager gameManager, IClient? client)
         {
             _gameManager = gameManager;
+            Client = client;
         }
+
+        public IClient? Client { get; }
 
         public GameCode? GameCode
         {
@@ -36,5 +40,7 @@ namespace Impostor.Server.Events
                 _gameCode = value;
             }
         }
+
+        public bool IsCancelled { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,7 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Net;
 using Impostor.Server.Config;
 using Impostor.Server.Events;
 using Impostor.Server.Net.Redirector;
@@ -43,7 +44,7 @@ namespace Impostor.Server.Net.Manager
         IEnumerable<IGame> IGameManager.Games => _games.Select(kv => kv.Value);
 
         IGame? IGameManager.Find(GameCode code) => Find(code);
-        
+
         public Game? Find(GameCode code)
         {
             _games.TryGetValue(code, out var game);
@@ -110,13 +111,18 @@ namespace Impostor.Server.Net.Manager
             await _eventManager.CallAsync(new GameDestroyedEvent(game));
         }
 
-        public async ValueTask<IGame> CreateAsync(GameOptionsData options)
+        public async ValueTask<IGame?> CreateAsync(IClient? owner, GameOptionsData options)
         {
-            var beforeGameCreatedEvent = new BeforeGameCreatedEvent(this);
-            await _eventManager.CallAsync(beforeGameCreatedEvent);
+            var @event = new GameCreationEvent(this, owner);
+            await _eventManager.CallAsync(@event);
+
+            if (@event.IsCancelled)
+            {
+                return null;
+            }
 
             // TODO: Prevent duplicates when using server redirector using INodeProvider.
-            var (success, game) = await TryCreateAsync(options, beforeGameCreatedEvent.GameCode);
+            var (success, game) = await TryCreateAsync(options, @event.GameCode);
 
             for (var i = 0; i < 10 && !success; i++)
             {
@@ -129,6 +135,11 @@ namespace Impostor.Server.Net.Manager
             }
 
             return game;
+        }
+
+        public ValueTask<IGame?> CreateAsync(GameOptionsData options)
+        {
+            return CreateAsync(null, options);
         }
 
         private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(GameOptionsData options, GameCode? desiredGameCode = null)

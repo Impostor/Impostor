@@ -10,6 +10,12 @@ namespace Impostor.Api.Games.Managers
 
         IGame? Find(GameCode code);
 
-        ValueTask<IGame> CreateAsync(GameOptionsData options);
+        /// <summary>
+        /// Creates a new game.
+        /// </summary>
+        /// <param name="options">Game options.</param>
+        /// <returns>Created game or null if creation was cancelled by a plugin.</returns>
+        /// <exception cref="ImpostorException">Thrown when game creation failed.</exception>
+        ValueTask<IGame?> CreateAsync(GameOptionsData options);
     }
 }

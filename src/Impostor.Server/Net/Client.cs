@@ -64,7 +64,13 @@ namespace Impostor.Server.Net
                     var gameInfo = Message00HostGameC2S.Deserialize(reader, out _);
 
                     // Create game.
-                    var game = await _gameManager.CreateAsync(gameInfo);
+                    var game = await _gameManager.CreateAsync(this, gameInfo);
+
+                    if (game == null)
+                    {
+                        await DisconnectAsync(DisconnectReason.GameMissing);
+                        return;
+                    }
 
                     // Code in the packet below will be used in JoinGame.
                     using (var writer = MessageWriter.Get(MessageType.Reliable))

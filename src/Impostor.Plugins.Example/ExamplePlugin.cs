@@ -27,10 +27,17 @@ namespace Impostor.Plugins.Example
             _logger.LogInformation("Example is being enabled.");
 
             var game = await _gameManager.CreateAsync(new GameOptionsData());
-            game.DisplayName = "Example game";
-            await game.SetPrivacyAsync(true);
+            if (game == null)
+            {
+                _logger.LogWarning("Example game creation was cancelled");
+            }
+            else
+            {
+                game.DisplayName = "Example game";
+                await game.SetPrivacyAsync(true);
 
-            _logger.LogInformation("Created game {0}.", game.Code.Code);
+                _logger.LogInformation("Created game {0}.", game.Code.Code);
+            }
         }
 
         public override ValueTask DisableAsync()
