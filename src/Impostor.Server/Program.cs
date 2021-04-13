@@ -78,6 +78,7 @@ namespace Impostor.Server
         {
             var configurationBuilder = new ConfigurationBuilder();
 
+            configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
             configurationBuilder.AddJsonFile("config.json", true);
             configurationBuilder.AddJsonFile("config.Development.json", true);
             configurationBuilder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
