@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Plugins;
@@ -6,11 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example
 {
-    [ImpostorPlugin(
-        package: "gg.impostor.example",
-        name: "Example",
-        author: "AeonLucid",
-        version: "1.0.0")]
+    [ImpostorPlugin("gg.impostor.example", "Example", "AeonLucid", "1.0.0")]
     public class ExamplePlugin : PluginBase
     {
         private readonly ILogger<ExamplePlugin> _logger;

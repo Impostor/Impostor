@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Impostor.Api.Plugins;
 
@@ -12,17 +14,20 @@ namespace Impostor.Server.Plugins
         {
             _attribute = pluginType.GetCustomAttribute<ImpostorPluginAttribute>()!;
 
+            Dependencies = pluginType.GetCustomAttributes<ImpostorDependencyAttribute>().Select(t => new DependencyInformation(t)).ToList();
             Startup = startup;
             PluginType = pluginType;
         }
 
-        public string Package => _attribute.Package;
+        public string Id => _attribute.Id;
 
         public string Name => _attribute.Name;
 
         public string Author => _attribute.Author;
 
         public string Version => _attribute.Version;
+
+        public List<DependencyInformation> Dependencies { get; }
 
         public IPluginStartup? Startup { get; }
 
@@ -32,7 +37,7 @@ namespace Impostor.Server.Plugins
 
         public override string ToString()
         {
-            return $"{Package} {Name} ({Version}) by {Author}";
+            return $"{Id} {Name} ({Version}) by {Author}";
         }
     }
 }
