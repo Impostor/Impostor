@@ -8,7 +8,6 @@ using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
-using Impostor.Server.Net.Inner;
 
 namespace Impostor.Server.Net.State
 {

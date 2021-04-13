@@ -2,7 +2,8 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Impostor.Api.Reactor;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Net.Messages.C2S;
 using Impostor.Hazel;
 using Impostor.Hazel.Udp;
 using Impostor.Server.Net.Hazel;
@@ -60,12 +61,12 @@ namespace Impostor.Server.Net
         private async ValueTask OnNewConnection(NewConnectionEventArgs e)
         {
             // Handshake.
-            ModdedHandshakeC2S.Deserialize(e.HandshakeData, out var clientVersion, out var name, out var mods);
+            HandshakeC2S.Deserialize(e.HandshakeData, out var clientVersion, out var name, out _);
 
             var connection = new HazelConnection(e.Connection, _connectionLogger);
 
             // Register client
-            await _clientManager.RegisterConnectionAsync(connection, name, clientVersion, mods);
+            await _clientManager.RegisterConnectionAsync(connection, name, clientVersion);
         }
     }
 }

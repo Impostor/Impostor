@@ -59,15 +59,23 @@ namespace Impostor.Server.Net.Inner.Objects
         public void Deserialize(IMessageReader reader)
         {
             PlayerName = reader.ReadString();
-            Color = (ColorType)reader.ReadByte();
+            Color = (ColorType)reader.ReadPackedInt32();
             Hat = (HatType)reader.ReadPackedUInt32();
             Pet = (PetType)reader.ReadPackedUInt32();
             Skin = (SkinType)reader.ReadPackedUInt32();
+
             var flag = reader.ReadByte();
             Disconnected = (flag & 1) > 0;
             IsImpostor = (flag & 2) > 0;
             IsDead = (flag & 4) > 0;
+
             var taskCount = reader.ReadByte();
+
+            if (Tasks.Count != taskCount)
+            {
+                Tasks = new List<InnerGameData.TaskInfo>(taskCount);
+            }
+
             for (var i = 0; i < taskCount; i++)
             {
                 Tasks[i] ??= new InnerGameData.TaskInfo();

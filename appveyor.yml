@@ -30,6 +30,7 @@ test: off
 
 artifacts:
   - path: ./build/*.zip
+  - path: ./build/*.tar.gz
   - path: ./build/*.nupkg
   - path: ./build/*.snupkg
 

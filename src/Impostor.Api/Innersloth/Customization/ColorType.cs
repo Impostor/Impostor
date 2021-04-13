@@ -1,6 +1,6 @@
 ﻿namespace Impostor.Api.Innersloth.Customization
 {
-    public enum ColorType : byte
+    public enum ColorType
     {
         Red = 0,
         Blue = 1,

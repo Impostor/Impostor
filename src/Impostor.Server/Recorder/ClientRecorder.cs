@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Impostor.Api.Net.Messages;
-using Impostor.Api.Reactor;
 using Impostor.Server.Config;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Hazel;
@@ -18,8 +16,8 @@ namespace Impostor.Server.Recorder
         private bool _createdGame;
         private bool _recordAfter;
 
-        public ClientRecorder(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, int gameVersion, HazelConnection connection, ISet<Mod> mods, PacketRecorder recorder)
-            : base(logger, antiCheatOptions, clientManager, gameManager, name, gameVersion, connection, mods)
+        public ClientRecorder(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, int gameVersion, HazelConnection connection, PacketRecorder recorder)
+            : base(logger, antiCheatOptions, clientManager, gameManager, name, gameVersion, connection)
         {
             _recorder = recorder;
             _isFirst = true;

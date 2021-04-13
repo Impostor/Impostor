@@ -10,7 +10,7 @@ namespace Impostor.Plugins.Example.Handlers
 {
     public class PlayerEventListener : IEventListener
     {
-        private static readonly Random Random = new Random();
+        private readonly Random _random = new Random();
 
         private readonly ILogger<PlayerEventListener> _logger;
 
@@ -22,48 +22,45 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnPlayerSpawned(IPlayerSpawnedEvent e)
         {
-            _logger.LogDebug(e.PlayerControl.PlayerInfo.PlayerName + " spawned");
+            _logger.LogInformation("Player {player} > spawned", e.PlayerControl.PlayerInfo.PlayerName);
 
             // Need to make a local copy because it might be possible that
             // the event gets changed after being handled.
             var clientPlayer = e.ClientPlayer;
             var playerControl = e.PlayerControl;
 
-            /*
             Task.Run(async () =>
             {
-                Console.WriteLine("Starting player task.");
+                _logger.LogDebug("Starting player task");
 
                 // Give the player time to load.
                 await Task.Delay(TimeSpan.FromSeconds(3));
 
-                while (clientPlayer.Client.Connection != null &&
-                       clientPlayer.Client.Connection.IsConnected)
+                while (clientPlayer.Client.Connection != null && clientPlayer.Client.Connection.IsConnected)
                 {
                     // Modify player properties.
-                    await playerControl.SetColorAsync((byte) Random.Next(1, 9));
-                    await playerControl.SetHatAsync((uint) Random.Next(1, 9));
-                    await playerControl.SetSkinAsync((uint) Random.Next(1, 9));
-                    await playerControl.SetPetAsync((uint) Random.Next(1, 9));
+                    await playerControl.SetColorAsync((ColorType)_random.Next(1, 9));
+                    await playerControl.SetHatAsync((HatType)_random.Next(1, 9));
+                    await playerControl.SetSkinAsync((SkinType)_random.Next(1, 9));
+                    await playerControl.SetPetAsync((PetType)_random.Next(1, 9));
 
                     await Task.Delay(TimeSpan.FromMilliseconds(5000));
                 }
 
-                _logger.LogDebug("Stopping player task.");
+                _logger.LogDebug("Stopping player task");
             });
-            */
         }
 
         [EventListener]
         public void OnPlayerDestroyed(IPlayerDestroyedEvent e)
         {
-            _logger.LogDebug(e.PlayerControl.PlayerInfo.PlayerName + " destroyed");
+            _logger.LogInformation("Player {player} > destroyed", e.PlayerControl.PlayerInfo.PlayerName);
         }
 
         [EventListener]
         public async ValueTask OnPlayerChat(IPlayerChatEvent e)
         {
-            _logger.LogDebug(e.PlayerControl.PlayerInfo.PlayerName + " said " + e.Message);
+            _logger.LogInformation("Player {player} > said {message}", e.PlayerControl.PlayerInfo.PlayerName, e.Message);
 
             if (e.Message == "test")
             {
@@ -94,7 +91,25 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnPlayerStartMeetingEvent(IPlayerStartMeetingEvent e)
         {
-            _logger.LogDebug($"Player {e.PlayerControl.PlayerInfo.PlayerName} start meeting, reason: " + (e.Body == null ? "Emergency call button" : "Found the body of the player " + e.Body.PlayerInfo.PlayerName));
+            _logger.LogInformation("Player {player} > started meeting, reason: {reason}", e.PlayerControl.PlayerInfo.PlayerName, e.Body == null ? "Emergency call button" : "Found the body of the player " + e.Body.PlayerInfo.PlayerName);
+        }
+
+        [EventListener]
+        public void OnPlayerEnterVentEvent(IPlayerEnterVentEvent e)
+        {
+            _logger.LogInformation("Player {player} entered the vent in {vent}", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name);
+        }
+
+        [EventListener]
+        public void OnPlayerExitVentEvent(IPlayerExitVentEvent e)
+        {
+            _logger.LogInformation("Player {player} exited the vent in {vent}", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name);
+        }
+
+        [EventListener]
+        public void OnPlayerVentEvent(IPlayerVentEvent e)
+        {
+            _logger.LogInformation("Player {player} vented to {vent}", e.PlayerControl.PlayerInfo.PlayerName, e.NewVent.Name);
         }
     }
 }

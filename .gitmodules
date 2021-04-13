@@ -1,0 +1,3 @@
+[submodule "src/Impostor.Hazel"]
+	path = src/Impostor.Hazel
+	url = https://github.com/Impostor/Impostor.Hazel

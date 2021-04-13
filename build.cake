@@ -52,7 +52,11 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
         }
     }
 
-    Zip(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".zip"));
+    if (runtime == "win-x64") {
+        Zip(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".zip"));
+    } else {
+        GZipCompress(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".tar.gz"));
+    }
 }
 
 private void ImpostorPublishNF(string name, string project) {
