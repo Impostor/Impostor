@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Impostor.Server.Input
 {
@@ -29,7 +30,7 @@ namespace Impostor.Server.Input
         /// </summary>
         /// <param name="stoppingToken"><see cref="CancellationToken"/> for a while loop.</param>
         /// <returns>The next line of characters from the input stream, or null if no more lines are available.</returns>
-        public string? ReadLine(CancellationToken stoppingToken)
+        public async ValueTask<string?> ReadLineAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -38,7 +39,7 @@ namespace Impostor.Server.Input
                     continue;
                 }
 
-                var keyInfo = Console.ReadKey(true);
+                var keyInfo = await Task<ConsoleKeyInfo>.Factory.StartNew(static _ => Console.ReadKey(true), this, stoppingToken, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
 
                 switch (keyInfo.Key)
                 {

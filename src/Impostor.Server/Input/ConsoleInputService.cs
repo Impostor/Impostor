@@ -36,7 +36,19 @@ namespace Impostor.Server.Input
             {
                 try
                 {
-                    var line = _susLine?.ReadLine(stoppingToken) ?? Console.ReadLine();
+                    string? line;
+
+                    if (_config.SusLine)
+                    {
+                        line = await _susLine!.ReadLineAsync(stoppingToken);
+                    }
+                    else
+                    {
+                        var task = Task.Run(Console.ReadLine, stoppingToken);
+                        await Task.WhenAny(task, Task.Delay(Timeout.Infinite, stoppingToken));
+
+                        line = task.IsCompleted ? task.GetAwaiter().GetResult() : null;
+                    }
 
                     if (string.IsNullOrEmpty(line))
                     {
