@@ -165,11 +165,11 @@ namespace Impostor.Server.Plugins
 
             foreach (var plugin in plugins)
             {
-                pluginDictionary[plugin.Name] = plugin;
-                hardDependencies[plugin.Name] = plugin
+                pluginDictionary[plugin.Id] = plugin;
+                hardDependencies[plugin.Id] = plugin
                     .Dependencies
                     .Where(p => p.DependencyType == DependencyType.HardDependency)
-                    .Select(p => p.Name)
+                    .Select(p => p.Id)
                     .ToList();
             }
 
@@ -182,15 +182,15 @@ namespace Impostor.Server.Plugins
 
             foreach (var plugin in checkedPlugins)
             {
-                foreach (var dependency in pluginDictionary[plugin].Dependencies.Where(d => checkedPlugins.Contains(d.Name)))
+                foreach (var dependency in pluginDictionary[plugin].Dependencies.Where(d => checkedPlugins.Contains(d.Id)))
                 {
                     if (dependency.DependencyType == DependencyType.LoadBefore)
                     {
-                        dependencyGraph[dependency.Name].Add(plugin);
+                        dependencyGraph[dependency.Id].Add(plugin);
                     }
                     else
                     {
-                        dependencyGraph[plugin].Add(dependency.Name);
+                        dependencyGraph[plugin].Add(dependency.Id);
                     }
                 }
             }

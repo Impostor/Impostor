@@ -19,7 +19,7 @@ namespace Impostor.Server.Plugins
             PluginType = pluginType;
         }
 
-        public string Package => _attribute.Package;
+        public string Id => _attribute.Id;
 
         public string Name => _attribute.Name;
 
@@ -37,7 +37,7 @@ namespace Impostor.Server.Plugins
 
         public override string ToString()
         {
-            return $"{Package} {Name} ({Version}) by {Author}";
+            return $"{Id} {Name} ({Version}) by {Author}";
         }
     }
 }

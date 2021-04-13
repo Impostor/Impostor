@@ -5,13 +5,13 @@ namespace Impostor.Api.Plugins
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class ImpostorDependencyAttribute : Attribute
     {
-        public ImpostorDependencyAttribute(string name, DependencyType type)
+        public ImpostorDependencyAttribute(string id, DependencyType type)
         {
-            Name = name;
+            Id = id;
             DependencyType = type;
         }
 
-        public string Name { get; }
+        public string Id { get; }
 
         public DependencyType DependencyType { get; }
     }

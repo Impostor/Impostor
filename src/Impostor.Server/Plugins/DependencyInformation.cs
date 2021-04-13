@@ -11,7 +11,7 @@ namespace Impostor.Server.Plugins
             _attribute = attribute;
         }
 
-        public string Name => _attribute.Name;
+        public string Id => _attribute.Id;
 
         public DependencyType DependencyType => _attribute.DependencyType;
     }
