@@ -160,12 +160,12 @@ namespace Impostor.Server.Plugins
 
         private static List<PluginInformation> LoadOrderPlugins(IEnumerable<PluginInformation> plugins)
         {
-            var pluginDict = new Dictionary<string, PluginInformation>();
+            var pluginDictionary = new Dictionary<string, PluginInformation>();
             var hardDependencies = new Dictionary<string, List<string>>();
 
             foreach (var plugin in plugins)
             {
-                pluginDict[plugin.Name] = plugin;
+                pluginDictionary[plugin.Name] = plugin;
                 hardDependencies[plugin.Name] = plugin
                     .Dependencies
                     .Where(p => p.DependencyType == DependencyType.HardDependency)
@@ -173,7 +173,7 @@ namespace Impostor.Server.Plugins
                     .ToList();
             }
 
-            var presentPlugins = pluginDict.Keys.ToList();
+            var presentPlugins = pluginDictionary.Keys.ToList();
 
             // Check whether the Hard Dependencies are present and remove those without.
             var checkedPlugins = CheckHardDependencies(presentPlugins, hardDependencies);
@@ -182,7 +182,7 @@ namespace Impostor.Server.Plugins
 
             foreach (var plugin in checkedPlugins)
             {
-                foreach (var dependency in pluginDict[plugin].Dependencies.Where(d => checkedPlugins.Contains(d.Name)))
+                foreach (var dependency in pluginDictionary[plugin].Dependencies.Where(d => checkedPlugins.Contains(d.Name)))
                 {
                     if (dependency.DependencyType == DependencyType.LoadBefore)
                     {
@@ -201,7 +201,7 @@ namespace Impostor.Server.Plugins
             {
                 if (!processed.Contains(plugin))
                 {
-                    RecursiveOrder(plugin, dependencyGraph, processed, ordered, pluginDict);
+                    RecursiveOrder(plugin, dependencyGraph, processed, ordered, pluginDictionary);
                 }
             }
 
@@ -221,8 +221,12 @@ namespace Impostor.Server.Plugins
 
                 foreach (var dependency in hardDependencies[plugin].Where(dependency => !plugins.Contains(dependency)))
                 {
-                    Logger.Error($"The plugin {plugin} has defined the plugin {dependency}" +
-                                 $" as a hard dependency but {dependency} is not present! {plugin} will not start.");
+                    Logger.Error(
+                        "The plugin {plugin} has defined the plugin {dependency} as a hard dependency but its not present! {plugin} will not loaded.",
+                        plugin,
+                        dependency,
+                        plugin
+                    );
 
                     // Remove the plugin from the plugins to load.
                     plugins.Remove(plugin);
@@ -240,20 +244,20 @@ namespace Impostor.Server.Plugins
             IReadOnlyDictionary<string, List<string>> dependencyGraph,
             ICollection<string> processed,
             ICollection<PluginInformation> ordered,
-            IReadOnlyDictionary<string, PluginInformation> pluginDict)
+            IReadOnlyDictionary<string, PluginInformation> pluginDictionary)
         {
             processed.Add(plugin);
 
-            foreach (var dep in dependencyGraph[plugin])
+            foreach (var dependency in dependencyGraph[plugin])
             {
                 // First add the dependencies using a recursive call before adding itself.
-                if (!processed.Contains(dep))
+                if (!processed.Contains(dependency))
                 {
-                    RecursiveOrder(dep, dependencyGraph, processed, ordered, pluginDict);
+                    RecursiveOrder(dependency, dependencyGraph, processed, ordered, pluginDictionary);
                 }
             }
 
-            ordered.Add(pluginDict[plugin]);
+            ordered.Add(pluginDictionary[plugin]);
         }
     }
 }
