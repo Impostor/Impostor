@@ -17,6 +17,7 @@ namespace Impostor.Tools.ServerReplay.Mocks
         public IPEndPoint EndPoint { get; }
         public bool IsConnected { get; }
         public IClient Client { get; set; }
+        public float AveragePing => 0;
 
         public ValueTask SendAsync(IMessageWriter writer)
         {

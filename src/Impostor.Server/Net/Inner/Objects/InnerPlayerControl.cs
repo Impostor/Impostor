@@ -544,7 +544,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            PlayerInfo.LastMurder = _dateTimeProvider.UtcNow;
+            PlayerInfo.LastMurder = _dateTimeProvider.UtcNow - TimeSpan.FromMilliseconds(sender.Client.Connection.AveragePing);
 
             if (target != null && !target.PlayerInfo.IsDead)
             {
