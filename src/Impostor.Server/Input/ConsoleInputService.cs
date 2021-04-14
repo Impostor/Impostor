@@ -1,4 +1,5 @@
 using System;
+using System.CommandLine.Rendering;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Events.Managers;
@@ -26,6 +27,19 @@ namespace Impostor.Server.Input
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            if (_config.SusLine && !ConsoleFormatInfo.CurrentInfo.SupportsAnsiCodes)
+            {
+                if (VirtualTerminalMode.TryEnable().IsEnabled)
+                {
+                    _logger.LogWarning("Enabled experimental windows ANSI mode");
+                }
+                else
+                {
+                    _logger.LogWarning("Your terminal doesn't support ANSI, falling back to System.Console input");
+                    _config.SusLine = false;
+                }
+            }
+
             if (_config.SusLine)
             {
                 _susLine = new SusLine();

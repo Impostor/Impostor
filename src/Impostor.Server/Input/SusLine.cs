@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.CommandLine.Rendering;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -117,7 +117,7 @@ namespace Impostor.Server.Input
                     }
                 }
 
-                _writer.WritePrompt();
+                Update();
             }
 
             Clear();
@@ -131,7 +131,7 @@ namespace Impostor.Server.Input
 
         public void Update()
         {
-            _writer.WritePrompt();
+            _writer.Update();
         }
 
         public void MoveCursorLeft()
@@ -218,9 +218,11 @@ namespace Impostor.Server.Input
 
             private readonly TextWriter _out;
             private readonly StringBuilder _input;
+            private readonly StringBuilder _buffer = new StringBuilder();
 
-            private int? _lastLength;
-            private int? _lastPosition;
+            private int _lastLength = -1;
+            private int _lastPosition = -1;
+            private ConsoleColor _lastColor = (ConsoleColor)(-1);
 
             public SusLineWriter(TextWriter @out, StringBuilder input)
             {
@@ -236,44 +238,82 @@ namespace Impostor.Server.Input
 
             public override void Write(char value)
             {
-                lock (this)
+                if (value == '\n')
                 {
-                    ClearPrompt();
-                    _out.Write(value);
+                    WriteLine();
+                    return;
+                }
+
+                lock (Console.Out)
+                {
+                    try
+                    {
+                        if (_lastColor != Console.ForegroundColor)
+                        {
+                            _buffer.Append(Console.ForegroundColor switch
+                            {
+                                ConsoleColor.Black => Ansi.Color.Foreground.Black.EscapeSequence,
+                                ConsoleColor.DarkBlue => Ansi.Color.Foreground.Blue.EscapeSequence,
+                                ConsoleColor.DarkGreen => Ansi.Color.Foreground.Green.EscapeSequence,
+                                ConsoleColor.DarkCyan => Ansi.Color.Foreground.Cyan.EscapeSequence,
+                                ConsoleColor.DarkRed => Ansi.Color.Foreground.Red.EscapeSequence,
+                                ConsoleColor.DarkMagenta => Ansi.Color.Foreground.Magenta.EscapeSequence,
+                                ConsoleColor.DarkYellow => Ansi.Color.Foreground.Yellow.EscapeSequence,
+                                ConsoleColor.Gray => Ansi.Color.Foreground.White.EscapeSequence,
+                                ConsoleColor.DarkGray => Ansi.Color.Foreground.DarkGray.EscapeSequence,
+                                ConsoleColor.Blue => Ansi.Color.Foreground.LightBlue.EscapeSequence,
+                                ConsoleColor.Green => Ansi.Color.Foreground.LightGreen.EscapeSequence,
+                                ConsoleColor.Cyan => Ansi.Color.Foreground.LightCyan.EscapeSequence,
+                                ConsoleColor.Red => Ansi.Color.Foreground.LightRed.EscapeSequence,
+                                ConsoleColor.Magenta => Ansi.Color.Foreground.LightMagenta.EscapeSequence,
+                                ConsoleColor.Yellow => Ansi.Color.Foreground.LightYellow.EscapeSequence,
+                                ConsoleColor.White => Ansi.Color.Foreground.LightGray.EscapeSequence,
+                                _ => Ansi.Color.Foreground.Default.EscapeSequence,
+                            });
+                        }
+
+                        _buffer.Append(value);
+                        _lastColor = Console.ForegroundColor;
+                    }
+                    catch (Exception e)
+                    {
+                        _out.WriteLine(e);
+                    }
                 }
             }
 
             public override void WriteLine()
             {
-                base.WriteLine();
-                WritePrompt();
+                lock (Console.Out)
+                {
+                    try
+                    {
+                        ClearPrompt();
+
+                        _out.WriteLine(_buffer);
+                        _buffer.Clear();
+
+                        WritePrompt();
+                    }
+                    catch (Exception e)
+                    {
+                        _out.WriteLine(e);
+                    }
+                }
             }
 
-            public void WritePrompt()
+            public void Update()
             {
-                lock (this)
+                lock (Console.Out)
                 {
                     ClearPrompt();
-
-                    var input = Prefix + _input;
-
-                    Console.SetCursorPosition(0, Console.CursorTop);
-
-                    _out.Write(input);
-
-                    var position = Prefix.Length + Position;
-                    var (lines, line) = CalculateLines(input.Length, position);
-
-                    Console.SetCursorPosition(position % Console.WindowWidth, Console.CursorTop + (line - lines));
-
-                    _lastPosition = position;
-                    _lastLength = input.Length;
+                    WritePrompt();
                 }
             }
 
             protected override void Dispose(bool disposing)
             {
-                lock (this)
+                lock (Console.Out)
                 {
                     ClearPrompt();
                     Console.SetOut(_out);
@@ -282,21 +322,51 @@ namespace Impostor.Server.Input
                 base.Dispose(disposing);
             }
 
+            private static (int Lines, int Line) CalculateLines(int length, int position, int width)
+            {
+                return (length / width, position / width);
+            }
+
+            private void WritePrompt()
+            {
+                var input = Prefix + _input;
+
+                if (Console.ForegroundColor != ConsoleColor.White)
+                {
+                    Console.ResetColor();
+                }
+
+                _out.Write(input);
+
+                var width = Console.WindowWidth;
+                var position = Prefix.Length + Position;
+                var (lines, line) = CalculateLines(input.Length, position, width);
+
+                Console.SetCursorPosition(position % width, Console.CursorTop + (line - lines));
+
+                _lastPosition = position;
+                _lastLength = input.Length;
+            }
+
             private void ClearPrompt()
             {
-                if (_lastLength == null || _lastPosition == null)
+                if (_lastLength == -1 || _lastPosition == -1)
                 {
                     return;
                 }
 
-                if (Console.CursorLeft != 0 || Console.CursorTop != 0)
+                var (left, top) = Console.GetCursorPosition();
+
+                if (left != 0 || top != 0)
                 {
+                    var width = Console.WindowWidth;
+
                     Console.CursorVisible = false;
 
-                    var (lines, line) = CalculateLines(_lastLength.Value, _lastPosition.Value);
-                    var start = Console.CursorTop - line;
+                    var (lines, line) = CalculateLines(_lastLength, _lastPosition, width);
+                    var start = top - line;
 
-                    if (_lastLength.Value % Console.WindowWidth == 0)
+                    if (_lastLength % width == 0)
                     {
                         start++;
                     }
@@ -311,36 +381,14 @@ namespace Impostor.Server.Input
                     Console.CursorVisible = true;
                 }
 
-                _lastLength = null;
-                _lastPosition = null;
-            }
-
-            private (int Lines, int Line) CalculateLines(int length, int position)
-            {
-                return (length / Console.WindowWidth, position / Console.WindowWidth);
+                _lastLength = -1;
+                _lastPosition = -1;
             }
 
             private void ClearLine(int line)
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    Console.SetCursorPosition(Console.WindowWidth - 1, line);
-
-                    for (var i = 0; i < Console.WindowWidth; i++)
-                    {
-                        WriteBackspace();
-                    }
-                }
-                else
-                {
-                    Console.SetCursorPosition(0, line);
-                    _out.Write("\u001b[2K");
-                }
-            }
-
-            private void WriteBackspace()
-            {
-                _out.Write("\b \b");
+                Console.SetCursorPosition(0, line);
+                _out.Write(Ansi.Clear.Line.EscapeSequence);
             }
         }
     }
