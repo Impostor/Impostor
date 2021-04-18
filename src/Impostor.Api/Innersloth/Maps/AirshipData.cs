@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Impostor.Api.Innersloth.Maps.Tasks;
 using Impostor.Api.Innersloth.Maps.Vents;
 
 namespace Impostor.Api.Innersloth.Maps
@@ -8,6 +9,7 @@ namespace Impostor.Api.Innersloth.Maps
     public class AirshipData : IMapData
     {
         private readonly IReadOnlyDictionary<int, IVent> _vents;
+        private readonly IReadOnlyDictionary<int, ITask> _tasks;
 
         public AirshipData()
         {
@@ -29,10 +31,61 @@ namespace Impostor.Api.Innersloth.Maps
 
             Vents = vents.ToDictionary(x => x.Id, x => x).AsReadOnly();
             _vents = vents.ToDictionary(x => (int)x.Id, x => (IVent)x).AsReadOnly();
+
+            var tasks = new[]
+            {
+                new AirshipTask(AirshipTask.Ids.ElectricalFixWiring, TaskTypes.FixWiring, TaskCategories.CommonTask, false),
+                new AirshipTask(AirshipTask.Ids.MeetingRoomEnterIDCode, TaskTypes.EnterIdCode, TaskCategories.CommonTask, false),
+                new AirshipTask(AirshipTask.Ids.ElectricalResetBreakers, TaskTypes.ResetBreakers, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.VaultRoomDownloadData, TaskTypes.UploadData, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.BrigDownloadData, TaskTypes.UploadData, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.CargoBayDownloadData, TaskTypes.UploadData, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.GapRoomDownloadData, TaskTypes.UploadData, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.RecordsDownloadData, TaskTypes.UploadData, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.CargoBayUnlockSafe, TaskTypes.UnlockSafe, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.VentilationStartFans, TaskTypes.StartFans, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.MainHallEmptyGarbage, TaskTypes.EmptyGarbage, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.MedicalEmptyGarbage, TaskTypes.EmptyGarbage, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.KitchenEmptyGarbage, TaskTypes.EmptyGarbage, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.MainHallDevelopPhotos, TaskTypes.DevelopPhotos, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.CargoBayFuelEngines, TaskTypes.FuelEngines, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.SecurityRewindTapes, TaskTypes.RewindTapes, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.VaultRoomPolishRuby, TaskTypes.PolishRuby, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.ElectricalCalibrateDistributor, TaskTypes.CalibrateDistributor, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.CockpitStabilizeSteering, TaskTypes.StabilizeSteering, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.ArmoryDownloadData, TaskTypes.UploadData, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.CockpitDownloadData, TaskTypes.UploadData, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.CommsDownloadData, TaskTypes.UploadData, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.MedicalDownloadData, TaskTypes.UploadData, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.ViewingDeckDownloadData, TaskTypes.UploadData, TaskCategories.LongTask, false),
+                new AirshipTask(AirshipTask.Ids.ElectricalDivertPowerToArmory, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.ElectricalDivertPowerToCockpit, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.ElectricalDivertPowerToGapRoom, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.ElectricalDivertPowerToMainHall, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.ElectricalDivertPowerToMeetingRoom, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.ElectricalDivertPowerToShowers, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.ElectricalDivertPowerToEngine, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.ShowersPickUpTowels, TaskTypes.PickUpTowels, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.LoungeCleanToilet, TaskTypes.CleanToilet, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.VaultRoomDressMannequin, TaskTypes.DressMannequin, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.RecordsSortRecords, TaskTypes.SortRecords, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.ArmoryPutAwayPistols, TaskTypes.PutAwayPistols, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.ArmoryPutAwayRifles, TaskTypes.PutAwayRifles, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.MainHallDecontaminate, TaskTypes.Decontaminate, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.KitchenMakeBurger, TaskTypes.MakeBurger, TaskCategories.ShortTask, false),
+                new AirshipTask(AirshipTask.Ids.ShowersFixShower, TaskTypes.FixShower, TaskCategories.ShortTask, false),
+            };
+
+            Tasks = tasks.ToDictionary(x => x.Id, x => x).AsReadOnly();
+            _tasks = tasks.ToDictionary(x => (int)x.Id, x => (ITask)x).AsReadOnly();
         }
 
         public IReadOnlyDictionary<AirshipVent.Ids, AirshipVent> Vents { get; }
 
         IReadOnlyDictionary<int, IVent> IMapData.Vents => _vents;
+
+        public IReadOnlyDictionary<AirshipTask.Ids, AirshipTask> Tasks { get; }
+
+        IReadOnlyDictionary<int, ITask> IMapData.Tasks => _tasks;
     }
 }

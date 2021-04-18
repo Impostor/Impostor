@@ -1,8 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Innersloth.Maps;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;
@@ -18,11 +20,13 @@ namespace Impostor.Server.Net.Inner.Objects
     internal partial class InnerGameData : InnerNetObject, IInnerGameData
     {
         private readonly ILogger<InnerGameData> _logger;
+        private readonly IEventManager _eventManager;
         private readonly ConcurrentDictionary<byte, InnerPlayerInfo> _allPlayers;
 
-        public InnerGameData(Game game, ILogger<InnerGameData> logger, IServiceProvider serviceProvider) : base(game)
+        public InnerGameData(Game game, ILogger<InnerGameData> logger, IEventManager eventManager, IServiceProvider serviceProvider) : base(game)
         {
             _logger = logger;
+            _eventManager = eventManager;
             _allPlayers = new ConcurrentDictionary<byte, InnerPlayerInfo>();
 
             Components.Add(this);
@@ -64,7 +68,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     var playerId = reader.ReadByte();
                     var playerInfo = new InnerPlayerInfo(playerId);
 
-                    playerInfo.Deserialize(reader);
+                    playerInfo.Deserialize(reader, _eventManager, Game);
 
                     if (!_allPlayers.TryAdd(playerInfo.PlayerId, playerInfo))
                     {
@@ -80,12 +84,12 @@ namespace Impostor.Server.Net.Inner.Objects
                     var playerInfo = this.GetPlayerById(inner.Tag);
                     if (playerInfo != null)
                     {
-                        playerInfo.Deserialize(inner);
+                        playerInfo.Deserialize(inner, _eventManager, Game);
                     }
                     else
                     {
                         playerInfo = new InnerPlayerInfo(inner.Tag);
-                        playerInfo.Deserialize(inner);
+                        playerInfo.Deserialize(inner, _eventManager, Game);
 
                         if (!_allPlayers.TryAdd(playerInfo.PlayerId, playerInfo))
                         {
@@ -150,9 +154,10 @@ namespace Impostor.Server.Net.Inner.Objects
 
             foreach (var taskId in taskTypeIds.ToArray())
             {
-                player.Tasks.Add(new TaskInfo
+                player.Tasks.Add(new TaskInfo(_eventManager, Game, player.Controller)
                 {
                     Id = taskId,
+                    Task = IMapData.Maps[Game.Options.Map].Tasks[taskId],
                 });
             }
         }

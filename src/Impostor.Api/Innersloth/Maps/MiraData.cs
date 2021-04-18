@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Impostor.Api.Innersloth.Maps.Tasks;
 using Impostor.Api.Innersloth.Maps.Vents;
 
 namespace Impostor.Api.Innersloth.Maps
@@ -8,6 +9,7 @@ namespace Impostor.Api.Innersloth.Maps
     public class MiraData : IMapData
     {
         private readonly IReadOnlyDictionary<int, IVent> _vents;
+        private readonly IReadOnlyDictionary<int, ITask> _tasks;
 
         public MiraData()
         {
@@ -28,10 +30,47 @@ namespace Impostor.Api.Innersloth.Maps
 
             Vents = vents.ToDictionary(x => x.Id, x => x).AsReadOnly();
             _vents = vents.ToDictionary(x => (int)x.Id, x => (IVent)x).AsReadOnly();
+
+            var tasks = new[]
+            {
+                new MiraTask(MiraTask.Ids.HallwayFixWiring, TaskTypes.FixWiring, TaskCategories.CommonTask, false),
+                new MiraTask(MiraTask.Ids.AdminEnterIDCode, TaskTypes.EnterIdCode, TaskCategories.CommonTask, false),
+                new MiraTask(MiraTask.Ids.MedbaySubmitScan, TaskTypes.SubmitScan, TaskCategories.LongTask, true),
+                new MiraTask(MiraTask.Ids.BalconyClearAsteroids, TaskTypes.ClearAsteroids, TaskCategories.LongTask, false),
+                new MiraTask(MiraTask.Ids.ElectricalDivertPowerToAdmin, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.ElectricalDivertPowerToCafeteria, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.ElectricalDivertPowerToCommunications, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.ElectricalDivertPowerToLaunchpad, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.ElectricalDivertPowerToMedbay, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.ElectricalDivertPowerToOffice, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.StorageWaterPlants, TaskTypes.WaterPlants, TaskCategories.LongTask, false),
+                new MiraTask(MiraTask.Ids.ReactorStartReactor, TaskTypes.StartReactor, TaskCategories.LongTask, false),
+                new MiraTask(MiraTask.Ids.ElectricalDivertPowerToGreenhouse, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.AdminChartCourse, TaskTypes.ChartCourse, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.GreenhouseCleanO2Filter, TaskTypes.Filter, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.LaunchpadFuelEngines, TaskTypes.FuelEngines, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.LaboratoryAssembleArtifact, TaskTypes.AssembleArtifact, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.LaboratorySortSamples, TaskTypes.SortSamples, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.AdminPrimeShields, TaskTypes.PrimeShields, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.CafeteriaEmptyGarbage, TaskTypes.EmptyGarbage, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.BalconyMeasureWeather, TaskTypes.MeasureWeather, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.ElectricalDivertPowerToLaboratory, TaskTypes.DivertPower, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.CafeteriaBuyBeverage, TaskTypes.BuyBeverage, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.OfficeProcessData, TaskTypes.ProcessData, TaskCategories.ShortTask, false),
+                new MiraTask(MiraTask.Ids.LaunchpadRunDiagnostics, TaskTypes.RunDiagnostics, TaskCategories.LongTask, false),
+                new MiraTask(MiraTask.Ids.ReactorUnlockManifolds, TaskTypes.UnlockManifolds, TaskCategories.ShortTask, false),
+            };
+
+            Tasks = tasks.ToDictionary(x => x.Id, x => x).AsReadOnly();
+            _tasks = tasks.ToDictionary(x => (int)x.Id, x => (ITask)x).AsReadOnly();
         }
 
         public IReadOnlyDictionary<MiraVent.Ids, MiraVent> Vents { get; }
 
         IReadOnlyDictionary<int, IVent> IMapData.Vents => _vents;
+
+        public IReadOnlyDictionary<MiraTask.Ids, MiraTask> Tasks { get; }
+
+        IReadOnlyDictionary<int, ITask> IMapData.Tasks => _tasks;
     }
 }

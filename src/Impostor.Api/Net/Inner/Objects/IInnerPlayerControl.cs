@@ -105,5 +105,12 @@ namespace Impostor.Api.Net.Inner.Objects
         /// </summary>
         /// <returns>Task that must be awaited.</returns>
         ValueTask ExileAsync();
+
+        /// <summary>
+        ///     Sets all the player's tasks as complete, if the player is a crewmate.
+        ///     Visible to all players.
+        /// </summary>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask CompleteAllTasksAsync();
     }
 }
