@@ -111,5 +111,11 @@ namespace Impostor.Plugins.Example.Handlers
         {
             _logger.LogInformation("Player {player} vented to {vent}", e.PlayerControl.PlayerInfo.PlayerName, e.NewVent.Name);
         }
+
+        [EventListener]
+        public void t(IPlayerCompletedTaskEvent e)
+        {
+            _logger.LogInformation("Player {player} completed {task},{type},{category} visual {visual}", e.ClientPlayer.Character.PlayerInfo.PlayerName, e.Task.Task.Name, e.Task.Task.Type, e.Task.Task.Category, e.Task.Task.IsVisual);
+        }
     }
 }
