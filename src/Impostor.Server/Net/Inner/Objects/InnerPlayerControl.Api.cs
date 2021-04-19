@@ -34,9 +34,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 player = this;
             }
 
-            using var writer = _game.StartRpc(NetId, RpcCalls.SetName);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetName);
             writer.Write(name);
-            await _game.FinishRpcAsync(writer, player.OwnerId);
+            await Game.FinishRpcAsync(writer, player.OwnerId);
         }
 
         public async ValueTask SetColorAsync(ColorType color)
@@ -55,9 +55,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 player = this;
             }
 
-            using var writer = _game.StartRpc(NetId, RpcCalls.SetColor);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetColor);
             Rpc08SetColor.Serialize(writer, color);
-            await _game.FinishRpcAsync(writer, player.OwnerId);
+            await Game.FinishRpcAsync(writer, player.OwnerId);
         }
 
         public async ValueTask SetHatAsync(HatType hat)
@@ -76,9 +76,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 player = this;
             }
 
-            using var writer = _game.StartRpc(NetId, RpcCalls.SetHat);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetHat);
             Rpc09SetHat.Serialize(writer, hat);
-            await _game.FinishRpcAsync(writer, player.OwnerId);
+            await Game.FinishRpcAsync(writer, player.OwnerId);
         }
 
         public async ValueTask SetPetAsync(PetType pet)
@@ -97,9 +97,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 player = this;
             }
 
-            using var writer = _game.StartRpc(NetId, RpcCalls.SetPet);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetPet);
             Rpc17SetPet.Serialize(writer, pet);
-            await _game.FinishRpcAsync(writer, player.OwnerId);
+            await Game.FinishRpcAsync(writer, player.OwnerId);
         }
 
         public async ValueTask SetSkinAsync(SkinType skin)
@@ -118,9 +118,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 player = this;
             }
 
-            using var writer = _game.StartRpc(NetId, RpcCalls.SetSkin);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetSkin);
             Rpc10SetSkin.Serialize(writer, skin);
-            await _game.FinishRpcAsync(writer, player.OwnerId);
+            await Game.FinishRpcAsync(writer, player.OwnerId);
         }
 
         public async ValueTask SendChatAsync(string text)

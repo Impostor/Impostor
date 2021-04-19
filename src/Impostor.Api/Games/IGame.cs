@@ -61,12 +61,12 @@ namespace Impostor.Api.Games
         ValueTask SyncSettingsAsync();
 
         /// <summary>
-        ///     Sends a <see cref="GameOptionsData"/> to one player.
+        ///     Sends a <see cref="GameOptionsData" /> to one player.
         ///     This will desync the options to the players. Use it carfully.
         /// </summary>
-        /// <param name="options">The <see cref="GameOptionsData"/> to send.</param>
-        /// <param name="player">The player to send the <see cref="GameOptionsData"/> to.</param>
-        /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
+        /// <param name="options">The <see cref="GameOptionsData" /> to send.</param>
+        /// <param name="player">The player to send the <see cref="GameOptionsData" /> to.</param>
+        /// <returns>A <see cref="ValueTask" /> representing the asynchronous operation.</returns>
         ValueTask SendSettingsToPlayerAsync(GameOptionsData options, IInnerPlayerControl player);
 
         /// <summary>
