@@ -84,6 +84,11 @@ namespace Impostor.Plugins.Example.Handlers
                 await e.PlayerControl.NetworkTransform.SnapToAsync(new Vector2(1, 1));
             }
 
+            if(e.Message == "completetasks")
+            {
+                _ = e.PlayerControl.CompleteAllTasksAsync();
+            }
+
             await e.PlayerControl.SetNameAsync(e.Message);
             await e.PlayerControl.SendChatAsync(e.Message);
         }
