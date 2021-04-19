@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;
+using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Player;
 
 namespace Impostor.Server.Net.Inner.Objects
@@ -19,8 +20,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 Complete = true;
 
-                using var writer = _game.StartRpc(_player.NetId, RpcCalls.CompleteTask);
-                writer.Write(Id);
+                // Send RPC.
+                using var writer = _game.StartRpc(_player.NetId, RpcCalls.Exiled);
+                Rpc01CompleteTask.Serialize(writer, Id);
                 await _game.FinishRpcAsync(writer);
 
                 // Notify plugins.
