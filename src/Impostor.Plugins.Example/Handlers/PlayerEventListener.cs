@@ -84,6 +84,11 @@ namespace Impostor.Plugins.Example.Handlers
                 await e.PlayerControl.NetworkTransform.SnapToAsync(new Vector2(1, 1));
             }
 
+            if (e.Message == "completetasks")
+            {
+                await e.PlayerControl.CompleteAllTasksAsync();
+            }
+
             await e.PlayerControl.SetNameAsync(e.Message);
             await e.PlayerControl.SendChatAsync(e.Message);
         }
@@ -110,6 +115,12 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnPlayerVentEvent(IPlayerVentEvent e)
         {
             _logger.LogInformation("Player {player} vented to {vent}", e.PlayerControl.PlayerInfo.PlayerName, e.NewVent.Name);
+        }
+
+        [EventListener]
+        public void OnPlayerCompletedTaskEvent(IPlayerCompletedTaskEvent e)
+        {
+            _logger.LogInformation("Player {player} completed {task}, {type}, {category}, visual {visual}", e.PlayerControl.PlayerInfo.PlayerName, e.Task.Task.Name, e.Task.Task.Type, e.Task.Task.Category, e.Task.Task.IsVisual);
         }
     }
 }
