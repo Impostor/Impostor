@@ -65,11 +65,6 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         {
             if (call == RpcCalls.AddVote)
             {
-                if (!await ValidateOwnership(call, sender))
-                {
-                    return false;
-                }
-
                 Rpc26AddVote.Deserialize(reader, out var clientId, out var targetClientId);
 
                 if (clientId != sender.Client.Id)
