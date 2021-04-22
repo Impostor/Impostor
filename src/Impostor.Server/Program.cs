@@ -45,7 +45,7 @@ namespace Impostor.Server
                 logLevel = LogEventLevel.Error;
             }
 
-            Log.Logger = new LoggerConfiguration()
+            var logConfiguration = new LoggerConfiguration()
                 .MinimumLevel.Is(logLevel)
 #if DEBUG
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
@@ -53,8 +53,19 @@ namespace Impostor.Server
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
 #endif
                 .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .CreateLogger();
+                .WriteTo.Console();
+
+            if (args.Contains("--log-file"))
+            {
+                if (!Directory.Exists("logs"))
+                {
+                    Directory.CreateDirectory("logs");
+                }
+
+                logConfiguration.WriteTo.File(path: "logs/log.txt", flushToDiskInterval: TimeSpan.FromMilliseconds(250), buffered: true, rollingInterval: RollingInterval.Day);
+            }
+
+            Log.Logger = logConfiguration.CreateLogger();
 
             try
             {
