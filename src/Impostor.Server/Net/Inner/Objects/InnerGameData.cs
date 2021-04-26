@@ -152,13 +152,15 @@ namespace Impostor.Server.Net.Inner.Objects
 
             player.Tasks = new List<TaskInfo>(taskTypeIds.Length);
 
-            foreach (var taskId in taskTypeIds.ToArray())
+            var taskId = 0u;
+            foreach (var taskTypeId in taskTypeIds.Span)
             {
-                player.Tasks.Add(new TaskInfo(_eventManager, Game, player.Controller)
-                {
-                    Id = taskId,
-                    Task = IMapData.Maps[Game.Options.Map].Tasks[taskId],
-                });
+                player.Tasks.Add(new TaskInfo(
+                    player,
+                    _eventManager,
+                    taskId++,
+                    Game.GameNet!.ShipStatus!.Data.Tasks[taskTypeId]
+                ));
             }
         }
     }

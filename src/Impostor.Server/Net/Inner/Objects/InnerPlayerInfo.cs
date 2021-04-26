@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
@@ -80,7 +80,6 @@ namespace Impostor.Server.Net.Inner.Objects
 
             for (var i = 0; i < taskCount; i++)
             {
-                Tasks[i] ??= new InnerGameData.TaskInfo(eventManager, game, Controller);
                 Tasks[i].Deserialize(reader);
             }
         }

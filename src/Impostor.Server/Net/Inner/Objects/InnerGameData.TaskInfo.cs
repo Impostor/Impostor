@@ -2,7 +2,6 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
-using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
@@ -10,15 +9,15 @@ namespace Impostor.Server.Net.Inner.Objects
     {
         public partial class TaskInfo : ITaskInfo
         {
+            private readonly InnerPlayerInfo _playerInfo;
             private readonly IEventManager _eventManager;
-            private readonly Game _game;
-            private readonly IInnerPlayerControl _player;
 
-            public TaskInfo(IEventManager eventManager, Game game, IInnerPlayerControl player)
+            public TaskInfo(InnerPlayerInfo playerInfo, IEventManager eventManager, uint id, ITask task)
             {
+                _playerInfo = playerInfo;
                 _eventManager = eventManager;
-                _game = game;
-                _player = player;
+                Id = id;
+                Task = task;
             }
 
             public uint Id { get; internal set; }
