@@ -2,7 +2,7 @@ namespace Impostor.Api.Innersloth.Maps.Tasks
 {
     public class MiraTask : ITask
     {
-        internal MiraTask(Ids id, TaskTypes type, TaskCategories category, bool isVisual)
+        internal MiraTask(Ids id, TaskTypes type, TaskCategories category, bool isVisual = false)
         {
             Id = id;
             Name = id.ToString();

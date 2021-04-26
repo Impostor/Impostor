@@ -2,7 +2,7 @@ namespace Impostor.Api.Innersloth.Maps.Tasks
 {
     public class AirshipTask : ITask
     {
-        internal AirshipTask(Ids id, TaskTypes type, TaskCategories category, bool isVisual)
+        internal AirshipTask(Ids id, TaskTypes type, TaskCategories category, bool isVisual = false)
         {
             Id = id;
             Name = id.ToString();

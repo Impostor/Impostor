@@ -2,7 +2,7 @@ namespace Impostor.Api.Innersloth.Maps.Tasks
 {
     public class PolusTask : ITask
     {
-        internal PolusTask(Ids id, TaskTypes type, TaskCategories category, bool isVisual)
+        internal PolusTask(Ids id, TaskTypes type, TaskCategories category, bool isVisual = false)
         {
             Id = id;
             Name = id.ToString();

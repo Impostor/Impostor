@@ -2,7 +2,7 @@ namespace Impostor.Api.Innersloth.Maps.Tasks
 {
     public class SkeldTask : ITask
     {
-        internal SkeldTask(Ids id, TaskTypes type, TaskCategories category, bool isVisual)
+        internal SkeldTask(Ids id, TaskTypes type, TaskCategories category, bool isVisual = false)
         {
             Id = id;
             Name = id.ToString();
