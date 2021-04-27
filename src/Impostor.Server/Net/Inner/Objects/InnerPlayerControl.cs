@@ -8,10 +8,12 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.Rpcs;
+using Impostor.Api.Utils;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner.Objects.Components;
 using Impostor.Server.Net.State;
@@ -28,7 +30,7 @@ namespace Impostor.Server.Net.Inner.Objects
         private readonly IEventManager _eventManager;
         private readonly IDateTimeProvider _dateTimeProvider;
 
-        public InnerPlayerControl(Game game, ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager, IDateTimeProvider dateTimeProvider) : base(game)
+        public InnerPlayerControl(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager, IDateTimeProvider dateTimeProvider) : base(customMessageManager, game)
         {
             _logger = logger;
             _eventManager = eventManager;
@@ -296,7 +298,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
 
                 default:
-                    return await UnregisteredCall(call, sender);
+                    return await base.HandleRpcAsync(sender, target, call, reader);
             }
 
             return true;

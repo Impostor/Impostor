@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.Rpcs;
@@ -27,7 +28,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private ushort _lastSequenceId;
         private bool _spawnSnapAllowed;
 
-        public InnerCustomNetworkTransform(Game game, ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool) : base(game)
+        public InnerCustomNetworkTransform(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool) : base(customMessageManager, game)
         {
             _logger = logger;
             _playerControl = playerControl;
@@ -135,7 +136,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 return true;
             }
 
-            return await UnregisteredCall(call, sender);
+            return await base.HandleRpcAsync(sender, target, call, reader);
         }
 
         internal async ValueTask SetPositionAsync(IClientPlayer sender, Vector2 position, Vector2 velocity)

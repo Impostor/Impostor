@@ -1,5 +1,5 @@
 using System;
-using Impostor.Api;
+using Impostor.Api.Utils;
 
 namespace Impostor.Tools.ServerReplay
 {

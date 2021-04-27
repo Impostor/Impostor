@@ -1,9 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Impostor.Api.Events.Managers;
-using Impostor.Api.Innersloth;
-using Impostor.Api.Innersloth.Maps;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.Rpcs;
@@ -19,7 +18,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly InnerPlayerControl _playerControl;
         private readonly IEventManager _eventManager;
 
-        public InnerPlayerPhysics(Game game, ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl, IEventManager eventManager) : base(game)
+        public InnerPlayerPhysics(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl, IEventManager eventManager) : base(customMessageManager, game)
         {
             _logger = logger;
             _playerControl = playerControl;
@@ -85,7 +84,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     break;
 
                 default:
-                    return await UnregisteredCall(call, sender);
+                    return await base.HandleRpcAsync(sender, target, call, reader);
             }
 
             return true;
