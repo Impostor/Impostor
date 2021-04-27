@@ -10,6 +10,7 @@ namespace Impostor.Api.Plugins
             Id = id;
         }
 
+        [Obsolete("Use (string id) constructor to avoid redundancy")]
         public ImpostorPluginAttribute(string id, string name, string author, string version)
         {
             Id = id;
