@@ -26,15 +26,6 @@ async function parseAddressAsync(serverAddress) {
             }
          }
     } 
-
-    if (dns && dns.Status === 0 && dns.Answer.length === 1 && IP_REGEX.test(dns.Answer[0].data)) {
-        return [dns.Answer[0].data, serverAddress];
-    } else {
-        const message = "Failed DNS request for " + serverAddress;
-
-        alert(message);
-        throw Error(message);
-    }
 }
 
 async function downloadAsync() {
