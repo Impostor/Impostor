@@ -13,6 +13,19 @@ async function parseAddressAsync(serverAddress) {
     }
 
     const dns = await (await fetch("https://dns.google/resolve?type=A&name=" + serverAddress)).json();
+    
+    for (let i of dns?.Answer) {
+         if (i.type === 1) {
+            if (dns && dns.Status === 0 && i.length === 1 && IP_REGEX.test(dns.Answer[0].data)) {
+                return [i.data, serverAddress];
+            } else {
+                const message = "Failed DNS request for " + serverAddress;
+
+                alert(message);
+                throw Error(message);
+            }
+         }
+    } 
 
     if (dns && dns.Status === 0 && dns.Answer.length === 1 && IP_REGEX.test(dns.Answer[0].data)) {
         return [dns.Answer[0].data, serverAddress];
