@@ -16,7 +16,7 @@ async function parseAddressAsync(serverAddress) {
     
     for (let i of dns?.Answer) {
          if (i.type === 1) {
-            if (dns && dns.Status === 0 && i.length === 1 && IP_REGEX.test(dns.Answer[0].data)) {
+            if (dns && dns.Status === 0 && i.length === 1 && IP_REGEX.test(i.data)) {
                 return [i.data, serverAddress];
             } else {
                 const message = "Failed DNS request for " + serverAddress;
