@@ -13,7 +13,11 @@ async function parseAddressAsync(serverAddress) {
     }
 
     /** @type {{ Status: number, Answer: { type: number, data: string }[] }} */
-    const dns = await (await fetch("https://dns.google/resolve?type=A&name=" + serverAddress)).json();
+    const dns = await (await fetch("https://cloudflare-dns.com/dns-query?type=A&name=" + serverAddress, {
+        headers: {
+            "Accept": "application/dns-json"
+        }
+    })).json();
 
     if (dns && dns.Status === 0) {
         for (const record of dns.Answer) {
