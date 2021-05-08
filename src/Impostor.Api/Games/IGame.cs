@@ -100,7 +100,7 @@ namespace Impostor.Api.Games
         /// <param name="targetClientId">Client id of GameDataTo's target.</param>
         /// <param name="type">Message type of the message.</param>
         /// <returns>A <see cref="IMessageWriter" /> that you can fill with rpc data and send using <see cref="FinishRpcAsync"/>.</returns>
-        IMessageWriter StartRpc(uint targetNetId, RpcCalls callId, int targetClientId = -1, MessageType type = MessageType.Reliable);
+        IMessageWriter StartRpc(uint targetNetId, RpcCalls callId, int? targetClientId, MessageType type = MessageType.Reliable);
 
         /// <summary>
         /// Finishes rpc message and sends it to the target.
