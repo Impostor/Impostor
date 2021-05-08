@@ -12,20 +12,21 @@ async function parseAddressAsync(serverAddress) {
         return [serverAddress, serverAddress];
     }
 
+    /** @type {{ Status: number, Answer: { type: number, data: string }[] }} */
     const dns = await (await fetch("https://dns.google/resolve?type=A&name=" + serverAddress)).json();
-    
-    for (let i of dns.Answer) {
-        if (i.type === 1) {
-            if (dns && dns.Status === 0 && IP_REGEX.test(i.data)) {
-                return [i.data, serverAddress];
-            } else {
-                const message = "Failed DNS request for " + serverAddress;
 
-                alert(message);
-                throw Error(message);
+    if (dns && dns.Status === 0) {
+        for (const record of dns.Answer) {
+            if (record.type === 1 && IP_REGEX.test(record.data)) {
+                return [record.data, serverAddress];
             }
         }
-    } 
+    }
+
+    const message = "Failed DNS request for " + serverAddress;
+
+    alert(message);
+    throw Error(message);
 }
 
 async function downloadAsync() {
@@ -35,7 +36,7 @@ async function downloadAsync() {
 
     const [serverIp, serverFqdn] = await parseAddressAsync(serverAddress);
     const json = generateRegionInfo(serverName, serverIp, serverFqdn, serverPort);
-    const blob = new Blob([json], { type: "text/plain" });
+    const blob = new Blob([json], {type: "text/plain"});
     saveFile(blob, "regionInfo.json");
 
     return false;
