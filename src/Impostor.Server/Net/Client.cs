@@ -172,10 +172,10 @@ namespace Impostor.Server.Net
 
                     var toPlayer = flag == MessageFlags.GameDataTo;
 
-                    // Handle packet.
-                    using var readerCopy = reader.Copy();
+                    var position = reader.Position;
+                    var verified = await Player!.Game.HandleGameDataAsync(reader, Player, toPlayer);
+                    reader.Seek(position);
 
-                    var verified = await Player!.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
                     if (verified)
                     {
                         // Broadcast packet to all other players.
