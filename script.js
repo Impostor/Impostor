@@ -69,18 +69,46 @@ function setPlatform(platform) {
 }
 
 function generateRegionInfo(name, ip, fqdn, port) {
-    const region = {
-        "$type": "DnsRegionInfo, Assembly-CSharp",
-        "Fqdn": fqdn,
-        "DefaultIp": ip,
-        "Port": port,
-        "Name": name,
-        "TranslateName": 1003 // StringNames.NoTranslation
-    };
+    const regions = [
+        // Add default regions so they also show up in the menu
+        {
+            $type: "DnsRegionInfo, Assembly-CSharp",
+            Fqdn: "na.mm.among.us",
+            DefaultIp: "50.116.1.42",
+            Port: 22023,
+            Name: "North America",
+            TranslateName: 289,
+        },
+        {
+            $type: "DnsRegionInfo, Assembly-CSharp",
+            Fqdn: "eu.mm.among.us",
+            DefaultIp: "172.105.251.170",
+            Port: 22023,
+            Name: "Europe",
+            TranslateName: 290,
+        },
+        {
+            $type: "DnsRegionInfo, Assembly-CSharp",
+            Fqdn: "as.mm.among.us",
+            DefaultIp: "139.162.111.196",
+            Port: 22023,
+            Name: "Asia",
+            TranslateName: 291,
+        },
+        // Followed by the custom region
+        {
+            $type: "DnsRegionInfo, Assembly-CSharp",
+            Fqdn: fqdn,
+            DefaultIp: ip,
+            Port: port,
+            Name: name,
+            TranslateName: 1003, // StringNames.NoTranslation
+        },
+    ];
 
     const jsonServerData = {
-        "CurrentRegionIdx": 0,
-        "Regions": [region]
+        CurrentRegionIdx: 3,
+        Regions: regions,
     };
 
     return JSON.stringify(jsonServerData);
