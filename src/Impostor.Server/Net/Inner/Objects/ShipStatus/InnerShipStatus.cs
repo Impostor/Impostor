@@ -7,6 +7,7 @@ using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Maps;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects.ShipStatus;
 using Impostor.Api.Net.Messages;
@@ -21,7 +22,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
     {
         private readonly Dictionary<SystemTypes, ISystemType> _systems = new Dictionary<SystemTypes, ISystemType>();
 
-        protected InnerShipStatus(Game game) : base(game)
+        protected InnerShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game)
         {
             Components.Add(this);
         }
@@ -36,7 +37,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 
         public abstract Vector2 MeetingSpawnCenter { get; }
 
-        public override ValueTask OnSpawnAsync()
+        internal override ValueTask OnSpawnAsync()
         {
             for (var i = 0; i < Doors.Count; i++)
             {
@@ -105,7 +106,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
                 }
 
                 default:
-                    return await UnregisteredCall(call, sender);
+                    return await base.HandleRpcAsync(sender, target, call, reader);
             }
 
             return true;

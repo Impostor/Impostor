@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
@@ -17,7 +18,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly ILogger<InnerVoteBanSystem> _logger;
         private readonly Dictionary<int, int[]> _votes;
 
-        public InnerVoteBanSystem(Game game, ILogger<InnerVoteBanSystem> logger) : base(game)
+        public InnerVoteBanSystem(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerVoteBanSystem> logger) : base(customMessageManager, game)
         {
             _logger = logger;
             _votes = new Dictionary<int, int[]>();
@@ -78,7 +79,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 return true;
             }
 
-            return await UnregisteredCall(call, sender);
+            return await base.HandleRpcAsync(sender, target, call, reader);
         }
     }
 }

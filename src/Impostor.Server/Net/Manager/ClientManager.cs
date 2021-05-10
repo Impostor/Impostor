@@ -10,6 +10,7 @@ using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
 using Impostor.Server.Config;
+using Impostor.Server.Events.Client;
 using Impostor.Server.Net.Factories;
 using Microsoft.Extensions.Logging;
 
@@ -24,13 +25,15 @@ namespace Impostor.Server.Net.Manager
         };
 
         private readonly ILogger<ClientManager> _logger;
+        private readonly IEventManager _eventManager;
         private readonly ConcurrentDictionary<int, ClientBase> _clients;
         private readonly IClientFactory _clientFactory;
         private int _idLast;
 
-        public ClientManager(ILogger<ClientManager> logger, IClientFactory clientFactory)
+        public ClientManager(ILogger<ClientManager> logger, IEventManager eventManager, IClientFactory clientFactory)
         {
             _logger = logger;
+            _eventManager = eventManager;
             _clientFactory = clientFactory;
             _clients = new ConcurrentDictionary<int, ClientBase>();
         }
@@ -85,6 +88,8 @@ namespace Impostor.Server.Net.Manager
             client.Id = id;
             _logger.LogTrace("Client connected.");
             _clients.TryAdd(id, client);
+
+            await _eventManager.CallAsync(new ClientConnectedEvent(connection, client));
         }
 
         public void Remove(IClient client)

@@ -199,6 +199,14 @@ namespace Impostor.Server.Net.State
                 return GameJoinResult.CreateSuccess(player);
             }
 
+            var @event = new GamePlayerJoiningEvent(this, player);
+            await _eventManager.CallAsync(@event);
+
+            if (@event.JoinResult != null && !@event.JoinResult.Value.IsSuccess)
+            {
+                return @event.JoinResult.Value;
+            }
+
             await HandleJoinGameNew(player, isNew);
             return GameJoinResult.CreateSuccess(player);
         }

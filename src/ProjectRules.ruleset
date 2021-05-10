@@ -19,4 +19,7 @@
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.SpacingRules">
     <Rule Id="SA1009" Action="None" />
   </Rules>
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.CSharp.OrderingRules">
+    <Rule Id="SA1202" Action="Info" />
+  </Rules>
 </RuleSet>

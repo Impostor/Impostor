@@ -20,6 +20,13 @@ namespace Impostor.Api.Net.Messages
         public MessageType SendOption { get; }
 
         /// <summary>
+        ///     Copies the contents of this writer into a new array.
+        /// </summary>
+        /// <param name="includeHeader">Whether to include message header in the array.</param>
+        /// <returns>An array containing the data in the current writer.</returns>
+        byte[] ToByteArray(bool includeHeader);
+
+        /// <summary>
         ///     Writes a boolean to the message.
         /// </summary>
         /// <param name="value">Value to write.</param>
