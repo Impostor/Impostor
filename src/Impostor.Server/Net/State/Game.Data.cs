@@ -19,8 +19,6 @@ namespace Impostor.Server.Net.State
 {
     internal partial class Game
     {
-        private const int FakeClientId = int.MaxValue - 1;
-
         /// <summary>
         ///     Used for global object, spawned by the host.
         /// </summary>
@@ -106,7 +104,8 @@ namespace Impostor.Server.Net.State
                         {
                             if (!await obj.HandleRpcAsync(sender, target, (RpcCalls)reader.ReadByte(), reader))
                             {
-                                return false;
+                                parent.RemoveMessage(reader);
+                                continue;
                             }
                         }
                         else
@@ -133,13 +132,6 @@ namespace Impostor.Server.Net.State
                         {
                             var innerNetObject = (InnerNetObject)ActivatorUtilities.CreateInstance(_serviceProvider, SpawnableObjects[objectId], this);
                             var ownerClientId = reader.ReadPackedInt32();
-
-                            // Prevent fake client from being broadcasted.
-                            // TODO: Remove message from stream properly.
-                            if (ownerClientId == FakeClientId)
-                            {
-                                return false;
-                            }
 
                             innerNetObject.SpawnFlags = (SpawnFlags)reader.ReadByte();
 

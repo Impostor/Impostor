@@ -1,6 +1,6 @@
 using System;
 
-namespace Impostor.Api
+namespace Impostor.Api.Utils
 {
     public interface IDateTimeProvider
     {

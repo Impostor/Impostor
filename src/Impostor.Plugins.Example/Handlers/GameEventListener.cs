@@ -1,4 +1,6 @@
 ﻿using Impostor.Api.Events;
+using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example.Handlers
@@ -10,6 +12,28 @@ namespace Impostor.Plugins.Example.Handlers
         public GameEventListener(ILogger<GameEventListener> logger)
         {
             _logger = logger;
+        }
+
+        [EventListener]
+        public void OnGameCreated(IGameCreationEvent e)
+        {
+            _logger.LogInformation("Game creation requested by {client}", e.Client == null ? "a plugin" : e.Client.Name);
+
+            if (e.Client != null)
+            {
+                var gameCode = GameCode.From(e.Client.Name);
+
+                if (!gameCode.IsInvalid)
+                {
+                    e.GameCode = gameCode;
+                }
+
+                if (e.Client.Name == "dima")
+                {
+                    e.IsCancelled = true;
+                    e.Client.DisconnectAsync(DisconnectReason.Custom, "No you dont >:(");
+                }
+            }
         }
 
         [EventListener]
@@ -47,6 +71,17 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnGameDestroyed(IGameDestroyedEvent e)
         {
             _logger.LogInformation("Game {code} > destroyed", e.Game.Code);
+        }
+
+        [EventListener]
+        public void OnGameHostChanged(IGameHostChangedEvent e)
+        {
+            _logger.LogInformation(
+                "Game {code} > changed host from {previous} to {new}",
+                e.Game.Code,
+                e.PreviousHost.Character?.PlayerInfo.PlayerName,
+                e.NewHost != null ? e.NewHost.Character?.PlayerInfo.PlayerName : "none"
+            );
         }
 
         [EventListener]

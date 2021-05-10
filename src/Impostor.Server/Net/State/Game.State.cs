@@ -50,20 +50,21 @@ namespace Impostor.Server.Net.State
 
             player.Client.Player = null;
 
+            // Host migration.
+            if (HostId == playerId)
+            {
+                await MigrateHost();
+                await _eventManager.CallAsync(new GameHostChangedEvent(this, player, Host));
+            }
+
             // Game is empty, remove it.
-            if (_players.IsEmpty)
+            if (_players.IsEmpty || Host == null)
             {
                 GameState = GameStates.Destroyed;
 
                 // Remove instance reference.
                 await _gameManager.RemoveAsync(Code);
                 return true;
-            }
-
-            // Host migration.
-            if (HostId == playerId)
-            {
-                await MigrateHost();
             }
 
             if (isBan)
@@ -97,7 +98,6 @@ namespace Impostor.Server.Net.State
 
             if (host == null)
             {
-                await EndAsync();
                 return;
             }
 

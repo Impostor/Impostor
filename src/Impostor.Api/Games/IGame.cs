@@ -90,5 +90,24 @@ namespace Impostor.Api.Games
         /// <param name="id">ID of the client.</param>
         /// <returns>A <see cref="ValueTask" /> representing the asynchronous operation.</returns>
         ValueTask SendToAsync(IMessageWriter writer, int id);
+
+        /// <summary>
+        ///     Creates a MessageWriter with GameData header.
+        /// </summary>
+        /// <remarks>Use with caution, recommended only for advanced developers.</remarks>
+        /// <param name="targetNetId">Net id of the InnerNetObject.</param>
+        /// <param name="callId">Rpc id of the message.</param>
+        /// <param name="targetClientId">Client id of GameDataTo's target.</param>
+        /// <param name="type">Message type of the message.</param>
+        /// <returns>A <see cref="IMessageWriter" /> that you can fill with rpc data and send using <see cref="FinishRpcAsync"/>.</returns>
+        IMessageWriter StartRpc(uint targetNetId, RpcCalls callId, int? targetClientId, MessageType type = MessageType.Reliable);
+
+        /// <summary>
+        /// Finishes rpc message and sends it to the target.
+        /// </summary>
+        /// <param name="writer">Message writer of the rpc.</param>
+        /// <param name="targetClientId">Id of the receiving client.</param>
+        /// <returns>A <see cref="ValueTask" /> representing the asynchronous operation.</returns>
+        ValueTask FinishRpcAsync(IMessageWriter writer, int? targetClientId = null);
     }
 }

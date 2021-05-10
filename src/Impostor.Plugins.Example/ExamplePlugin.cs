@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Plugins;
@@ -6,11 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example
 {
-    [ImpostorPlugin(
-        package: "gg.impostor.example",
-        name: "Example",
-        author: "AeonLucid",
-        version: "1.0.0")]
+    [ImpostorPlugin("gg.impostor.example")]
     public class ExamplePlugin : PluginBase
     {
         private readonly ILogger<ExamplePlugin> _logger;
@@ -27,10 +23,17 @@ namespace Impostor.Plugins.Example
             _logger.LogInformation("Example is being enabled.");
 
             var game = await _gameManager.CreateAsync(new GameOptionsData());
-            game.DisplayName = "Example game";
-            await game.SetPrivacyAsync(true);
+            if (game == null)
+            {
+                _logger.LogWarning("Example game creation was cancelled");
+            }
+            else
+            {
+                game.DisplayName = "Example game";
+                await game.SetPrivacyAsync(true);
 
-            _logger.LogInformation("Created game {0}.", game.Code.Code);
+                _logger.LogInformation("Created game {0}.", game.Code.Code);
+            }
         }
 
         public override ValueTask DisableAsync()

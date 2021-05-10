@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Impostor.Api.Innersloth;
 
 namespace Impostor.Api.Games
@@ -14,12 +14,14 @@ namespace Impostor.Api.Games
         public GameCode(string code)
         {
             Value = GameCodeParser.GameNameToInt(code);
-            Code = code;
+            Code = code.ToUpperInvariant();
         }
 
         public string Code { get; }
 
         public int Value { get; }
+
+        public bool IsInvalid => Value == -1;
 
         public static implicit operator string(GameCode code) => code.Code;
 

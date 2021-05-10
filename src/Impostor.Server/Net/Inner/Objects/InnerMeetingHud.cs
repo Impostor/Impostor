@@ -7,6 +7,7 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Events.Player;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.Rpcs;
@@ -25,7 +26,7 @@ namespace Impostor.Server.Net.Inner.Objects
         [AllowNull]
         private PlayerVoteArea[] _playerStates;
 
-        public InnerMeetingHud(Game game, ILogger<InnerMeetingHud> logger, IEventManager eventManager) : base(game)
+        public InnerMeetingHud(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerMeetingHud> logger, IEventManager eventManager) : base(customMessageManager, game)
         {
             _logger = logger;
             _eventManager = eventManager;
@@ -122,7 +123,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
 
                 default:
-                    return await UnregisteredCall(call, sender);
+                    return await base.HandleRpcAsync(sender, target, call, reader);
             }
 
             return true;

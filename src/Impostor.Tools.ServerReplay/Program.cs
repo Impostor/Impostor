@@ -4,19 +4,21 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
+using Impostor.Api.Utils;
 using Impostor.Hazel;
 using Impostor.Hazel.Extensions;
 using Impostor.Server;
 using Impostor.Server.Events;
 using Impostor.Server.Net;
+using Impostor.Server.Net.Custom;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Redirector;
@@ -114,6 +116,8 @@ namespace Impostor.Tools.ServerReplay
 
             services.AddEventPools();
             services.AddHazel();
+            services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
+            services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
 
             return services.BuildServiceProvider();
         }
@@ -209,7 +213,7 @@ namespace Impostor.Tools.ServerReplay
                 case RecordedPacketType.GameCreated:
                     _gameCodeFactory.Result = GameCode.From(reader.ReadString());
 
-                    await _gameManager.CreateAsync(GameOptions[clientId]);
+                    await _gameManager.CreateAsync(Connections[clientId].Client, GameOptions[clientId]);
 
                     GameOptions.Remove(clientId);
                     break;

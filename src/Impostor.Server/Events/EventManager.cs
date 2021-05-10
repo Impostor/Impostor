@@ -36,7 +36,7 @@ namespace Impostor.Server.Events
             }
 
             var eventListeners = RegisteredEventListener.FromType(listener.GetType());
-            var disposes = new IDisposable[eventListeners.Count];
+            var disposes = new List<IDisposable>(eventListeners.Count);
 
             foreach (var eventListener in eventListeners)
             {
@@ -51,7 +51,7 @@ namespace Impostor.Server.Events
                     wrappedEventListener.EventType,
                     _ => new TemporaryEventRegister());
 
-                register.Add(wrappedEventListener);
+                disposes.Add(register.Add(wrappedEventListener));
             }
 
             if (eventListeners.Count > 0)
