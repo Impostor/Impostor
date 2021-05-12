@@ -58,7 +58,7 @@ namespace Impostor.Server.Net.Inner.Objects
             throw new NotImplementedException();
         }
 
-        public void Deserialize(IMessageReader reader, IEventManager eventManager, Game game)
+        public void Deserialize(IMessageReader reader)
         {
             PlayerName = reader.ReadString();
             Color = (ColorType)reader.ReadPackedInt32();

@@ -69,7 +69,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     var playerId = reader.ReadByte();
                     var playerInfo = new InnerPlayerInfo(playerId);
 
-                    playerInfo.Deserialize(reader, _eventManager, Game);
+                    playerInfo.Deserialize(reader);
 
                     if (!_allPlayers.TryAdd(playerInfo.PlayerId, playerInfo))
                     {
@@ -85,12 +85,12 @@ namespace Impostor.Server.Net.Inner.Objects
                     var playerInfo = this.GetPlayerById(inner.Tag);
                     if (playerInfo != null)
                     {
-                        playerInfo.Deserialize(inner, _eventManager, Game);
+                        playerInfo.Deserialize(inner);
                     }
                     else
                     {
                         playerInfo = new InnerPlayerInfo(inner.Tag);
-                        playerInfo.Deserialize(inner, _eventManager, Game);
+                        playerInfo.Deserialize(inner);
 
                         if (!_allPlayers.TryAdd(playerInfo.PlayerId, playerInfo))
                         {
