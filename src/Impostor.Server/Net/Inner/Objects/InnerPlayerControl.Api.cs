@@ -126,18 +126,5 @@ namespace Impostor.Server.Net.Inner.Objects
             // Notify plugins.
             await _eventManager.CallAsync(new PlayerExileEvent(Game, Game.GetClientPlayer(OwnerId)!, this));
         }
-
-        public async ValueTask CompleteAllTasksAsync()
-        {
-            if (PlayerInfo.IsImpostor)
-            {
-                return;
-            }
-
-            foreach (var task in PlayerInfo.Tasks)
-            {
-                await task.CompleteAsync();
-            }
-        }
     }
 }

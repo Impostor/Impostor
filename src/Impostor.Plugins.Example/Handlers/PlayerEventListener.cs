@@ -86,7 +86,10 @@ namespace Impostor.Plugins.Example.Handlers
 
             if (e.Message == "completetasks")
             {
-                await e.PlayerControl.CompleteAllTasksAsync();
+                foreach (var task in e.PlayerControl.PlayerInfo.Tasks)
+                {
+                    await task.CompleteAsync();
+                }
             }
 
             await e.PlayerControl.SetNameAsync(e.Message);
