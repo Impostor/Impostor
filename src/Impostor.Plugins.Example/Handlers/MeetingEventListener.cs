@@ -22,7 +22,19 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnMeetingEnded(IMeetingEndedEvent e)
         {
-            _logger.LogInformation("Meeting > ended");
+            _logger.LogInformation("Meeting > ended, exiled: {exiled}, tie: {tie}", e.Exiled?.PlayerInfo.PlayerName, e.IsTie);
+
+            foreach (var playerState in e.MeetingHud.PlayerStates)
+            {
+                if (playerState.IsDead)
+                {
+                    _logger.LogInformation("- {player} is dead", playerState.TargetPlayer.PlayerName);
+                }
+                else
+                {
+                    _logger.LogInformation("- {player} voted for {voteType} {votedFor}", playerState.TargetPlayer.PlayerName, playerState.VoteType, playerState.VotedFor?.PlayerInfo.PlayerName);
+                }
+            }
         }
     }
 }

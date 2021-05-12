@@ -4,9 +4,9 @@ namespace Impostor.Api.Events.Player
 {
     public enum VoteType : sbyte
     {
+        ForceSkip = -2,
         Skip = -1,
         Player = 0,
-        None = 0xf - 1,
     }
 
     public interface IPlayerVotedEvent : IPlayerEvent
