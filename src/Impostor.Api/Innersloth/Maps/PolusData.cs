@@ -11,7 +11,7 @@ namespace Impostor.Api.Innersloth.Maps
         private readonly IReadOnlyDictionary<int, IVent> _vents;
         private readonly IReadOnlyDictionary<int, ITask> _tasks;
 
-        public PolusData()
+        internal PolusData()
         {
             var vents = new[]
             {
