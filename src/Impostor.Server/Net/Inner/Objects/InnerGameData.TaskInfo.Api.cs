@@ -21,7 +21,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 if (Complete)
                 {
-                    return;
+                    throw new ImpostorException("Can't complete a task that is already completed");
                 }
 
                 Complete = true;
