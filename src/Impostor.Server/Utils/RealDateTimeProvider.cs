@@ -1,7 +1,7 @@
 using System;
 using Impostor.Api.Utils;
 
-namespace Impostor.Server
+namespace Impostor.Server.Utils
 {
     public class RealDateTimeProvider : IDateTimeProvider
     {

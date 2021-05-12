@@ -9,7 +9,7 @@ There are currently two modes to run the Impostor server in. The first way is th
     - [Windows x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.0-windows-x64-installer)
     - [Linux x64](https://docs.microsoft.com/en-us/dotnet/core/install/linux)
     - [macOS x64](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.0-macos-x64-installer)
-2. Find the [latest dev release](https://ci.appveyor.com/project/Impostor/Impostor/branch/dev/artifacts).
+2. Find the [latest master release](https://ci.appveyor.com/project/Impostor/Impostor/branch/master/artifacts).
 3. Download either the Windows or the Linux version.
 4. Extract the zip.
 5. Modify `config.json` to your liking. Documentation can be found [here](Server-configuration.md) *(this step is mandatory if you want to expose this server to other devices)*

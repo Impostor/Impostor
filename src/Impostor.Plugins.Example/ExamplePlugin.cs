@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example
 {
-    [ImpostorPlugin("gg.impostor.example", "Example", "AeonLucid", "1.0.0")]
+    [ImpostorPlugin("gg.impostor.example")]
     public class ExamplePlugin : PluginBase
     {
         private readonly ILogger<ExamplePlugin> _logger;

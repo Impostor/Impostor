@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Maps;
+using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner.Objects.ShipStatus;
 using Impostor.Server.Net.Inner.Objects.Systems;
 using Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
@@ -12,7 +13,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 {
     internal class InnerAirshipStatus : InnerShipStatus, IInnerAirshipStatus
     {
-        public InnerAirshipStatus(Game game) : base(game)
+        public InnerAirshipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game)
         {
         }
 

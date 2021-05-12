@@ -4,6 +4,7 @@ using Impostor.Api;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
@@ -21,14 +22,16 @@ namespace Impostor.Server.Net
         private readonly AntiCheatConfig _antiCheatConfig;
         private readonly ClientManager _clientManager;
         private readonly GameManager _gameManager;
+        private readonly ICustomMessageManager<ICustomRootMessage> _customMessageManager;
 
-        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, string name, int gameVersion, IHazelConnection connection)
+        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, string name, int gameVersion, IHazelConnection connection)
             : base(name, gameVersion, connection)
         {
             _logger = logger;
             _antiCheatConfig = antiCheatOptions.Value;
             _clientManager = clientManager;
             _gameManager = gameManager;
+            _customMessageManager = customMessageManager;
         }
 
         public override async ValueTask<bool> ReportCheatAsync(CheatContext context, string message)
@@ -169,11 +172,11 @@ namespace Impostor.Server.Net
 
                     var toPlayer = flag == MessageFlags.GameDataTo;
 
-                    // Handle packet.
-                    using var readerCopy = reader.Copy();
+                    var position = reader.Position;
+                    var verified = await Player!.Game.HandleGameDataAsync(reader, Player, toPlayer);
+                    reader.Seek(position);
 
-                    var verified = await Player!.Game.HandleGameDataAsync(readerCopy, Player, toPlayer);
-                    if (verified)
+                    if (verified && Player != null)
                     {
                         // Broadcast packet to all other players.
                         using (var writer = MessageWriter.Get(messageType))
@@ -255,6 +258,12 @@ namespace Impostor.Server.Net
                 }
 
                 default:
+                    if (_customMessageManager.TryGet(flag, out var customRootMessage))
+                    {
+                        await customRootMessage.HandleMessageAsync(this, reader, messageType);
+                        break;
+                    }
+
                     _logger.LogWarning("Server received unknown flag {0}.", flag);
                     break;
             }

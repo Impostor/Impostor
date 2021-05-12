@@ -6,6 +6,7 @@ using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth.Maps;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages;
@@ -23,7 +24,7 @@ namespace Impostor.Server.Net.Inner.Objects
         private readonly IEventManager _eventManager;
         private readonly ConcurrentDictionary<byte, InnerPlayerInfo> _allPlayers;
 
-        public InnerGameData(Game game, ILogger<InnerGameData> logger, IEventManager eventManager, IServiceProvider serviceProvider) : base(game)
+        public InnerGameData(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerGameData> logger, IEventManager eventManager, IServiceProvider serviceProvider) : base(customMessageManager, game)
         {
             _logger = logger;
             _eventManager = eventManager;
@@ -117,7 +118,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
 
                 default:
-                    return await UnregisteredCall(call, sender);
+                    return await base.HandleRpcAsync(sender, target, call, reader);
             }
 
             return true;

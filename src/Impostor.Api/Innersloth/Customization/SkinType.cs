@@ -18,5 +18,8 @@
         Miner = 13,
         Winter = 14,
         Archae = 15,
+        Prisoner = 16,
+        CCC = 17,
+        RightHandMan = 18,
     }
 }
