@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Impostor.Api.Events.Managers;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
@@ -65,7 +66,15 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                             throw new ArgumentOutOfRangeException(nameof(call), call, null);
                     }
 
-                    var vent = Game.GameNet.ShipStatus!.Data.Vents[ventId];
+                    if (!Game.GameNet.ShipStatus!.Data.Vents.TryGetValue(ventId, out var vent))
+                    {
+                        if (await sender.Client.ReportCheatAsync(call, "Client interacted with nonexistent vent"))
+                        {
+                            return false;
+                        }
+
+                        break;
+                    }
 
                     switch (call)
                     {
