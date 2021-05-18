@@ -67,7 +67,7 @@ async function openApp() {
         serverip,
     });
     const url = `amongus://init?${params.toString()}`;
-    window.open(url, "_blank");
+    window.location = url;
 
     return false;
 }
