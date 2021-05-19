@@ -91,8 +91,8 @@ namespace Impostor.Server.Net.Inner.Objects
                     {
                         var playerVoteArea = _playerStates[i];
 
-                        var clientPlayer = Game.Players.Single(x => x.Character?.PlayerId == playerVoteArea.TargetPlayer.PlayerId);
-                        var isHost = clientPlayer.IsHost && playerVoteArea.VoteType != VoteType.ForceSkip;
+                        var clientPlayer = Game.Players.SingleOrDefault(x => x.Character?.PlayerId == playerVoteArea.TargetPlayer.PlayerId);
+                        var isHost = (clientPlayer?.IsHost ?? false) && playerVoteArea.VoteType != VoteType.ForceSkip;
 
                         playerVoteArea.Deserialize(reader, isHost);
 
