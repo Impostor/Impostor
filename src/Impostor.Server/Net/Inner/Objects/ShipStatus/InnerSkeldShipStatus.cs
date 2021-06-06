@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Numerics;
+using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Maps;
 using Impostor.Api.Net.Custom;
@@ -12,7 +13,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 {
     internal class InnerSkeldShipStatus : InnerShipStatus, IInnerSkeldShipStatus
     {
-        public InnerSkeldShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game)
+        public InnerSkeldShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, IEventManager eventManager) : base(customMessageManager, game, eventManager)
         {
         }
 
