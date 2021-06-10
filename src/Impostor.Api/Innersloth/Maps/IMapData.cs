@@ -13,5 +13,7 @@ namespace Impostor.Api.Innersloth.Maps
         }.AsReadOnly();
 
         IReadOnlyDictionary<int, IVent> Vents { get; }
+
+        IReadOnlyDictionary<int, ITask> Tasks { get; }
     }
 }

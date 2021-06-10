@@ -1,4 +1,4 @@
-﻿namespace Impostor.Api.Innersloth
+namespace Impostor.Api.Innersloth
 {
     public enum TaskTypes : uint
     {
@@ -45,5 +45,22 @@
         AlignTelescope = 40,
         RecordTemperature = 41,
         RebootWifi = 42,
+        PolishRuby = 43,
+        ResetBreakers = 44,
+        Decontaminate = 45,
+        MakeBurger = 46,
+        UnlockSafe = 47,
+        SortRecords = 48,
+        PutAwayPistols = 49,
+        FixShower = 50,
+        CleanToilet = 51,
+        DressMannequin = 52,
+        PickUpTowels = 53,
+        RewindTapes = 54,
+        StartFans = 55,
+        DevelopPhotos = 56,
+        GetBiggolSword = 57,
+        PutAwayRifles = 58,
+        StopCharles = 59,
     }
 }

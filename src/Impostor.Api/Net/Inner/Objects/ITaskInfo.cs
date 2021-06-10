@@ -1,4 +1,5 @@
-﻿using Impostor.Api.Innersloth;
+using System.Threading.Tasks;
+using Impostor.Api.Innersloth;
 
 namespace Impostor.Api.Net.Inner.Objects
 {
@@ -6,8 +7,14 @@ namespace Impostor.Api.Net.Inner.Objects
     {
         uint Id { get; }
 
-        TaskTypes Type { get; }
+        ITask Task { get; }
 
         bool Complete { get; }
+
+        /// <summary>
+        ///     Sets the task as complete.
+        /// </summary>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask CompleteAsync();
     }
 }
