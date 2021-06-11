@@ -176,7 +176,7 @@ namespace Impostor.Server.Net
                     var verified = await Player!.Game.HandleGameDataAsync(reader, Player, toPlayer);
                     reader.Seek(position);
 
-                    if (verified)
+                    if (verified && Player != null)
                     {
                         // Broadcast packet to all other players.
                         using (var writer = MessageWriter.Get(messageType))
