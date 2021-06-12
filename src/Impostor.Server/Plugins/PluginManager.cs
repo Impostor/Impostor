@@ -4,24 +4,60 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Threading;
+using System.Threading.Tasks;
 using Impostor.Api.Plugins;
+using Impostor.Server.Config;
+using Impostor.Server.Plugins.Proxies;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Hosting;
-using Serilog;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Plugins
 {
-    public static class PluginLoader
+    public class PluginManager : IPluginManager, IHostedService
     {
-        private static readonly ILogger Logger = Log.ForContext(typeof(PluginLoader));
+        private readonly ILogger<PluginManager> _logger;
+        private readonly IOptions<PluginLoaderConfig> _pluginConfig;
+        private readonly IConfiguration _configuration;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ServiceProxyCollection _serviceProxyCollection;
 
-        public static IHostBuilder UsePluginLoader(this IHostBuilder builder, PluginConfig config)
+        private PluginAssemblyLoadContext? _currentContext;
+
+        public PluginManager(ILogger<PluginManager> logger, IOptions<PluginLoaderConfig> pluginConfig, IConfiguration configuration, IServiceProvider serviceProvider, ServiceProxyCollection serviceProxyCollection)
         {
-            var assemblyInfos = new List<IAssemblyInformation>();
-            var context = AssemblyLoadContext.Default;
+            _logger = logger;
+            _pluginConfig = pluginConfig;
+            _configuration = configuration;
+            _serviceProvider = serviceProvider;
+            _serviceProxyCollection = serviceProxyCollection;
+        }
 
+        public IHost? CurrentHost { get; private set; }
+
+        public List<PluginInformation> Plugins { get; } = new List<PluginInformation>();
+
+        IReadOnlyList<IPluginInformation> IPluginManager.Plugins => Plugins.AsReadOnly();
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            CurrentHost = CreatePluginHost();
+            return CurrentHost.StartAsync(cancellationToken);
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return CurrentHost?.StopAsync(cancellationToken) ?? Task.CompletedTask;
+        }
+
+        private IDictionary<string, IAssemblyInformation> GetAssemblyInformation()
+        {
             // Add the plugins and libraries.
+            var config = _pluginConfig.Value;
             var pluginPaths = new List<string>(config.Paths);
             var libraryPaths = new List<string>(config.LibraryPaths);
             CheckPaths(pluginPaths);
@@ -35,38 +71,69 @@ namespace Impostor.Server.Plugins
             var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
             matcher.AddInclude("*.dll");
             matcher.AddExclude("Impostor.Api.dll");
+            matcher.AddExclude("Impostor.Server.dll");
 
-            RegisterAssemblies(pluginPaths, matcher, assemblyInfos, true);
-            RegisterAssemblies(libraryPaths, matcher, assemblyInfos, false);
+            var assembliesByName = AssemblyLoadContext.Default.Assemblies
+                .Where(a => a.GetName().Name != null)
+                .ToDictionary(
+                    a => a.GetName().Name!,
+                    a => (IAssemblyInformation)new LoadedAssemblyInformation(a, true));
 
-            // Register the resolver to the current context.
-            // TODO: Move this to a new context so we can unload/reload plugins.
-            context.Resolving += (loadContext, name) =>
+            RegisterAssemblies(assembliesByName, pluginPaths, matcher, true);
+            RegisterAssemblies(assembliesByName, libraryPaths, matcher, false);
+
+            return assembliesByName;
+        }
+
+        private IHost CreatePluginHost()
+        {
+            var assembliesByName = GetAssemblyInformation();
+            _currentContext ??= new PluginAssemblyLoadContext(assembliesByName);
+
+            var pluginHostBuilder = new HostBuilder()
+                .UseContentRoot(_configuration.GetValue<string>(HostDefaults.ContentRootKey))
+                .ConfigureHostConfiguration(builder => { builder.AddConfiguration(_configuration); })
+                .UseServiceProviderFactory(_ => new DefaultServiceProviderFactory());
+
+            Plugins.Clear();
+            Plugins.AddRange(GetPluginInformation(assembliesByName, _currentContext));
+
+            foreach (var plugin in Plugins)
             {
-                Logger.Verbose("Loading assembly {0} v{1}", name.Name, name.Version);
+                plugin.Startup?.ConfigureHost(pluginHostBuilder);
+            }
 
-                // Some plugins may be referencing another Impostor.Api version and try to load it.
-                // We want to only use the one shipped with the server.
-                if (name.Name == "Impostor.Api")
+            pluginHostBuilder.ConfigureServices(services =>
+            {
+                services.AddHostedService<PluginLoaderService>();
+
+                foreach (var (type, lifetime) in _serviceProxyCollection.ServiceTypes)
                 {
-                    return typeof(IPlugin).Assembly;
+                    services.Add(new ServiceDescriptor(
+                        type,
+                        _ => _serviceProvider.GetService(type)!,
+                        lifetime));
                 }
 
-                var info = assemblyInfos.FirstOrDefault(a => a.AssemblyName.Name == name.Name);
+                foreach (var plugin in Plugins)
+                {
+                    plugin.Startup?.ConfigureServices(services);
+                }
+            });
 
-                return info?.Load(loadContext);
-            };
+            return pluginHostBuilder.Build();
+        }
 
-            // TODO: Catch uncaught exceptions.
-            var assemblies = assemblyInfos
+        private List<PluginInformation> GetPluginInformation(IDictionary<string, IAssemblyInformation> assembliesByName, PluginAssemblyLoadContext context)
+        {
+            var plugins = new List<PluginInformation>();
+            var pluginAssemblies = assembliesByName
+                .Values
                 .Where(a => a.IsPlugin)
                 .Select(a => context.LoadFromAssemblyName(a.AssemblyName))
                 .ToList();
 
-            // Find all plugins.
-            var plugins = new List<PluginInformation>();
-
-            foreach (var assembly in assemblies)
+            foreach (var assembly in pluginAssemblies)
             {
                 // Find plugin startup.
                 var pluginStartup = assembly
@@ -76,7 +143,7 @@ namespace Impostor.Server.Plugins
 
                 if (pluginStartup.Count > 1)
                 {
-                    Logger.Warning("A plugin may only define zero or one IPluginStartup implementation ({0}).", assembly);
+                    _logger.LogWarning("A plugin may only define zero or one IPluginStartup implementation ({0}).", assembly);
                     continue;
                 }
 
@@ -91,7 +158,7 @@ namespace Impostor.Server.Plugins
 
                 if (plugin.Count != 1)
                 {
-                    Logger.Warning("A plugin must define exactly one IPlugin or PluginBase implementation ({0}).", assembly);
+                    _logger.LogWarning("A plugin must define exactly one IPlugin or PluginBase implementation ({0}).", assembly);
                     continue;
                 }
 
@@ -104,61 +171,75 @@ namespace Impostor.Server.Plugins
                     plugin.Single()));
             }
 
-            var orderedPlugins = LoadOrderPlugins(plugins);
-
-            foreach (var plugin in orderedPlugins)
-            {
-                plugin.Startup?.ConfigureHost(builder);
-            }
-
-            builder.ConfigureServices(services =>
-            {
-                services.AddHostedService(provider => ActivatorUtilities.CreateInstance<PluginLoaderService>(provider, orderedPlugins));
-
-                foreach (var plugin in orderedPlugins)
-                {
-                    plugin.Startup?.ConfigureServices(services);
-                }
-            });
-
-            return builder;
+            return OrderPlugins(plugins);
         }
 
-        private static void CheckPaths(IEnumerable<string> paths)
+        private void CheckPaths(IEnumerable<string> paths)
         {
             foreach (var path in paths)
             {
                 if (!Directory.Exists(path))
                 {
-                    Logger.Warning("Path {path} was specified in the PluginLoader configuration, but this folder doesn't exist!", path);
+                    _logger.LogWarning("Path {path} was specified in the PluginLoader configuration, but this folder doesn't exist!", path);
                 }
             }
         }
 
-        private static void RegisterAssemblies(
+        private void RegisterAssemblies(
+            IDictionary<string, IAssemblyInformation> assemblies,
             IEnumerable<string> paths,
             Matcher matcher,
-            ICollection<IAssemblyInformation> assemblyInfos,
             bool isPlugin)
         {
             foreach (var path in paths.SelectMany(matcher.GetResultsInFullPath))
             {
-                AssemblyName assemblyName;
+                AssemblyName name;
 
                 try
                 {
-                    assemblyName = AssemblyName.GetAssemblyName(path);
+                    name = AssemblyName.GetAssemblyName(path);
                 }
                 catch (BadImageFormatException)
                 {
                     continue;
                 }
 
-                assemblyInfos.Add(new AssemblyInformation(assemblyName, path, isPlugin));
+                if (name.Name == null)
+                {
+                    _logger.LogWarning(
+                        "Skipped {0} because the assembly name could not be resolved",
+                        path);
+                    continue;
+                }
+
+                if (assemblies.TryGetValue(name.Name, out var loaded))
+                {
+                    var version = name.Version;
+                    var loadedVersion = loaded.AssemblyName.Version;
+
+                    if (loadedVersion != null && version != null && version.Major != loadedVersion.Major)
+                    {
+                        _logger.LogError(
+                            "Assembly {0} is already loaded with version {1} while loading version {2}",
+                            name.Name,
+                            loadedVersion,
+                            version);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Skipped assembly {0} because it's already loaded", name.Name);
+                    }
+
+                    continue;
+                }
+
+                _logger.LogTrace("Registered assembly {name} v{version} ({path})", name.Name, name.Version, path);
+
+                assemblies.Add(name.Name, new AssemblyInformation(name, path, isPlugin, false));
             }
         }
 
-        private static List<PluginInformation> LoadOrderPlugins(IEnumerable<PluginInformation> plugins)
+        private List<PluginInformation> OrderPlugins(IEnumerable<PluginInformation> plugins)
         {
             var pluginDictionary = new Dictionary<string, PluginInformation>();
             var hardDependencies = new Dictionary<string, List<string>>();
@@ -208,7 +289,7 @@ namespace Impostor.Server.Plugins
             return ordered;
         }
 
-        private static List<string> CheckHardDependencies(
+        private List<string> CheckHardDependencies(
             List<string> plugins,
             IReadOnlyDictionary<string, List<string>> hardDependencies)
         {
@@ -221,7 +302,7 @@ namespace Impostor.Server.Plugins
 
                 foreach (var dependency in hardDependencies[plugin].Where(dependency => !plugins.Contains(dependency)))
                 {
-                    Logger.Error(
+                    _logger.LogError(
                         "The plugin {plugin} has defined the plugin {dependency} as a hard dependency but its not present! {plugin} will not loaded.",
                         plugin,
                         dependency,
@@ -239,7 +320,7 @@ namespace Impostor.Server.Plugins
             return plugins;
         }
 
-        private static void RecursiveOrder(
+        private void RecursiveOrder(
             string plugin,
             IReadOnlyDictionary<string, List<string>> dependencyGraph,
             ICollection<string> processed,
