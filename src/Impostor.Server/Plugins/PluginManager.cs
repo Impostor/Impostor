@@ -49,9 +49,21 @@ namespace Impostor.Server.Plugins
             return CurrentHost.StartAsync(cancellationToken);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            return CurrentHost?.StopAsync(cancellationToken) ?? Task.CompletedTask;
+            if (CurrentHost != null)
+            {
+                await CurrentHost.StopAsync(cancellationToken);
+
+                if (CurrentHost is IAsyncDisposable asyncDisposable)
+                {
+                    await asyncDisposable.DisposeAsync();
+                }
+                else
+                {
+                    CurrentHost.Dispose();
+                }
+            }
         }
 
         private IDictionary<string, IAssemblyInformation> GetAssemblyInformation()
@@ -91,6 +103,7 @@ namespace Impostor.Server.Plugins
             _currentContext ??= new PluginAssemblyLoadContext(assembliesByName);
 
             var pluginHostBuilder = new HostBuilder()
+                .UseConsoleLifetime(options => options.SuppressStatusMessages = true)
                 .UseContentRoot(_configuration.GetValue<string>(HostDefaults.ContentRootKey))
                 .ConfigureHostConfiguration(builder => { builder.AddConfiguration(_configuration); })
                 .UseServiceProviderFactory(_ => new DefaultServiceProviderFactory());
