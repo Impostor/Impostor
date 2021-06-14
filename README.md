@@ -34,7 +34,7 @@ If you just want to play on a server hosted by someone else, you need to follow 
 
 ![Client](docs/images/client.jpg)
 
-If you do not wish to execute any programs. Follow the instructions in [this website](https://impostor.github.io/Impostor)
+If you do not wish to execute any programs, follow the instructions in [this website](https://impostor.github.io/Impostor)
 
 #### Android
 
