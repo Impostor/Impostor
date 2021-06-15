@@ -36,13 +36,15 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
             }
 
             Vector2 position;
-            if (player.PlayerId < 5)
+            int halfPlayers = numPlayers / 2; // floored intentionally
+            int spawnId = player.PlayerId % 15;
+            if (player.PlayerId < halfPlayers)
             {
-                position = this.MeetingSpawnCenter + (new Vector2(1, 0) * player.PlayerId);
+                position = this.MeetingSpawnCenter + (new Vector2(0.6f, 0) * spawnId);
             }
             else
             {
-                position = this.MeetingSpawnCenter2 + (new Vector2(1, 0) * (player.PlayerId - 5));
+                position = this.MeetingSpawnCenter2 + (new Vector2(0.6f, 0) * (spawnId - halfPlayers));
             }
 
             return position;
