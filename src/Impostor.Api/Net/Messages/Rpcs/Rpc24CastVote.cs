@@ -8,10 +8,10 @@ namespace Impostor.Api.Net.Messages.Rpcs
             writer.Write(suspectPlayerId);
         }
 
-        public static void Deserialize(IMessageReader reader, out byte playerId, out sbyte suspectPlayerId)
+        public static void Deserialize(IMessageReader reader, out byte playerId, out byte suspectPlayerId)
         {
             playerId = reader.ReadByte();
-            suspectPlayerId = reader.ReadSByte();
+            suspectPlayerId = reader.ReadByte();
         }
     }
 }
