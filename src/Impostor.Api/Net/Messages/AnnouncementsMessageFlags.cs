@@ -4,6 +4,6 @@ namespace Impostor.Api.Net.Messages
     {
         public const byte UseCache = 0;
         public const byte SetUpdate = 1;
-        public const byte SetFreeWeekend = 2;
+        public const byte AddLanguages = 4;
     }
 }

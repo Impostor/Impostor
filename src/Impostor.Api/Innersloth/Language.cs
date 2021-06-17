@@ -3,9 +3,17 @@ namespace Impostor.Api.Innersloth
     public enum Language
     {
         English,
-        Spanish,
+        SpanishLA,
+        Brazilian,
         Portuguese,
         Korean,
         Russian,
+        Dutch,
+        Filipino,
+        French,
+        German,
+        Italian,
+        Japanese,
+        SpanishEU,
     }
 }

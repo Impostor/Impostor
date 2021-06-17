@@ -19,8 +19,6 @@ namespace Impostor.Server.Events.Announcements
 
         public class AnnouncementResponse : IAnnouncementRequestEvent.IResponse
         {
-            public FreeWeekendState FreeWeekendState { get; set; } = FreeWeekendState.NotFree;
-
             public bool UseCached { get; set; } = false;
 
             public Announcement? Announcement { get; set; } = null;
