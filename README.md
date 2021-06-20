@@ -22,34 +22,7 @@ Impostor is one of the first **Among Us** private servers, written in C#.
 
 ### Client
 
-If you just want to play on a server hosted by someone else, you need to follow these instructions.
-
-#### Windows
-
-1. Find the [latest release](https://github.com/AeonLucid/Impostor/releases/latest).
-2. Download `Impostor-Patcher-win-x64.zip`.
-3. Extract the zip.
-4. Run `Impostor.Patcher.exe`.
-5. Follow the instructions inside the application.
-
-![Client](docs/images/client.jpg)
-
-If you do not wish to execute any programs. Follow the instructions in [this website](https://impostor.github.io/Impostor)
-
-#### Android
-
-##### Android 10 and below.
-1. Go to [this website](https://impostor.github.io/Impostor) **(ON YOUR MOBILE DEVICE)**
-2. Follow the instructions listed there.
-
-##### Android 11.
-1. Connect your phone to a computer. Go to [this website](https://impostor.github.io/Impostor) on the computer and follow the steps 1 and 2 to generate a `regionInfo.dat` file.
-2. Instead of following the next steps, open the phone's internal storage on your computer and navigate to `/sdcard/Android/data/com.innersloth.spacemafia/files`.
-3. Copy the generated `regionInfo.dat` file into the `files` folder you just navigated to.
-
-#### iOS
-
-iOS devices need to be jailbroken in order to connect to Impostor servers. 
+If you just want to play on a server hosted by someone else, you need to configure your client to connect to an Impostor server. Please go to [this website](https://impostor.github.io/Impostor) to set up your client by following the instructions for your OS there.
 
 ### Server
 
