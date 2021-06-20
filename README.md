@@ -3,14 +3,11 @@
 [![Discord](https://img.shields.io/badge/Discord-chat-blue?style=flat-square)](https://discord.gg/Mk3w6Tb)
 [![AppVeyor](https://img.shields.io/appveyor/build/Impostor/Impostor/master?style=flat-square)](https://ci.appveyor.com/project/Impostor/Impostor/branch/master)
 
-Impostor is one of the first **Among Us** private servers, written in C#. 
+Impostor is the first working **Among Us** private server, written in C#.
 
-| Impostor version | Among Us version | Experimental | Download |
-|-|-|-|-|
-| 1.1.0 | 2020.09.07 - 2020.09.22 | No | [![Download](https://img.shields.io/badge/Download-v1.1.0-blue?style=flat-square)](https://github.com/Impostor/Impostor/releases/tag/v1.1.0) |
-| 1.2.2 | 2020.09.22 - 2020.11.17 | No | [![Download](https://img.shields.io/badge/Download-v1.2.2-blue?style=flat-square)](https://github.com/Impostor/Impostor/releases/tag/v1.2.2) |
-| 1.3.0 | 2021.3.5 | No | [![Download](https://img.shields.io/badge/Download-v1.3.0-blue?style=flat-square)](https://github.com/Impostor/Impostor/releases/tag/v1.3.0) |
-| 1.4.0 | 2021.3.31 - 2021.4.2 | Yes | [![Download](https://img.shields.io/badge/Download-master-blue?style=flat-square)](https://ci.appveyor.com/project/Impostor/Impostor/branch/master/artifacts) |
+As Among Us is actively updated, you may want to use the latest build from the master branch if you want to play on the latest version of Among Us that supported by Impostor.
+
+If you want to play on an older version of Among Us, you can download old releases from [here](https://github.com/Impostor/Impostor/releases/), however these versions are less supported.
 
 ## Features
 
@@ -30,7 +27,7 @@ See the [docs](docs/Running-the-server.md) for instructions on how to set it up.
 
 ## Troubleshooting
 
-See [TROUBLESHOOTING](docs/TROUBLESHOOTING.md) to solve issues the Impostor client or the server.
+See [TROUBLESHOOTING](docs/TROUBLESHOOTING.md) to solve issues with the Impostor client or the server.
 
 ## Contributing
 
