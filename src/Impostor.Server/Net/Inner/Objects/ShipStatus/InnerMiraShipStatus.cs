@@ -31,7 +31,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
         {
             base.AddSystems(systems);
 
-            systems.Add(SystemTypes.Comms, new HudOverrideSystemType());
+            systems.Add(SystemTypes.Comms, new HudOverrideSystemType(Game, EventManager));
             systems.Add(SystemTypes.Reactor, new ReactorSystemType());
             systems.Add(SystemTypes.LifeSupp, new LifeSuppSystemType());
         }

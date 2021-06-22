@@ -23,12 +23,11 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
     internal abstract class InnerShipStatus : InnerNetObject, IInnerShipStatus
     {
         private readonly Dictionary<SystemTypes, ISystemType> _systems = new Dictionary<SystemTypes, ISystemType>();
-        private readonly IEventManager _eventManager;
 
         protected InnerShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, IEventManager eventManager) : base(customMessageManager, game)
         {
             Components.Add(this);
-            _eventManager = eventManager;
+            EventManager = eventManager;
         }
 
         public abstract IMapData Data { get; }
@@ -40,6 +39,8 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
         public abstract Vector2 InitialSpawnCenter { get; }
 
         public abstract Vector2 MeetingSpawnCenter { get; }
+
+        protected IEventManager EventManager { get; }
 
         internal override ValueTask OnSpawnAsync()
         {
@@ -108,7 +109,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 
                     if (player != null)
                     {
-                        await _eventManager.CallAsync(new PlayerRepairSystemEvent(Game, sender, player, systemType, amount));
+                        await EventManager.CallAsync(new PlayerRepairSystemEvent(Game, sender, player, systemType, amount));
                     }
 
                     break;
