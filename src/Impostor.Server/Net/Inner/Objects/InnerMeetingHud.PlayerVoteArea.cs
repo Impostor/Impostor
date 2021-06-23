@@ -16,16 +16,16 @@ namespace Impostor.Server.Net.Inner.Objects
                 Parent = parent;
                 TargetPlayer = targetPlayer;
 
-                IsDead = isDead;
+                VotedForId = (byte)(isDead ? TVoteType.Dead : TVoteType.HasNotVoted);
             }
 
             public InnerMeetingHud Parent { get; }
 
             public InnerPlayerInfo TargetPlayer { get; }
 
-            public bool IsDead { get; private set; }
+            public bool IsDead => VoteType == TVoteType.Dead;
 
-            public bool DidVote { get; private set; }
+            public bool DidVote => VoteType != TVoteType.HasNotVoted;
 
             public bool DidReport { get; private set; }
 
@@ -40,7 +40,6 @@ namespace Impostor.Server.Net.Inner.Objects
                     switch ((VoteType)value)
                     {
                         case TVoteType.Dead:
-                            IsDead = true;
                             VoteType = TVoteType.Dead;
                             break;
 
@@ -55,8 +54,6 @@ namespace Impostor.Server.Net.Inner.Objects
                             VotedFor = Parent.Game.GameNet.GameData!.GetPlayerById(value)?.Controller;
                             break;
                     }
-
-                    DidVote = VoteType != TVoteType.HasNotVoted;
                 }
             }
 
