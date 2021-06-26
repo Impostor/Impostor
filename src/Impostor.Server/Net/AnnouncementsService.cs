@@ -101,15 +101,6 @@ namespace Impostor.Server.Net
                 _logger.LogDebug("Sent ({Id}) {Message}", announcement.Id, announcement.Message);
             }
 
-            if (response.FreeWeekendState != FreeWeekendState.NotFree)
-            {
-                using var writer = MessageWriter.Get(MessageType.Reliable);
-                Message02SetFreeWeekend.Serialize(writer, response.FreeWeekendState);
-                await e.Connection.SendAsync(writer);
-
-                _logger.LogDebug("Sent {FreeWeekendState} weekend state", response.FreeWeekendState);
-            }
-
             await e.Connection.Disconnect(null);
         }
     }

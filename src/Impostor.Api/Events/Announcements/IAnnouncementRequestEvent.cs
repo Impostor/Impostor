@@ -10,11 +10,6 @@ namespace Impostor.Api.Events.Announcements
         public interface IResponse
         {
             /// <summary>
-            ///     Gets or sets FreeWeekendState, currently unused by the client.
-            /// </summary>
-            public FreeWeekendState FreeWeekendState { get; set; }
-
-            /// <summary>
             ///     Gets or sets a value indicating whether announcement should be loaded from client's cache, can save some bytes.
             /// </summary>
             public bool UseCached { get; set; }

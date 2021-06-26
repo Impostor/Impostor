@@ -34,5 +34,6 @@
         SetTasks = 29,
         ClimbLadder = 31,
         UsePlatform = 32,
+        SendQuickChat = 33,
     }
 }

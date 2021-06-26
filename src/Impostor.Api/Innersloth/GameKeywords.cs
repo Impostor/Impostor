@@ -6,14 +6,21 @@ namespace Impostor.Api.Innersloth
     public enum GameKeywords : uint
     {
         All = 0,
-        Other = 1,
-        Spanish = 2,
+        English = 256,
+        SpanishLA = 2,
+        Brazilian = 2048,
+        Portuguese = 16,
         Korean = 4,
         Russian = 8,
-        Portuguese = 16,
+        Dutch = 4096,
+        Filipino = 64,
+        French = 8192,
+        German = 16384,
+        Italian = 32768,
+        Japanese = 512,
+        SpanishEU = 1024,
         Arabic = 32,
-        Filipone = 64,
         Polish = 128,
-        English = 256,
+        Other = 1,
     }
 }

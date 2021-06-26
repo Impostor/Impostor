@@ -2,10 +2,12 @@ using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Api.Events.Player
 {
-    public enum VoteType : sbyte
+    public enum VoteType : byte
     {
-        ForceSkip = -2,
-        Skip = -1,
+        HasNotVoted = 255,
+        Missed = 254,
+        Skipped = 253,
+        Dead = 252,
         Player = 0,
     }
 

@@ -24,9 +24,9 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 
         public override Vector2 InitialSpawnCenter { get; } = new Vector2(16.64f, -2.46f);
 
-        public override Vector2 MeetingSpawnCenter { get; } = new Vector2(17.726f, -16.286f);
+        public override Vector2 MeetingSpawnCenter { get; } = new Vector2(17.4f, -16.286f);
 
-        public Vector2 MeetingSpawnCenter2 { get; } = new Vector2(-17.7f, -17.5f);
+        public Vector2 MeetingSpawnCenter2 { get; } = new Vector2(17.4f, -17.515f);
 
         public override Vector2 GetSpawnLocation(InnerPlayerControl player, int numPlayers, bool initialSpawn)
         {
@@ -35,17 +35,16 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
                 return base.GetSpawnLocation(player, numPlayers, initialSpawn);
             }
 
-            Vector2 position;
-            if (player.PlayerId < 5)
+            var halfPlayers = numPlayers / 2; // floored intentionally
+            var spawnId = player.PlayerId % 15;
+            if (player.PlayerId < halfPlayers)
             {
-                position = this.MeetingSpawnCenter + (new Vector2(1, 0) * player.PlayerId);
+                return this.MeetingSpawnCenter + (new Vector2(0.6f, 0) * spawnId);
             }
             else
             {
-                position = this.MeetingSpawnCenter2 + (new Vector2(1, 0) * (player.PlayerId - 5));
+                return this.MeetingSpawnCenter2 + (new Vector2(0.6f, 0) * (spawnId - halfPlayers));
             }
-
-            return position;
         }
 
         protected override void AddSystems(Dictionary<SystemTypes, ISystemType> systems)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -42,7 +43,8 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 try
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(Game.Options.DiscussionTime + Game.Options.VotingTime), _timerToken.Token);
+                    const float AnimationTime = 0.25f + 0.5f + 0.4f + 3f + 0.75f + 5f;
+                    await Task.Delay(TimeSpan.FromSeconds(AnimationTime + Game.Options.DiscussionTime + Game.Options.VotingTime), _timerToken.Token);
                 }
                 catch (TaskCanceledException)
                 {
@@ -70,37 +72,31 @@ namespace Impostor.Server.Net.Inner.Objects
             if (initialState)
             {
                 PopulateButtons();
-
-                foreach (var playerState in _playerStates)
-                {
-                    playerState.Deserialize(reader, false);
-
-                    if (playerState.DidReport)
-                    {
-                        Reporter = playerState.TargetPlayer;
-                    }
-                }
             }
-            else
+
+            var length = reader.ReadPackedUInt32();
+
+            for (var i = 0; i < length; i++)
             {
-                var num = reader.ReadPackedUInt32();
+                var inner = reader.ReadMessage();
+                var playerVoteArea = _playerStates.SingleOrDefault(x => x.TargetPlayer.PlayerId == inner.Tag);
 
-                for (var i = 0; i < _playerStates.Length; i++)
+                if (playerVoteArea != null)
                 {
-                    if ((num & 1 << i) != 0)
+                    var clientPlayer = Game.Players.SingleOrDefault(x => x.Character?.PlayerId == playerVoteArea.TargetPlayer.PlayerId);
+                    var updateVote = !playerVoteArea.DidVote && (clientPlayer?.IsHost ?? false) && playerVoteArea.VoteType != VoteType.Missed;
+
+                    playerVoteArea.Deserialize(inner, updateVote);
+
+                    if (updateVote)
                     {
-                        var playerVoteArea = _playerStates[i];
+                        await HandleVoteAsync(playerVoteArea);
+                        await CheckForEndVotingAsync();
+                    }
 
-                        var clientPlayer = Game.Players.SingleOrDefault(x => x.Character?.PlayerId == playerVoteArea.TargetPlayer.PlayerId);
-                        var isHost = (clientPlayer?.IsHost ?? false) && playerVoteArea.VoteType != VoteType.ForceSkip;
-
-                        playerVoteArea.Deserialize(reader, isHost);
-
-                        if (isHost)
-                        {
-                            await HandleVoteAsync(playerVoteArea);
-                            await CheckForEndVotingAsync();
-                        }
+                    if (initialState && playerVoteArea.DidReport)
+                    {
+                        Reporter = playerVoteArea.TargetPlayer;
                     }
                 }
             }
@@ -177,7 +173,7 @@ namespace Impostor.Server.Net.Inner.Objects
             }
         }
 
-        private async ValueTask<bool> HandleCastVoteAsync(ClientPlayer sender, ClientPlayer? target, byte playerId, sbyte suspectPlayerId)
+        private async ValueTask<bool> HandleCastVoteAsync(ClientPlayer sender, ClientPlayer? target, byte playerId, byte suspectPlayerId)
         {
             if (sender.IsHost)
             {
@@ -221,46 +217,45 @@ namespace Impostor.Server.Net.Inner.Objects
             }
         }
 
-        private byte[] CalculateVotes()
+        private KeyValuePair<byte, int> MaxPair(Dictionary<byte, int> self, out bool tie)
         {
-            byte[] array = new byte[_playerStates.Max(x => x.TargetPlayer.PlayerId) + 2];
-            foreach (var playerVoteArea in _playerStates)
+            tie = true;
+            var result = new KeyValuePair<byte, int>(byte.MaxValue, int.MinValue);
+            foreach (var keyValuePair in self)
             {
-                if (playerVoteArea.DidVote)
+                if (keyValuePair.Value > result.Value)
                 {
-                    var index = playerVoteArea.VotedForId + 1;
-                    if (index >= 0 && index < array.Length)
-                    {
-                        array[index] += 1;
-                    }
-                }
-            }
-
-            return array;
-        }
-
-        private int IndexOfMax<T>(T[] self, Func<T, int> comparer, out bool tie)
-        {
-            tie = false;
-            var num = int.MinValue;
-            var result = -1;
-            for (var i = 0; i < self.Length; i++)
-            {
-                var num2 = comparer.Invoke(self[i]);
-                if (num2 > num)
-                {
-                    result = i;
-                    num = num2;
+                    result = keyValuePair;
                     tie = false;
                 }
-                else if (num2 == num)
+                else if (keyValuePair.Value == result.Value)
                 {
                     tie = true;
-                    result = -1;
                 }
             }
 
             return result;
+        }
+
+        private Dictionary<byte, int> CalculateVotes()
+        {
+            var players = new Dictionary<byte, int>();
+            foreach (var playerVoteArea in _playerStates)
+            {
+                if (!playerVoteArea.IsDead && playerVoteArea.DidVote && playerVoteArea.VoteType != VoteType.Missed)
+                {
+                    if (players.TryGetValue(playerVoteArea.VotedForId, out var current))
+                    {
+                        players[playerVoteArea.VotedForId] = current + 1;
+                    }
+                    else
+                    {
+                        players[playerVoteArea.VotedForId] = 1;
+                    }
+                }
+            }
+
+            return players;
         }
 
         private async ValueTask HandleVotingCompleteAsync()
@@ -271,14 +266,14 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 if (!playerVoteArea.DidVote)
                 {
-                    playerVoteArea.SetVotedFor((sbyte)VoteType.ForceSkip);
+                    playerVoteArea.SetVotedFor((byte)VoteType.Missed);
                     await HandleVoteAsync(playerVoteArea);
                 }
             }
 
-            byte[] self = this.CalculateVotes();
-            var maxIdx = IndexOfMax(self, p => p, out var tie) - 1;
-            var exiled = Game.GameNet.GameData!.GetPlayerById((byte)maxIdx)?.Controller;
+            var self = this.CalculateVotes();
+            var max = MaxPair(self, out var tie);
+            var exiled = tie ? null : Game.GameNet.GameData!.GetPlayerById(max.Key)?.Controller;
 
             if (exiled != null)
             {
