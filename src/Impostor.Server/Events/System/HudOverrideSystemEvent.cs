@@ -8,7 +8,7 @@ namespace Impostor.Server.Events.System
 {
     public class HudOverrideSystemEvent : IHudOverrideSystemEvent
     {
-        public HudOverrideSystemEvent(IGame game,  bool active)
+        public HudOverrideSystemEvent(IGame game, bool active)
         {
             Game = game;
 

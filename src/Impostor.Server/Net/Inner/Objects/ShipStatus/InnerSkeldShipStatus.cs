@@ -34,7 +34,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
             systems.Add(SystemTypes.Doors, new AutoDoorsSystemType(Doors));
             systems.Add(SystemTypes.Comms, new HudOverrideSystemType(Game, EventManager));
             systems.Add(SystemTypes.Security, new SecurityCameraSystemType());
-            systems.Add(SystemTypes.Reactor, new ReactorSystemType());
+            systems.Add(SystemTypes.Reactor, new ReactorSystemType(Game, EventManager));
             systems.Add(SystemTypes.LifeSupp, new LifeSuppSystemType());
         }
     }

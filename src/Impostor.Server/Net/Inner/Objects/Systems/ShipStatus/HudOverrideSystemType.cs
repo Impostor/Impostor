@@ -6,32 +6,21 @@ using Impostor.Server.Events.System;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 {
-    public class HudOverrideSystemType : ISystemType, IActivatable
+    public class HudOverrideSystemType : SystemType, IActivatable
     {
-        // Next Two are probably to move into ISystemType. Maybe while replacing with an IInnerShipStatus for reporting events.
-        private readonly IEventManager _eventManager;
-        private readonly IGame _game;
-
-        public HudOverrideSystemType(IGame game, IEventManager eventManager)
+        public HudOverrideSystemType(IGame game, IEventManager eventManager) : base(game, eventManager)
         {
-            _game = game;
-            _eventManager = eventManager;
         }
 
         public bool IsActive { get; private set; }
 
-        public void Serialize(IMessageWriter writer, bool initialState)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async void Deserialize(IMessageReader reader, bool initialState)
+        public override void Deserialize(IMessageReader reader, bool initialState)
         {
             bool status = reader.ReadBoolean();
 
             if (status != IsActive)
             {
-                await _eventManager.CallAsync(new HudOverrideSystemEvent(_game, status));
+                EventManager.CallAsync(new HudOverrideSystemEvent(Game, status));
             }
 
             IsActive = status;
