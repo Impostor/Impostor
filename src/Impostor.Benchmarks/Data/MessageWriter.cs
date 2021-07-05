@@ -11,7 +11,7 @@ namespace Impostor.Benchmarks.Data
     {
         public MessageType SendOption { get; private set; }
 
-        private Stack<int> messageStarts = new Stack<int>();
+        private readonly Stack<int> _messageStarts = new Stack<int>();
 
         public MessageWriter(byte[] buffer)
         {
@@ -78,7 +78,7 @@ namespace Impostor.Benchmarks.Data
         ///
         public void StartMessage(byte typeFlag)
         {
-            messageStarts.Push(this.Position);
+            _messageStarts.Push(this.Position);
             this.Position += 2; // Skip for size
             this.Write(typeFlag);
         }
@@ -86,7 +86,7 @@ namespace Impostor.Benchmarks.Data
         ///
         public void EndMessage()
         {
-            var lastMessageStart = messageStarts.Pop();
+            var lastMessageStart = _messageStarts.Pop();
             var length = (ushort)(this.Position - lastMessageStart - 3); // Minus length and type byte
             this.Buffer[lastMessageStart] = (byte)length;
             this.Buffer[lastMessageStart + 1] = (byte)(length >> 8);
@@ -95,13 +95,13 @@ namespace Impostor.Benchmarks.Data
         ///
         public void CancelMessage()
         {
-            this.Position = this.messageStarts.Pop();
+            this.Position = this._messageStarts.Pop();
             this.Length = this.Position;
         }
 
         public void Clear(MessageType sendOption)
         {
-            this.messageStarts.Clear();
+            this._messageStarts.Clear();
             this.SendOption = sendOption;
             this.Buffer[0] = (byte)sendOption;
             switch (sendOption)
@@ -293,7 +293,7 @@ namespace Impostor.Benchmarks.Data
             this.Write(msg.Buffer, offset, msg.Length - offset);
         }
 
-        public unsafe static bool IsLittleEndian()
+        public static unsafe bool IsLittleEndian()
         {
             byte b;
             unsafe

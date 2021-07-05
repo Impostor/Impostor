@@ -9,7 +9,7 @@ namespace Impostor.Benchmarks.Data
 {
     public class MessageReader_Bytes_Pooled
     {
-        private static ConcurrentQueue<MessageReader_Bytes_Pooled> _readers;
+        private static readonly ConcurrentQueue<MessageReader_Bytes_Pooled> _readers;
 
         static MessageReader_Bytes_Pooled()
         {

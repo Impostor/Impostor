@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
-using Impostor.Api.Innersloth.Maps;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
