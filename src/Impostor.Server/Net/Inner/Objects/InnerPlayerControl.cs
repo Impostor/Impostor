@@ -427,7 +427,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     var i = 1;
                     while (true)
                     {
-                        string text = expected + " " + i;
+                        var text = expected + " " + i;
 
                         if (Game.Players.All(x => x.Character == null || x.Character == this || x.Character.PlayerInfo.PlayerName != text))
                         {
