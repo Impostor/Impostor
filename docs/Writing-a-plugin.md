@@ -31,12 +31,11 @@ The first step is creating a new C# project, it must be a **Class Library (.NET 
 
 - .NET Standard 2.0
 - .NET Standard 2.1
-- .NET Core 3.1
 - .NET 5
 
 For more information about compatibility, see https://docs.microsoft.com/en-us/dotnet/standard/net-standard.
 
-> At the moment of writing this document, I recommend you to use **.NET Standard 2.1** until .NET 5 is released officially. This should give you enough functionality. If not, upgrade to .NET Core 3.1.
+> At the moment of writing this document, I recommend you to use **.NET Standard 2.1**. This should give you enough functionality. If not, upgrade to .NET 5.
 
 When the project has been created, you should have `Class.cs` and `Project.csproj` files. Your `Project.csproj` should look something like this.
 
@@ -62,16 +61,13 @@ Make sure to get a prerelease if you are writing a plugin for a dev release of t
 1. Right click your project.
 2. Click `Manage NuGet Packages`.
 3. Click `Browse`.
-4. Next to the search bar, enable `Include prerelease`.
-5. Search for `Impostor.Api`.
-6. Click the `Impostor.Api` result and press install on the right side.
+4. Search for `Impostor.Api`.
+5. Click the `Impostor.Api` result and press install on the right side.
 
 ### Dotnet CLI
 
-> Make sure to grab the latest (pre-)release version from NuGet [here](https://www.nuget.org/packages/Impostor.Api).
-
 1. Open your project folder in command prompt / bash.
-2. Run `dotnet add package Impostor.Api -v "1.2.0-ci.58"`.
+2. Run `dotnet add package Impostor.Api`.
 
 ## 4. The plugin class
 

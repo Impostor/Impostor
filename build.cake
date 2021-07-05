@@ -114,13 +114,6 @@ Task("Build")
         DotNetCoreBuild("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetCoreBuildSettings {
             Configuration = configuration,
         });
-
-        // Client.
-        ImpostorPublishNF("Impostor-Patcher", "./src/Impostor.Patcher/Impostor.Patcher.WinForms/Impostor.Patcher.WinForms.csproj");
-
-        ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "win-x64");
-        ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "osx-x64");
-        ImpostorPublish("Impostor-Patcher-Cli", "./src/Impostor.Patcher/Impostor.Patcher.Cli/Impostor.Patcher.Cli.csproj", "linux-x64");
             
         // Server.
         ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64", true);
