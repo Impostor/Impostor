@@ -14,16 +14,11 @@
         Brown = 9,
         Cyan = 10,
         Lime = 11,
-        Mahogany = 12,
+        Maroon = 12,
         Rose = 13,
         Banana = 14,
         Gray = 15,
         Tan = 16,
-        Lilac = 17,
-        Aqua = 18,
-        Cobalt = 19,
-        Barf = 20,
-        Salmon = 21,
-        Chocolate = 22,
+        Coral = 17,
     }
 }
