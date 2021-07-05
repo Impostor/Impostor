@@ -144,6 +144,9 @@ dotnet_naming_style.end_in_async.word_separator =
 # error RS2008: Enable analyzer release tracking for the analyzer project containing rule '{0}'
 dotnet_diagnostic.RS2008.severity = none
 
+# IDE0005: Remove unnecessary import
+dotnet_diagnostic.IDE0005.severity = warning
+
 # IDE0035: Remove unreachable code
 dotnet_diagnostic.IDE0035.severity = warning
 
