@@ -59,6 +59,9 @@ namespace Impostor.Server.Net.Manager
         {
             if (!SupportedVersions.Contains(clientVersion))
             {
+                GameVersion.ParseVersion(clientVersion, out var year, out var month, out var day, out var revision);
+                _logger.LogTrace("Client connected using unsupported version: {clientVersion} ({version})", clientVersion, $"{year}.{month}.{day}{(revision == 0 ? string.Empty : "." + revision)}");
+
                 using var packet = MessageWriter.Get(MessageType.Reliable);
                 Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
                 await connection.SendAsync(packet);
