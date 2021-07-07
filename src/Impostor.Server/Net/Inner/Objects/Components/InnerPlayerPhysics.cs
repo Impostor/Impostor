@@ -46,6 +46,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             {
                 case RpcCalls.EnterVent:
                 case RpcCalls.ExitVent:
+                {
                     if (!await ValidateImpostor(call, sender, _playerControl.PlayerInfo))
                     {
                         return false;
@@ -86,6 +87,13 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     }
 
                     break;
+                }
+
+                case RpcCalls.BootFromVent:
+                {
+                    Rpc34BootFromVent.Deserialize(reader, out var ventId);
+                    break;
+                }
 
                 case RpcCalls.ClimbLadder:
                     Rpc31ClimbLadder.Deserialize(reader, out var ladderId, out var lastClimbLadderSid);
