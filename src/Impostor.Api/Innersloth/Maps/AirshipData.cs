@@ -76,6 +76,7 @@ namespace Impostor.Api.Innersloth.Maps
                 new AirshipTask(AirshipTask.Ids.MainHallDecontaminate, TaskTypes.Decontaminate, TaskCategories.ShortTask),
                 new AirshipTask(AirshipTask.Ids.KitchenMakeBurger, TaskTypes.MakeBurger, TaskCategories.ShortTask),
                 new AirshipTask(AirshipTask.Ids.ShowersFixShower, TaskTypes.FixShower, TaskCategories.ShortTask),
+                new AirshipTask(AirshipTask.Ids.CleanVent, TaskTypes.VentCleaning, TaskCategories.ShortTask),
             };
 
             Tasks = tasks.ToDictionary(x => x.Id, x => x).AsReadOnly();

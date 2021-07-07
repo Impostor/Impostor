@@ -55,6 +55,7 @@ namespace Impostor.Api.Innersloth.Maps.Tasks
             MainHallDecontaminate = 39,
             KitchenMakeBurger = 40,
             ShowersFixShower = 41,
+            CleanVent = 42,
         }
 
         public Ids Id { get; }
