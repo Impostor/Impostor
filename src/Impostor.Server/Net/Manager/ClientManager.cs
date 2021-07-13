@@ -18,7 +18,8 @@ namespace Impostor.Server.Net.Manager
 {
     internal partial class ClientManager
     {
-        private static readonly HashSet<int> SupportedVersions = new HashSet<int>
+        // NOTE: when updating this array, keep the versions ordered from old to new, otherwise the version compare logic doesn't work properly
+        private static readonly int[] SupportedVersions =
         {
             GameVersion.GetVersion(2021, 4, 25), // 2021.6.15
         };
@@ -35,6 +36,14 @@ namespace Impostor.Server.Net.Manager
             _eventManager = eventManager;
             _clientFactory = clientFactory;
             _clients = new ConcurrentDictionary<int, ClientBase>();
+        }
+
+        private enum VersionCompareResult
+        {
+            Compatible,
+            ClientTooOld,
+            ServerTooOld,
+            Unknown,
         }
 
         public IEnumerable<ClientBase> Clients => _clients.Values;
@@ -57,13 +66,26 @@ namespace Impostor.Server.Net.Manager
 
         public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion)
         {
-            if (!SupportedVersions.Contains(clientVersion))
+            var versionCompare = CompareVersion(clientVersion);
+            if (versionCompare != VersionCompareResult.Compatible)
             {
                 GameVersion.ParseVersion(clientVersion, out var year, out var month, out var day, out var revision);
                 _logger.LogTrace("Client connected using unsupported version: {clientVersion} ({version})", clientVersion, $"{year}.{month}.{day}{(revision == 0 ? string.Empty : "." + revision)}");
 
                 using var packet = MessageWriter.Get(MessageType.Reliable);
-                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.IncorrectVersion);
+                switch (versionCompare)
+                {
+                    case VersionCompareResult.ClientTooOld:
+                        Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.VersionClientTooOld);
+                        break;
+                    case VersionCompareResult.ServerTooOld:
+                        Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.VersionServerTooOld);
+                        break;
+                    case VersionCompareResult.Unknown:
+                        Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.VersionUnsupported);
+                        break;
+                }
+
                 await connection.SendAsync(packet);
                 return;
             }
@@ -105,6 +127,30 @@ namespace Impostor.Server.Net.Manager
             return client.Id != 0
                    && _clients.TryGetValue(client.Id, out var registeredClient)
                    && ReferenceEquals(client, registeredClient);
+        }
+
+        private VersionCompareResult CompareVersion(int clientVersion)
+        {
+            foreach (var serverVersion in SupportedVersions)
+            {
+                if (clientVersion == serverVersion)
+                {
+                    return VersionCompareResult.Compatible;
+                }
+            }
+
+            if (clientVersion < SupportedVersions[0])
+            {
+                return VersionCompareResult.ClientTooOld;
+            }
+
+            if (clientVersion > SupportedVersions.Last())
+            {
+                return VersionCompareResult.ServerTooOld;
+            }
+
+            // This may happen in the very rare case that version X is supported, X+2 is as well, but X+1 is not.
+            return VersionCompareResult.Unknown;
         }
     }
 }
