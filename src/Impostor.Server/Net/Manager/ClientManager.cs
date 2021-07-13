@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -73,18 +74,16 @@ namespace Impostor.Server.Net.Manager
                 _logger.LogTrace("Client connected using unsupported version: {clientVersion} ({version})", clientVersion, $"{year}.{month}.{day}{(revision == 0 ? string.Empty : "." + revision)}");
 
                 using var packet = MessageWriter.Get(MessageType.Reliable);
-                switch (versionCompare)
+
+                var message = versionCompare switch
                 {
-                    case VersionCompareResult.ClientTooOld:
-                        Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.VersionClientTooOld);
-                        break;
-                    case VersionCompareResult.ServerTooOld:
-                        Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.VersionServerTooOld);
-                        break;
-                    case VersionCompareResult.Unknown:
-                        Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.VersionUnsupported);
-                        break;
-                }
+                    VersionCompareResult.ClientTooOld => DisconnectMessages.VersionClientTooOld,
+                    VersionCompareResult.ServerTooOld => DisconnectMessages.VersionServerTooOld,
+                    VersionCompareResult.Unknown => DisconnectMessages.VersionUnsupported,
+                    _ => throw new ArgumentOutOfRangeException(),
+                };
+
+                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, message);
 
                 await connection.SendAsync(packet);
                 return;
