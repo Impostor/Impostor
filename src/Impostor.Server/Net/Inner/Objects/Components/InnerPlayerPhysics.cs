@@ -37,7 +37,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (!await ValidateOwnership(call, sender))
+            if (call != RpcCalls.BootFromVent && !await ValidateOwnership(call, sender))
             {
                 return false;
             }
