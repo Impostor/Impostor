@@ -4,6 +4,8 @@ namespace Impostor.Api.Net.Messages.C2S
 {
     public static class HandshakeC2S
     {
+        private static readonly int ExtendedHandshakeMinVersion = GameVersion.GetVersion(2021, 6, 30);
+
         public static void Deserialize(IMessageReader reader, out int clientVersion, out string name, out uint lastNonceReceived, out Language language, out QuickChatModes chatMode)
         {
             clientVersion = reader.ReadInt32();
@@ -12,7 +14,7 @@ namespace Impostor.Api.Net.Messages.C2S
 
             // Version 2021.6.30 (aka 50537300) is the first version that includes language and chat modes
             // In case the game is older than that, stop reading here.
-            if (clientVersion >= 50537300)
+            if (clientVersion >= ExtendedHandshakeMinVersion)
             {
                 language = (Language)reader.ReadUInt32();
                 chatMode = (QuickChatModes)reader.ReadByte();
