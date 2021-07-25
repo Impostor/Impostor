@@ -1,6 +1,6 @@
 # Server configuration
 
-Some information about all the possible configurations. Click [here](https://github.com/AeonLucid/Impostor/blob/master/src/Impostor.Server/config-full.json) to see all the possible config options.
+Some information about all the possible configurations. Click [here](https://github.com/Impostor/Impostor/blob/master/src/Impostor.Server/config-full.json) to see all the possible config options.
 
 ## Options
 
