@@ -8,10 +8,10 @@ Some information about all the possible configurations. Click [here](https://git
 
 | Key            | Default     | Description                                                                                                                                                                                                                                                                                                                                                                                            |
 | -------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **PublicIp**   | `127.0.0.1` | This needs to the public IPv4 address of the server which you give to others to connect. You can find your IPv4 address [on this website](http://whatismyip.host/). Unless you are only planning to use Impostor privately, on your local network, you should change this to your public ip. It is also possible to use hostnames instead of IPv4 addresses, which will be resolved to IPv4 addresses. |
-| **PublicPort** | `22023`     | The public port of the server which you give to others to connect. (**This is the external port you configure on your router when port forwarding.**) Usually `22023`.                                                                                                                                                                                                                                 |
-| **ListenIp**   | `0.0.0.0`   | The network interface to listen on. If you do not know what to put here, use `0.0.0.0`. Since 1.2.2 it is also possible to use hostnames instead of IPv4 addresses, these must resolve to a valid IPv4 address.                                                                                                                                                                                        |
-| **ListenPort** | `22023`     | The listen port of the server, usually `22023`.                                                                                                                                                                                                                                                                                                                                                        |
+| __PublicIp__   | `127.0.0.1` | This needs to the public IPv4 address of the server which you give to others to connect. You can find your IPv4 address [on this website](http://whatismyip.host/). Unless you are only planning to use Impostor privately, on your local network, you should change this to your public ip. It is also possible to use hostnames instead of IPv4 addresses, which will be resolved to IPv4 addresses. |
+| __PublicPort__ | `22023`     | The public port of the server which you give to others to connect. (__This is the external port you configure on your router when port forwarding.__) Usually `22023`.                                                                                                                                                                                                                                 |
+| __ListenIp__   | `0.0.0.0`   | The network interface to listen on. If you do not know what to put here, use `0.0.0.0`. Since 1.2.2 it is also possible to use hostnames instead of IPv4 addresses, these must resolve to a valid IPv4 address.                                                                                                                                                                                        |
+| __ListenPort__ | `22023`     | The listen port of the server, usually `22023`.                                                                                                                                                                                                                                                                                                                                                        |
 
 ### AntiCheat
 
@@ -19,8 +19,8 @@ Impostor has an Anticheat that makes it possible to kick cheaters from games aut
 
 | Key               | Default | Value                                                                                                                                                                                                               |
 | ----------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Enabled**       | `true`  | Whether the anticheat should be enabled.                                                                                                                                                                            |
-| **BanIpFromGame** | `true`  | When anticheat is enabled and a player is caught hacking, they will be kicked from the server. If this value is set to `true`, the player will be banned instead and will not be able to rejoin that specific game. |
+| __Enabled__       | `true`  | Whether the anticheat should be enabled.                                                                                                                                                                            |
+| __BanIpFromGame__ | `true`  | When anticheat is enabled and a player is caught hacking, they will be kicked from the server. If this value is set to `true`, the player will be banned instead and will not be able to rejoin that specific game. |
 
 ### AnnouncementsServer
 
@@ -28,9 +28,9 @@ The Announcement Server is used to show update announcements to clients. Using t
 
 | Key            | Default   | Value                                               |
 | -------------- | --------- | --------------------------------------------------- |
-| **Enabled**    | `false`   | Whether the announcements server should be enabled. |
-| **ListenIp**   | `0.0.0.0` | See Required Server Configuration.                  |
-| **ListenPort** | `22025`   | See Required Server Configuration.                  |
+| __Enabled__    | `false`   | Whether the announcements server should be enabled. |
+| __ListenIp__   | `0.0.0.0` | See Required Server Configuration.                  |
+| __ListenPort__ | `22025`   | See Required Server Configuration.                  |
 
 ### AuthServer
 
@@ -38,11 +38,11 @@ The Authentication Server is used since Among Us version 2021.3.31 and is used b
 
 | Key             | Default                | Value                                                |
 | --------------- | ---------------------- | ---------------------------------------------------- |
-| **Enabled**     | `false`                | Whether the authentication server should be enabled. |
-| **ListenIp**    | `0.0.0.0`              | See Required Server Configuration.                   |
-| **ListenPort**  | `22025`                | See Required Server Configuration.                   |
-| **Certificate** | `dtls/certificate.pem` | The public certificate used to authenticate with.    |
-| **PrivateKey**  | `dtls/key.pem`         | The corresponding private key.                       |
+| __Enabled__     | `false`                | Whether the authentication server should be enabled. |
+| __ListenIp__    | `0.0.0.0`              | See Required Server Configuration.                   |
+| __ListenPort__  | `22025`                | See Required Server Configuration.                   |
+| __Certificate__ | `dtls/certificate.pem` | The public certificate used to authenticate with.    |
+| __PrivateKey__  | `dtls/key.pem`         | The corresponding private key.                       |
 
 On Linux you can generate a certificate by running `openssl req -x509 -newkey rsa:2048 -keyout dtls/key.pem -out dtls/certificate.pem -days 3650 -nodes`. It does not need to be signed.
 
@@ -52,8 +52,8 @@ The Debug configuration is used to enable the game recorder. This is mostly usef
 
 | Key                     | Default | Value                                        |
 | ----------------------- | ------- | -------------------------------------------- |
-| **GameRecorderEnabled** | `false` | Enables the Game Recorder.                   |
-| **GameRecorderPath**    | _empty_ | Path where the recorded games will be saved. |
+| __GameRecorderEnabled__ | `false` | Enables the Game Recorder.                   |
+| __GameRecorderPath__    | _empty_ | Path where the recorded games will be saved. |
 
 ### ServerRedirector
 
@@ -61,12 +61,12 @@ In a multi-node setup these values need to be specified. Note that most people d
 
 | Key                    | Default | Value                                                                                                                                             |
 | ---------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Enabled**            | `false` | Whether the server runs in multi-node setup. If this is `false`, all other options in this section do not have any effect.                        |
-| **Master**             | `false` | Whether the current server is a master. A master is responsible for redirecting clients to nodes                                                  |
-| **Locator**            |         | Fill in either `Redis` or `UdpMasterEndpoint` to choose which method to use for locating other nodes. This must be the same across all servers.   |
-| **>Redis**             |         | Format `127.0.0.1.6379`, you can also use a password like so: `127.0.0.1.6379,password=value`.                                                    |
-| **>UdpMasterEndpoint** |         | On the master, this value acts as a listen ip and port. On a node, this should be the public ip and port of the master. Format `127.0.0.1:32320`. |
-| **Nodes**              |         | An array containing public ips and ports of nodes. Only needs to be set on the master. See above for an example.                                  |
+| __Enabled__            | `false` | Whether the server runs in multi-node setup. If this is `false`, all other options in this section do not have any effect.                        |
+| __Master__             | `false` | Whether the current server is a master. A master is responsible for redirecting clients to nodes                                                  |
+| __Locator__            |         | Fill in either `Redis` or `UdpMasterEndpoint` to choose which method to use for locating other nodes. This must be the same across all servers.   |
+| __>Redis__             |         | Format `127.0.0.1.6379`, you can also use a password like so: `127.0.0.1.6379,password=value`.                                                    |
+| __>UdpMasterEndpoint__ |         | On the master, this value acts as a listen ip and port. On a node, this should be the public ip and port of the master. Format `127.0.0.1:32320`. |
+| __Nodes__              |         | An array containing public ips and ports of nodes. Only needs to be set on the master. See above for an example.                                  |
 
 ## Config providers
 

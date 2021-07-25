@@ -13,7 +13,7 @@ There are currently two modes to run the Impostor server. The first way, Single 
 5. Modify `config.json` to your liking. Documentation can be found [here](Server-configuration.md) _(this step is mandatory if you want to expose this server to other devices)_
 6. Run `Impostor.Server` (Linux/macOS) or `Impostor.Server.exe` (Windows)
 
-### Installing with Docker
+### Using Docker
 
 [![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor?sort=semver)](https://hub.docker.com/r/aeonlucid/impostor)
 [![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor/nightly)](https://hub.docker.com/r/aeonlucid/impostor)
@@ -24,7 +24,7 @@ After installing Docker, you can just start a Docker container with `docker run`
 docker run -p 22023:22023/udp aeonlucid/impostor:nightly
 ```
 
-### Installing with Docker Compose
+### Using Docker Compose
 
 ```
 version: '3.4'
@@ -78,7 +78,7 @@ Example configuration:
 
 ### Node servers
 
-The node server should have `ServerRedirector` enabled too, but `Master` **must be disabled**. Nodes do not need to be aware of each other.
+The node server should have `ServerRedirector` enabled too, but `Master` __must be disabled__. Nodes do not need to be aware of each other.
 
 Example configuration:
 

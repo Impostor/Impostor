@@ -2,7 +2,7 @@
 
 ## What is this?
 
-The Impostor project is a reverse engineered and open source server for the game Among Us. The game itself is developed by [InnerSloth](http://www.innersloth.com/) while this project is maintained by the community. This project was built out of frustration for the lack of server availability in certain regions and the inability for the core developer, [AeonLucid](https://github.com/AeonLucid), to join a public game. As of this time, it has not been officially endorsed by the studio.
+The Impostor project is a reverse engineered and open source server for the game Among Us. The game itself is developed by [Innersloth](http://www.innersloth.com/) while this project is maintained by the community. This project was built out of frustration for the lack of server availability in certain regions and the inability for the core developer, [AeonLucid](https://github.com/AeonLucid), to join a public game. As of this time, it has not been officially endorsed by the studio.
 
 ## Can this be used with the mobile version of the game?
 

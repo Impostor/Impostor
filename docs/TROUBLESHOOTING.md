@@ -5,7 +5,7 @@ Don't worry though, as this is the most thorough guide to help you!
 
 ## `./Impostor.Server: line 1: ELF: not found` (plus other errors)
 
-No idea where you got that system. But we clearly do **NOT** support it.
+No idea where you got that system. But we clearly do __NOT__ support it.
 
 ## `cannot execute binary file: Exec format error`
 
@@ -39,12 +39,12 @@ Look at which version of the game you're playing, which you can see in the top l
 ## Disconnected with `You disconnected from the server. Reliable Packet 1 ...`
 
 Please double-check that you have followed the [Server Configuration](Server-configuration.md) correctly.
-**NOTE: Your public ip does not start with `10`, `127` or `192`**
+__NOTE: Your public ip does not start with `10`, `127` or `192`__
 Also check if the port Impostor (ListenPort) is listening on is correctly port-forwarded for UDP (or TCP/UDP).
 
 ## `Could not load file or assembly...`
 
-Please check that you only have **working** plugins in the `plugins` folder.
+Please check that you only have __working__ plugins in the `plugins` folder.
 This error can be caused by non-plugin files or plugins that are not working correctly.
 
 ## My question is not yet answered and I'm still having problems!
