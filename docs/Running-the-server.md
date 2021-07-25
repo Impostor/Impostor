@@ -10,7 +10,7 @@ There are currently two modes to run the Impostor server. The first way, Single 
 2. Find the [latest release](https://github.com/Impostor/Impostor/releases) or the [latest CI build](https://ci.appveyor.com/project/Impostor/Impostor/branch/master/artifacts).
 3. Download the version for your OS (linux/win/osx). Impostor is built for multiple CPU-architectures, you most likely want the x64 version, unless you are running on a Raspberry Pi or another device with an ARM processor.
 4. Extract the zip.
-5. Modify `config.json` to your liking. Documentation can be found [here](Server-configuration.md) _(this step is mandatory if you want to expose this server to other devices)_
+5. Modify `config.json` to your liking. Documentation can be found [here](Server-configuration.md) *(this step is mandatory if you want to expose this server to other devices)*
 6. Run `Impostor.Server` (Linux/macOS) or `Impostor.Server.exe` (Windows)
 
 ### Using Docker
@@ -78,7 +78,7 @@ Example configuration:
 
 ### Node servers
 
-The node server should have `ServerRedirector` enabled too, but `Master` __must be disabled__. Nodes do not need to be aware of each other.
+The node server should have `ServerRedirector` enabled too, but `Master` **must be disabled**. Nodes do not need to be aware of each other.
 
 Example configuration:
 
