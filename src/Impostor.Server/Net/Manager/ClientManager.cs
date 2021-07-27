@@ -65,7 +65,7 @@ namespace Impostor.Server.Net.Manager
             return clientId;
         }
 
-        public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion)
+        public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion, Language language, QuickChatModes chatMode)
         {
             var versionCompare = CompareVersion(clientVersion);
             if (versionCompare != VersionCompareResult.Compatible)
@@ -105,7 +105,7 @@ namespace Impostor.Server.Net.Manager
                 return;
             }
 
-            var client = _clientFactory.Create(connection, name, clientVersion);
+            var client = _clientFactory.Create(connection, name, clientVersion, language, chatMode);
             var id = NextId();
 
             client.Id = id;

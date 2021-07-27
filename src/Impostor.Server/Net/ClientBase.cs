@@ -13,10 +13,12 @@ namespace Impostor.Server.Net
 {
     internal abstract class ClientBase : IClient
     {
-        protected ClientBase(string name, int gameVersion, IHazelConnection connection)
+        protected ClientBase(string name, int gameVersion, Language language, QuickChatModes chatMode, IHazelConnection connection)
         {
             Name = name;
             GameVersion = gameVersion;
+            Language = language;
+            ChatMode = chatMode;
             Connection = connection;
             Items = new ConcurrentDictionary<object, object>();
         }
@@ -24,6 +26,10 @@ namespace Impostor.Server.Net
         public int Id { get; set; }
 
         public string Name { get; }
+
+        public Language Language { get; }
+
+        public QuickChatModes ChatMode { get; }
 
         public int GameVersion { get; }
 

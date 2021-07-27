@@ -24,8 +24,8 @@ namespace Impostor.Server.Net
         private readonly GameManager _gameManager;
         private readonly ICustomMessageManager<ICustomRootMessage> _customMessageManager;
 
-        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, string name, int gameVersion, IHazelConnection connection)
-            : base(name, gameVersion, connection)
+        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, string name, int gameVersion, Language language, QuickChatModes chatMode, IHazelConnection connection)
+            : base(name, gameVersion, language, chatMode, connection)
         {
             _logger = logger;
             _antiCheatConfig = antiCheatOptions.Value;

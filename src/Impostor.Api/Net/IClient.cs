@@ -28,6 +28,16 @@ namespace Impostor.Api.Net
         string Name { get; }
 
         /// <summary>
+        ///     Gets the language.
+        /// </summary>
+        Language Language { get; }
+
+        /// <summary>
+        ///     Gets the quick chat mode.
+        /// </summary>
+        QuickChatModes ChatMode { get; }
+
+        /// <summary>
         ///     Gets the connection of the client.
         /// </summary>
         /// <remarks>

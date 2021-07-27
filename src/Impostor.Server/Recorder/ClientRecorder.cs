@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Config;
@@ -17,8 +18,8 @@ namespace Impostor.Server.Recorder
         private bool _createdGame;
         private bool _recordAfter;
 
-        public ClientRecorder(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, GameManager gameManager, string name, int gameVersion, HazelConnection connection, PacketRecorder recorder)
-            : base(logger, antiCheatOptions, clientManager, gameManager, customMessageManager, name, gameVersion, connection)
+        public ClientRecorder(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, GameManager gameManager, string name, int gameVersion, Language language, QuickChatModes chatMode, HazelConnection connection, PacketRecorder recorder)
+            : base(logger, antiCheatOptions, clientManager, gameManager, customMessageManager, name, gameVersion, language, chatMode, connection)
         {
             _recorder = recorder;
             _isFirst = true;

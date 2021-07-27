@@ -170,7 +170,7 @@ namespace Impostor.Tools.ServerReplay
                     // Create and register connection.
                     var connection = new MockHazelConnection(address);
 
-                    await _clientManager.RegisterConnectionAsync(connection, name, gameVersion);
+                    await _clientManager.RegisterConnectionAsync(connection, name, gameVersion, Language.English, QuickChatModes.FreeChatOrQuickChat);
 
                     // Store reference for ourselfs.
                     Connections.Add(clientId, connection);

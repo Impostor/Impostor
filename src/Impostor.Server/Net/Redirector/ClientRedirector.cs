@@ -22,11 +22,13 @@ namespace Impostor.Server.Net.Redirector
         public ClientRedirector(
             string name,
             int gameVersion,
+            Language language,
+            QuickChatModes chatMode,
             HazelConnection connection,
             ClientManager clientManager,
             INodeProvider nodeProvider,
             INodeLocator nodeLocator)
-            : base(name, gameVersion, connection)
+            : base(name, gameVersion, language, chatMode, connection)
         {
             _clientManager = clientManager;
             _nodeProvider = nodeProvider;
