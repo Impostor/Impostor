@@ -22,7 +22,7 @@ namespace Impostor.Server.Net.Manager
         // NOTE: when updating this array, keep the versions ordered from old to new, otherwise the version compare logic doesn't work properly
         private static readonly int[] SupportedVersions =
         {
-            GameVersion.GetVersion(2021, 4, 25), // 2021.6.15
+            GameVersion.GetVersion(2021, 6, 30), // 2021.6.30
         };
 
         private readonly ILogger<ClientManager> _logger;
@@ -65,7 +65,7 @@ namespace Impostor.Server.Net.Manager
             return clientId;
         }
 
-        public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion)
+        public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion, Language language, QuickChatModes chatMode)
         {
             var versionCompare = CompareVersion(clientVersion);
             if (versionCompare != VersionCompareResult.Compatible)
@@ -105,7 +105,7 @@ namespace Impostor.Server.Net.Manager
                 return;
             }
 
-            var client = _clientFactory.Create(connection, name, clientVersion);
+            var client = _clientFactory.Create(connection, name, clientVersion, language, chatMode);
             var id = NextId();
 
             client.Id = id;

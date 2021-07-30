@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -102,6 +102,12 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
                         return false;
                     }
 
+                    break;
+                }
+
+                case RpcCalls.UpdateSystem:
+                {
+                    Rpc35UpdateSystem.Deserialize(reader, Game, out var systemType, out var playerControl, out var sequenceId, out var state, out var ventId);
                     break;
                 }
 
