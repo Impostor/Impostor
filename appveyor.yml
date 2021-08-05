@@ -20,11 +20,12 @@ image: Ubuntu2004
 
 install:
   - git submodule update --init --recursive
-  - ps: dotnet tool restore
+  - dotnet tool restore
 
 build_script:
-  - ps: dotnet cake build.cake --bootstrap
-  - ps: dotnet cake build.cake --pack
+  - pwsh: if ($env:APPVEYOR_REPO_TAG_NAME) { Update-AppveyorBuild -Version "$($env:APPVEYOR_REPO_TAG_NAME -replace "v")" }
+  - dotnet cake build.cake --bootstrap
+  - dotnet cake build.cake --pack
 
 test: off
 
@@ -34,13 +35,25 @@ artifacts:
   - path: ./build/*.nupkg
   - path: ./build/*.snupkg
 
-# deploy:
-#   - provider: NuGet
-#     artifact: /.*(\.|\.s)nupkg/
-#     on:
-#       branch: dev
-#     api_key:
-#       secure: 4OHXl+m1KVi60hB1j54MpdP8tVv0UNfkdF4rVP+2AhAjN4a2MVT+Bl90gJZ96xHF
+deploy:
+  #  - provider: NuGet
+  #    artifact: /.*(\.|\.s)nupkg/
+  #    on:
+  #      branch: master
+  #    api_key:
+  #      secure: 4OHXl+m1KVi60hB1j54MpdP8tVv0UNfkdF4rVP+2AhAjN4a2MVT+Bl90gJZ96xHF
+
+  - provider: GitHub
+    tag: $(APPVEYOR_REPO_TAG_NAME)
+    release: $(APPVEYOR_PROJECT_NAME) $(APPVEYOR_BUILD_VERSION)
+    description: 'DRAFT'
+    auth_token:
+      secure: vyQ+zijv9g99wEgIdSC8uPSlnFvH3KZiD0yE7mNA3r3z2OY4lTEF6bpuUvtjoaM3
+    artifact: /.*/
+    draft: true
+    on:
+      branch: master
+      APPVEYOR_REPO_TAG: true
 
 only_commits:
   files:
