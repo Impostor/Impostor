@@ -29,37 +29,10 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetColorAsync(ColorType color)
         {
-            PlayerInfo.Color = color;
+            PlayerInfo.CurrentOutfit.Color = color;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetColor);
             Rpc08SetColor.Serialize(writer, color);
-            await Game.FinishRpcAsync(writer);
-        }
-
-        public async ValueTask SetHatAsync(HatType hat)
-        {
-            PlayerInfo.Hat = hat;
-
-            using var writer = Game.StartRpc(NetId, RpcCalls.SetHat);
-            Rpc09SetHat.Serialize(writer, hat);
-            await Game.FinishRpcAsync(writer);
-        }
-
-        public async ValueTask SetPetAsync(PetType pet)
-        {
-            PlayerInfo.Pet = pet;
-
-            using var writer = Game.StartRpc(NetId, RpcCalls.SetPet);
-            Rpc17SetPet.Serialize(writer, pet);
-            await Game.FinishRpcAsync(writer);
-        }
-
-        public async ValueTask SetSkinAsync(SkinType skin)
-        {
-            PlayerInfo.Skin = skin;
-
-            using var writer = Game.StartRpc(NetId, RpcCalls.SetSkin);
-            Rpc10SetSkin.Serialize(writer, skin);
             await Game.FinishRpcAsync(writer);
         }
 

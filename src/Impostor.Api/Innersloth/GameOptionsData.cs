@@ -9,7 +9,7 @@ namespace Impostor.Api.Innersloth
         /// <summary>
         ///     The latest major version of the game client.
         /// </summary>
-        public const int LatestVersion = 4;
+        public const int LatestVersion = 5;
 
         /// <summary>
         ///     Gets or sets host's version of the game.
@@ -125,6 +125,11 @@ namespace Impostor.Api.Innersloth
         public TaskBarUpdate TaskBarUpdate { get; set; } = TaskBarUpdate.Always;
 
         /// <summary>
+        ///     Gets or sets role options.
+        /// </summary>
+        public RoleOptionsData RoleOptions { get; set; } = new RoleOptionsData();
+
+        /// <summary>
         ///     Gets or sets a value indicating whether the GameOptions are the default ones.
         /// </summary>
         public bool IsDefaults { get; set; } = true;
@@ -184,6 +189,11 @@ namespace Impostor.Api.Innersloth
             }
 
             if (version > 4)
+            {
+                RoleOptions.Serialize(writer);
+            }
+
+            if (version > 5)
             {
                 throw new ImpostorException($"Unknown GameOptionsData version {Version}.");
             }
@@ -246,6 +256,11 @@ namespace Impostor.Api.Innersloth
             }
 
             if (Version > 4)
+            {
+                RoleOptions = RoleOptionsData.Deserialize(bytes);
+            }
+
+            if (Version > 5)
             {
                 throw new ImpostorException($"Unknown GameOptionsData version {Version}.");
             }

@@ -17,6 +17,13 @@ namespace Impostor.Api
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static short ReadInt16(this ref ReadOnlySpan<byte> input)
+        {
+            var original = Advance<short>(ref input);
+            return BinaryPrimitives.ReadInt16LittleEndian(original);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ReadInt32(this ref ReadOnlySpan<byte> input)
         {
             var original = Advance<int>(ref input);

@@ -69,6 +69,18 @@ namespace Impostor.Api.Net.Messages
         void Write(int value);
 
         /// <summary>
+        ///     Writes an ulong to the message.
+        /// </summary>
+        /// <param name="value">Value to write.</param>
+        public void Write(ulong value);
+
+        /// <summary>
+        ///     Writes an ulong to the message.
+        /// </summary>
+        /// <param name="value">Value to write.</param>
+        public void Write(long value);
+
+        /// <summary>
         ///     Writes a float to the message.
         /// </summary>
         /// <param name="value">Value to write.</param>

@@ -45,29 +45,29 @@ namespace Impostor.Api.Net.Inner.Objects
         /// <returns>Task that must be awaited.</returns>
         ValueTask SetColorAsync(ColorType colorType);
 
-        /// <summary>
-        ///     Sets the hat of the current <see cref="IInnerPlayerControl" />.
-        ///     Visible to all players.
-        /// </summary>
-        /// <param name="hatType">An hat for the player.</param>
-        /// <returns>Task that must be awaited.</returns>
-        ValueTask SetHatAsync(HatType hatType);
-
-        /// <summary>
-        ///     Sets the pet of the current <see cref="IInnerPlayerControl" />.
-        ///     Visible to all players.
-        /// </summary>
-        /// <param name="petType">A pet for the player.</param>
-        /// <returns>Task that must be awaited.</returns>
-        ValueTask SetPetAsync(PetType petType);
-
-        /// <summary>
-        ///     Sets the skin of the current <see cref="IInnerPlayerControl" />.
-        ///     Visible to all players.
-        /// </summary>
-        /// <param name="skinType">A skin for the player.</param>
-        /// <returns>Task that must be awaited.</returns>
-        ValueTask SetSkinAsync(SkinType skinType);
+        // /// <summary>
+        // ///     Sets the hat of the current <see cref="IInnerPlayerControl" />.
+        // ///     Visible to all players.
+        // /// </summary>
+        // /// <param name="hatId">An hat for the player.</param>
+        // /// <returns>Task that must be awaited.</returns>
+        // ValueTask SetHatAsync(string hatId);
+        //
+        // /// <summary>
+        // ///     Sets the pet of the current <see cref="IInnerPlayerControl" />.
+        // ///     Visible to all players.
+        // /// </summary>
+        // /// <param name="petId">A pet for the player.</param>
+        // /// <returns>Task that must be awaited.</returns>
+        // ValueTask SetPetAsync(string petId);
+        //
+        // /// <summary>
+        // ///     Sets the skin of the current <see cref="IInnerPlayerControl" />.
+        // ///     Visible to all players.
+        // /// </summary>
+        // /// <param name="skinId">A skin for the player.</param>
+        // /// <returns>Task that must be awaited.</returns>
+        // ValueTask SetSkinAsync(string skinId);
 
         /// <summary>
         ///     Send a chat message as the current <see cref="IInnerPlayerControl" />.

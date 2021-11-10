@@ -62,14 +62,14 @@ namespace Impostor.Server.Net
         private async ValueTask OnNewConnection(NewConnectionEventArgs e)
         {
             // Handshake.
-            HandshakeC2S.Deserialize(e.HandshakeData, out var clientVersion, out var name, out _, out var language, out var chatMode);
+            HandshakeC2S.Deserialize(e.HandshakeData, out var clientVersion, out var name, out var language, out var chatMode, out var platformSpecificData);
 
             var connection = new HazelConnection(e.Connection, _connectionLogger);
 
             await _eventManager.CallAsync(new ClientConnectionEvent(connection, e.HandshakeData));
 
             // Register client
-            await _clientManager.RegisterConnectionAsync(connection, name, clientVersion, language, chatMode);
+            await _clientManager.RegisterConnectionAsync(connection, name, clientVersion, language, chatMode, platformSpecificData);
         }
     }
 }
