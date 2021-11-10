@@ -5,11 +5,6 @@
     "ListenIp": "0.0.0.0",
     "ListenPort": 22023
   },
-  "AnnouncementsServer": {
-    "Enabled": true,
-    "ListenIp": "0.0.0.0",
-    "ListenPort": 22024
-  },
   "AntiCheat": {
     "Enabled": true,
     "BanIpFromGame": true
