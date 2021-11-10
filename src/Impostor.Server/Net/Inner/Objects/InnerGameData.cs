@@ -59,42 +59,22 @@ namespace Impostor.Server.Net.Inner.Objects
                 return;
             }
 
-            if (initialState)
+            while (reader.Position < reader.Length)
             {
-                var num = reader.ReadPackedInt32();
-
-                for (var i = 0; i < num; i++)
+                var inner = reader.ReadMessage();
+                var playerInfo = this.GetPlayerById(inner.Tag);
+                if (playerInfo != null)
                 {
-                    var playerId = reader.ReadByte();
-                    var playerInfo = new InnerPlayerInfo(playerId);
-
-                    playerInfo.Deserialize(reader);
+                    playerInfo.Deserialize(inner);
+                }
+                else
+                {
+                    playerInfo = new InnerPlayerInfo(inner.Tag);
+                    playerInfo.Deserialize(inner);
 
                     if (!_allPlayers.TryAdd(playerInfo.PlayerId, playerInfo))
                     {
                         throw new ImpostorException("Failed to add player to InnerGameData.");
-                    }
-                }
-            }
-            else
-            {
-                while (reader.Position < reader.Length)
-                {
-                    var inner = reader.ReadMessage();
-                    var playerInfo = this.GetPlayerById(inner.Tag);
-                    if (playerInfo != null)
-                    {
-                        playerInfo.Deserialize(inner);
-                    }
-                    else
-                    {
-                        playerInfo = new InnerPlayerInfo(inner.Tag);
-                        playerInfo.Deserialize(inner);
-
-                        if (!_allPlayers.TryAdd(playerInfo.PlayerId, playerInfo))
-                        {
-                            throw new ImpostorException("Failed to add player to InnerGameData.");
-                        }
                     }
                 }
             }
