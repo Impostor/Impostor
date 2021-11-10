@@ -257,6 +257,12 @@ namespace Impostor.Server.Net
                     break;
                 }
 
+                case MessageFlags.SetActivePodType:
+                {
+                    Message21SetActivePodType.Deserialize(reader, out _);
+                    break;
+                }
+
                 default:
                     if (_customMessageManager.TryGet(flag, out var customRootMessage))
                     {
