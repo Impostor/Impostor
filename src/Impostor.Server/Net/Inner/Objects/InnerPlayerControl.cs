@@ -355,6 +355,18 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
                 }
 
+                case RpcCalls.Shapeshift:
+                {
+                    if (!await ValidateRole(call, sender, PlayerInfo, RoleTypes.Shapeshifter))
+                    {
+                        return false;
+                    }
+
+                    Rpc46Shapeshift.Deserialize(reader, Game, out _, out _);
+
+                    break;
+                }
+
                 default:
                     return await base.HandleRpcAsync(sender, target, call, reader);
             }
