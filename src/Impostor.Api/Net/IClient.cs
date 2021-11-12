@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Messages;
@@ -64,6 +64,8 @@ namespace Impostor.Api.Net
         ///     Gets the current game data of the <see cref="IClient" />.
         /// </summary>
         IClientPlayer? Player { get; }
+
+        PlatformSpecificData PlatformSpecificData { get; }
 
         ValueTask<bool> ReportCheatAsync(CheatContext context, string message);
 

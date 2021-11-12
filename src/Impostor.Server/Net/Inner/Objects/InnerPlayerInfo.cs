@@ -44,6 +44,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public DateTimeOffset LastMurder { get; set; }
 
+        public uint PlayerLevel { get; internal set; }
+
         public bool CanMurder(IGame game, IDateTimeProvider dateTimeProvider)
         {
             if (!IsImpostor)
@@ -70,7 +72,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 Outfits[key].Deserialize(reader);
             }
 
-            var PlayerLevel = reader.ReadPackedUInt32();
+            PlayerLevel = reader.ReadPackedUInt32();
 
             var flag = reader.ReadByte();
             Disconnected = (flag & 1) != 0;

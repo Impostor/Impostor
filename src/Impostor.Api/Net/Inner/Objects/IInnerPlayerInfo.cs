@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
@@ -36,5 +36,7 @@ namespace Impostor.Api.Net.Inner.Objects
         IEnumerable<ITaskInfo> Tasks { get; }
 
         DateTimeOffset LastMurder { get; }
+
+        uint PlayerLevel { get; }
     }
 }

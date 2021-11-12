@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -114,7 +114,7 @@ namespace Impostor.Server.Net.State
 
         private ValueTask BroadcastJoinMessage(IMessageWriter message, bool clear, ClientPlayer player)
         {
-            Message01JoinGameS2C.SerializeJoin(message, clear, Code, player.Client.Id, HostId);
+            Message01JoinGameS2C.SerializeJoin(message, clear, Code, player, HostId);
 
             return SendToAllExceptAsync(message, player.Client.Id);
         }
