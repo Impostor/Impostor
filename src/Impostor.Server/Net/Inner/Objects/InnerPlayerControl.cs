@@ -342,6 +342,19 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
                 }
 
+                case RpcCalls.SetRole:
+                {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc44SetRole.Deserialize(reader, out var role);
+                    PlayerInfo.RoleType = role;
+
+                    break;
+                }
+
                 default:
                     return await base.HandleRpcAsync(sender, target, call, reader);
             }
