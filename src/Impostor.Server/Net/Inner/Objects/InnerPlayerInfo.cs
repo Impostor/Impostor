@@ -36,6 +36,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public bool IsImpostor => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter;
 
+        public bool CanVent => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Engineer;
+
         public bool IsDead { get; internal set; }
 
         public DeathReason LastDeathReason { get; internal set; }

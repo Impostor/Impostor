@@ -85,6 +85,19 @@ namespace Impostor.Server.Net.Inner
             return true;
         }
 
+        protected async ValueTask<bool> ValidateCanVent(CheatContext context, IClientPlayer sender, InnerPlayerInfo playerInfo, bool value = true)
+        {
+            if (playerInfo.CanVent != value)
+            {
+                if (await sender.Client.ReportCheatAsync(context, "Failed can vent check"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         protected async ValueTask<bool> UnregisteredCall(CheatContext context, IClientPlayer sender)
         {
             if (await sender.Client.ReportCheatAsync(context, "Client sent unregistered call"))
