@@ -5,6 +5,14 @@ namespace Impostor.Api.Innersloth
 {
     public class PlatformSpecificData
     {
+        public PlatformSpecificData(Platforms platform, string platformName, ulong? xboxPlatformId = null, ulong? psnPlatformId = null)
+        {
+            Platform = platform;
+            PlatformName = platformName;
+            XboxPlatformId = xboxPlatformId;
+            PsnPlatformId = psnPlatformId;
+        }
+
         public PlatformSpecificData(IMessageReader reader)
         {
             Platform = (Platforms)reader.Tag;
