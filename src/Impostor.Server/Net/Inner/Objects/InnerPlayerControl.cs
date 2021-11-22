@@ -358,6 +358,17 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
                 }
 
+                case RpcCalls.ProtectPlayer:
+                {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc45ProtectPlayer.Deserialize(reader, Game, out _, out _);
+                    break;
+                }
+
                 case RpcCalls.Shapeshift:
                 {
                     if (!await ValidateRole(call, sender, PlayerInfo, RoleTypes.Shapeshifter))
@@ -379,6 +390,18 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     Rpc47CheckMurder.Deserialize(reader, Game, out var murdered);
                     return await HandleCheckMurder(sender, murdered);
+                }
+
+                case RpcCalls.CheckProtect:
+                {
+                    if (!await ValidateRole(call, sender, PlayerInfo, RoleTypes.GuardianAngel))
+                    {
+                        return false;
+                    }
+
+                    Rpc48CheckProtect.Deserialize(reader, Game, out _);
+
+                    break;
                 }
 
                 default:
