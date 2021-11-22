@@ -61,6 +61,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
         internal Queue<ColorType> RequestedColorId { get; } = new Queue<ColorType>();
 
+        /// <summary> Gets or sets target that was set by the last CheckMurder RPC. </summary>
+        internal IInnerPlayerControl? IsMurdering { get; set; } = null;
+
         public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
             throw new NotImplementedException();
@@ -243,7 +246,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.MurderPlayer:
                 {
-                    if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(call, sender, PlayerInfo))
+                    if (!await ValidateHost(call, sender))
                     {
                         return false;
                     }
@@ -365,6 +368,17 @@ namespace Impostor.Server.Net.Inner.Objects
                     Rpc46Shapeshift.Deserialize(reader, Game, out _, out _);
 
                     break;
+                }
+
+                case RpcCalls.CheckMurder:
+                {
+                    if (!await ValidateImpostor(call, sender, PlayerInfo))
+                    {
+                        return false;
+                    }
+
+                    Rpc47CheckMurder.Deserialize(reader, Game, out var murdered);
+                    return await HandleCheckMurder(sender, murdered);
                 }
 
                 default:
@@ -598,16 +612,33 @@ namespace Impostor.Server.Net.Inner.Objects
         //     return true;
         // }
 
-        private async ValueTask<bool> HandleMurderPlayer(ClientPlayer sender, IInnerPlayerControl? target)
+        private async ValueTask<bool> HandleCheckMurder(ClientPlayer sender, IInnerPlayerControl? target)
         {
             if (!PlayerInfo.CanMurder(Game, _dateTimeProvider))
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder too fast"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, "Client tried to murder too fast"))
                 {
                     return false;
                 }
             }
 
+            PlayerInfo.LastMurder = _dateTimeProvider.UtcNow - TimeSpan.FromMilliseconds(sender.Client.Connection.AveragePing);
+
+            if (target == null || target.PlayerInfo.IsImpostor)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, "Client tried to murder invalid target"))
+                {
+                    return false;
+                }
+            }
+
+            IsMurdering = target;
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleMurderPlayer(ClientPlayer sender, IInnerPlayerControl? target)
+        {
             if (target == null || target.PlayerInfo.IsImpostor)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder invalid target"))
@@ -616,13 +647,22 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            PlayerInfo.LastMurder = _dateTimeProvider.UtcNow - TimeSpan.FromMilliseconds(sender.Client.Connection.AveragePing);
+            // If the host is also the impostor that committed the murder, CheckMurder is actually sent *after* the MurderPlayer RPC
+            if (sender.Character != this && target != IsMurdering)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Host tried to murder incorrect target"))
+                {
+                    return false;
+                }
+            }
 
             if (target != null && !target.PlayerInfo.IsDead)
             {
                 ((InnerPlayerControl)target).Die(DeathReason.Kill);
                 await _eventManager.CallAsync(new PlayerMurderEvent(Game, sender, this, target));
             }
+
+            IsMurdering = null;
 
             return true;
         }
