@@ -23,6 +23,7 @@ namespace Impostor.Server.Net.Manager
         private static readonly int[] SupportedVersions =
         {
             GameVersion.GetVersion(2021, 11, 9), // 2021.11.9
+            GameVersion.GetVersion(2021, 12, 14), // 2021.12.14
         };
 
         private readonly ILogger<ClientManager> _logger;

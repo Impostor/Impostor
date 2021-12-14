@@ -35,6 +35,11 @@ namespace Impostor.Api.Net.Messages.C2S
             {
                 platformSpecificData = null;
             }
+
+            if (clientVersion >= Version.V4)
+            {
+                reader.ReadByte(); // purpose unknown, seems hardcoded to 0
+            }
         }
 
         private static class Version
@@ -44,6 +49,8 @@ namespace Impostor.Api.Net.Messages.C2S
             public static readonly int V2 = GameVersion.GetVersion(2021, 6, 30);
 
             public static readonly int V3 = GameVersion.GetVersion(2021, 11, 9);
+
+            public static readonly int V4 = GameVersion.GetVersion(2021, 12, 14);
         }
     }
 }
