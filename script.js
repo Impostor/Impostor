@@ -106,6 +106,7 @@ function generateRegionInfo(name, ip, fqdn, port) {
             Port: 22023,
             Name: "North America",
             TranslateName: 289,
+            UseDtls: true,
         },
         {
             $type: "DnsRegionInfo, Assembly-CSharp",
@@ -114,6 +115,7 @@ function generateRegionInfo(name, ip, fqdn, port) {
             Port: 22023,
             Name: "Europe",
             TranslateName: 290,
+            UseDtls: true,
         },
         {
             $type: "DnsRegionInfo, Assembly-CSharp",
@@ -122,6 +124,7 @@ function generateRegionInfo(name, ip, fqdn, port) {
             Port: 22023,
             Name: "Asia",
             TranslateName: 291,
+            UseDtls: true,
         },
         // Followed by the custom region
         {
@@ -131,6 +134,7 @@ function generateRegionInfo(name, ip, fqdn, port) {
             Port: port,
             Name: name,
             TranslateName: 1003, // StringNames.NoTranslation
+            UseDtls: false, // As no custom key can be specified, we need to disable DTLS on custom servers.
         },
     ];
 
