@@ -65,6 +65,9 @@ namespace Impostor.Api.Net
         /// </summary>
         IClientPlayer? Player { get; }
 
+        /// <summary>
+        /// Gets platform specific data of the <see cref="IClient" />.
+        /// </summary>
         PlatformSpecificData PlatformSpecificData { get; }
 
         ValueTask<bool> ReportCheatAsync(CheatContext context, string message);
