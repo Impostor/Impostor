@@ -81,7 +81,7 @@ namespace Impostor.Server.Net.Inner.Objects
             IsDead = (flag & 4) != 0;
 
             var roleType = (RoleTypes)reader.ReadUInt16();
-            // Role = roleType;
+            RoleType = roleType;
 
             var taskCount = reader.ReadByte();
 
