@@ -36,6 +36,33 @@ namespace Impostor.Server.Net.Inner.Objects
             await Game.FinishRpcAsync(writer);
         }
 
+        public async ValueTask SetHatAsync(string hatId)
+        {
+            PlayerInfo.CurrentOutfit.HatId = hatId;
+
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetHat);
+            Rpc39SetHat.Serialize(writer, hatId);
+            await Game.FinishRpcAsync(writer);
+        }
+
+        public async ValueTask SetPetAsync(string petId)
+        {
+            PlayerInfo.CurrentOutfit.PetId = petId;
+
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetPet);
+            Rpc41SetPet.Serialize(writer, petId);
+            await Game.FinishRpcAsync(writer);
+        }
+
+        public async ValueTask SetSkinAsync(string skinId)
+        {
+            PlayerInfo.CurrentOutfit.SkinId = skinId;
+
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetSkin);
+            Rpc40SetSkin.Serialize(writer, skinId);
+            await Game.FinishRpcAsync(writer);
+        }
+
         public async ValueTask SendChatAsync(string text)
         {
             using var writer = Game.StartRpc(NetId, RpcCalls.SendChat);

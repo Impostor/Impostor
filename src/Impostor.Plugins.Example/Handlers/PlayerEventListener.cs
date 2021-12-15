@@ -40,9 +40,10 @@ namespace Impostor.Plugins.Example.Handlers
                 {
                     // Modify player properties.
                     await playerControl.SetColorAsync((ColorType)_random.Next(1, 9));
-                    await playerControl.SetHatAsync((HatType)_random.Next(1, 9));
-                    await playerControl.SetSkinAsync((SkinType)_random.Next(1, 9));
-                    await playerControl.SetPetAsync((PetType)_random.Next(1, 9));
+                    // TODO Rewrite using cosmetics source generator
+                    // await playerControl.SetHatAsync((HatType)_random.Next(1, 9));
+                    // await playerControl.SetSkinAsync((SkinType)_random.Next(1, 9));
+                    // await playerControl.SetPetAsync((PetType)_random.Next(1, 9));
 
                     await Task.Delay(TimeSpan.FromMilliseconds(5000));
                 }
@@ -74,9 +75,9 @@ namespace Impostor.Plugins.Example.Handlers
             if (e.Message == "look")
             {
                 await e.PlayerControl.SetColorAsync(ColorType.Pink);
-                await e.PlayerControl.SetHatAsync(HatType.Cheese);
-                await e.PlayerControl.SetSkinAsync(SkinType.Police);
-                await e.PlayerControl.SetPetAsync(PetType.Ufo);
+                await e.PlayerControl.SetHatAsync("hat_pk05_Cheese");
+                await e.PlayerControl.SetSkinAsync("skin_Police");
+                await e.PlayerControl.SetPetAsync("pet_alien1");
             }
 
             if (e.Message == "snap")
