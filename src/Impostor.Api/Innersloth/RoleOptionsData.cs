@@ -9,23 +9,23 @@ namespace Impostor.Api.Innersloth
     {
         public bool ShapeshifterLeaveSkin { get; set; }
 
-        public float ShapeshifterCooldown { get; set; } = 10f;
+        public byte ShapeshifterCooldown { get; set; } = 10;
 
-        public float ShapeshifterDuration { get; set; } = 30f;
+        public byte ShapeshifterDuration { get; set; } = 30;
 
-        public float ScientistCooldown { get; set; } = 15f;
+        public byte ScientistCooldown { get; set; } = 15;
 
-        public float ScientistBatteryCharge { get; set; } = 5f;
+        public byte ScientistBatteryCharge { get; set; } = 5;
 
-        public float GuardianAngelCooldown { get; set; } = 60f;
+        public byte GuardianAngelCooldown { get; set; } = 60;
 
         public bool ImpostorsCanSeeProtect { get; set; }
 
-        public float ProtectionDurationSeconds { get; set; } = 10f;
+        public byte ProtectionDurationSeconds { get; set; } = 10;
 
-        public float EngineerCooldown { get; set; } = 30f;
+        public byte EngineerCooldown { get; set; } = 30;
 
-        public float EngineerInVentMaxTime { get; set; } = 15f;
+        public byte EngineerInVentMaxTime { get; set; } = 15;
 
         public Dictionary<RoleTypes, RoleRate> RoleRates { get; } = new Dictionary<RoleTypes, RoleRate>();
 
@@ -88,14 +88,14 @@ namespace Impostor.Api.Innersloth
             }
 
             writer.Write(ShapeshifterLeaveSkin);
-            writer.Write((byte)ShapeshifterCooldown);
-            writer.Write((byte)ShapeshifterDuration);
-            writer.Write((byte)ScientistCooldown);
-            writer.Write((byte)GuardianAngelCooldown);
-            writer.Write((byte)EngineerCooldown);
-            writer.Write((byte)EngineerInVentMaxTime);
-            writer.Write((byte)ScientistBatteryCharge);
-            writer.Write((byte)ProtectionDurationSeconds);
+            writer.Write(ShapeshifterCooldown);
+            writer.Write(ShapeshifterDuration);
+            writer.Write(ScientistCooldown);
+            writer.Write(GuardianAngelCooldown);
+            writer.Write(EngineerCooldown);
+            writer.Write(EngineerInVentMaxTime);
+            writer.Write(ScientistBatteryCharge);
+            writer.Write(ProtectionDurationSeconds);
             writer.Write(ImpostorsCanSeeProtect);
         }
 
@@ -110,14 +110,14 @@ namespace Impostor.Api.Innersloth
             }
 
             writer.Write(ShapeshifterLeaveSkin);
-            writer.Write((byte)ShapeshifterCooldown);
-            writer.Write((byte)ShapeshifterDuration);
-            writer.Write((byte)ScientistCooldown);
-            writer.Write((byte)GuardianAngelCooldown);
-            writer.Write((byte)EngineerCooldown);
-            writer.Write((byte)EngineerInVentMaxTime);
-            writer.Write((byte)ScientistBatteryCharge);
-            writer.Write((byte)ProtectionDurationSeconds);
+            writer.Write(ShapeshifterCooldown);
+            writer.Write(ShapeshifterDuration);
+            writer.Write(ScientistCooldown);
+            writer.Write(GuardianAngelCooldown);
+            writer.Write(EngineerCooldown);
+            writer.Write(EngineerInVentMaxTime);
+            writer.Write(ScientistBatteryCharge);
+            writer.Write(ProtectionDurationSeconds);
             writer.Write(ImpostorsCanSeeProtect);
         }
 
