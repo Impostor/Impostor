@@ -24,8 +24,8 @@ namespace Impostor.Server.Net
         private readonly GameManager _gameManager;
         private readonly ICustomMessageManager<ICustomRootMessage> _customMessageManager;
 
-        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, string name, int gameVersion, Language language, QuickChatModes chatMode, IHazelConnection connection)
-            : base(name, gameVersion, language, chatMode, connection)
+        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, string name, int gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, IHazelConnection connection)
+            : base(name, gameVersion, language, chatMode, platformSpecificData, connection)
         {
             _logger = logger;
             _antiCheatConfig = antiCheatOptions.Value;
@@ -64,7 +64,7 @@ namespace Impostor.Server.Net
                 case MessageFlags.HostGame:
                 {
                     // Read game settings.
-                    var gameInfo = Message00HostGameC2S.Deserialize(reader, out _);
+                    var gameInfo = Message00HostGameC2S.Deserialize(reader);
 
                     // Create game.
                     var game = await _gameManager.CreateAsync(this, gameInfo);
@@ -254,6 +254,12 @@ namespace Impostor.Server.Net
                 {
                     Message16GetGameListC2S.Deserialize(reader, out var options, out _);
                     await OnRequestGameListAsync(options);
+                    break;
+                }
+
+                case MessageFlags.SetActivePodType:
+                {
+                    Message21SetActivePodType.Deserialize(reader, out _);
                     break;
                 }
 

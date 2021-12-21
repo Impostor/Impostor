@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using Impostor.Api.Innersloth;
 
 namespace Impostor.Api.Net.Messages.S2C
 {
     public class Message01JoinGameS2C
     {
-        public static void SerializeJoin(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId)
+        public static void SerializeJoin(IMessageWriter writer, bool clear, int gameCode, IClientPlayer player, int hostId)
         {
             if (clear)
             {
@@ -14,8 +14,11 @@ namespace Impostor.Api.Net.Messages.S2C
 
             writer.StartMessage(MessageFlags.JoinGame);
             writer.Write(gameCode);
-            writer.Write(playerId);
+            writer.Write(player.Client.Id);
             writer.Write(hostId);
+            writer.Write(player.Client.Name);
+            player.Client.PlatformSpecificData.Serialize(writer);
+            writer.WritePacked(player.Character?.PlayerInfo.PlayerLevel ?? 1);
             writer.EndMessage();
         }
 

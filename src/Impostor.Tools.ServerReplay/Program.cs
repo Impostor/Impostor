@@ -170,7 +170,7 @@ namespace Impostor.Tools.ServerReplay
                     // Create and register connection.
                     var connection = new MockHazelConnection(address);
 
-                    await _clientManager.RegisterConnectionAsync(connection, name, gameVersion, Language.English, QuickChatModes.FreeChatOrQuickChat);
+                    await _clientManager.RegisterConnectionAsync(connection, name, gameVersion, Language.English, QuickChatModes.FreeChatOrQuickChat, new PlatformSpecificData(Platforms.Unknown, "ServerReplay"));
 
                     // Store reference for ourselfs.
                     Connections.Add(clientId, connection);
@@ -200,7 +200,7 @@ namespace Impostor.Tools.ServerReplay
 
                     if (tag == MessageFlags.HostGame)
                     {
-                        GameOptions.Add(clientId, Message00HostGameC2S.Deserialize(message, out _));
+                        GameOptions.Add(clientId, Message00HostGameC2S.Deserialize(message));
                     }
                     else if (Connections.TryGetValue(clientId, out var client))
                     {

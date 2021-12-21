@@ -13,6 +13,7 @@ namespace Impostor.Api.Net.Messages.C2S
         public static void Deserialize(IMessageReader reader, out GameCode gameCode)
         {
             gameCode = reader.ReadInt32();
+            reader.ReadBoolean(); // no crossplay
         }
     }
 }

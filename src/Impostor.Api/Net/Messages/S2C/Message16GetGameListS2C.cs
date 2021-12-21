@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Impostor.Api.Games;
 
@@ -25,6 +25,9 @@ namespace Impostor.Api.Net.Messages.S2C
                 writer.Write((byte)game.Options.Map);
                 writer.Write((byte)game.Options.NumImpostors);
                 writer.Write((byte)game.Options.MaxPlayers);
+                var platform = game.Host?.Client.PlatformSpecificData;
+                writer.Write((byte)(platform?.Platform ?? 0));
+                writer.Write(platform?.PlatformName ?? string.Empty);
                 writer.EndMessage();
             }
 

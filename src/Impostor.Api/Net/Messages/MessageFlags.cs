@@ -16,7 +16,13 @@
         public const byte WaitForHost = 12;
         public const byte Redirect = 13;
         public const byte ReselectServer = 14;
-        public const byte GetGameList = 9;
         public const byte GetGameListV2 = 16;
+        public const byte ReportPlayer = 17;
+        public const byte QuickMatch = 18;
+        public const byte QuickMatchHost = 19;
+        public const byte SetGameSession = 20;
+        public const byte SetActivePodType = 21;
+        public const byte QueryPlatformIds = 22;
+        public const byte QueryLobbyInfo = 23;
     }
 }

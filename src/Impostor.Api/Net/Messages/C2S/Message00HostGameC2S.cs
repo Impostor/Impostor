@@ -8,6 +8,7 @@ namespace Impostor.Api.Net.Messages.C2S
         {
             writer.StartMessage(MessageFlags.HostGame);
             gameOptionsData.Serialize(writer);
+            writer.Write(int.MaxValue); // crossplayFlags
             writer.EndMessage();
         }
 
@@ -15,12 +16,11 @@ namespace Impostor.Api.Net.Messages.C2S
         ///     Deserialize a packet.
         /// </summary>
         /// <param name="reader"><see cref="IMessageReader" /> with <see cref="IMessageReader.Tag" /> 0.</param>
-        /// <param name="chatMode">The chat type selected in the client of the player.</param>
         /// <returns>Deserialized <see cref="GameOptionsData" />.</returns>
-        public static GameOptionsData Deserialize(IMessageReader reader, out QuickChatModes chatMode)
+        public static GameOptionsData Deserialize(IMessageReader reader)
         {
             var gameOptionsData = GameOptionsData.DeserializeCreate(reader);
-            chatMode = (QuickChatModes)reader.ReadByte();
+            reader.ReadInt32(); // crossplayFlags, not used yet
 
             return gameOptionsData;
         }

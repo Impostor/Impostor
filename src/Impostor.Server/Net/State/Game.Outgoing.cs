@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
@@ -78,12 +78,12 @@ namespace Impostor.Server.Net.State
 
         private void WriteJoinedGameMessage(IMessageWriter message, bool clear, IClientPlayer player)
         {
-            var playerIds = _players
+            var players = _players
                 .Where(x => x.Value != player)
-                .Select(x => x.Key)
+                .Select(x => x.Value)
                 .ToArray();
 
-            Message07JoinedGameS2C.Serialize(message, clear, Code, player.Client.Id, HostId, playerIds);
+            Message07JoinedGameS2C.Serialize(message, clear, Code, player.Client.Id, HostId, players);
         }
 
         private void WriteAlterGameMessage(IMessageWriter message, bool clear, bool isPublic)

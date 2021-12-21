@@ -61,6 +61,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
         internal Queue<ColorType> RequestedColorId { get; } = new Queue<ColorType>();
 
+        /// <summary> Gets or sets target that was set by the last CheckMurder RPC. </summary>
+        internal IInnerPlayerControl? IsMurdering { get; set; } = null;
+
         public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
             throw new NotImplementedException();
@@ -182,8 +185,8 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc09SetHat.Deserialize(reader, out var hat);
-                    return await HandleSetHat(sender, hat);
+                    Rpc39SetHat.Deserialize(reader, out var hat);
+                    return true;
                 }
 
                 case RpcCalls.SetSkin:
@@ -193,8 +196,41 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc10SetSkin.Deserialize(reader, out var skin);
-                    return await HandleSetSkin(sender, skin);
+                    Rpc40SetSkin.Deserialize(reader, out var skin);
+                    return true;
+                }
+
+                case RpcCalls.SetVisor:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    // Rpc42SetVistor.Deserialize(reader, out var visor);
+                    return true;
+                }
+
+                case RpcCalls.SetNamePlate:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    // Rpc43SetNamePlate.Deserialize(reader, out var namePlate);
+                    return true;
+                }
+
+                case RpcCalls.SetLevel:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    // Rpc38SetLevel.Deserialize(reader, out var level);
+                    return true;
                 }
 
                 case RpcCalls.ReportDeadBody:
@@ -210,7 +246,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.MurderPlayer:
                 {
-                    if (!await ValidateOwnership(call, sender) || !await ValidateImpostor(call, sender, PlayerInfo))
+                    if (!await ValidateHost(call, sender))
                     {
                         return false;
                     }
@@ -271,7 +307,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc17SetPet.Deserialize(reader, out var pet);
+                    Rpc41SetPet.Deserialize(reader, out var pet);
                     return await HandleSetPet(sender, pet);
                 }
 
@@ -305,6 +341,65 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     // TODO: deserialize and expose the result in an API
+                    break;
+                }
+
+                case RpcCalls.SetRole:
+                {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc44SetRole.Deserialize(reader, out var role);
+                    PlayerInfo.RoleType = role;
+
+                    break;
+                }
+
+                case RpcCalls.ProtectPlayer:
+                {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc45ProtectPlayer.Deserialize(reader, Game, out _, out _);
+                    break;
+                }
+
+                case RpcCalls.Shapeshift:
+                {
+                    if (!await ValidateRole(call, sender, PlayerInfo, RoleTypes.Shapeshifter))
+                    {
+                        return false;
+                    }
+
+                    Rpc46Shapeshift.Deserialize(reader, Game, out _, out _);
+
+                    break;
+                }
+
+                case RpcCalls.CheckMurder:
+                {
+                    if (!await ValidateImpostor(call, sender, PlayerInfo))
+                    {
+                        return false;
+                    }
+
+                    Rpc47CheckMurder.Deserialize(reader, Game, out var murdered);
+                    return await HandleCheckMurder(sender, murdered);
+                }
+
+                case RpcCalls.CheckProtect:
+                {
+                    if (!await ValidateRole(call, sender, PlayerInfo, RoleTypes.GuardianAngel))
+                    {
+                        return false;
+                    }
+
+                    Rpc48CheckProtect.Deserialize(reader, Game, out _);
+
                     break;
                 }
 
@@ -343,7 +438,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 var player = Game.GameNet.GameData!.GetPlayerById(infectedIds.Span[i]);
                 if (player != null)
                 {
-                    player.IsImpostor = true;
+                    // player.IsImpostor = true;
                 }
             }
 
@@ -479,7 +574,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (sender.IsOwner(this))
             {
-                if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.Color == color))
+                if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == color))
                 {
                     if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, "Client sent a color that is already used"))
                     {
@@ -497,7 +592,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 var expected = RequestedColorId.Dequeue();
 
-                while (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.Color == expected))
+                while (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == expected))
                 {
                     expected = (ColorType)(((byte)expected + 1) % ColorsCount);
                 }
@@ -510,45 +605,62 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            PlayerInfo.Color = color;
+            PlayerInfo.CurrentOutfit.Color = color;
 
             return true;
         }
 
-        private async ValueTask<bool> HandleSetHat(ClientPlayer sender, HatType hat)
+        private async ValueTask<bool> HandleSetHat(ClientPlayer sender, string hat)
         {
             if (Game.GameState == GameStates.Started && await sender.Client.ReportCheatAsync(RpcCalls.SetHat, "Client tried to change hat while not in lobby"))
             {
                 return false;
             }
 
-            PlayerInfo.Hat = hat;
+            PlayerInfo.CurrentOutfit.HatId = hat;
 
             return true;
         }
 
-        private async ValueTask<bool> HandleSetSkin(ClientPlayer sender, SkinType skin)
+        private async ValueTask<bool> HandleSetSkin(ClientPlayer sender, string skin)
         {
             if (Game.GameState == GameStates.Started && await sender.Client.ReportCheatAsync(RpcCalls.SetSkin, "Client tried to change skin while not in lobby"))
             {
                 return false;
             }
 
-            PlayerInfo.Skin = skin;
+            PlayerInfo.CurrentOutfit.SkinId = skin;
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleCheckMurder(ClientPlayer sender, IInnerPlayerControl? target)
+        {
+            if (!PlayerInfo.CanMurder(Game, _dateTimeProvider))
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, "Client tried to murder too fast"))
+                {
+                    return false;
+                }
+            }
+
+            PlayerInfo.LastMurder = _dateTimeProvider.UtcNow - TimeSpan.FromMilliseconds(sender.Client.Connection.AveragePing);
+
+            if (target == null || target.PlayerInfo.IsImpostor)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, "Client tried to murder invalid target"))
+                {
+                    return false;
+                }
+            }
+
+            IsMurdering = target;
 
             return true;
         }
 
         private async ValueTask<bool> HandleMurderPlayer(ClientPlayer sender, IInnerPlayerControl? target)
         {
-            if (!PlayerInfo.CanMurder(Game, _dateTimeProvider))
-            {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder too fast"))
-                {
-                    return false;
-                }
-            }
-
             if (target == null || target.PlayerInfo.IsImpostor)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder invalid target"))
@@ -557,13 +669,22 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            PlayerInfo.LastMurder = _dateTimeProvider.UtcNow - TimeSpan.FromMilliseconds(sender.Client.Connection.AveragePing);
+            // If the host is also the impostor that committed the murder, CheckMurder is actually sent *after* the MurderPlayer RPC
+            if (sender.Character != this && target != IsMurdering)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Host tried to murder incorrect target"))
+                {
+                    return false;
+                }
+            }
 
             if (target != null && !target.PlayerInfo.IsDead)
             {
                 ((InnerPlayerControl)target).Die(DeathReason.Kill);
                 await _eventManager.CallAsync(new PlayerMurderEvent(Game, sender, this, target));
             }
+
+            IsMurdering = null;
 
             return true;
         }
@@ -582,14 +703,14 @@ namespace Impostor.Server.Net.Inner.Objects
             await _eventManager.CallAsync(new PlayerStartMeetingEvent(Game, Game.GetClientPlayer(this.OwnerId)!, this, deadPlayer));
         }
 
-        private async ValueTask<bool> HandleSetPet(ClientPlayer sender, PetType pet)
+        private async ValueTask<bool> HandleSetPet(ClientPlayer sender, string pet)
         {
             if (Game.GameState == GameStates.Started && await sender.Client.ReportCheatAsync(RpcCalls.SetPet, "Client tried to change pet while not in lobby"))
             {
                 return false;
             }
 
-            PlayerInfo.Pet = pet;
+            PlayerInfo.CurrentOutfit.PetId = pet;
 
             return true;
         }

@@ -125,6 +125,10 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc23VotingComplete.Deserialize(reader, out var states, out var playerId, out var tie);
+                    foreach (var messageReader in states)
+                    {
+                        messageReader.Dispose();
+                    }
 
                     // This would be a nice place to implement an anti cheat.
                     // But for whatever reason host sends VotingComplete before sending his vote.

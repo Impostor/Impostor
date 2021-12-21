@@ -39,7 +39,7 @@ namespace Impostor.Api.Net.Messages.S2C
 
             if (hasReason)
             {
-                var inner = reader.ReadMessage();
+                using var inner = reader.ReadMessage();
                 reason = (DisconnectReason)inner.ReadByte();
                 message = reason == DisconnectReason.Custom ? inner.ReadString() : null;
             }

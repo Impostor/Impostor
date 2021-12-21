@@ -18,7 +18,6 @@ namespace Impostor.Plugins.Example
             services.AddSingleton<IEventListener, ClientEventListener>();
             services.AddSingleton<IEventListener, PlayerEventListener>();
             services.AddSingleton<IEventListener, MeetingEventListener>();
-            services.AddSingleton<IEventListener, AnnouncementsListener>();
         }
     }
 }

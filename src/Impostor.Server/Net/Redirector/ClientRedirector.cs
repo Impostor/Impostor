@@ -24,11 +24,12 @@ namespace Impostor.Server.Net.Redirector
             int gameVersion,
             Language language,
             QuickChatModes chatMode,
+            PlatformSpecificData platformSpecificData,
             HazelConnection connection,
             ClientManager clientManager,
             INodeProvider nodeProvider,
             INodeLocator nodeLocator)
-            : base(name, gameVersion, language, chatMode, connection)
+            : base(name, gameVersion, language, chatMode, platformSpecificData, connection)
         {
             _clientManager = clientManager;
             _nodeProvider = nodeProvider;

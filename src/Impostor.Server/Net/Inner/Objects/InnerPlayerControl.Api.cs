@@ -29,37 +29,37 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetColorAsync(ColorType color)
         {
-            PlayerInfo.Color = color;
+            PlayerInfo.CurrentOutfit.Color = color;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetColor);
             Rpc08SetColor.Serialize(writer, color);
             await Game.FinishRpcAsync(writer);
         }
 
-        public async ValueTask SetHatAsync(HatType hat)
+        public async ValueTask SetHatAsync(string hatId)
         {
-            PlayerInfo.Hat = hat;
+            PlayerInfo.CurrentOutfit.HatId = hatId;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetHat);
-            Rpc09SetHat.Serialize(writer, hat);
+            Rpc39SetHat.Serialize(writer, hatId);
             await Game.FinishRpcAsync(writer);
         }
 
-        public async ValueTask SetPetAsync(PetType pet)
+        public async ValueTask SetPetAsync(string petId)
         {
-            PlayerInfo.Pet = pet;
+            PlayerInfo.CurrentOutfit.PetId = petId;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetPet);
-            Rpc17SetPet.Serialize(writer, pet);
+            Rpc41SetPet.Serialize(writer, petId);
             await Game.FinishRpcAsync(writer);
         }
 
-        public async ValueTask SetSkinAsync(SkinType skin)
+        public async ValueTask SetSkinAsync(string skinId)
         {
-            PlayerInfo.Skin = skin;
+            PlayerInfo.CurrentOutfit.SkinId = skinId;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetSkin);
-            Rpc10SetSkin.Serialize(writer, skin);
+            Rpc40SetSkin.Serialize(writer, skinId);
             await Game.FinishRpcAsync(writer);
         }
 

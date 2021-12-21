@@ -47,7 +47,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 case RpcCalls.EnterVent:
                 case RpcCalls.ExitVent:
                 {
-                    if (!await ValidateImpostor(call, sender, _playerControl.PlayerInfo))
+                    if (!await ValidateCanVent(call, sender, _playerControl.PlayerInfo))
                     {
                         return false;
                     }

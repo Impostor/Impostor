@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 
 namespace Impostor.Api.Net.Messages.S2C
 {
     public static class Message07JoinedGameS2C
     {
-        public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId, int[] otherPlayerIds)
+        public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId, IClientPlayer[] otherPlayers)
         {
             if (clear)
             {
@@ -15,11 +15,14 @@ namespace Impostor.Api.Net.Messages.S2C
             writer.Write(gameCode);
             writer.Write(playerId);
             writer.Write(hostId);
-            writer.WritePacked(otherPlayerIds.Length);
+            writer.WritePacked(otherPlayers.Length);
 
-            foreach (var id in otherPlayerIds)
+            foreach (var ply in otherPlayers)
             {
-                writer.WritePacked(id);
+                writer.WritePacked(ply.Client.Id);
+                writer.Write(ply.Client.Name);
+                ply.Client.PlatformSpecificData.Serialize(writer);
+                writer.WritePacked(ply.Character?.PlayerInfo.PlayerLevel ?? 1);
             }
 
             writer.EndMessage();

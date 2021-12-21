@@ -21,17 +21,22 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public string PlayerName { get; internal set; } = string.Empty;
 
-        public ColorType Color { get; internal set; } = (ColorType)(-1);
+        public Dictionary<PlayerOutfitType, PlayerOutfit> Outfits { get; } = new()
+        {
+            [PlayerOutfitType.Default] = new PlayerOutfit(),
+        };
 
-        public HatType Hat { get; internal set; }
+        public PlayerOutfitType CurrentOutfitType { get; set; } = PlayerOutfitType.Default;
 
-        public PetType Pet { get; internal set; }
+        public PlayerOutfit CurrentOutfit => Outfits[CurrentOutfitType];
 
-        public SkinType Skin { get; internal set; }
+        public RoleTypes RoleType { get; internal set; }
 
         public bool Disconnected { get; internal set; }
 
-        public bool IsImpostor { get; internal set; }
+        public bool IsImpostor => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter;
+
+        public bool CanVent => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Engineer;
 
         public bool IsDead { get; internal set; }
 
@@ -40,6 +45,8 @@ namespace Impostor.Server.Net.Inner.Objects
         public List<InnerGameData.TaskInfo> Tasks { get; internal set; } = new List<InnerGameData.TaskInfo>(0);
 
         public DateTimeOffset LastMurder { get; set; }
+
+        public uint PlayerLevel { get; internal set; }
 
         public bool CanMurder(IGame game, IDateTimeProvider dateTimeProvider)
         {
@@ -58,16 +65,23 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public void Deserialize(IMessageReader reader)
         {
-            PlayerName = reader.ReadString();
-            Color = (ColorType)reader.ReadPackedInt32();
-            Hat = (HatType)reader.ReadPackedUInt32();
-            Pet = (PetType)reader.ReadPackedUInt32();
-            Skin = (SkinType)reader.ReadPackedUInt32();
+            Outfits.Clear();
+            var b = reader.ReadByte();
+            for (var i = 0; i < b; i++)
+            {
+                var key = (PlayerOutfitType)reader.ReadByte();
+                Outfits[key] = new PlayerOutfit();
+                Outfits[key].Deserialize(reader);
+            }
+
+            PlayerLevel = reader.ReadPackedUInt32();
 
             var flag = reader.ReadByte();
-            Disconnected = (flag & 1) > 0;
-            IsImpostor = (flag & 2) > 0;
-            IsDead = (flag & 4) > 0;
+            Disconnected = (flag & 1) != 0;
+            IsDead = (flag & 4) != 0;
+
+            var roleType = (RoleTypes)reader.ReadUInt16();
+            RoleType = roleType;
 
             var taskCount = reader.ReadByte();
 

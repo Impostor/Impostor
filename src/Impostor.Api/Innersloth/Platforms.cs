@@ -11,5 +11,7 @@ namespace Impostor.Api.Innersloth
         IPhone = 6,
         Android = 7,
         Switch = 8,
+        Xbox = 9,
+        Playstation = 10,
     }
 }
