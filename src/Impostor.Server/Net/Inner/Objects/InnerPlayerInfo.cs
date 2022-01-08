@@ -55,7 +55,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 return false;
             }
 
-            return dateTimeProvider.UtcNow.Subtract(LastMurder).TotalSeconds >= game.Options.KillCooldown;
+            return dateTimeProvider.UtcNow.Subtract(LastMurder).TotalSeconds >= game.Options.KillCooldown / 2;
         }
 
         public void Serialize(IMessageWriter writer)
