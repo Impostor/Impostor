@@ -90,15 +90,7 @@ namespace Impostor.Server.Net.Manager
                 return;
             }
 
-            if (name.Length > 10)
-            {
-                using var packet = MessageWriter.Get(MessageType.Reliable);
-                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameLength);
-                await connection.SendAsync(packet);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(name) || !name.All(TextBox.IsCharAllowed))
+            if (string.IsNullOrWhiteSpace(name))
             {
                 using var packet = MessageWriter.Get(MessageType.Reliable);
                 Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameIllegalCharacters);
