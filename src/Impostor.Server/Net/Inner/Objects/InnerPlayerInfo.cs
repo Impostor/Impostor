@@ -55,6 +55,11 @@ namespace Impostor.Server.Net.Inner.Objects
                 return false;
             }
 
+            // In 2021.11.9 the Guardian Angel was created, which was unfortunately implemented in such a way that
+            // it is hard to determine accurately whether a kill was prevented or not. When a kill was prevented,
+            // the impostor has a cooldown of half the usual duration. As a workaround we always assume the kill was
+            // prevented and the impostor only has half of its cooldown.
+            // FIXME when the base game improved their implementation.
             return dateTimeProvider.UtcNow.Subtract(LastMurder).TotalSeconds >= game.Options.KillCooldown / 2;
         }
 
