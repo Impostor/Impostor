@@ -354,6 +354,11 @@ namespace Impostor.Server.Net.Inner.Objects
                     Rpc44SetRole.Deserialize(reader, out var role);
                     PlayerInfo.RoleType = role;
 
+                    if (Game.GameState == GameStates.Starting)
+                    {
+                        await Game.StartedAsync();
+                    }
+
                     break;
                 }
 

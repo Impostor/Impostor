@@ -383,6 +383,7 @@ namespace Impostor.Server.Net.State
                 case InnerPlayerControl control:
                 {
                     if (GameState != GameStates.Started)
+                    if (GameState != GameStates.Started && GameState != GameStates.Starting)
                     {
                         GameNet.GameData?.RemovePlayer(control);
                     }

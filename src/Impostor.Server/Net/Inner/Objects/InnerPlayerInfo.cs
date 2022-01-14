@@ -85,9 +85,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
             var taskCount = reader.ReadByte();
 
-            if (Tasks.Count != taskCount)
+            if (Tasks.Count < taskCount)
             {
-                Tasks = new List<InnerGameData.TaskInfo>(taskCount);
+                taskCount = (byte)Tasks.Count;
             }
 
             for (var i = 0; i < taskCount; i++)
