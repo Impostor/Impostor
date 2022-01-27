@@ -120,7 +120,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     }
                 }
 
-                if (!await ValidateImpostor(call, sender, _playerControl.PlayerInfo))
+                if (!await ValidateCanVent(call, sender, _playerControl.PlayerInfo))
                 {
                     return false;
                 }
