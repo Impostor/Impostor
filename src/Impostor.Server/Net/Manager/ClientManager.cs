@@ -98,7 +98,7 @@ namespace Impostor.Server.Net.Manager
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(name) || !name.All(TextBox.IsCharAllowed))
+            if (string.IsNullOrWhiteSpace(name))
             {
                 using var packet = MessageWriter.Get(MessageType.Reliable);
                 Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameIllegalCharacters);
