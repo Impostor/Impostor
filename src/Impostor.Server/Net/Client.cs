@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Games;
@@ -263,6 +264,13 @@ namespace Impostor.Server.Net
                     break;
                 }
 
+                case MessageFlags.QueryPlatformIds:
+                {
+                    Message22QueryPlatformIdsC2S.Deserialize(reader, out var gameCode);
+                    await OnQueryPlatformIds(gameCode);
+                    break;
+                }
+
                 default:
                     if (_customMessageManager.TryGet(flag, out var customRootMessage))
                     {
@@ -351,6 +359,23 @@ namespace Impostor.Server.Net
             var games = _gameManager.FindListings((MapFlags)options.Map, options.NumImpostors, options.Keywords);
 
             Message16GetGameListS2C.Serialize(message, games);
+
+            return Connection.SendAsync(message);
+        }
+
+        /// <summary>
+        ///     Triggered when the connected client requests the PlatformSpecificData.
+        /// </summary>
+        /// <param name="code">
+        ///     The GameCode of the game whose platform id's are checked.
+        /// </param>
+        private ValueTask OnQueryPlatformIds(GameCode code)
+        {
+            using var message = MessageWriter.Get(MessageType.Reliable);
+
+            var playerSpecificData = _gameManager.Find(code)?.Players.Select(p => p.Client.PlatformSpecificData) ?? Enumerable.Empty<PlatformSpecificData>();
+
+            Message22QueryPlatformIdsS2C.Serialize(message, code, playerSpecificData);
 
             return Connection.SendAsync(message);
         }
