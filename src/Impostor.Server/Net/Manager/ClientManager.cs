@@ -85,25 +85,19 @@ namespace Impostor.Server.Net.Manager
                     _ => throw new ArgumentOutOfRangeException(),
                 };
 
-                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, message);
-
-                await connection.SendAsync(packet);
+                await DisconnectConnection(connection, message);
                 return;
             }
 
             if (name.Length > 10)
             {
-                using var packet = MessageWriter.Get(MessageType.Reliable);
-                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameLength);
-                await connection.SendAsync(packet);
+                await DisconnectConnection(connection, DisconnectMessages.UsernameLength);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                using var packet = MessageWriter.Get(MessageType.Reliable);
-                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameIllegalCharacters);
-                await connection.SendAsync(packet);
+                await DisconnectConnection(connection, DisconnectMessages.UsernameIllegalCharacters);
                 return;
             }
 
@@ -152,6 +146,15 @@ namespace Impostor.Server.Net.Manager
 
             // This may happen in the very rare case that version X is supported, X+2 is as well, but X+1 is not.
             return VersionCompareResult.Unknown;
+        }
+
+        private async ValueTask DisconnectConnection(IHazelConnection connection, string message)
+        {
+            using var writer = MessageWriter.Get();
+            MessageDisconnect.Serialize(writer, true, DisconnectReason.Custom, message);
+
+            await connection.DisconnectAsync(DisconnectReason.Custom.ToString(), writer);
+            return;
         }
     }
 }
