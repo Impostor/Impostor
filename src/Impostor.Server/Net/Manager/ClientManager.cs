@@ -8,7 +8,6 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
-using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
 using Impostor.Server.Config;
 using Impostor.Server.Events.Client;
@@ -85,19 +84,19 @@ namespace Impostor.Server.Net.Manager
                     _ => throw new ArgumentOutOfRangeException(),
                 };
 
-                await DisconnectConnection(connection, message);
+                await connection.CustomDisconnectAsync(message);
                 return;
             }
 
             if (name.Length > 10)
             {
-                await DisconnectConnection(connection, DisconnectMessages.UsernameLength);
+                await connection.CustomDisconnectAsync(DisconnectMessages.UsernameLength);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                await DisconnectConnection(connection, DisconnectMessages.UsernameIllegalCharacters);
+                await connection.CustomDisconnectAsync(DisconnectMessages.UsernameIllegalCharacters);
                 return;
             }
 
@@ -146,15 +145,6 @@ namespace Impostor.Server.Net.Manager
 
             // This may happen in the very rare case that version X is supported, X+2 is as well, but X+1 is not.
             return VersionCompareResult.Unknown;
-        }
-
-        private async ValueTask DisconnectConnection(IHazelConnection connection, string message)
-        {
-            using var writer = MessageWriter.Get();
-            MessageDisconnect.Serialize(writer, true, DisconnectReason.Custom, message);
-
-            await connection.DisconnectAsync(DisconnectReason.Custom.ToString(), writer);
-            return;
         }
     }
 }
