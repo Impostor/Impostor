@@ -5,8 +5,6 @@ using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
-using Impostor.Api.Net.Messages.S2C;
-using Impostor.Hazel;
 using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net
@@ -55,15 +53,7 @@ namespace Impostor.Server.Net
 
         public async ValueTask DisconnectAsync(DisconnectReason reason, string? message = null)
         {
-            if (!Connection.IsConnected)
-            {
-                return;
-            }
-
-            using var writer = MessageWriter.Get();
-            MessageDisconnect.Serialize(writer, true, reason, message);
-
-            await Connection.DisconnectAsync(message ?? reason.ToString(), writer);
+            await Connection.CustomDisconnectAsync(message ?? reason.ToString());
         }
     }
 }

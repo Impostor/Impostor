@@ -22,6 +22,7 @@ namespace Impostor.Api.Net.Messages.S2C
             writer.EndMessage();
         }
 
+        [Obsolete("JoinGame errors are no longer used by 2021.11.9 and up, disconnect clients instead.")]
         public static void SerializeError(IMessageWriter writer, bool clear, DisconnectReason reason, string? message = null)
         {
             if (clear)

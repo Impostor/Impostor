@@ -56,27 +56,25 @@ namespace Impostor.Server.Net.Redirector
                 {
                     Message01JoinGameC2S.Deserialize(reader, out var gameCode);
 
-                    using var packet = MessageWriter.Get(MessageType.Reliable);
                     var endpoint = await _nodeLocator.FindAsync(gameCode);
                     if (endpoint == null)
                     {
-                        Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.GameMissing);
+                        await DisconnectAsync(DisconnectReason.GameMissing);
                     }
                     else
                     {
+                        using var packet = MessageWriter.Get(MessageType.Reliable);
                         Message13RedirectS2C.Serialize(packet, false, endpoint);
+                        await Connection.SendAsync(packet);
                     }
 
-                    await Connection.SendAsync(packet);
                     break;
                 }
 
                 case MessageFlags.GetGameListV2:
                 {
                     // TODO: Implement.
-                    using var packet = MessageWriter.Get(MessageType.Reliable);
-                    Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.NotImplemented);
-                    await Connection.SendAsync(packet);
+                    await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.NotImplemented);
                     break;
                 }
 

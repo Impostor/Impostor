@@ -8,7 +8,6 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
-using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
 using Impostor.Server.Config;
 using Impostor.Server.Events.Client;
@@ -85,25 +84,19 @@ namespace Impostor.Server.Net.Manager
                     _ => throw new ArgumentOutOfRangeException(),
                 };
 
-                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, message);
-
-                await connection.SendAsync(packet);
+                await connection.CustomDisconnectAsync(message);
                 return;
             }
 
             if (name.Length > 10)
             {
-                using var packet = MessageWriter.Get(MessageType.Reliable);
-                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameLength);
-                await connection.SendAsync(packet);
+                await connection.CustomDisconnectAsync(DisconnectMessages.UsernameLength);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                using var packet = MessageWriter.Get(MessageType.Reliable);
-                Message01JoinGameS2C.SerializeError(packet, false, DisconnectReason.Custom, DisconnectMessages.UsernameIllegalCharacters);
-                await connection.SendAsync(packet);
+                await connection.CustomDisconnectAsync(DisconnectMessages.UsernameIllegalCharacters);
                 return;
             }
 
