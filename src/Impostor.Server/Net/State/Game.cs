@@ -123,7 +123,8 @@ namespace Impostor.Server.Net.State
         {
             return Players
                 .Where(filter)
-                .Select(p => p.Client.Connection)!;
+                .Select(p => p.Client.Connection)
+                .Where(c => c != null && c.IsConnected)!;
         }
     }
 }
