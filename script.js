@@ -34,7 +34,7 @@ async function parseAddressAsync(serverAddress) {
 }
 
 function parseForm() {
-    const serverAddress = document.getElementById("address").value;
+    const serverAddress = document.getElementById("address").value.trim();
     const serverPort = parseInt(document.getElementById("port").value) ?? DEFAULT_PORT;
     const serverName = document.getElementById("name").value || "Impostor";
 
