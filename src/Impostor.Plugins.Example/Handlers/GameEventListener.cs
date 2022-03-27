@@ -25,7 +25,7 @@ namespace Impostor.Plugins.Example.Handlers
 
                 if (!gameCode.IsInvalid)
                 {
-                    e.GameCode = gameCode;
+                    e.GameCode = gameCode.ToUpper();
                 }
 
                 if (e.Client.Name == "dima")
