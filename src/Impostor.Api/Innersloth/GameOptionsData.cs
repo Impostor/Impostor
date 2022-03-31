@@ -193,7 +193,8 @@ namespace Impostor.Api.Innersloth
                 RoleOptions.Serialize(writer);
             }
 
-            if (version > 5)
+            // V6 is equal to V5
+            if (version > 6)
             {
                 throw new ImpostorException($"Unknown GameOptionsData version {Version}.");
             }
@@ -260,7 +261,8 @@ namespace Impostor.Api.Innersloth
                 RoleOptions = RoleOptionsData.Deserialize(bytes);
             }
 
-            if (Version > 5)
+            // V6 is equal to V5
+            if (Version > 6)
             {
                 throw new ImpostorException($"Unknown GameOptionsData version {Version}.");
             }
