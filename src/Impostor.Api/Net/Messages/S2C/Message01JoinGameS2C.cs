@@ -19,6 +19,8 @@ namespace Impostor.Api.Net.Messages.S2C
             writer.Write(player.Client.Name);
             player.Client.PlatformSpecificData.Serialize(writer);
             writer.WritePacked(player.Character?.PlayerInfo.PlayerLevel ?? 1);
+            writer.Write("");
+            writer.Write("");
             writer.EndMessage();
         }
 
