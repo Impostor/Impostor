@@ -83,7 +83,15 @@ namespace Impostor.Server.Net.State
                 .Select(x => x.Value)
                 .ToArray();
 
-            Message07JoinedGameS2C.Serialize(message, clear, Code, player.Client.Id, HostId, players);
+            // TODO: clean up Pre20220202 when versions before it are no longer supported.
+            if (player.Client.GameVersion >= GameVersion.GetVersion(2022, 2, 2))
+            {
+                Message07JoinedGameS2C.Serialize(message, clear, Code, player.Client.Id, HostId, players);
+            }
+            else
+            {
+                Message07JoinedGameS2CPre20220202.Serialize(message, clear, Code, player.Client.Id, HostId, players);
+            }
         }
 
         private void WriteAlterGameMessage(IMessageWriter message, bool clear, bool isPublic)
