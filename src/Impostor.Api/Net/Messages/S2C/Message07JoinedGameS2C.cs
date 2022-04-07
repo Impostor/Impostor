@@ -4,7 +4,7 @@ namespace Impostor.Api.Net.Messages.S2C
 {
     public static class Message07JoinedGameS2C
     {
-        public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId, IClientPlayer[] otherPlayers)
+        public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId, IClientPlayer[] otherPlayers, bool post20220202 = true)
         {
             if (clear)
             {
@@ -24,9 +24,12 @@ namespace Impostor.Api.Net.Messages.S2C
                 ply.Client.PlatformSpecificData.Serialize(writer);
                 writer.WritePacked(ply.Character?.PlayerInfo.PlayerLevel ?? 1);
 
-                // ProductUserId and FriendCode are not yet known, so set them to an empty string
-                writer.Write(string.Empty);
-                writer.Write(string.Empty);
+                if (post20220202)
+                {
+                    // ProductUserId and FriendCode are not yet known, so set them to an empty string
+                    writer.Write(string.Empty);
+                    writer.Write(string.Empty);
+                }
             }
 
             writer.EndMessage();
