@@ -65,6 +65,7 @@ async function openApp() {
         servername,
         serverport,
         serverip,
+        usedtls: false,
     });
     const url = `amongus://init?${params.toString()}`;
     window.location = url;
