@@ -66,6 +66,11 @@ namespace Impostor.Api.Net
         IClientPlayer? Player { get; }
 
         /// <summary>
+        /// Gets the version of the game the client is using.
+        /// </summary>
+        int GameVersion { get; }
+
+        /// <summary>
         /// Gets platform specific data of the <see cref="IClient" />.
         /// </summary>
         PlatformSpecificData PlatformSpecificData { get; }

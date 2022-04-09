@@ -171,29 +171,34 @@ namespace Impostor.Api.Innersloth
             writer.Write((uint)VotingTime);
             writer.Write((bool)IsDefaults);
 
-            if (version > 1)
+            if (version >= 2)
             {
                 writer.Write((byte)EmergencyCooldown);
             }
 
-            if (version > 2)
+            if (version >= 3)
             {
                 writer.Write((bool)ConfirmImpostor);
                 writer.Write((bool)VisualTasks);
             }
 
-            if (version > 3)
+            if (version >= 4)
             {
                 writer.Write((bool)AnonymousVotes);
                 writer.Write((byte)TaskBarUpdate);
             }
 
-            if (version > 4)
+            if (version >= 5)
             {
                 RoleOptions.Serialize(writer);
             }
 
-            if (version > 5)
+            if (version >= 6)
+            {
+                // Nothing was changed in V6
+            }
+
+            if (version > 6)
             {
                 throw new ImpostorException($"Unknown GameOptionsData version {Version}.");
             }
@@ -238,29 +243,34 @@ namespace Impostor.Api.Innersloth
 
             IsDefaults = bytes.ReadBoolean();
 
-            if (Version > 1)
+            if (Version >= 2)
             {
                 EmergencyCooldown = bytes.ReadByte();
             }
 
-            if (Version > 2)
+            if (Version >= 3)
             {
                 ConfirmImpostor = bytes.ReadBoolean();
                 VisualTasks = bytes.ReadBoolean();
             }
 
-            if (Version > 3)
+            if (Version >= 4)
             {
                 AnonymousVotes = bytes.ReadBoolean();
                 TaskBarUpdate = (TaskBarUpdate)bytes.ReadByte();
             }
 
-            if (Version > 4)
+            if (Version >= 5)
             {
                 RoleOptions = RoleOptionsData.Deserialize(bytes);
             }
 
-            if (Version > 5)
+            if (Version >= 6)
+            {
+                // Nothing was changed in V6
+            }
+
+            if (Version > 6)
             {
                 throw new ImpostorException($"Unknown GameOptionsData version {Version}.");
             }
