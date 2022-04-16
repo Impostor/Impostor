@@ -144,7 +144,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     player,
                     _eventManager,
                     taskId++,
-                    Game.GameNet!.ShipStatus!.Data.Tasks[taskTypeId]
+                    Game.GameNet!.ShipStatus?.Data.Tasks[taskTypeId]
                 ));
             }
         }

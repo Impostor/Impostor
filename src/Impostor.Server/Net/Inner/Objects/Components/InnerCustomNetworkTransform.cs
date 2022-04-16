@@ -125,20 +125,31 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     return false;
                 }
 
-                var vents = Game.GameNet.ShipStatus!.Data.Vents.Values;
-
-                var vent = vents.SingleOrDefault(x => Approximately(x.Position, position + ColliderOffset));
-
-                if (vent == null)
+                if (Game.GameNet.ShipStatus == null)
                 {
-                    if (await sender.Client.ReportCheatAsync(call, "Failed vent position check"))
+                    // Cannot perform vent position check on unknown ship statuses
+                    if (await sender.Client.ReportCheatAsync(call, "Failed vent position check on unknown map"))
                     {
                         return false;
                     }
                 }
                 else
                 {
-                    await _eventManager.CallAsync(new PlayerVentEvent(Game, sender, _playerControl, vent));
+                    var vents = Game.GameNet.ShipStatus!.Data.Vents.Values;
+
+                    var vent = vents.SingleOrDefault(x => Approximately(x.Position, position + ColliderOffset));
+
+                    if (vent == null)
+                    {
+                        if (await sender.Client.ReportCheatAsync(call, "Failed vent position check"))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        await _eventManager.CallAsync(new PlayerVentEvent(Game, sender, _playerControl, vent));
+                    }
                 }
 
                 await SnapToAsync(sender, position, minSid);

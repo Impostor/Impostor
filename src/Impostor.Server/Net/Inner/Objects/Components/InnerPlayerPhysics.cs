@@ -66,6 +66,16 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                             throw new ArgumentOutOfRangeException(nameof(call), call, null);
                     }
 
+                    if (Game.GameNet.ShipStatus == null)
+                    {
+                        if (await sender.Client.ReportCheatAsync(call, "Client interacted with vent on unknown map"))
+                        {
+                            return false;
+                        }
+
+                        break;
+                    }
+
                     if (!Game.GameNet.ShipStatus!.Data.Vents.TryGetValue(ventId, out var vent))
                     {
                         if (await sender.Client.ReportCheatAsync(call, "Client interacted with nonexistent vent"))

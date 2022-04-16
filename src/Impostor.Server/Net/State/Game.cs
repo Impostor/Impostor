@@ -103,7 +103,11 @@ namespace Impostor.Server.Net.State
                 foreach (var player in _players.Values)
                 {
                     player.Character?.NetworkTransform.OnPlayerSpawn();
-                    await player.Character!.NetworkTransform.SetPositionAsync(player, GameNet.ShipStatus!.GetSpawnLocation(player.Character, PlayerCount, true), Vector2.Zero);
+
+                    if (GameNet.ShipStatus != null)
+                    {
+                        await player.Character!.NetworkTransform.SetPositionAsync(player, GameNet.ShipStatus.GetSpawnLocation(player.Character, PlayerCount, true), Vector2.Zero);
+                    }
                 }
 
                 GameState = GameStates.Started;
