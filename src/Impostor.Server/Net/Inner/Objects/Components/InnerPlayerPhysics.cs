@@ -76,7 +76,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                         break;
                     }
 
-                    if (!Game.GameNet.ShipStatus!.Data.Vents.TryGetValue(ventId, out var vent))
+                    if (!Game.GameNet.ShipStatus.Data.Vents.TryGetValue(ventId, out var vent))
                     {
                         if (await sender.Client.ReportCheatAsync(call, "Client interacted with nonexistent vent"))
                         {
