@@ -12,7 +12,7 @@ namespace Impostor.Server.Net.Inner.Objects
             private readonly InnerPlayerInfo _playerInfo;
             private readonly IEventManager _eventManager;
 
-            public TaskInfo(InnerPlayerInfo playerInfo, IEventManager eventManager, uint id, ITask task)
+            public TaskInfo(InnerPlayerInfo playerInfo, IEventManager eventManager, uint id, ITask? task)
             {
                 _playerInfo = playerInfo;
                 _eventManager = eventManager;
@@ -22,7 +22,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             public uint Id { get; internal set; }
 
-            public ITask Task { get; internal set; }
+            public ITask? Task { get; internal set; }
 
             public bool Complete { get; internal set; }
 

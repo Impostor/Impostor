@@ -7,7 +7,7 @@ namespace Impostor.Api.Net.Inner.Objects
     {
         uint Id { get; }
 
-        ITask Task { get; }
+        ITask? Task { get; }
 
         bool Complete { get; }
 
