@@ -35,6 +35,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <!-- HACK: Some plugins depend on System.IO.Pipelines and expect the version to be 6.0.0.0, but Hazel still depends on version 5.0.0.0. Figure out why this happens. -->
+    <PackageReference Include="System.IO.Pipelines" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
