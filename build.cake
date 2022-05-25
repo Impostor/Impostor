@@ -1,6 +1,6 @@
-#addin "nuget:?package=SharpZipLib&Version=1.3.1"
-#addin "nuget:?package=Cake.Compression&Version=0.2.6"
-#addin "nuget:?package=Cake.FileHelpers&Version=4.0.1"
+#addin "nuget:?package=SharpZipLib&Version=1.3.3"
+#addin "nuget:?package=Cake.Compression&Version=0.3.0"
+#addin "nuget:?package=Cake.FileHelpers&Version=5.0.0"
 
 var buildId = EnvironmentVariable("GITHUB_RUN_NUMBER") ?? EnvironmentVariable("APPVEYOR_BUILD_VERSION");
 var buildRelease = EnvironmentVariable("APPVEYOR_REPO_TAG") == "true";
@@ -10,7 +10,7 @@ var buildDir = MakeAbsolute(Directory("./build"));
 var target = Argument("target", "Deploy");
 var configuration = Argument("configuration", "Release");
 
-var msbuildSettings = new DotNetCoreMSBuildSettings();
+var msbuildSettings = new DotNetMSBuildSettings();
 
 if (buildRelease) 
 {
@@ -31,10 +31,9 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
     var projBuildDir = buildDir.Combine(name + "_" + runtime);
     var projBuildName = name + "_" + buildVersion + "_" + runtime;
 
-    DotNetCorePublish(project, new DotNetCorePublishSettings {
+    DotNetPublish(project, new DotNetPublishSettings {
         Configuration = configuration,
         NoRestore = true,
-        Framework = "net5.0",
         Runtime = runtime,
         SelfContained = false,
         PublishSingleFile = true,
@@ -64,7 +63,7 @@ private void ImpostorPublishNF(string name, string project) {
     var projBuildDir = buildDir.Combine(name + "_" + runtime);
     var projBuildZip = buildDir.CombineWithFilePath(name + "_" + buildVersion + "_" + runtime + ".zip");
 
-    DotNetCorePublish(project, new DotNetCorePublishSettings {
+    DotNetPublish(project, new DotNetPublishSettings {
         Configuration = configuration,
         NoRestore = true,
         Framework = "net472",
@@ -90,18 +89,17 @@ Task("Clean")
 
 Task("Restore")
     .Does(() => {
-        DotNetCoreRestore("./src/Impostor.sln");
+        DotNetRestore("./src/Impostor.sln");
     });
 
 Task("Replay")
     .Does(() => {
         // D:\Projects\GitHub\Impostor\Impostor\src\Impostor.Tools.ServerReplay\sessions
-        DotNetCoreRun(
+        DotNetRun(
             "./src/Impostor.Tools.ServerReplay/Impostor.Tools.ServerReplay.csproj", 
-            "./src/Impostor.Tools.ServerReplay/sessions", new DotNetCoreRunSettings {
+            "./src/Impostor.Tools.ServerReplay/sessions", new DotNetRunSettings {
                 Configuration = configuration,
                 NoRestore = true,
-                Framework = "net5.0"
             });
     });
 
@@ -111,7 +109,7 @@ Task("Build")
     .IsDependentOn("Replay")
     .Does(() => {
         // Tests.
-        DotNetCoreBuild("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetCoreBuildSettings {
+        DotNetBuild("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetBuildSettings {
             Configuration = configuration,
         });
             
@@ -123,7 +121,7 @@ Task("Build")
         ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm64", true);
 
         // API.
-        DotNetCorePack("./src/Impostor.Api/Impostor.Api.csproj", new DotNetCorePackSettings {
+        DotNetPack("./src/Impostor.Api/Impostor.Api.csproj", new DotNetPackSettings {
             Configuration = configuration,
             OutputDirectory = buildDir,
             IncludeSource = true,
@@ -135,7 +133,7 @@ Task("Build")
 Task("Test")
     .IsDependentOn("Build")
     .Does(() => {
-        DotNetCoreTest("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetCoreTestSettings {
+        DotNetTest("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetTestSettings {
             Configuration = configuration,
             NoBuild = true
         });

@@ -19,23 +19,24 @@ Impostor has support for plugins. This document will help you to setup a develop
   - [Impostor versions](#impostor-versions)
 - [9. Missing/invalid data or want more functions?](#9-missinginvalid-data-or-want-more-functions)
 
-## 1. Install .NET Core SDK
+## 1. Install .NET SDK
 
-Download and install the latest .NET Core SDK.
+Download and install the latest .NET SDK.
 
 https://dotnet.microsoft.com/download
 
 ## 2. Create a C# project
 
-The first step is creating a new C# project, it must be a **Class Library (.NET Standard)**. The target framework can be any of those compatible with .NET 5, which includes:
+The first step is creating a new C# project, it must be a **Class Library (.NET Standard)**. The target framework can be any of those compatible with .NET 6, which includes:
 
 - .NET Standard 2.0
 - .NET Standard 2.1
 - .NET 5
+- .NET 6
 
 For more information about compatibility, see https://docs.microsoft.com/en-us/dotnet/standard/net-standard.
 
-> At the moment of writing this document, I recommend you to use **.NET Standard 2.1**. This should give you enough functionality. If not, upgrade to .NET 5.
+> At the moment of writing this document, I recommend you to use **.NET Standard 2.1**. This should give you enough functionality. If not, upgrade to .NET 6.
 
 When the project has been created, you should have `Class.cs` and `Project.csproj` files. Your `Project.csproj` should look something like this.
 

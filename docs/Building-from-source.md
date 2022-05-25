@@ -1,6 +1,6 @@
 # Building from source
 
-The solution contains the Impostor server and its dependencies, like Hazel and the plugin API. The server is built using [.NET 5](https://dotnet.microsoft.com/download/dotnet/5.0).
+The solution contains the Impostor server and its dependencies, like Hazel and the plugin API. The server is built using [.NET 6](https://dotnet.microsoft.com/download/dotnet/6.0).
 
 ## Cloning Impostor
 
@@ -14,7 +14,7 @@ git clone https://github.com/Impostor/Impostor.git
 
 ### Dependencies
 
-- [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0)
+- [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
 - [Rider](https://www.jetbrains.com/rider/) or [Visual Studio](https://visualstudio.microsoft.com/vs/) (Optional, only if you want the full IDE experience)
 
 ### Build using the CLI
