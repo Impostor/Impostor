@@ -34,7 +34,6 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
     DotNetCorePublish(project, new DotNetCorePublishSettings {
         Configuration = configuration,
         NoRestore = true,
-        Framework = "net6.0",
         Runtime = runtime,
         SelfContained = false,
         PublishSingleFile = true,
@@ -101,7 +100,6 @@ Task("Replay")
             "./src/Impostor.Tools.ServerReplay/sessions", new DotNetCoreRunSettings {
                 Configuration = configuration,
                 NoRestore = true,
-                Framework = "net6.0"
             });
     });
 
