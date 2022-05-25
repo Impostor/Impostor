@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
     <VersionPrefix>1.7.0</VersionPrefix>
     <VersionSuffix>dev</VersionSuffix>
     <EnforceCodeStyleInBuild Condition="$(MSBuildProjectName)!='Hazel'">true</EnforceCodeStyleInBuild>
