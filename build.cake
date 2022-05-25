@@ -10,7 +10,7 @@ var buildDir = MakeAbsolute(Directory("./build"));
 var target = Argument("target", "Deploy");
 var configuration = Argument("configuration", "Release");
 
-var msbuildSettings = new DotNetCoreMSBuildSettings();
+var msbuildSettings = new DotNetMSBuildSettings();
 
 if (buildRelease) 
 {
@@ -31,7 +31,7 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
     var projBuildDir = buildDir.Combine(name + "_" + runtime);
     var projBuildName = name + "_" + buildVersion + "_" + runtime;
 
-    DotNetPublish(project, new DotNetCorePublishSettings {
+    DotNetPublish(project, new DotNetPublishSettings {
         Configuration = configuration,
         NoRestore = true,
         Runtime = runtime,
@@ -63,7 +63,7 @@ private void ImpostorPublishNF(string name, string project) {
     var projBuildDir = buildDir.Combine(name + "_" + runtime);
     var projBuildZip = buildDir.CombineWithFilePath(name + "_" + buildVersion + "_" + runtime + ".zip");
 
-    DotNetPublish(project, new DotNetCorePublishSettings {
+    DotNetPublish(project, new DotNetPublishSettings {
         Configuration = configuration,
         NoRestore = true,
         Framework = "net472",
@@ -97,7 +97,7 @@ Task("Replay")
         // D:\Projects\GitHub\Impostor\Impostor\src\Impostor.Tools.ServerReplay\sessions
         DotNetRun(
             "./src/Impostor.Tools.ServerReplay/Impostor.Tools.ServerReplay.csproj", 
-            "./src/Impostor.Tools.ServerReplay/sessions", new DotNetCoreRunSettings {
+            "./src/Impostor.Tools.ServerReplay/sessions", new DotNetRunSettings {
                 Configuration = configuration,
                 NoRestore = true,
             });
@@ -109,7 +109,7 @@ Task("Build")
     .IsDependentOn("Replay")
     .Does(() => {
         // Tests.
-        DotNetBuild("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetCoreBuildSettings {
+        DotNetBuild("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetBuildSettings {
             Configuration = configuration,
         });
             
@@ -121,7 +121,7 @@ Task("Build")
         ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm64", true);
 
         // API.
-        DotNetPack("./src/Impostor.Api/Impostor.Api.csproj", new DotNetCorePackSettings {
+        DotNetPack("./src/Impostor.Api/Impostor.Api.csproj", new DotNetPackSettings {
             Configuration = configuration,
             OutputDirectory = buildDir,
             IncludeSource = true,
@@ -133,7 +133,7 @@ Task("Build")
 Task("Test")
     .IsDependentOn("Build")
     .Does(() => {
-        DotNetTest("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetCoreTestSettings {
+        DotNetTest("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetTestSettings {
             Configuration = configuration,
             NoBuild = true
         });
