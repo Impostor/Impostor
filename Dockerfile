@@ -12,6 +12,7 @@ WORKDIR /source
 COPY src/Impostor.Server/Impostor.Server.csproj ./src/Impostor.Server/Impostor.Server.csproj
 COPY src/Impostor.Api/Impostor.Api.csproj ./src/Impostor.Api/Impostor.Api.csproj
 COPY src/Impostor.Hazel/Hazel/Hazel.csproj ./src/Impostor.Hazel/Hazel/Hazel.csproj
+COPY src/Directory.Build.props ./src/Directory.Build.props
 
 RUN case "$TARGETARCH" in \
     amd64)  NETCORE_PLATFORM='linux-x64';; \
