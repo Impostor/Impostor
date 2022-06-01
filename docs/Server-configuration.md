@@ -68,6 +68,33 @@ In a multi-node setup these values need to be specified. Note that most people d
 | **>UdpMasterEndpoint** |         | On the master, this value acts as a listen ip and port. On a node, this should be the public ip and port of the master. Format `127.0.0.1:32320`. |
 | **Nodes**              |         | An array containing public ips and ports of nodes. Only needs to be set on the master. See above for an example.                                  |
 
+### Serilog (Logging)
+
+If the standard logging via the console is not enough, it is possible to configure the logging framework Serilog to add additional sinks.
+
+For example, to add logging to a file, you should add the following snippet to your configuration:
+
+```json
+"Serilog": {
+  "Using": [
+    "Serilog.Sinks.File"
+  ],
+  "WriteTo": [
+    {
+      "Name": "File",
+      "Args": {
+        "path": "logs/log.txt",
+        "rollingInterval": "Day"
+      }
+    }
+  ]
+}
+```
+
+Next to that, you also need to copy over Serilog.Sinks.File.dll from [NuGet](https://www.nuget.org/packages/Serilog.Sinks.File/). See the [Serilog.Sinks.File documentation](https://github.com/serilog/serilog-sinks-file#json-appsettingsjson-configuration) for a list of parameters that can be configured.
+
+Other Serilog sinks are also supported, but are out of scope for this documentation.
+
 ## Config providers
 
 ### File
