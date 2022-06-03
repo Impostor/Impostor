@@ -53,7 +53,7 @@ The Debug configuration is used to enable the game recorder. This is mostly usef
 | Key                     | Default | Value                                        |
 | ----------------------- | ------- | -------------------------------------------- |
 | **GameRecorderEnabled** | `false` | Enables the Game Recorder.                   |
-| **GameRecorderPath**    | *empty* | Path where the recorded games will be saved. |
+| **GameRecorderPath**    | _empty_ | Path where the recorded games will be saved. |
 
 ### ServerRedirector
 
@@ -70,7 +70,15 @@ In a multi-node setup these values need to be specified. Note that most people d
 
 ### Serilog (Logging)
 
-If the standard logging via the console is not enough, it is possible to configure the logging framework Serilog to add additional sinks.
+Impostor's log framework, Serilog, can be configured in the config file. You can change its default log level and you can add additional sinks.
+
+| Key              | Default       | Value                                                                                                                                                                                                                          |
+| ---------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **MinimumLevel** | `Information` | Minimum log level for a message to be printed. If a log entry is as severe or more severe than this level, it will be printed. From most severe to least severe: `Fatal`,`Error`, `Warning`, `Information`, `Debug`, `Verbose` |
+| **Using**        | `[]`          | List of additional Serilog Sinks assemblies to load.                                                                                                                                                                           |
+| **WriteTo**      | `[]`          | Additional logging sinks. See the Serilog documentation or the example in this section. Serilog                                                                                                                                |
+
+For more information, check the [Serilog.Settings.Configuration](https://github.com/serilog/serilog-settings-configuration) documentation.
 
 For example, to add logging to a file, you should add the following snippet to your configuration:
 
