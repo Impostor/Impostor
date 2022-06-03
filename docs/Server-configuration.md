@@ -53,7 +53,7 @@ The Debug configuration is used to enable the game recorder. This is mostly usef
 | Key                     | Default | Value                                        |
 | ----------------------- | ------- | -------------------------------------------- |
 | **GameRecorderEnabled** | `false` | Enables the Game Recorder.                   |
-| **GameRecorderPath**    | *empty* | Path where the recorded games will be saved. |
+| **GameRecorderPath**    | _empty_ | Path where the recorded games will be saved. |
 
 ### ServerRedirector
 
@@ -67,6 +67,41 @@ In a multi-node setup these values need to be specified. Note that most people d
 | **>Redis**             |         | Format `127.0.0.1.6379`, you can also use a password like so: `127.0.0.1.6379,password=value`.                                                    |
 | **>UdpMasterEndpoint** |         | On the master, this value acts as a listen ip and port. On a node, this should be the public ip and port of the master. Format `127.0.0.1:32320`. |
 | **Nodes**              |         | An array containing public ips and ports of nodes. Only needs to be set on the master. See above for an example.                                  |
+
+### Serilog (Logging)
+
+Impostor's log framework, Serilog, can be configured in the config file. You can change its default log level and you can add additional sinks.
+
+| Key              | Default       | Value                                                                                                                                                                                                                          |
+| ---------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **MinimumLevel** | `Information` | Minimum log level for a message to be printed. If a log entry is as severe or more severe than this level, it will be printed. From most severe to least severe: `Fatal`,`Error`, `Warning`, `Information`, `Debug`, `Verbose` |
+| **Using**        | `[]`          | List of additional Serilog Sinks assemblies to load.                                                                                                                                                                           |
+| **WriteTo**      | `[]`          | Additional logging sinks. See the Serilog documentation or the example in this section. Serilog                                                                                                                                |
+
+For more information, check the [Serilog.Settings.Configuration](https://github.com/serilog/serilog-settings-configuration) documentation.
+
+For example, to add logging to a file, you should add the following snippet to your configuration:
+
+```json
+"Serilog": {
+  "Using": [
+    "Serilog.Sinks.File"
+  ],
+  "WriteTo": [
+    {
+      "Name": "File",
+      "Args": {
+        "path": "logs/log.txt",
+        "rollingInterval": "Day"
+      }
+    }
+  ]
+}
+```
+
+Next to that, you also need to copy over Serilog.Sinks.File.dll from [NuGet](https://www.nuget.org/packages/Serilog.Sinks.File/). See the [Serilog.Sinks.File documentation](https://github.com/serilog/serilog-sinks-file#json-appsettingsjson-configuration) for a list of parameters that can be configured.
+
+Other Serilog sinks are also supported, but are out of scope for this documentation.
 
 ## Config providers
 
