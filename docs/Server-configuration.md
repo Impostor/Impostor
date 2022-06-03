@@ -22,30 +22,6 @@ Impostor has an Anticheat that makes it possible to kick cheaters from games aut
 | **Enabled**       | `true`  | Whether the anticheat should be enabled.                                                                                                                                                                            |
 | **BanIpFromGame** | `true`  | When anticheat is enabled and a player is caught hacking, they will be kicked from the server. If this value is set to `true`, the player will be banned instead and will not be able to rejoin that specific game. |
 
-### AnnouncementsServer
-
-The Announcement Server is used to show update announcements to clients. Using the Plugin API you can create a plugin that serves custom announcements.
-
-| Key            | Default   | Value                                               |
-| -------------- | --------- | --------------------------------------------------- |
-| **Enabled**    | `false`   | Whether the announcements server should be enabled. |
-| **ListenIp**   | `0.0.0.0` | See Required Server Configuration.                  |
-| **ListenPort** | `22025`   | See Required Server Configuration.                  |
-
-### AuthServer
-
-The Authentication Server is used since Among Us version 2021.3.31 and is used by clients to identify themselves. If you're playing with modded Among Us clients, you can enable this server to skip the 5 second wait to join.
-
-| Key             | Default                | Value                                                |
-| --------------- | ---------------------- | ---------------------------------------------------- |
-| **Enabled**     | `false`                | Whether the authentication server should be enabled. |
-| **ListenIp**    | `0.0.0.0`              | See Required Server Configuration.                   |
-| **ListenPort**  | `22025`                | See Required Server Configuration.                   |
-| **Certificate** | `dtls/certificate.pem` | The public certificate used to authenticate with.    |
-| **PrivateKey**  | `dtls/key.pem`         | The corresponding private key.                       |
-
-On Linux you can generate a certificate by running `openssl req -x509 -newkey rsa:2048 -keyout dtls/key.pem -out dtls/certificate.pem -days 3650 -nodes`. It does not need to be signed.
-
 ### Debug
 
 The Debug configuration is used to enable the game recorder. This is mostly useful when developing Impostor.
