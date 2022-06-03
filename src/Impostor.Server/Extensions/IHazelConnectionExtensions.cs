@@ -12,9 +12,10 @@ namespace Impostor.Server
         /// Disconnect a connection using a custom message.
         /// </summary>
         /// <param name="connection">The connection to disconnect.</param>
-        /// <param name="message">The message to disconnect with.</param>
+        /// <param name="reason">The reason to disconnect with.</param>
+        /// <param name="message">The custom message to disconnect with if <paramref name="reason"/> is <see cref="DisconnectReason.Custom"/>.</param>
         /// <returns>Task that should be awaited to ensure disconnection.</returns>
-        public static async ValueTask CustomDisconnectAsync(this IHazelConnection connection, string message)
+        public static async ValueTask CustomDisconnectAsync(this IHazelConnection connection, DisconnectReason reason, string? message = null)
         {
             if (!connection.IsConnected)
             {
@@ -22,9 +23,9 @@ namespace Impostor.Server
             }
 
             using var writer = MessageWriter.Get();
-            MessageDisconnect.Serialize(writer, true, DisconnectReason.Custom, message);
+            MessageDisconnect.Serialize(writer, true, reason, message);
 
-            await connection.DisconnectAsync(DisconnectReason.Custom.ToString(), writer);
+            await connection.DisconnectAsync(reason.ToString(), writer);
         }
     }
 }

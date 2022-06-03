@@ -53,7 +53,7 @@ namespace Impostor.Server.Net
 
         public async ValueTask DisconnectAsync(DisconnectReason reason, string? message = null)
         {
-            await Connection.CustomDisconnectAsync(message ?? reason.ToString());
+            await Connection.CustomDisconnectAsync(reason, message);
         }
     }
 }
