@@ -141,7 +141,7 @@ namespace Impostor.Server.Net.Inner.Objects
             foreach (var taskTypeId in taskTypeIds.Span)
             {
                 var mapTasks = Game.GameNet!.ShipStatus?.Data.Tasks;
-                var taskType = mapTasks?.ContainsKey(taskTypeId) ?? false ? mapTasks[taskTypeId] : null;
+                var taskType = (mapTasks != null && mapTasks.ContainsKey(taskTypeId)) ? mapTasks[taskTypeId] : null;
                 player.Tasks.Add(new TaskInfo(player, _eventManager, taskId++, taskType));
             }
         }
