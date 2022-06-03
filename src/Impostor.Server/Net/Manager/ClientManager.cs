@@ -85,19 +85,19 @@ namespace Impostor.Server.Net.Manager
                     _ => throw new ArgumentOutOfRangeException(),
                 };
 
-                await connection.CustomDisconnectAsync(message);
+                await connection.CustomDisconnectAsync(DisconnectReason.Custom, message);
                 return;
             }
 
             if (name.Length > 10)
             {
-                await connection.CustomDisconnectAsync(DisconnectMessages.UsernameLength);
+                await connection.CustomDisconnectAsync(DisconnectReason.Custom, DisconnectMessages.UsernameLength);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                await connection.CustomDisconnectAsync(DisconnectMessages.UsernameIllegalCharacters);
+                await connection.CustomDisconnectAsync(DisconnectReason.Custom, DisconnectMessages.UsernameIllegalCharacters);
                 return;
             }
 
