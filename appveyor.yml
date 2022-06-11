@@ -52,7 +52,6 @@ deploy:
     artifact: /.*/
     draft: true
     on:
-      branch: master
       APPVEYOR_REPO_TAG: true
 
 only_commits:
