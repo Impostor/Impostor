@@ -48,7 +48,7 @@ deploy:
     release: $(APPVEYOR_PROJECT_NAME) $(APPVEYOR_BUILD_VERSION)
     description: 'DRAFT'
     auth_token:
-      secure: vyQ+zijv9g99wEgIdSC8uPSlnFvH3KZiD0yE7mNA3r3z2OY4lTEF6bpuUvtjoaM3
+      secure: /2Yz69s8BOfuNmV5NDcC37Zglw/QrT5QCUEDnGiJK8FIdO/owWPgm+KUqa8D/+9j
     artifact: /.*/
     draft: true
     on:
