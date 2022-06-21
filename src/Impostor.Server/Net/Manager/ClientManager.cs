@@ -24,7 +24,8 @@ namespace Impostor.Server.Net.Manager
             GameVersion.GetVersion(2021, 11, 9), // 2021.11.9
             GameVersion.GetVersion(2021, 12, 14), // 2021.12.14
             GameVersion.GetVersion(2022, 1, 10), // 2021.2.23
-            GameVersion.GetVersion(2022, 2, 2), // 2022.3.29
+            GameVersion.GetVersion(2022, 2, 2), // 2022.3.29 and 2022.4.19
+            GameVersion.GetVersion(2022, 4, 20), // 2022.6.21
         };
 
         private readonly ILogger<ClientManager> _logger;
