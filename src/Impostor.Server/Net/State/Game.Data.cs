@@ -181,7 +181,7 @@ namespace Impostor.Server.Net.State
                                     await obj.DeserializeAsync(sender, target, readerSub, true);
                                 }
 
-                                await OnSpawnAsync(obj);
+                                await OnSpawnAsync(sender, obj);
                             }
 
                             continue;
@@ -284,7 +284,7 @@ namespace Impostor.Server.Net.State
             return true;
         }
 
-        private async ValueTask OnSpawnAsync(InnerNetObject netObj)
+        private async ValueTask OnSpawnAsync(ClientPlayer sender, InnerNetObject netObj)
         {
             switch (netObj)
             {
@@ -315,13 +315,15 @@ namespace Impostor.Server.Net.State
                 case InnerPlayerControl control:
                 {
                     // Hook up InnerPlayerControl <-> IClientPlayer.
-                    if (!TryGetPlayer(control.OwnerId, out var player))
+                    if (TryGetPlayer(control.OwnerId, out var player))
                     {
-                        throw new ImpostorException("Failed to find player that spawned the InnerPlayerControl");
+                        player.Character = control;
+                        player.DisableSpawnTimeout();
                     }
-
-                    player.Character = control;
-                    player.DisableSpawnTimeout();
+                    else
+                    {
+                        await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), "Failed to find player that spawned the InnerPlayerControl");
+                    }
 
                     // Hook up InnerPlayerControl <-> InnerPlayerControl.PlayerInfo.
                     var playerInfo = GameNet.GameData!.GetPlayerById(control.PlayerId) ?? GameNet.GameData.AddPlayer(control);
@@ -332,7 +334,10 @@ namespace Impostor.Server.Net.State
                         control.PlayerInfo = playerInfo;
                     }
 
-                    await _eventManager.CallAsync(new PlayerSpawnedEvent(this, player, control));
+                    if (player != null)
+                    {
+                        await _eventManager.CallAsync(new PlayerSpawnedEvent(this, player, control));
+                    }
 
                     break;
                 }
