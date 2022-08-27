@@ -6,6 +6,11 @@
                                     "Check the server console for more information. " +
                                     "Please report the issue on the Impostor GitHub if it keeps happening.";
 
+        public const string ClientOutdated = "Please update your game to play in this lobby.";
+
+        public const string ClientTooNew = "Your game version is too new for this lobby. " +
+                                           "If you want to join this lobby you need to downgrade your client.";
+
         public const string Destroyed = "The game you tried to join is being destroyed. " +
                                         "Please create a new game.";
 

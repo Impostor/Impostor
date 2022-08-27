@@ -51,7 +51,7 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        public IEnumerable<Game> FindListings(MapFlags map, int impostorCount, GameKeywords language, int count = 10)
+        public IEnumerable<Game> FindListings(MapFlags map, int impostorCount, GameKeywords language, int gameVersion, int count = 10)
         {
             var results = 0;
 
@@ -59,7 +59,8 @@ namespace Impostor.Server.Net.Manager
             foreach (var (_, game) in _games.Where(x =>
                 x.Value.IsPublic &&
                 x.Value.GameState == GameStates.NotStarted &&
-                x.Value.PlayerCount < x.Value.Options.MaxPlayers))
+                x.Value.PlayerCount < x.Value.Options.MaxPlayers &&
+                x.Value.Host?.Client.GameVersion == gameVersion))
             {
                 // Check for options.
                 if (!map.HasFlag((MapFlags)(1 << (byte)game.Options.Map)))

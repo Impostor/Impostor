@@ -121,6 +121,12 @@ namespace Impostor.Server.Net
                         case GameJoinError.GameDestroyed:
                             await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.Destroyed);
                             break;
+                        case GameJoinError.ClientOutdated:
+                            await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.ClientOutdated);
+                            break;
+                        case GameJoinError.ClientTooNew:
+                            await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.ClientTooNew);
+                            break;
                         case GameJoinError.Custom:
                             await DisconnectAsync(DisconnectReason.Custom, result.Message);
                             break;
@@ -356,7 +362,7 @@ namespace Impostor.Server.Net
         {
             using var message = MessageWriter.Get(MessageType.Reliable);
 
-            var games = _gameManager.FindListings((MapFlags)options.Map, options.NumImpostors, options.Keywords);
+            var games = _gameManager.FindListings((MapFlags)options.Map, options.NumImpostors, options.Keywords, this.GameVersion);
 
             Message16GetGameListS2C.Serialize(message, games);
 
