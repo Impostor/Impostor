@@ -38,6 +38,16 @@
         GameDestroyed,
 
         /// <summary>
+        ///     The host has a newer version of the game and the client should update.
+        /// </summary>
+        ClientOutdated,
+
+        /// <summary>
+        ///     The host has an older version of the game and the client should downgrade.
+        /// </summary>
+        ClientTooNew,
+
+        /// <summary>
         ///     Custom error by a plugin.
         /// </summary>
         /// <remarks>
