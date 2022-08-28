@@ -4,6 +4,8 @@ namespace Impostor.Server.Config
     {
         public const string Section = "Compatibility";
 
+        public bool AllowFutureGameVersions { get; set; } = false;
+
         public bool AllowVersionMixing { get; set; } = false;
     }
 }
