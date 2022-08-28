@@ -23,6 +23,10 @@
       }
     ]
   },
+  "Compatibility": {
+    "AllowFutureGameVersions": false,
+    "AllowVersionMixing": false
+  },
   "Debug": {
     "GameRecorderEnabled": true,
     "GameRecorderPath": ""

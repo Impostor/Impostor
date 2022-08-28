@@ -22,6 +22,15 @@ Impostor has an Anticheat that makes it possible to kick cheaters from games aut
 | **Enabled**       | `true`  | Whether the anticheat should be enabled.                                                                                                                                                                            |
 | **BanIpFromGame** | `true`  | When anticheat is enabled and a player is caught hacking, they will be kicked from the server. If this value is set to `true`, the player will be banned instead and will not be able to rejoin that specific game. |
 
+### Compatibility
+
+Impostor has two compatibility options which allow some extra flexibility but may not work properly. Enabling either of these options is not recommended.
+
+| Key                      | Default | Value                                                                                                                                                                          |
+| ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **AllowNewGameVersions** | `false` | Warning: Setting this option to `true` is unsupported and may cause issues when large updates to Among Us are released. Allow future versions of Among Us to join your server. |
+| **AllowVersionMixing**   | `false` | Allow players using different game versions to play in one lobby.                                                                                                              |
+
 ### Debug
 
 The Debug configuration is used to enable the game recorder. This is mostly useful when developing Impostor.
