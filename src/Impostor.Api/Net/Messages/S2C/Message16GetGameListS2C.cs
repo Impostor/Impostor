@@ -28,6 +28,7 @@ namespace Impostor.Api.Net.Messages.S2C
                 var platform = game.Host?.Client.PlatformSpecificData;
                 writer.Write((byte)(platform?.Platform ?? 0));
                 writer.Write(platform?.PlatformName ?? string.Empty);
+                writer.Write((uint)game.Options.Keywords);
                 writer.EndMessage();
             }
 
