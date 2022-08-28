@@ -12,9 +12,11 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.S2C;
+using Impostor.Server.Config;
 using Impostor.Server.Events;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.State
 {
@@ -27,6 +29,7 @@ namespace Impostor.Server.Net.State
         private readonly ConcurrentDictionary<int, ClientPlayer> _players;
         private readonly HashSet<IPAddress> _bannedIps;
         private readonly IEventManager _eventManager;
+        private readonly CompatibilityConfig _compatibilityConfig;
 
         public Game(
             ILogger<Game> logger,
@@ -36,7 +39,8 @@ namespace Impostor.Server.Net.State
             GameCode code,
             GameOptionsData options,
             ClientManager clientManager,
-            IEventManager eventManager)
+            IEventManager eventManager,
+            IOptions<CompatibilityConfig> compatibilityConfig)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
@@ -52,6 +56,7 @@ namespace Impostor.Server.Net.State
             Options = options;
             _clientManager = clientManager;
             _eventManager = eventManager;
+            _compatibilityConfig = compatibilityConfig.Value;
             Items = new ConcurrentDictionary<object, object>();
         }
 
