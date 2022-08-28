@@ -26,11 +26,12 @@ namespace Impostor.Server.Net.Manager
         private readonly INodeLocator _nodeLocator;
         private readonly IPEndPoint _publicIp;
         private readonly ConcurrentDictionary<int, Game> _games;
+        private readonly CompatibilityConfig _compatibilityConfig;
         private readonly IServiceProvider _serviceProvider;
         private readonly IEventManager _eventManager;
         private readonly IGameCodeFactory _gameCodeFactory;
 
-        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, INodeLocator nodeLocator, IServiceProvider serviceProvider, IEventManager eventManager, IGameCodeFactory gameCodeFactory)
+        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, INodeLocator nodeLocator, IServiceProvider serviceProvider, IEventManager eventManager, IGameCodeFactory gameCodeFactory, IOptions<CompatibilityConfig> compatibilityConfig)
         {
             _logger = logger;
             _nodeLocator = nodeLocator;
@@ -39,6 +40,7 @@ namespace Impostor.Server.Net.Manager
             _gameCodeFactory = gameCodeFactory;
             _publicIp = new IPEndPoint(IPAddress.Parse(config.Value.ResolvePublicIp()), config.Value.PublicPort);
             _games = new ConcurrentDictionary<int, Game>();
+            _compatibilityConfig = compatibilityConfig.Value;
         }
 
         IEnumerable<IGame> IGameManager.Games => _games.Select(kv => kv.Value);
@@ -60,7 +62,7 @@ namespace Impostor.Server.Net.Manager
                 x.Value.IsPublic &&
                 x.Value.GameState == GameStates.NotStarted &&
                 x.Value.PlayerCount < x.Value.Options.MaxPlayers &&
-                x.Value.Host?.Client.GameVersion == gameVersion))
+                (_compatibilityConfig.AllowVersionMixing == true || x.Value.Host?.Client.GameVersion == gameVersion)))
             {
                 // Check for options.
                 if (!map.HasFlag((MapFlags)(1 << (byte)game.Options.Map)))
