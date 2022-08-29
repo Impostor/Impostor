@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Impostor.Server.Config
+namespace Impostor.Api.Config
 {
     public class ServerRedirectorConfig
     {

@@ -1,9 +1,8 @@
 ﻿using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using Impostor.Api;
 
-namespace Impostor.Server.Utils
+namespace Impostor.Api.Utils
 {
     internal static class IpUtils
     {
