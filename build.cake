@@ -2,24 +2,32 @@
 #addin "nuget:?package=Cake.Compression&Version=0.3.0"
 #addin "nuget:?package=Cake.FileHelpers&Version=5.0.0"
 
-var buildId = EnvironmentVariable("GITHUB_RUN_NUMBER") ?? EnvironmentVariable("APPVEYOR_BUILD_VERSION");
-var buildRelease = EnvironmentVariable("APPVEYOR_REPO_TAG") == "true";
+var workflow = BuildSystem.GitHubActions.Environment.Workflow;
+var buildId = workflow.RunNumber;
+var tag = workflow.RefType == GitHubActionsRefType.Tag ? workflow.RefName : null;
+
 var buildVersion = FindRegexMatchGroupInFile("./src/Directory.Build.props", @"\<VersionPrefix\>(.*?)\<\/VersionPrefix\>", 1, System.Text.RegularExpressions.RegexOptions.None).Value;
 var buildDir = MakeAbsolute(Directory("./build"));
 
-var target = Argument("target", "Deploy");
+var target = Argument("target", "Test");
 var configuration = Argument("configuration", "Release");
 
 var msbuildSettings = new DotNetMSBuildSettings();
 
-if (buildRelease) 
+if (tag != null) 
 {
-    msbuildSettings.Properties["Version"] = new[] { buildVersion };
+    if (tag[1..] != buildVersion) throw new Exception("Tag version has to be the same as VersionPrefix in Directory.Build.props");
+    msbuildSettings.Version = buildVersion;
 }
-else if (buildId != null) 
+else if (buildId != 0) 
 {
-    msbuildSettings.Properties["VersionSuffix"] = new[] { "ci." + buildId };
+    buildId += 500; 
+    msbuildSettings.VersionSuffix = "ci." + buildId;
     buildVersion += "-ci." + buildId;
+} 
+else 
+{
+    buildVersion += "-dev";
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -55,6 +63,10 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
         Zip(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".zip"));
     } else {
         GZipCompress(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".tar.gz"));
+    }
+    
+    if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
+        BuildSystem.GitHubActions.Commands.UploadArtifact(projBuildDir, projBuildName);
     }
 }
 
@@ -128,6 +140,13 @@ Task("Build")
             IncludeSymbols = true,
             MSBuildSettings = msbuildSettings
         });
+
+        if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
+            foreach (var file in GetFiles(buildDir + "/*.{nupkg,snupkg}"))
+            {
+                BuildSystem.GitHubActions.Commands.UploadArtifact(file, "Impostor.Api");
+            }
+        }
     });
 
 Task("Test")
@@ -137,12 +156,6 @@ Task("Test")
             Configuration = configuration,
             NoBuild = true
         });
-    });
-
-Task("Deploy")
-    .IsDependentOn("Test")
-    .Does(() => {
-        Information("Finished.");
     });
 
 //////////////////////////////////////////////////////////////////////
