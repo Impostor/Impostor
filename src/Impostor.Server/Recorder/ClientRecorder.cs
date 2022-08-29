@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
+using Impostor.Api.Config;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
-using Impostor.Server.Config;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;

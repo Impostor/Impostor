@@ -1,8 +1,8 @@
-﻿using Impostor.Server.Utils;
+﻿using Impostor.Api.Utils;
 
-namespace Impostor.Server.Config
+namespace Impostor.Api.Config
 {
-    internal class ServerConfig
+    public class ServerConfig
     {
         public const string Section = "Server";
 

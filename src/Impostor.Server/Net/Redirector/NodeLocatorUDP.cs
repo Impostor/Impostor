@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using Impostor.Server.Config;
+using Impostor.Api.Config;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
