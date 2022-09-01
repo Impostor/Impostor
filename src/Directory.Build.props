@@ -1,9 +1,10 @@
 <Project>
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <VersionPrefix>1.7.1</VersionPrefix>
+    <VersionPrefix>1.7.2</VersionPrefix>
     <VersionSuffix>dev</VersionSuffix>
     <EnforceCodeStyleInBuild Condition="$(MSBuildProjectName)!='Hazel'">true</EnforceCodeStyleInBuild>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    paths:
+      - '.github/workflows/ci.yml'
+      - 'src/**/**'
+      - '.gitmodules'
+      - 'build.cake'
+  pull_request:
+    paths:
+      - '.github/workflows/ci.yml'
+      - 'src/**/**'
+      - '.gitmodules'
+      - 'build.cake'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.x
+
+      - name: Run the Cake script
+        uses: cake-build/cake-action@v1
+        with:
+          verbosity: Diagnostic
+
+      - uses: softprops/action-gh-release@v1
+        if: github.ref_type == 'tag'
+        with:
+          draft: true
+          files: |
+            ./build/*.zip
+            ./build/*.tar.gz
+            ./build/*.nupkg
+            ./build/*.snupkg
+
+      - name: Push NuGet package
+        if: github.ref_type == 'tag'
+        run: |
+          dotnet nuget push ./build/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_IMPOSTOR }}
