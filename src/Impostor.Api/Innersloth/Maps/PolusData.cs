@@ -24,7 +24,7 @@ namespace Impostor.Api.Innersloth.Maps
                 new PolusVent(this, PolusVent.Ids.Laboratory, new Vector2(32.963f, -9.526f), right: PolusVent.Ids.Lava),
                 new PolusVent(this, PolusVent.Ids.Lava, new Vector2(30.907f, -11.86f), left: PolusVent.Ids.Laboratory, right: PolusVent.Ids.Admin),
                 new PolusVent(this, PolusVent.Ids.Storage, new Vector2(22f, -12.19f), left: PolusVent.Ids.Communications, right: PolusVent.Ids.Office),
-                new PolusVent(this, PolusVent.Ids.RightStabilizer, new Vector2(24.02f, -8.39f), left: PolusVent.Ids.LeftStabilizer),
+                new PolusVent(this, PolusVent.Ids.RightStabilizer, new Vector2(23.72f, -7.82f), left: PolusVent.Ids.LeftStabilizer),
                 new PolusVent(this, PolusVent.Ids.LeftStabilizer, new Vector2(9.64f, -7.72f), left: PolusVent.Ids.RightStabilizer),
                 new PolusVent(this, PolusVent.Ids.OutsideAdmin, new Vector2(18.93f, -24.85f), right: PolusVent.Ids.Admin),
             };
