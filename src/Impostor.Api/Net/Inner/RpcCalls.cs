@@ -45,5 +45,7 @@
         Shapeshift = 46,
         CheckMurder = 47,
         CheckProtect = 48,
+        Pet = 49,
+        CancelPet = 50,
     }
 }
