@@ -65,6 +65,7 @@
         "resolved": "1.2.0.435",
         "contentHash": "ouwPWZxbOV3SmCZxIRqHvljkSzkCyi1tDoMzQtDb/bRP8ctASV/iRJr+A2Gdj0QLaLmWnqTWDrH82/iP+X80Lg=="
       }
-    }
+    },
+    ".NETStandard,Version=v2.1/linux-x64": {}
   }
 }

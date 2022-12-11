@@ -10,6 +10,7 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Server.Events;
 using Impostor.Server.Net.State;
@@ -59,7 +60,7 @@ namespace Impostor.Server.Net.Manager
                 x.Value.IsPublic &&
                 x.Value.GameState == GameStates.NotStarted &&
                 x.Value.PlayerCount < x.Value.Options.MaxPlayers &&
-                (_compatibilityConfig.AllowVersionMixing == true || x.Value.Host?.Client.GameVersion == gameVersion)))
+                (_compatibilityConfig.AllowVersionMixing || x.Value.Host == null || x.Value.Host.Client.GameVersion == gameVersion)))
             {
                 // Check for options.
                 if (!map.HasFlag((MapFlags)(1 << (byte)game.Options.Map)))
@@ -110,7 +111,7 @@ namespace Impostor.Server.Net.Manager
             await _eventManager.CallAsync(new GameDestroyedEvent(game));
         }
 
-        public async ValueTask<IGame?> CreateAsync(IClient? owner, GameOptionsData options)
+        public async ValueTask<IGame?> CreateAsync(IClient? owner, IGameOptions options)
         {
             var @event = new GameCreationEvent(this, owner);
             await _eventManager.CallAsync(@event);
@@ -135,12 +136,12 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        public ValueTask<IGame?> CreateAsync(GameOptionsData options)
+        public ValueTask<IGame?> CreateAsync(IGameOptions options)
         {
             return CreateAsync(null, options);
         }
 
-        private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(GameOptionsData options, GameCode? desiredGameCode = null)
+        private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(IGameOptions options, GameCode? desiredGameCode = null)
         {
             var gameCode = desiredGameCode ?? _gameCodeFactory.Create();
             var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options);

@@ -8,6 +8,7 @@ using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Events.Player;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
@@ -43,7 +44,15 @@ namespace Impostor.Server.Net.Inner.Objects
                 try
                 {
                     const float AnimationTime = 0.25f + 0.5f + 0.4f + 3f + 0.75f + 5f;
-                    await Task.Delay(TimeSpan.FromSeconds(AnimationTime + Game.Options.DiscussionTime + Game.Options.VotingTime), _timerToken.Token);
+                    if (Game.Options.GameMode == GameModes.Normal)
+                    {
+                        var options = (NormalGameOptions)Game.Options;
+                        await Task.Delay(TimeSpan.FromSeconds(AnimationTime + options.DiscussionTime + options.VotingTime), _timerToken.Token);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
                 }
                 catch (TaskCanceledException)
                 {

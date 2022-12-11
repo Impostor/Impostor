@@ -1,5 +1,5 @@
 ﻿using System;
-using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 
 namespace Impostor.Api.Net.Messages.S2C
 {
@@ -12,7 +12,7 @@ namespace Impostor.Api.Net.Messages.S2C
             writer.EndMessage();
         }
 
-        public static GameOptionsData Deserialize(IMessageReader reader)
+        public static LegacyGameOptionsData Deserialize(IMessageReader reader)
         {
             throw new NotImplementedException();
         }

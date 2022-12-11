@@ -1,17 +1,22 @@
-using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 
 namespace Impostor.Api.Net.Messages.Rpcs
 {
     public static class Rpc02SyncSettings
     {
-        public static void Serialize(IMessageWriter writer, GameOptionsData gameOptionsData)
+        public static void Serialize(IMessageWriter writer, IGameOptions gameOptionsData)
         {
-            gameOptionsData.Serialize(writer);
+            GameOptionsFactory.Serialize(writer, gameOptionsData);
         }
 
-        public static void Deserialize(IMessageReader reader, GameOptionsData gameOptionsData)
+        public static void Deserialize(IMessageReader reader, out IGameOptions gameOptionsData)
         {
-            gameOptionsData.Deserialize(reader.ReadBytesAndSize());
+            gameOptionsData = GameOptionsFactory.Deserialize(reader);
+        }
+
+        public static void DeserializeInto(IMessageReader reader, IGameOptions gameOptionsData)
+        {
+            GameOptionsFactory.DeserializeInto(reader, gameOptionsData);
         }
     }
 }

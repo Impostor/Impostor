@@ -1,11 +1,10 @@
-﻿using System.IO;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Games;
-using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
+using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Hazel;
 
 namespace Impostor.Server.Net.State
@@ -21,6 +20,7 @@ namespace Impostor.Server.Net.State
             _bannedIps.Add(ipAddress);
         }
 
+        // TODO This no longer does anything, it was replaced by LogicOptions
         public async ValueTask SyncSettingsAsync()
         {
             if (Host?.Character == null)
@@ -34,12 +34,7 @@ namespace Impostor.Server.Net.State
                 // If this is not done, the host will overwrite changes later with the defaults.
                 Options.IsDefaults = false;
 
-                await using (var memory = new MemoryStream())
-                await using (var writerBin = new BinaryWriter(memory))
-                {
-                    Options.Serialize(writerBin, GameOptionsData.LatestVersion);
-                    writer.WriteBytesAndSize(memory.ToArray());
-                }
+                Rpc02SyncSettings.Serialize(writer, Options);
 
                 await FinishRpcAsync(writer);
             }

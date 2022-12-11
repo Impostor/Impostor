@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 
 namespace Impostor.Api.Games.Managers
 {
@@ -16,6 +16,6 @@ namespace Impostor.Api.Games.Managers
         /// <param name="options">Game options.</param>
         /// <returns>Created game or null if creation was cancelled by a plugin.</returns>
         /// <exception cref="ImpostorException">Thrown when game creation failed.</exception>
-        ValueTask<IGame?> CreateAsync(GameOptionsData options);
+        ValueTask<IGame?> CreateAsync(IGameOptions options);
     }
 }

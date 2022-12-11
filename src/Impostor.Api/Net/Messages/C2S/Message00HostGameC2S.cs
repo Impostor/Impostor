@@ -1,28 +1,24 @@
 ﻿using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 
 namespace Impostor.Api.Net.Messages.C2S
 {
     public static class Message00HostGameC2S
     {
-        public static void Serialize(IMessageWriter writer, GameOptionsData gameOptionsData)
+        public static void Serialize(IMessageWriter writer, IGameOptions gameOptions, CrossplayFlags crossplayFlags, GameFilterOptions gameFilterOptions)
         {
             writer.StartMessage(MessageFlags.HostGame);
-            gameOptionsData.Serialize(writer);
-            writer.Write(int.MaxValue); // crossplayFlags
+            GameOptionsFactory.Serialize(writer, gameOptions);
+            writer.Write((int)crossplayFlags);
+            gameFilterOptions.Serialize(writer);
             writer.EndMessage();
         }
 
-        /// <summary>
-        ///     Deserialize a packet.
-        /// </summary>
-        /// <param name="reader"><see cref="IMessageReader" /> with <see cref="IMessageReader.Tag" /> 0.</param>
-        /// <returns>Deserialized <see cref="GameOptionsData" />.</returns>
-        public static GameOptionsData Deserialize(IMessageReader reader)
+        public static void Deserialize(IMessageReader reader, out IGameOptions gameOptions, out CrossplayFlags crossplayFlags, out GameFilterOptions gameFilterOptions)
         {
-            var gameOptionsData = GameOptionsData.DeserializeCreate(reader);
-            reader.ReadInt32(); // crossplayFlags, not used yet
-
-            return gameOptionsData;
+            gameOptions = GameOptionsFactory.Deserialize(reader);
+            crossplayFlags = (CrossplayFlags)reader.ReadInt32();
+            gameFilterOptions = GameFilterOptions.Deserialize(reader);
         }
     }
 }

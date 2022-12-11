@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 
@@ -9,7 +10,7 @@ namespace Impostor.Api.Games
 {
     public interface IGame
     {
-        GameOptionsData Options { get; }
+        IGameOptions Options { get; }
 
         GameCode Code { get; }
 
