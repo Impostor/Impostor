@@ -21,14 +21,8 @@ namespace Impostor.Server.Net.Manager
         // NOTE: when updating this array, keep the versions ordered from old to new, otherwise the version compare logic doesn't work properly
         private static readonly int[] SupportedVersions =
         {
-            GameVersion.GetVersion(2021, 11, 9), // 2021.11.9
-            GameVersion.GetVersion(2021, 12, 14), // 2021.12.14
-            GameVersion.GetVersion(2022, 1, 10), // 2021.2.23
-            GameVersion.GetVersion(2022, 2, 2), // 2022.3.29 and 2022.4.19
-            GameVersion.GetVersion(2022, 4, 20), // 2022.6.21 and 2022.7.12
-            GameVersion.GetVersion(2022, 5, 12), // 2022.8.23
-            GameVersion.GetVersion(2022, 7, 25), // 2022.10.18
-            GameVersion.GetVersion(2022, 9, 2), // 2022.10.25
+            GameVersion.GetVersion(2022, 11, 1), // 2022.12.8
+            GameVersion.GetVersion(2022, 11, 9), // 2022.12.14
         };
 
         private readonly ILogger<ClientManager> _logger;
