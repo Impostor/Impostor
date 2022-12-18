@@ -4,8 +4,9 @@
     "net7.0": {
       "Impostor.Hazel.Abstractions": {
         "type": "Direct",
-        "requested": "[1.0.0-dev, )",
-        "resolved": "1.0.0-dev"
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "x56AEsY5fKU2Z5O7ZrzEqKfr62kq/C05Aevcciwz5yMfOQlpwuFI1awgNGJsoe+bcx+XnFc3+l+eadtY72aZsg=="
       },
       "Microsoft.Extensions.Hosting.Abstractions": {
         "type": "Direct",

@@ -4,7 +4,8 @@
     "net7.0": {
       "Impostor.Hazel.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.0.0-dev"
+        "resolved": "1.0.0",
+        "contentHash": "x56AEsY5fKU2Z5O7ZrzEqKfr62kq/C05Aevcciwz5yMfOQlpwuFI1awgNGJsoe+bcx+XnFc3+l+eadtY72aZsg=="
       },
       "Microsoft.Extensions.Configuration.Abstractions": {
         "type": "Transitive",
@@ -50,7 +51,7 @@
       "impostor.api": {
         "type": "Project",
         "dependencies": {
-          "Impostor.Hazel.Abstractions": "[1.0.0-dev, )",
+          "Impostor.Hazel.Abstractions": "[1.0.0, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[7.0.0, )",
           "Microsoft.Extensions.Logging.Abstractions": "[7.0.0, )"
         }

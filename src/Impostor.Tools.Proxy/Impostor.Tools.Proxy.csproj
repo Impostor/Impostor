@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Impostor.Hazel" Version="1.0.0-dev" />
+    <PackageReference Include="Impostor.Hazel" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

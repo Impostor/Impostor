@@ -4,10 +4,11 @@
     "net7.0": {
       "Impostor.Hazel": {
         "type": "Direct",
-        "requested": "[1.0.0-dev, )",
-        "resolved": "1.0.0-dev",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "FgVKuIWK+o6Q+wOPFoZZTeoSuVh4giAhrS8Zvs6O0++Bg8RxH4Lw51uSwnexLiwosXveUCIXICzgGHmRyguVSA==",
         "dependencies": {
-          "Impostor.Hazel.Abstractions": "1.0.0-dev",
+          "Impostor.Hazel.Abstractions": "1.0.0",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "7.0.0",
           "Microsoft.Extensions.ObjectPool": "7.0.1",
           "Serilog": "2.12.0"
@@ -107,7 +108,8 @@
       },
       "Impostor.Hazel.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.0.0-dev"
+        "resolved": "1.0.0",
+        "contentHash": "x56AEsY5fKU2Z5O7ZrzEqKfr62kq/C05Aevcciwz5yMfOQlpwuFI1awgNGJsoe+bcx+XnFc3+l+eadtY72aZsg=="
       },
       "Microsoft.Extensions.Caching.Abstractions": {
         "type": "Transitive",
@@ -492,7 +494,7 @@
       "impostor.api": {
         "type": "Project",
         "dependencies": {
-          "Impostor.Hazel.Abstractions": "[1.0.0-dev, )",
+          "Impostor.Hazel.Abstractions": "[1.0.0, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[7.0.0, )",
           "Microsoft.Extensions.Logging.Abstractions": "[7.0.0, )"
         }
