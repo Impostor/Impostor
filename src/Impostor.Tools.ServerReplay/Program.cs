@@ -14,6 +14,7 @@ using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Utils;
 using Impostor.Hazel;
+using Impostor.Hazel.Abstractions;
 using Impostor.Hazel.Extensions;
 using Impostor.Server;
 using Impostor.Server.Events;

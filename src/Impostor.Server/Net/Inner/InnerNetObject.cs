@@ -3,7 +3,6 @@ using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
-using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner

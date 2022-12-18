@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
 using Impostor.Server.Events;
 using Impostor.Server.Net.Hazel;

@@ -2,7 +2,6 @@ using System.Numerics;
 using Impostor.Api.Games;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Unity;
-using Impostor.Hazel.Abstractions;
 
 namespace Impostor.Api.Net;
 

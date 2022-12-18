@@ -1,6 +1,4 @@
-﻿using Impostor.Api.Net.Messages;
-
-namespace Impostor.Server.Net.Inner.Objects.Systems
+﻿namespace Impostor.Server.Net.Inner.Objects.Systems
 {
     public interface ISystemType
     {

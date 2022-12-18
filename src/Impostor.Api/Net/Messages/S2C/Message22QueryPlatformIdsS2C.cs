@@ -10,7 +10,7 @@ namespace Impostor.Api.Net.Messages.S2C
         public static void Serialize(IMessageWriter writer, GameCode gameCode, IEnumerable<PlatformSpecificData> playerSpecificDatas)
         {
             writer.StartMessage(MessageFlags.QueryPlatformIds);
-            writer.Write(gameCode);
+            gameCode.Serialize(writer);
             foreach (var playerSpecificData in playerSpecificDatas)
             {
                 playerSpecificData.Serialize(writer);

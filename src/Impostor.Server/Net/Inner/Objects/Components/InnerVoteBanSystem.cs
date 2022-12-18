@@ -6,7 +6,6 @@ using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;
-using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;

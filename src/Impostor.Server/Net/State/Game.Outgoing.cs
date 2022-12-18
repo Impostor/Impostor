@@ -45,12 +45,12 @@ namespace Impostor.Server.Net.State
             if (targetClientId == null || targetClientId < 0)
             {
                 writer.StartMessage(MessageFlags.GameData);
-                writer.Write(Code);
+                Code.Serialize(writer);
             }
             else
             {
                 writer.StartMessage(MessageFlags.GameDataTo);
-                writer.Write(Code);
+                Code.Serialize(writer);
                 writer.WritePacked(targetClientId.Value);
             }
 

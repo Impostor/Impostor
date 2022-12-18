@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using Impostor.Api.Games;
-using Impostor.Api.Net.Messages;
+using Impostor.Hazel.Abstractions;
 
 namespace Impostor.Benchmarks.Data
 {

@@ -1,7 +1,6 @@
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner.Objects;
-using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Net.Inner.Objects
 {

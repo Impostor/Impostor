@@ -10,7 +10,6 @@ using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects.ShipStatus;
-using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Net.Inner.Objects.Systems;
 using Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;

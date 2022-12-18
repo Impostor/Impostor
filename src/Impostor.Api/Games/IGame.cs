@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
-using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Games
 {

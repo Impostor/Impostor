@@ -18,7 +18,7 @@ namespace Impostor.Api.Net.Messages.S2C
                 writer.StartMessage(0);
                 writer.Write(game.PublicIp.Address);
                 writer.Write((ushort)game.PublicIp.Port);
-                writer.Write(game.Code);
+                game.Code.Serialize(writer);
                 writer.Write(game.DisplayName ?? game.Host?.Client.Name ?? string.Empty);
                 writer.Write((byte)game.PlayerCount);
                 writer.WritePacked(1); // TODO: What does Age do?

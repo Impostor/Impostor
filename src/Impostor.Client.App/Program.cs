@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
-using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Hazel;
+using Impostor.Hazel.Abstractions;
 using Impostor.Hazel.Udp;
 using Serilog;
 
