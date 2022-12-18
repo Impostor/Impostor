@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Impostor.Hazel\Hazel\Hazel.csproj" />
+    <PackageReference Include="Impostor.Hazel" Version="1.0.0-dev" />
   </ItemGroup>
 
 </Project>

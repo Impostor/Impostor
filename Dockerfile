@@ -11,7 +11,6 @@ WORKDIR /source
 # Copy csproj and restore.
 COPY src/Impostor.Server/Impostor.Server.csproj ./src/Impostor.Server/Impostor.Server.csproj
 COPY src/Impostor.Api/Impostor.Api.csproj ./src/Impostor.Api/Impostor.Api.csproj
-COPY src/Impostor.Hazel/Hazel/Hazel.csproj ./src/Impostor.Hazel/Hazel/Hazel.csproj
 COPY src/Directory.Build.props ./src/Directory.Build.props
 
 RUN case "$TARGETARCH" in \
@@ -21,8 +20,7 @@ RUN case "$TARGETARCH" in \
     *) echo "unsupported architecture"; exit 1 ;; \
   esac && \
   dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Server/Impostor.Server.csproj && \
-  dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Api/Impostor.Api.csproj && \
-  dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Hazel/Hazel/Hazel.csproj
+  dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Api/Impostor.Api.csproj
 
 # Copy everything else.
 COPY src/. ./src/
