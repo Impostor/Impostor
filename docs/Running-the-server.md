@@ -6,7 +6,7 @@ There are currently two modes to run the Impostor server. The first way, Single 
 
 ### Without Docker
 
-1. Install the [.NET 6.0 runtime](https://dotnet.microsoft.com/download/dotnet/6.0). Installing the SDK also works, but is not necessary unless you plan on developing Impostor or Impostor plugins. If you're asked to pick between the normal, desktop or server runtime, the normal runtime is enough, but some plugins may require the ASP.NET Core Runtime as well.
+1. Install the [.NET 7.0 runtime](https://dotnet.microsoft.com/download/dotnet/7.0). Installing the SDK also works, but is not necessary unless you plan on developing Impostor or Impostor plugins. If you're asked to pick between the normal, desktop or server runtime, the normal runtime is enough, but some plugins may require the ASP.NET Core Runtime as well.
 2. Find the [latest release](https://github.com/Impostor/Impostor/releases) or the [latest CI build](https://nightly.link/Impostor/Impostor/workflows/ci/master).
 3. Download the version for your OS (linux/win/osx). Impostor is built for multiple CPU-architectures, you most likely want the x64 version, unless you are running on a Raspberry Pi or another device with an ARM processor.
 4. Extract the zip.

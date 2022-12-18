@@ -8,7 +8,6 @@ using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
 using Impostor.Server.Events.Client;
 using Impostor.Server.Net.Factories;

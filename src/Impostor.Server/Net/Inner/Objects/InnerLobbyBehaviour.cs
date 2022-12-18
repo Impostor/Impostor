@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner.Objects;
-using Impostor.Api.Net.Messages;
 using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner.Objects

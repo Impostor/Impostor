@@ -1,6 +1,5 @@
 ﻿using Impostor.Api.Events.Player;
 using Impostor.Api.Net.Inner.Objects;
-using Impostor.Api.Net.Messages;
 using TVoteType = Impostor.Api.Events.Player.VoteType;
 
 namespace Impostor.Server.Net.Inner.Objects

@@ -6,7 +6,6 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Impostor.Api.Config;
 using Impostor.Api.Games;
-using Impostor.Api.Net.Messages;
 using Impostor.Server.Net;
 using Impostor.Server.Utils;
 using Microsoft.Extensions.Hosting;

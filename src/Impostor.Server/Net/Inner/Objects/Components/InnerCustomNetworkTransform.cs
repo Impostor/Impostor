@@ -6,7 +6,6 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
-using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner.Objects.ShipStatus;

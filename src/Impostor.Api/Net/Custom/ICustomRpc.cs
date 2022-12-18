@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Impostor.Api.Net.Inner;
-using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Net.Custom
 {

@@ -17,8 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{36AA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Plugins.Debugger", "Impostor.Plugins.Debugger\Impostor.Plugins.Debugger.csproj", "{ECBCAA3B-B974-41CF-AFFC-6F5AA4C42FA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Hazel", "Impostor.Hazel\Hazel\Hazel.csproj", "{671B753B-31AE-4C36-AD71-09CF00FA17CA}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{9F1919B0-915B-4749-9944-697DF7E7F67F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Client", "Impostor.Client\Impostor.Client.csproj", "{BE44C4A8-A202-4B63-A3BA-AC0AB5E7A0EB}"
@@ -79,14 +77,6 @@ Global
 		{ECBCAA3B-B974-41CF-AFFC-6F5AA4C42FA7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ECBCAA3B-B974-41CF-AFFC-6F5AA4C42FA7}.Release|x86.ActiveCfg = Release|Any CPU
 		{ECBCAA3B-B974-41CF-AFFC-6F5AA4C42FA7}.Release|x86.Build.0 = Release|Any CPU
-		{671B753B-31AE-4C36-AD71-09CF00FA17CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{671B753B-31AE-4C36-AD71-09CF00FA17CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{671B753B-31AE-4C36-AD71-09CF00FA17CA}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{671B753B-31AE-4C36-AD71-09CF00FA17CA}.Debug|x86.Build.0 = Debug|Any CPU
-		{671B753B-31AE-4C36-AD71-09CF00FA17CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{671B753B-31AE-4C36-AD71-09CF00FA17CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{671B753B-31AE-4C36-AD71-09CF00FA17CA}.Release|x86.ActiveCfg = Release|Any CPU
-		{671B753B-31AE-4C36-AD71-09CF00FA17CA}.Release|x86.Build.0 = Release|Any CPU
 		{BE44C4A8-A202-4B63-A3BA-AC0AB5E7A0EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BE44C4A8-A202-4B63-A3BA-AC0AB5E7A0EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE44C4A8-A202-4B63-A3BA-AC0AB5E7A0EB}.Debug|x86.ActiveCfg = Debug|Any CPU

@@ -1,5 +1,3 @@
-using Impostor.Api.Net.Messages;
-
 namespace Impostor.Api.Innersloth.Customization
 {
     public class PlayerOutfit

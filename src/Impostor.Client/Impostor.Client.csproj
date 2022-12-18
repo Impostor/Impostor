@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj" />
-    <ProjectReference Include="..\Impostor.Hazel\Hazel\Hazel.csproj" />
+    <PackageReference Include="Impostor.Hazel" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,5 @@
 using Impostor.Api.Events.Client;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Messages;
 
 namespace Impostor.Server.Events.Client
 {

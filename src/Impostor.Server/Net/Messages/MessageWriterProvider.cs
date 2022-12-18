@@ -1,5 +1,4 @@
-﻿using Impostor.Api.Net.Messages;
-using Impostor.Hazel;
+﻿using Impostor.Hazel;
 
 namespace Impostor.Server.Net.Messages
 {

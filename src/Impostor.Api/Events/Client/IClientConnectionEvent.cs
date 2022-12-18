@@ -1,5 +1,4 @@
 using Impostor.Api.Net;
-using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Events.Client
 {

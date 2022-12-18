@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
 using Microsoft.Extensions.Logging;
 

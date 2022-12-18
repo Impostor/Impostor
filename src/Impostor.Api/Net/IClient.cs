@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
-using Impostor.Api.Net.Messages;
 
 namespace Impostor.Api.Net
 {

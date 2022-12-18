@@ -27,23 +27,24 @@ https://dotnet.microsoft.com/download
 
 ## 2. Create a C# project
 
-The first step is creating a new C# project, it must be a **Class Library (.NET Standard)**. The target framework can be any of those compatible with .NET 6, which includes:
+The first step is creating a new C# project, it must be a **Class Library (.NET Standard)**. The target framework can be any of those compatible with .NET 7, which includes:
 
 - .NET Standard 2.0
 - .NET Standard 2.1
 - .NET 5
 - .NET 6
+- .NET 7
 
 For more information about compatibility, see https://docs.microsoft.com/en-us/dotnet/standard/net-standard.
 
-> At the moment of writing this document, I recommend you to use **.NET Standard 2.1**. This should give you enough functionality. If not, upgrade to .NET 6.
+> At the moment of writing this document, I recommend you to use **.NET 7.0**.
 
 When the project has been created, you should have `Class.cs` and `Project.csproj` files. Your `Project.csproj` should look something like this.
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
 </Project>
 ```
@@ -269,7 +270,7 @@ Now your plugin is ready to be tested.
 
 1. Right click your project and press `Build`.
 2. Right click your project and press `Open Folder in File Explorer`.
-3. Go to `bin/Debug/netstandard2.1/`.
+3. Go to `bin/Debug/net7.0/`.
 4. In this directory, you should find your plugin named `Project.dll`.
 5. Copy the `Project.dll` to the `plugins` directory in your Impostor server directory.
 6. (Re)start your Impostor server.
@@ -309,7 +310,7 @@ Constantly copying the plugin dll to your server directory can be pretty annoyin
   },
   "PluginLoader": {
     "Paths": [
-      "D:\\Projects\\Impostor\\src\\Impostor.Plugins.Example\\bin\\Debug\\netstandard2.1"
+      "D:\\Projects\\Impostor\\src\\Impostor.Plugins.Example\\bin\\Debug\\net7.0"
     ],
     "LibraryPaths": []
   }

@@ -12,8 +12,6 @@ namespace Impostor.Api.Innersloth
 
         private static readonly int[] V2Map = Enumerable.Range(65, 26).Select(v => V2.IndexOf((char)v)).ToArray();
 
-        private static readonly RNGCryptoServiceProvider Random = new RNGCryptoServiceProvider();
-
         public static string IntToGameName(int input)
         {
             // V2.
@@ -67,7 +65,7 @@ namespace Impostor.Api.Innersloth
 #else
             Span<byte> data = stackalloc byte[len];
 #endif
-            Random.GetBytes(data);
+            RandomNumberGenerator.Fill(data);
 
             // Convert to their char representation.
             Span<char> dataChar = stackalloc char[len];
