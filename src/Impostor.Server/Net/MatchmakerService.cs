@@ -12,18 +12,15 @@ namespace Impostor.Server.Net
     {
         private readonly ILogger<MatchmakerService> _logger;
         private readonly ServerConfig _serverConfig;
-        private readonly ServerRedirectorConfig _redirectorConfig;
         private readonly Matchmaker _matchmaker;
 
         public MatchmakerService(
             ILogger<MatchmakerService> logger,
             IOptions<ServerConfig> serverConfig,
-            IOptions<ServerRedirectorConfig> redirectorConfig,
             Matchmaker matchmaker)
         {
             _logger = logger;
             _serverConfig = serverConfig.Value;
-            _redirectorConfig = redirectorConfig.Value;
             _matchmaker = matchmaker;
         }
 
@@ -39,13 +36,6 @@ namespace Impostor.Server.Net
                 endpoint.Port,
                 _serverConfig.ResolvePublicIp(),
                 _serverConfig.PublicPort);
-
-            if (_redirectorConfig.Enabled)
-            {
-                _logger.LogWarning(_redirectorConfig.Master
-                    ? "Server redirection is enabled as master, this instance will redirect clients to other nodes."
-                    : "Server redirection is enabled as node, this instance will accept clients.");
-            }
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

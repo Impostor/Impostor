@@ -40,19 +40,6 @@ The Debug configuration is used to enable the game recorder. This is mostly usef
 | **GameRecorderEnabled** | `false` | Enables the Game Recorder.                   |
 | **GameRecorderPath**    | _empty_ | Path where the recorded games will be saved. |
 
-### ServerRedirector
-
-In a multi-node setup these values need to be specified. Note that most people do not need to run a Multi-node setup.
-
-| Key                    | Default | Value                                                                                                                                             |
-| ---------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Enabled**            | `false` | Whether the server runs in multi-node setup. If this is `false`, all other options in this section do not have any effect.                        |
-| **Master**             | `false` | Whether the current server is a master. A master is responsible for redirecting clients to nodes                                                  |
-| **Locator**            |         | Fill in either `Redis` or `UdpMasterEndpoint` to choose which method to use for locating other nodes. This must be the same across all servers.   |
-| **>Redis**             |         | Format `127.0.0.1.6379`, you can also use a password like so: `127.0.0.1.6379,password=value`.                                                    |
-| **>UdpMasterEndpoint** |         | On the master, this value acts as a listen ip and port. On a node, this should be the public ip and port of the master. Format `127.0.0.1:32320`. |
-| **Nodes**              |         | An array containing public ips and ports of nodes. Only needs to be set on the master. See above for an example.                                  |
-
 ### Serilog (Logging)
 
 Impostor's log framework, Serilog, can be configured in the config file. You can change its default log level and you can add additional sinks.
@@ -105,12 +92,4 @@ IMPOSTOR_Server__ListenIp=0.0.0.0
 IMPOSTOR_Server__ListenPort=22023
 IMPOSTOR_AntiCheat__Enabled=true
 IMPOSTOR_AntiCheat__BanIpFromGame=true
-IMPOSTOR_ServerRedirector__Enabled=false
-IMPOSTOR_ServerRedirector__Master=true
-IMPOSTOR_ServerRedirector__Locator__Redis=127.0.0.1.6379
-IMPOSTOR_ServerRedirector__Locator__UdpMasterEndpoint=127.0.0.1:32320
-IMPOSTOR_ServerRedirector__Nodes__0__Ip=127.0.0.1
-IMPOSTOR_ServerRedirector__Nodes__0__Port=22024
-IMPOSTOR_ServerRedirector__Nodes__1__Ip=127.0.0.1
-IMPOSTOR_ServerRedirector__Nodes__1__Port=22025
 ```
