@@ -9,20 +9,6 @@
     "Enabled": true,
     "BanIpFromGame": true
   },
-  "ServerRedirector": {
-    "Enabled": false,
-    "Master": true,
-    "Locator": {
-      "Redis": "127.0.0.1.6379",
-      "UdpMasterEndpoint": "127.0.0.1:32320"
-    },
-    "Nodes": [
-      {
-        "Ip": "127.0.0.1",
-        "Port": 22024
-      }
-    ]
-  },
   "Compatibility": {
     "AllowFutureGameVersions": false,
     "AllowVersionMixing": false

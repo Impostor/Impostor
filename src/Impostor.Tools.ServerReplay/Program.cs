@@ -22,7 +22,6 @@ using Impostor.Server.Net;
 using Impostor.Server.Net.Custom;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
-using Impostor.Server.Net.Redirector;
 using Impostor.Server.Recorder;
 using Impostor.Server.Utils;
 using Impostor.Tools.ServerReplay.Mocks;
@@ -112,7 +111,6 @@ namespace Impostor.Tools.ServerReplay
 
             services.AddSingleton<ClientManager>();
             services.AddSingleton<IClientFactory, ClientFactory<Client>>();
-            services.AddSingleton<INodeLocator, NodeLocatorNoOp>();
             services.AddSingleton<IEventManager, EventManager>();
 
             services.AddEventPools();

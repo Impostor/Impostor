@@ -293,7 +293,6 @@ Some extra information that might be useful for those developing plugins.
   - `IEventManager`
   - `IClientManager`
   - `IOptions<ServerConfig>`
-  - `IOptions<ServerRedirectorConfig>`
 - You can add your own classes and `EventListener` implementation to the `IServiceProvider` by creating a new class and implementing `IPluginStartup`. Make sure to register them as a singleton `services.AddSingleton<IEventListener, GameEventListener>();`.
 
 ### Server configuration

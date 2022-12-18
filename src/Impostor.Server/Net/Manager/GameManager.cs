@@ -12,7 +12,6 @@ using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Server.Events;
-using Impostor.Server.Net.Redirector;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -23,7 +22,6 @@ namespace Impostor.Server.Net.Manager
     internal class GameManager : IGameManager
     {
         private readonly ILogger<GameManager> _logger;
-        private readonly INodeLocator _nodeLocator;
         private readonly IPEndPoint _publicIp;
         private readonly ConcurrentDictionary<int, Game> _games;
         private readonly CompatibilityConfig _compatibilityConfig;
@@ -31,10 +29,9 @@ namespace Impostor.Server.Net.Manager
         private readonly IEventManager _eventManager;
         private readonly IGameCodeFactory _gameCodeFactory;
 
-        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, INodeLocator nodeLocator, IServiceProvider serviceProvider, IEventManager eventManager, IGameCodeFactory gameCodeFactory, IOptions<CompatibilityConfig> compatibilityConfig)
+        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, IServiceProvider serviceProvider, IEventManager eventManager, IGameCodeFactory gameCodeFactory, IOptions<CompatibilityConfig> compatibilityConfig)
         {
             _logger = logger;
-            _nodeLocator = nodeLocator;
             _serviceProvider = serviceProvider;
             _eventManager = eventManager;
             _gameCodeFactory = gameCodeFactory;
@@ -109,7 +106,6 @@ namespace Impostor.Server.Net.Manager
             }
 
             _logger.LogDebug("Remove game with code {0} ({1}).", GameCodeParser.IntToGameName(gameCode), gameCode);
-            await _nodeLocator.RemoveAsync(GameCodeParser.IntToGameName(gameCode));
 
             await _eventManager.CallAsync(new GameDestroyedEvent(game));
         }
@@ -124,7 +120,6 @@ namespace Impostor.Server.Net.Manager
                 return null;
             }
 
-            // TODO: Prevent duplicates when using server redirector using INodeProvider.
             var (success, game) = await TryCreateAsync(options, @event.GameCode);
 
             for (var i = 0; i < 10 && !success; i++)
@@ -148,15 +143,13 @@ namespace Impostor.Server.Net.Manager
         private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(GameOptionsData options, GameCode? desiredGameCode = null)
         {
             var gameCode = desiredGameCode ?? _gameCodeFactory.Create();
-            var gameCodeStr = gameCode.Code;
             var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options);
 
-            if (await _nodeLocator.ExistsAsync(gameCodeStr) || !_games.TryAdd(gameCode, game))
+            if (!_games.TryAdd(gameCode, game))
             {
                 return (false, null);
             }
 
-            await _nodeLocator.SaveAsync(gameCodeStr, _publicIp);
             _logger.LogDebug("Created game with code {0}.", game.Code);
 
             await _eventManager.CallAsync(new GameCreatedEvent(game));
