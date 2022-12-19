@@ -20,6 +20,6 @@ internal abstract class LogicOptions : GameLogicComponent
 
     public override void Deserialize(IMessageReader reader, bool initialState)
     {
-        var options = GameOptionsFactory.Deserialize(reader);
+        GameOptionsFactory.DeserializeInto(reader, _game.Options);
     }
 }
