@@ -88,8 +88,8 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
                     "Server did not consume all bytes from {0} component {1} ({2} < {3}).",
                     nameof(InnerGameManager),
                     component.GetType().FullName,
-                    reader.Position,
-                    reader.Length);
+                    innerReader.Position,
+                    innerReader.Length);
             }
         }
 
