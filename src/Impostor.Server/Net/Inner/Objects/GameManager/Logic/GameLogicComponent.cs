@@ -17,6 +17,5 @@ internal abstract class GameLogicComponent
 
     public virtual void Deserialize(IMessageReader reader, bool initialState)
     {
-        throw new NotImplementedException();
     }
 }

@@ -78,7 +78,19 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
                 continue;
             }
 
-            this._logicComponents[tag].Deserialize(innerReader, initialState);
+            var component = this._logicComponents[tag];
+
+            component.Deserialize(innerReader, initialState);
+
+            if (innerReader.Position < innerReader.Length)
+            {
+                _logger.LogWarning(
+                    "Server did not consume all bytes from {0} component {1} ({2} < {3}).",
+                    nameof(InnerGameManager),
+                    component.GetType().FullName,
+                    reader.Position,
+                    reader.Length);
+            }
         }
 
         return ValueTask.CompletedTask;
