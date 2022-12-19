@@ -60,6 +60,20 @@ namespace Impostor.Server.Net.State
             return default;
         }
 
+        public T? FindObjectByType<T>()
+            where T : IInnerNetObject
+        {
+            foreach (var netObject in _allObjects)
+            {
+                if (netObject is T result)
+                {
+                    return result;
+                }
+            }
+
+            return default;
+        }
+
         public async ValueTask<bool> HandleGameDataAsync(IMessageReader parent, ClientPlayer sender, bool toPlayer)
         {
             // Find target player.

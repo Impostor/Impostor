@@ -2,10 +2,13 @@
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Games;
+using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
-using Impostor.Api.Net.Messages.Rpcs;
+using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
+using Impostor.Server.Net.Inner;
+using Impostor.Server.Net.Inner.Objects.GameManager;
 
 namespace Impostor.Server.Net.State
 {
@@ -20,24 +23,45 @@ namespace Impostor.Server.Net.State
             _bannedIps.Add(ipAddress);
         }
 
-        // TODO This no longer does anything, it was replaced by LogicOptions
         public async ValueTask SyncSettingsAsync()
         {
             if (Host?.Character == null)
             {
-                throw new ImpostorException("Attempted to set infected when the host was not spawned.");
+                throw new ImpostorException("Attempted to change settings when the host was not spawned.");
             }
 
-            using (var writer = StartRpc(Host.Character.NetId, RpcCalls.SyncSettings))
+            var gameManager = FindObjectByType<InnerGameManager>();
+            if (gameManager == null)
             {
-                // Someone will probably forget to do this, so we include it here.
-                // If this is not done, the host will overwrite changes later with the defaults.
-                Options.IsDefaults = false;
-
-                Rpc02SyncSettings.Serialize(writer, Options);
-
-                await FinishRpcAsync(writer);
+                throw new ImpostorException("Attempted to change options when the game manager was not spawned.");
             }
+
+            var gameOptionsTag = gameManager.GetGameLogicTag(gameManager.LogicOptions);
+            if (gameOptionsTag == null)
+            {
+                throw new ImpostorException("Attempted to change options when the LogicOptions was not spawned.");
+            }
+
+            // Someone will probably forget to do this, so we include it here.
+            // If this is not done, the host will overwrite changes later with the defaults.
+            Options.IsDefaults = false;
+
+            using var writer = MessageWriter.Get(MessageType.Reliable);
+
+            writer.StartMessage(MessageFlags.GameData);
+            Code.Serialize(writer);
+
+            writer.StartMessage(GameDataTag.DataFlag);
+            writer.WritePacked(gameManager.NetId);
+
+            writer.StartMessage((byte)gameOptionsTag);
+            GameOptionsFactory.Serialize(writer, Options);
+
+            writer.EndMessage();
+            writer.EndMessage();
+            writer.EndMessage();
+
+            await SendToAllAsync(writer);
         }
 
         public async ValueTask SetPrivacyAsync(bool isPublic)

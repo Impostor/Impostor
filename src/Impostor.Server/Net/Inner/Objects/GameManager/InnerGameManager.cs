@@ -39,6 +39,21 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
         return logic;
     }
 
+    internal int? GetGameLogicTag<T>(T logic)
+        where T : GameLogicComponent
+    {
+        for (var i = 0; i < LogicComponents.Count; i++)
+        {
+            var component = LogicComponents[i];
+            if (component == logic)
+            {
+                return i;
+            }
+        }
+
+        return null;
+    }
+
     public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
     {
         throw new System.NotImplementedException();
