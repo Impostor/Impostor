@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
+using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects.GameManager;
 using Impostor.Server.Net.Inner.Objects.GameManager.Logic;
 using Impostor.Server.Net.State;
@@ -12,6 +13,7 @@ namespace Impostor.Server.Net.Inner.Objects.GameManager;
 internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
 {
     private readonly ILogger<InnerGameManager> _logger;
+    private readonly List<GameLogicComponent> _logicComponents = new();
 
     public InnerGameManager(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerGameManager> logger) : base(customMessageManager, game)
     {
@@ -19,8 +21,6 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
 
         Components.Add(this);
     }
-
-    protected readonly List<GameLogicComponent> LogicComponents = new();
 
     public LogicGameFlow LogicFlow { get; protected init; } = null!;
 
@@ -35,23 +35,30 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
     protected T AddGameLogic<T>(T logic)
         where T : GameLogicComponent
     {
-        LogicComponents.Add(logic);
+        _logicComponents.Add(logic);
         return logic;
     }
 
-    internal int? GetGameLogicTag<T>(T logic)
+    /// <summary>
+    ///     Finds the tag of the registered <see cref="GameLogicComponent"/>.
+    /// </summary>
+    /// <param name="logic">Instance to search for.</param>
+    /// <typeparam name="T">Intance type to search for.</typeparam>
+    /// <returns>Tag of the registered <see cref="GameLogicComponent"/>, or -1 if not found.</returns>
+    internal int GetGameLogicTag<T>(T logic)
         where T : GameLogicComponent
     {
-        for (var i = 0; i < LogicComponents.Count; i++)
+        return _logicComponents.IndexOf(logic);
+    }
+
+    public override ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+    {
+        foreach (var logicComponent in _logicComponents)
         {
-            var component = LogicComponents[i];
-            if (component == logic)
-            {
-                return i;
-            }
+            logicComponent.HandleRPC(call, reader);
         }
 
-        return null;
+        return ValueTask.FromResult(true);
     }
 
     public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
@@ -65,13 +72,13 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
         {
             var innerReader = reader.ReadMessage();
             var tag = (int)innerReader.Tag;
-            if (tag < 0 || tag > this.LogicComponents.Count)
+            if (tag < 0 || tag > this._logicComponents.Count)
             {
                 _logger.LogError("Out of bounds in DeserializeAsync of InnerGameManager");
                 continue;
             }
 
-            this.LogicComponents[tag].Deserialize(innerReader, initialState);
+            this._logicComponents[tag].Deserialize(innerReader, initialState);
         }
 
         return ValueTask.CompletedTask;

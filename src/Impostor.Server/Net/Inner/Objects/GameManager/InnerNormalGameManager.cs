@@ -11,10 +11,10 @@ internal class InnerNormalGameManager : InnerGameManager, IInnerNormalGameManage
 {
     public InnerNormalGameManager(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerGameManager> logger) : base(customMessageManager, game, logger)
     {
-        LogicFlow = AddGameLogic(new LogicGameFlowNormal(this));
-        LogicMinigame = AddGameLogic(new LogicMinigame(this));
-        LogicRoleSelection = AddGameLogic(new LogicRoleSelectionNormal(this));
-        LogicUsables = AddGameLogic(new LogicUsablesBasic(this));
-        LogicOptions = AddGameLogic(new LogicOptionsNormal(this, game));
+        LogicFlow = AddGameLogic(new LogicGameFlowNormal());
+        LogicMinigame = AddGameLogic(new LogicMinigame());
+        LogicRoleSelection = AddGameLogic(new LogicRoleSelectionNormal());
+        LogicUsables = AddGameLogic(new LogicUsablesBasic());
+        LogicOptions = AddGameLogic(new LogicOptionsNormal(game));
     }
 }

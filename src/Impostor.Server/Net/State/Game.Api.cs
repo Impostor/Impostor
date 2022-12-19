@@ -2,13 +2,11 @@
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Games;
-using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
 using Impostor.Server.Net.Inner;
-using Impostor.Server.Net.Inner.Objects.GameManager;
 
 namespace Impostor.Server.Net.State
 {
@@ -30,14 +28,13 @@ namespace Impostor.Server.Net.State
                 throw new ImpostorException("Attempted to change settings when the host was not spawned.");
             }
 
-            var gameManager = FindObjectByType<InnerGameManager>();
-            if (gameManager == null)
+            if (GameNet.GameManager == null)
             {
                 throw new ImpostorException("Attempted to change options when the game manager was not spawned.");
             }
 
-            var gameOptionsTag = gameManager.GetGameLogicTag(gameManager.LogicOptions);
-            if (gameOptionsTag == null)
+            var gameOptionsTag = GameNet.GameManager.GetGameLogicTag(GameNet.GameManager.LogicOptions);
+            if (gameOptionsTag == -1)
             {
                 throw new ImpostorException("Attempted to change options when the LogicOptions was not spawned.");
             }
@@ -52,10 +49,10 @@ namespace Impostor.Server.Net.State
             Code.Serialize(writer);
 
             writer.StartMessage(GameDataTag.DataFlag);
-            writer.WritePacked(gameManager.NetId);
+            writer.WritePacked(GameNet.GameManager.NetId);
 
             writer.StartMessage((byte)gameOptionsTag);
-            GameOptionsFactory.Serialize(writer, Options);
+            GameNet.GameManager.LogicOptions.Serialize(writer, false);
 
             writer.EndMessage();
             writer.EndMessage();

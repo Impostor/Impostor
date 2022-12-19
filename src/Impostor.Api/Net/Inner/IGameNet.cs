@@ -1,4 +1,5 @@
 ﻿using Impostor.Api.Net.Inner.Objects;
+using Impostor.Api.Net.Inner.Objects.GameManager;
 using Impostor.Api.Net.Inner.Objects.ShipStatus;
 
 namespace Impostor.Api.Net.Inner
@@ -8,6 +9,8 @@ namespace Impostor.Api.Net.Inner
     /// </summary>
     public interface IGameNet
     {
+        IInnerGameManager? GameManager { get; }
+
         IInnerLobbyBehaviour? LobbyBehaviour { get; }
 
         IInnerGameData? GameData { get; }

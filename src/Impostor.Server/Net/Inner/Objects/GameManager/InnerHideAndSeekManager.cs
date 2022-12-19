@@ -6,21 +6,21 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Inner.Objects.GameManager;
 
-internal class InnerHideAndSeekManager : InnerGameManager, IInnerHideAndSeekManager
+internal partial class InnerHideAndSeekManager : InnerGameManager, IInnerHideAndSeekManager
 {
     public InnerHideAndSeekManager(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerGameManager> logger) : base(customMessageManager, game, logger)
     {
-        LogicMusic = AddGameLogic(new LogicHnSMusic(this));
-        LogicMinigame = AddGameLogic(new LogicMinigameHnS(this));
-        LogicFlowHnS = new LogicGameFlowHnS(this);
+        LogicMusic = AddGameLogic(new LogicHnSMusic());
+        LogicMinigame = AddGameLogic(new LogicMinigameHnS());
+        LogicFlowHnS = new LogicGameFlowHnS();
         LogicFlow = AddGameLogic(LogicFlowHnS);
         LogicUsables = AddGameLogic(new LogicUsablesHnS());
-        LogicRoleSelection = AddGameLogic(new LogicRoleSelectionHnS(this));
-        LogicOptionsHnS = new LogicOptionsHnS(this, game);
+        LogicRoleSelection = AddGameLogic(new LogicRoleSelectionHnS());
+        LogicOptionsHnS = new LogicOptionsHnS(game);
         LogicOptions = AddGameLogic(this.LogicOptionsHnS);
-        LogicDangerLevel = AddGameLogic(new LogicHnSDangerLevel(this));
-        LogicPing = AddGameLogic(new LogicPingsHnS(this));
-        LogicDeathPopup = AddGameLogic(new LogicHnSDeathPopup(this));
+        LogicDangerLevel = AddGameLogic(new LogicHnSDangerLevel());
+        LogicPing = AddGameLogic(new LogicPingsHnS());
+        LogicDeathPopup = AddGameLogic(new LogicHnSDeathPopup());
     }
 
     public LogicHnSMusic LogicMusic { get; private set; }

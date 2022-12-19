@@ -1,6 +1,8 @@
-﻿namespace Impostor.Api.Net.Inner.Objects.GameManager;
+﻿using Impostor.Api.Net.Inner.Objects.GameManager.Logic.HideAndSeek;
 
-internal interface IInnerHideAndSeekManager
+namespace Impostor.Api.Net.Inner.Objects.GameManager;
+
+public interface IInnerHideAndSeekManager
 {
-    
+    ILogicGameFlowHnS LogicFlowHnS { get; }
 }

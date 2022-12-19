@@ -2,7 +2,4 @@
 
 internal class LogicMinigameHnS : LogicMinigame
 {
-    public LogicMinigameHnS(InnerHideAndSeekManager gameManager) : base(gameManager)
-    {
-    }
 }

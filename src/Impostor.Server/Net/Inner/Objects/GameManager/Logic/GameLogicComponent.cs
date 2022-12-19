@@ -1,19 +1,22 @@
-﻿using Impostor.Api.Net.Inner;
-using Impostor.Api.Net.Inner.Objects;
+﻿using System;
+using Impostor.Api.Net.Inner;
 
 namespace Impostor.Server.Net.Inner.Objects.GameManager.Logic;
 
 internal abstract class GameLogicComponent
 {
-    public virtual void OnPlayerDisconnect(IInnerPlayerControl pc)
-    {
-    }
-
     public virtual void HandleRPC(RpcCalls callId, IMessageReader reader)
     {
+        throw new NotImplementedException($"Unhandled RpcCall {callId}");
     }
 
-    public abstract bool Serialize(IMessageWriter writer, bool initialState);
+    public virtual bool Serialize(IMessageWriter writer, bool initialState)
+    {
+        throw new NotImplementedException();
+    }
 
-    public abstract void Deserialize(IMessageReader reader, bool initialState);
+    public virtual void Deserialize(IMessageReader reader, bool initialState)
+    {
+        throw new NotImplementedException();
+    }
 }
