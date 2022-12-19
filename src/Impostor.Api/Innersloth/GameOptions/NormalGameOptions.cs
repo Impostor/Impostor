@@ -180,20 +180,20 @@ public class NormalGameOptions : IGameOptions
         writer.Write(ImpostorLightMod);
         writer.Write(KillCooldown);
 
-        writer.Write(NumCommonTasks);
-        writer.Write(NumLongTasks);
-        writer.Write(NumShortTasks);
+        writer.Write((byte)NumCommonTasks);
+        writer.Write((byte)NumLongTasks);
+        writer.Write((byte)NumShortTasks);
 
         writer.Write(NumEmergencyMeetings);
 
-        writer.Write(NumImpostors);
+        writer.Write((byte)NumImpostors);
         writer.Write((byte)KillDistance);
         writer.Write(DiscussionTime);
         writer.Write(VotingTime);
 
         writer.Write(IsDefaults);
 
-        writer.Write(EmergencyCooldown);
+        writer.Write((byte)EmergencyCooldown);
         writer.Write(ConfirmImpostor);
         writer.Write(VisualTasks);
         writer.Write(AnonymousVotes);
