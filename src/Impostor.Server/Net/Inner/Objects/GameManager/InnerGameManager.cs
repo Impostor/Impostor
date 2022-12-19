@@ -55,7 +55,7 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
     {
         foreach (var logicComponent in _logicComponents)
         {
-            logicComponent.HandleRPC(call, reader);
+            logicComponent.HandleRpc(call, reader);
         }
 
         return ValueTask.FromResult(true);

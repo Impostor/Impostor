@@ -5,7 +5,7 @@ namespace Impostor.Server.Net.Inner.Objects.GameManager.Logic;
 
 internal abstract class GameLogicComponent
 {
-    public virtual void HandleRPC(RpcCalls callId, IMessageReader reader)
+    public virtual void HandleRpc(RpcCalls callId, IMessageReader reader)
     {
         throw new NotImplementedException($"Unhandled RpcCall {callId}");
     }
