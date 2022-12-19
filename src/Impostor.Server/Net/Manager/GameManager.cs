@@ -51,7 +51,7 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        public IEnumerable<Game> FindListings(MapFlags map, int impostorCount, GameKeywords language, int gameVersion, int count = 10)
+        public IEnumerable<Game> FindListings(MapFlags map, int impostorCount, GameKeywords language, int gameVersion, HashSet<string> filterTags, int count = 10)
         {
             var results = 0;
 
@@ -74,6 +74,11 @@ namespace Impostor.Server.Net.Manager
                 }
 
                 if (impostorCount != 0 && game.Options.NumImpostors != impostorCount)
+                {
+                    continue;
+                }
+
+                if (!game.FilterOptions.FilterTags.SetEquals(filterTags))
                 {
                     continue;
                 }
@@ -111,7 +116,7 @@ namespace Impostor.Server.Net.Manager
             await _eventManager.CallAsync(new GameDestroyedEvent(game));
         }
 
-        public async ValueTask<IGame?> CreateAsync(IClient? owner, IGameOptions options)
+        public async ValueTask<IGame?> CreateAsync(IClient? owner, IGameOptions options, GameFilterOptions filterOptions)
         {
             var @event = new GameCreationEvent(this, owner);
             await _eventManager.CallAsync(@event);
@@ -121,11 +126,11 @@ namespace Impostor.Server.Net.Manager
                 return null;
             }
 
-            var (success, game) = await TryCreateAsync(options, @event.GameCode);
+            var (success, game) = await TryCreateAsync(options, filterOptions, @event.GameCode);
 
             for (var i = 0; i < 10 && !success; i++)
             {
-                (success, game) = await TryCreateAsync(options);
+                (success, game) = await TryCreateAsync(options, filterOptions);
             }
 
             if (!success || game == null)
@@ -136,15 +141,15 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        public ValueTask<IGame?> CreateAsync(IGameOptions options)
+        public ValueTask<IGame?> CreateAsync(IGameOptions options, GameFilterOptions filterOptions)
         {
-            return CreateAsync(null, options);
+            return CreateAsync(null, options, filterOptions);
         }
 
-        private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(IGameOptions options, GameCode? desiredGameCode = null)
+        private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(IGameOptions options, GameFilterOptions filterOptions, GameCode? desiredGameCode = null)
         {
             var gameCode = desiredGameCode ?? _gameCodeFactory.Create();
-            var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options);
+            var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options, filterOptions);
 
             if (!_games.TryAdd(gameCode, game))
             {

@@ -12,6 +12,8 @@ namespace Impostor.Api.Games
     {
         IGameOptions Options { get; }
 
+        GameFilterOptions FilterOptions { get; }
+
         GameCode Code { get; }
 
         GameStates GameState { get; }

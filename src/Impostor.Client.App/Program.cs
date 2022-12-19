@@ -32,7 +32,7 @@ namespace Impostor.Client.App
             {
                 MaxPlayers = 4,
                 NumImpostors = 2,
-            }, CrossplayFlags.All, new GameFilterOptions());
+            }, CrossplayFlags.All, GameFilterOptions.CreateDefault());
 
             // TODO: ObjectPool for MessageReaders
             using (var connection = new UdpClientConnection(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 22023), null))

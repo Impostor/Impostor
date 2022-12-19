@@ -6,6 +6,17 @@ public class GameFilterOptions
 {
     public HashSet<string> FilterTags { get; } = new HashSet<string>();
 
+    public static GameFilterOptions CreateDefault()
+    {
+        return new GameFilterOptions
+        {
+            FilterTags =
+            {
+                "Beginner",
+            },
+        };
+    }
+
     public static GameFilterOptions Deserialize(IMessageReader reader)
     {
         var options = new GameFilterOptions();

@@ -38,6 +38,7 @@ namespace Impostor.Server.Net.State
             IPEndPoint publicIp,
             GameCode code,
             IGameOptions options,
+            GameFilterOptions filterOptions,
             ClientManager clientManager,
             IEventManager eventManager,
             IOptions<CompatibilityConfig> compatibilityConfig)
@@ -54,6 +55,7 @@ namespace Impostor.Server.Net.State
             GameState = GameStates.NotStarted;
             GameNet = new GameNet();
             Options = options;
+            FilterOptions = filterOptions;
             _clientManager = clientManager;
             _eventManager = eventManager;
             _compatibilityConfig = compatibilityConfig.Value;
@@ -73,6 +75,8 @@ namespace Impostor.Server.Net.State
         public GameStates GameState { get; private set; }
 
         public IGameOptions Options { get; }
+
+        public GameFilterOptions FilterOptions { get; }
 
         public IDictionary<object, object> Items { get; }
 
