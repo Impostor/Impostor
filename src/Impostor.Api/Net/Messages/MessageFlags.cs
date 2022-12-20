@@ -36,7 +36,7 @@ namespace Impostor.Api.Net.Messages
             FlagCache = typeof(MessageFlags)
                 .GetFields(BindingFlags.Public | BindingFlags.Static)
                 .Where(fi => fi.IsLiteral && !fi.IsInitOnly)
-                .ToDictionary(x => (byte) x.GetValue(null)!, y => y.Name);
+                .ToDictionary(x => (byte)x.GetValue(null)!, y => y.Name);
         }
 
         public static string FlagToString(byte flag)

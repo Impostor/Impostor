@@ -55,7 +55,7 @@ namespace Impostor.Api.Games
         void BanIp(IPAddress ipAddress);
 
         /// <summary>
-        ///     Syncs the internal <see cref="GameOptionsData" /> to all players.
+        ///     Syncs the internal <see cref="IGameOptions" /> to all players.
         ///     Necessary to do if you modified it, otherwise it won't be used.
         /// </summary>
         /// <returns>A <see cref="ValueTask" /> representing the asynchronous operation.</returns>
