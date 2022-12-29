@@ -355,10 +355,8 @@ namespace Impostor.Server.Net
         /// <summary>
         ///     Triggered when the connected client requests the game listing.
         /// </summary>
-        /// <param name="options">
-        ///     All options given.
-        ///     At this moment, the client can only specify the map, impostor count and chat language.
-        /// </param>
+        /// <param name="options">Options specific to the game mode. At this moment, the client can only specify the map, impostor count and chat language.</param>
+        /// <param name="filterOptions">Filter options not specific to the game mode.</param>
         private ValueTask OnRequestGameListAsync(IGameOptions options, GameFilterOptions filterOptions)
         {
             using var message = MessageWriter.Get(MessageType.Reliable);

@@ -38,9 +38,7 @@
 
         Sabotage = 17,
 
-        /// <summary>
-        ///     Decontam on Mira and bottom decontam on Polus
-        /// </summary>
+        /// <remarks>The only decontamination on Mira and bottom decontamination on Polus.</remarks>
         Decontamination = 18,
 
         Launchpad = 19,
@@ -57,9 +55,7 @@
 
         Dropship = 25,
 
-        /// <summary>
-        ///     Top decontam on Polus
-        /// </summary>
+        /// <remarks>Top decontamination on Polus.</remarks>
         Decontamination2 = 26,
 
         Outside = 27,
