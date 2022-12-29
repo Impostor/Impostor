@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <LangVersion>11</LangVersion>
-    <VersionPrefix>1.7.3</VersionPrefix>
+    <VersionPrefix>1.8.0</VersionPrefix>
     <VersionSuffix>dev</VersionSuffix>
     <EnforceCodeStyleInBuild Condition="$(MSBuildProjectName)!='Hazel'">true</EnforceCodeStyleInBuild>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>

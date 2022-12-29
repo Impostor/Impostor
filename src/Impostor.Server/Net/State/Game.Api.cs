@@ -1,12 +1,12 @@
-﻿using System.IO;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Games;
-using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
+using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
+using Impostor.Server.Net.Inner;
 
 namespace Impostor.Server.Net.State
 {
@@ -25,24 +25,40 @@ namespace Impostor.Server.Net.State
         {
             if (Host?.Character == null)
             {
-                throw new ImpostorException("Attempted to set infected when the host was not spawned.");
+                throw new ImpostorException("Attempted to change settings when the host was not spawned.");
             }
 
-            using (var writer = StartRpc(Host.Character.NetId, RpcCalls.SyncSettings))
+            if (GameNet.GameManager == null)
             {
-                // Someone will probably forget to do this, so we include it here.
-                // If this is not done, the host will overwrite changes later with the defaults.
-                Options.IsDefaults = false;
-
-                await using (var memory = new MemoryStream())
-                await using (var writerBin = new BinaryWriter(memory))
-                {
-                    Options.Serialize(writerBin, GameOptionsData.LatestVersion);
-                    writer.WriteBytesAndSize(memory.ToArray());
-                }
-
-                await FinishRpcAsync(writer);
+                throw new ImpostorException("Attempted to change options when the game manager was not spawned.");
             }
+
+            var gameOptionsTag = GameNet.GameManager.GetGameLogicTag(GameNet.GameManager.LogicOptions);
+            if (gameOptionsTag == -1)
+            {
+                throw new ImpostorException("Attempted to change options when the LogicOptions was not spawned.");
+            }
+
+            // Someone will probably forget to do this, so we include it here.
+            // If this is not done, the host will overwrite changes later with the defaults.
+            Options.IsDefaults = false;
+
+            using var writer = MessageWriter.Get(MessageType.Reliable);
+
+            writer.StartMessage(MessageFlags.GameData);
+            Code.Serialize(writer);
+
+            writer.StartMessage(GameDataTag.DataFlag);
+            writer.WritePacked(GameNet.GameManager.NetId);
+
+            writer.StartMessage((byte)gameOptionsTag);
+            GameNet.GameManager.LogicOptions.Serialize(writer, false);
+
+            writer.EndMessage();
+            writer.EndMessage();
+            writer.EndMessage();
+
+            await SendToAllAsync(writer);
         }
 
         public async ValueTask SetPrivacyAsync(bool isPublic)

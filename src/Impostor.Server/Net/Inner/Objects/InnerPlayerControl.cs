@@ -117,7 +117,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc02SyncSettings.Deserialize(reader, Game.Options);
+                    Rpc02SyncSettings.DeserializeInto(reader, Game.Options);
                     break;
                 }
 

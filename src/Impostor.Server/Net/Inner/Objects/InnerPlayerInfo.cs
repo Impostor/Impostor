@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
+using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Utils;
 
 namespace Impostor.Server.Net.Inner.Objects
@@ -59,7 +60,15 @@ namespace Impostor.Server.Net.Inner.Objects
             // the impostor has a cooldown of half the usual duration. As a workaround we always assume the kill was
             // prevented and the impostor only has half of its cooldown.
             // FIXME when the base game improved their implementation.
-            return dateTimeProvider.UtcNow.Subtract(LastMurder).TotalSeconds >= game.Options.KillCooldown / 2;
+            if (game.Options.GameMode == GameModes.Normal)
+            {
+                var options = (NormalGameOptions)game.Options;
+                return dateTimeProvider.UtcNow.Subtract(LastMurder).TotalSeconds >= options.KillCooldown / 2;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public void Serialize(IMessageWriter writer)

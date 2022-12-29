@@ -108,6 +108,18 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     Rpc31ClimbLadder.Deserialize(reader, out var ladderId, out var lastClimbLadderSid);
                     break;
 
+                case RpcCalls.Pet:
+                {
+                    Rpc49Pet.Deserialize(reader, out var position, out var petPosition);
+                    break;
+                }
+
+                case RpcCalls.CancelPet:
+                {
+                    Rpc50CancelPet.Deserialize(reader);
+                    break;
+                }
+
                 default:
                     return await base.HandleRpcAsync(sender, target, call, reader);
             }

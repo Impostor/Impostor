@@ -1,5 +1,6 @@
 ﻿using System;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 
 namespace Impostor.Api.Net.Messages.C2S
 {
@@ -10,7 +11,7 @@ namespace Impostor.Api.Net.Messages.C2S
             throw new NotImplementedException();
         }
 
-        public static void Deserialize(IMessageReader reader, out GameOptionsData options, out QuickChatModes chatMode)
+        public static void Deserialize(IMessageReader reader, out IGameOptions options, out QuickChatModes chatMode, out CrossplayFlags crossplayFlags, out GameFilterOptions gameFilterOptions)
         {
             var version = reader.ReadPackedInt32();
             if (version != 2)
@@ -18,9 +19,10 @@ namespace Impostor.Api.Net.Messages.C2S
                 throw new NotSupportedException($"Version {version} of {nameof(Message16GetGameListC2S)} is not supported");
             }
 
-            options = GameOptionsData.DeserializeCreate(reader);
+            options = GameOptionsFactory.Deserialize(reader);
             chatMode = (QuickChatModes)reader.ReadByte();
-            reader.ReadInt32(); // crossplayFlags, not used yet
+            crossplayFlags = (CrossplayFlags)reader.ReadInt32();
+            gameFilterOptions = GameFilterOptions.Deserialize(reader);
         }
     }
 }

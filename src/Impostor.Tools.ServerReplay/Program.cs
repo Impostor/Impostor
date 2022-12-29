@@ -8,13 +8,14 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
+using Impostor.Hazel.Abstractions;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Utils;
 using Impostor.Hazel;
-using Impostor.Hazel.Abstractions;
 using Impostor.Hazel.Extensions;
 using Impostor.Server;
 using Impostor.Server.Events;
@@ -37,7 +38,7 @@ namespace Impostor.Tools.ServerReplay
     {
         private static readonly ILogger Logger = Log.ForContext(typeof(Program));
         private static readonly Dictionary<int, IHazelConnection> Connections = new Dictionary<int, IHazelConnection>();
-        private static readonly Dictionary<int, GameOptionsData> GameOptions = new Dictionary<int, GameOptionsData>();
+        private static readonly Dictionary<int, IGameOptions> GameOptions = new Dictionary<int, IGameOptions>();
 
         private static ServiceProvider _serviceProvider;
 
@@ -199,7 +200,8 @@ namespace Impostor.Tools.ServerReplay
 
                     if (tag == MessageFlags.HostGame)
                     {
-                        GameOptions.Add(clientId, Message00HostGameC2S.Deserialize(message));
+                        Message00HostGameC2S.Deserialize(message, out var gameOptions, out _, out _);
+                        GameOptions.Add(clientId, gameOptions);
                     }
                     else if (Connections.TryGetValue(clientId, out var client))
                     {
@@ -212,7 +214,7 @@ namespace Impostor.Tools.ServerReplay
                 case RecordedPacketType.GameCreated:
                     _gameCodeFactory.Result = GameCode.From(reader.ReadString());
 
-                    await _gameManager.CreateAsync(Connections[clientId].Client, GameOptions[clientId]);
+                    await _gameManager.CreateAsync(Connections[clientId].Client, GameOptions[clientId], GameFilterOptions.CreateDefault());
 
                     GameOptions.Remove(clientId);
                     break;

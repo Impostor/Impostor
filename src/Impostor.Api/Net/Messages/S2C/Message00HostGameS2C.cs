@@ -1,20 +1,19 @@
-﻿using System;
-using Impostor.Api.Innersloth;
+﻿using Impostor.Api.Games;
 
 namespace Impostor.Api.Net.Messages.S2C
 {
     public static class Message00HostGameS2C
     {
-        public static void Serialize(IMessageWriter writer, int gameCode)
+        public static void Serialize(IMessageWriter writer, GameCode gameCode)
         {
             writer.StartMessage(MessageFlags.HostGame);
-            writer.Write(gameCode);
+            gameCode.Serialize(writer);
             writer.EndMessage();
         }
 
-        public static GameOptionsData Deserialize(IMessageReader reader)
+        public static void Deserialize(IMessageReader reader, out GameCode gameCode)
         {
-            throw new NotImplementedException();
+            gameCode = reader.ReadInt32();
         }
     }
 }

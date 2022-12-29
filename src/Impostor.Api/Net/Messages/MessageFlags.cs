@@ -1,4 +1,8 @@
-﻿namespace Impostor.Api.Net.Messages
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
+namespace Impostor.Api.Net.Messages
 {
     public static class MessageFlags
     {
@@ -24,5 +28,20 @@
         public const byte SetActivePodType = 21;
         public const byte QueryPlatformIds = 22;
         public const byte QueryLobbyInfo = 23;
+
+        private static readonly Dictionary<byte, string> FlagCache;
+
+        static MessageFlags()
+        {
+            FlagCache = typeof(MessageFlags)
+                .GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Where(fi => fi.IsLiteral && !fi.IsInitOnly)
+                .ToDictionary(x => (byte)x.GetValue(null)!, y => y.Name);
+        }
+
+        public static string FlagToString(byte flag)
+        {
+            return FlagCache[flag];
+        }
     }
 }

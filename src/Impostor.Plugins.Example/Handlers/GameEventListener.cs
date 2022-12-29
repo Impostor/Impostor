@@ -19,21 +19,16 @@ namespace Impostor.Plugins.Example.Handlers
         {
             _logger.LogInformation("Game creation requested by {client}", e.Client == null ? "a plugin" : e.Client.Name);
 
-            if (e.Client != null)
-            {
-                var gameCode = GameCode.From(e.Client.Name);
-
-                if (!gameCode.IsInvalid)
-                {
-                    e.GameCode = gameCode;
-                }
-
-                if (e.Client.Name == "dima")
-                {
-                    e.IsCancelled = true;
-                    e.Client.DisconnectAsync(DisconnectReason.Custom, "No you dont >:(");
-                }
-            }
+            // TODO: Code below causes the lobby to stop loading and close after 5 secs.
+            // if (e.Client != null)
+            // {
+            //     var gameCode = GameCode.From(e.Client.Name);
+            //
+            //     if (!gameCode.IsInvalid)
+            //     {
+            //         e.GameCode = gameCode;
+            //     }
+            // }
         }
 
         [EventListener]

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Hazel;
 using Impostor.Hazel.Abstractions;
@@ -27,11 +28,11 @@ namespace Impostor.Client.App
 
             var writeGameCreate = MessageWriter.Get(MessageType.Reliable);
 
-            Message00HostGameC2S.Serialize(writeGameCreate, new GameOptionsData
+            Message00HostGameC2S.Serialize(writeGameCreate, new LegacyGameOptionsData
             {
                 MaxPlayers = 4,
                 NumImpostors = 2,
-            });
+            }, CrossplayFlags.All, GameFilterOptions.CreateDefault());
 
             // TODO: ObjectPool for MessageReaders
             using (var connection = new UdpClientConnection(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 22023), null))

@@ -10,6 +10,7 @@ using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Server.Events;
@@ -36,7 +37,8 @@ namespace Impostor.Server.Net.State
             GameManager gameManager,
             IPEndPoint publicIp,
             GameCode code,
-            GameOptionsData options,
+            IGameOptions options,
+            GameFilterOptions filterOptions,
             ClientManager clientManager,
             IEventManager eventManager,
             IOptions<CompatibilityConfig> compatibilityConfig)
@@ -53,6 +55,7 @@ namespace Impostor.Server.Net.State
             GameState = GameStates.NotStarted;
             GameNet = new GameNet();
             Options = options;
+            FilterOptions = filterOptions;
             _clientManager = clientManager;
             _eventManager = eventManager;
             _compatibilityConfig = compatibilityConfig.Value;
@@ -71,7 +74,9 @@ namespace Impostor.Server.Net.State
 
         public GameStates GameState { get; private set; }
 
-        public GameOptionsData Options { get; }
+        public IGameOptions Options { get; }
+
+        public GameFilterOptions FilterOptions { get; }
 
         public IDictionary<object, object> Items { get; }
 
