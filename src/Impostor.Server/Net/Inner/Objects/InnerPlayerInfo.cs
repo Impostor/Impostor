@@ -93,8 +93,7 @@ namespace Impostor.Server.Net.Inner.Objects
             Disconnected = (flag & 1) != 0;
             IsDead = (flag & 4) != 0;
 
-            var roleType = (RoleTypes)reader.ReadUInt16();
-            RoleType = roleType;
+            _ = (RoleTypes)reader.ReadUInt16(); // ignore the RoleType here and only trust the SetRole rpc
 
             var taskCount = reader.ReadByte();
 
