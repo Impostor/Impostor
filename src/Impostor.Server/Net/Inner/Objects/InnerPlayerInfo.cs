@@ -30,7 +30,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public PlayerOutfit CurrentOutfit => Outfits[CurrentOutfitType];
 
-        public RoleTypes RoleType { get; internal set; }
+        public RoleTypes? RoleType { get; internal set; }
 
         public bool Disconnected { get; internal set; }
 
