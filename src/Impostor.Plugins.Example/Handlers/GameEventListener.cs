@@ -52,7 +52,7 @@ namespace Impostor.Plugins.Example.Handlers
             {
                 var info = player.Character!.PlayerInfo;
 
-                _logger.LogInformation("- {player} is {role}", info.PlayerName, info.IsImpostor ? "an impostor" : "a crewmate");
+                _logger.LogInformation("- {player} is {role}", info.PlayerName, info.RoleType);
             }
         }
 

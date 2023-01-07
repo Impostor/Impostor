@@ -13,6 +13,11 @@ namespace Impostor.Api.Net.Inner.Objects
         string PlayerName { get; }
 
         /// <summary>
+        ///     Gets the role type of the player.
+        /// </summary>
+        RoleTypes? RoleType { get; }
+
+        /// <summary>
         ///     Gets a value indicating whether the player is an impostor.
         /// </summary>
         bool IsImpostor { get; }
