@@ -8,5 +8,7 @@ namespace Impostor.Api.Innersloth
         Engineer,
         GuardianAngel,
         Shapeshifter,
+        CrewmateGhost,
+        ImpostorGhost,
     }
 }
