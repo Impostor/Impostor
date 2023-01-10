@@ -1,4 +1,4 @@
-const DEFAULT_PORT = 22023;
+const DEFAULT_PORT = 22000;
 
 const IP_REGEX = /(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}/;
 
@@ -37,19 +37,19 @@ function parseForm() {
     const serverAddress = document.getElementById("address").value.trim();
     const serverPort = parseInt(document.getElementById("port").value) ?? DEFAULT_PORT;
     const serverName = document.getElementById("name").value || "Impostor";
+    const serverProtocol = document.querySelector("input[name=serverProtocol]:checked").value || "http";
 
-    return [serverAddress, serverPort, serverName];
+    return [serverAddress, serverPort, serverName, serverProtocol];
 }
 
 async function downloadAsync() {
-    const [serverAddress, serverPort, serverName] = parseForm();
-    const [serverIp, serverFqdn] = await parseAddressAsync(serverAddress);
+    const [serverAddress, serverPort, serverName, serverProtocol] = parseForm();
 
     const json = generateRegionInfo(
         serverName,
-        serverIp,
-        serverFqdn,
-        serverPort
+        serverAddress,
+        serverPort,
+        serverProtocol
     );
     const blob = new Blob([json], { type: "text/plain" });
     saveFile(blob, "regionInfo.json");
@@ -58,8 +58,9 @@ async function downloadAsync() {
 }
 
 async function openApp() {
-    const [serveraddress, serverport, servername] = parseForm();
-    const [serverip, _] = await parseAddressAsync(serveraddress);
+    const [serveraddress, serverport, servername, serverprotocol] = parseForm();
+
+    const serverip = serverprotocol + ":%2F%2F" + serveraddress
 
     const params = new URLSearchParams({
         servername,
@@ -74,6 +75,7 @@ async function openApp() {
 }
 
 let currentPlatform;
+let httpsSetExplicitly;
 
 function setEnabled(platform, value) {
     for (const e of document.querySelectorAll(`.${platform}-support`)) {
@@ -91,51 +93,88 @@ function setPlatform(platform) {
         document.getElementById(currentPlatform).classList.remove("text-primary");
     }
 
+    // HTTPS is mandatory on ios/android
+    if ('android' == platform || 'ios' == platform) {
+        const httpsRadio = document.getElementById("https");
+        httpsSetExplicitly = httpsRadio.checked;
+        httpsRadio.checked = true;
+    } else if (false == httpsSetExplicitly) {
+        document.getElementById("http").checked = true;
+    }
+
     setEnabled(platform, true);
     document.getElementById(platform).classList.add("text-primary");
 
     currentPlatform = platform;
 }
 
-function generateRegionInfo(name, ip, fqdn, port) {
+function generateRegionInfo(name, fqdn, port, protocol) {
     const regions = [
         // Add default regions so they also show up in the menu
         {
-            $type: "DnsRegionInfo, Assembly-CSharp",
-            Fqdn: "na.mm.among.us",
-            DefaultIp: "50.116.1.42",
-            Port: 22023,
-            Name: "North America",
-            TranslateName: 289,
-            UseDtls: true,
+            "$type": "StaticHttpRegionInfo, Assembly-CSharp",
+            "Name": "North America",
+            "PingServer": "matchmaker.among.us",
+            "Servers": [
+                {
+                    "Name": "Http-1",
+                    "Ip": "https://matchmaker.among.us",
+                    "Port": 443,
+                    "UseDtls": true,
+                    "Players": 0,
+                    "ConnectionFailures": 0
+                }
+            ],
+            "TranslateName": 289
         },
         {
-            $type: "DnsRegionInfo, Assembly-CSharp",
-            Fqdn: "eu.mm.among.us",
-            DefaultIp: "172.105.251.170",
-            Port: 22023,
-            Name: "Europe",
-            TranslateName: 290,
-            UseDtls: true,
+            "$type": "StaticHttpRegionInfo, Assembly-CSharp",
+            "Name": "Europe",
+            "PingServer": "matchmaker-eu.among.us",
+            "Servers": [
+                {
+                    "Name": "Http-1",
+                    "Ip": "https://matchmaker-eu.among.us",
+                    "Port": 443,
+                    "UseDtls": true,
+                    "Players": 0,
+                    "ConnectionFailures": 0
+                }
+            ],
+            "TranslateName": 290
         },
         {
-            $type: "DnsRegionInfo, Assembly-CSharp",
-            Fqdn: "as.mm.among.us",
-            DefaultIp: "139.162.111.196",
-            Port: 22023,
-            Name: "Asia",
-            TranslateName: 291,
-            UseDtls: true,
+            "$type": "StaticHttpRegionInfo, Assembly-CSharp",
+            "Name": "Asia",
+            "PingServer": "matchmaker-as.among.us",
+            "Servers": [
+                {
+                    "Name": "Http-1",
+                    "Ip": "https://matchmaker-as.among.us",
+                    "Port": 443,
+                    "UseDtls": true,
+                    "Players": 0,
+                    "ConnectionFailures": 0
+                }
+            ],
+            "TranslateName": 291
         },
         // Followed by the custom region
         {
-            $type: "DnsRegionInfo, Assembly-CSharp",
-            Fqdn: fqdn,
-            DefaultIp: ip,
-            Port: port,
+            $type: "StaticHttpRegionInfo, Assembly-CSharp",
             Name: name,
+            PingServer: fqdn,
+            Servers: [
+                {
+                    Name: "http-1",
+                    Ip: protocol + "://" + fqdn,
+                    Port: port,
+                    UseDtls: false, // As no custom key can be specified, we need to disable DTLS on custom servers.
+                    Players: 0,
+                    ConnectionFailures: 0
+                }
+            ],
             TranslateName: 1003, // StringNames.NoTranslation
-            UseDtls: false, // As no custom key can be specified, we need to disable DTLS on custom servers.
         },
     ];
 
