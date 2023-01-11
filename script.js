@@ -13,11 +13,16 @@ async function parseAddressAsync(serverAddress) {
     }
 
     /** @type {{ Status: number, Answer: { type: number, data: string }[] }} */
-    const dns = await (await fetch("https://cloudflare-dns.com/dns-query?type=A&name=" + serverAddress, {
-        headers: {
-            "Accept": "application/dns-json"
-        }
-    })).json();
+    const dns = await (
+        await fetch(
+            "https://cloudflare-dns.com/dns-query?type=A&name=" + serverAddress,
+            {
+                headers: {
+                    Accept: "application/dns-json",
+                },
+            }
+        )
+    ).json();
 
     if (dns && dns.Status === 0) {
         for (const record of dns.Answer) {
@@ -35,9 +40,12 @@ async function parseAddressAsync(serverAddress) {
 
 function parseForm() {
     const serverAddress = document.getElementById("address").value.trim();
-    const serverPort = parseInt(document.getElementById("port").value) ?? DEFAULT_PORT;
+    const serverPort =
+        parseInt(document.getElementById("port").value) ?? DEFAULT_PORT;
     const serverName = document.getElementById("name").value || "Impostor";
-    const serverProtocol = document.querySelector("input[name=serverProtocol]:checked").value || "http";
+    const serverProtocol =
+        document.querySelector("input[name=serverProtocol]:checked").value ||
+        "http";
 
     return [serverAddress, serverPort, serverName, serverProtocol];
 }
@@ -60,7 +68,7 @@ async function downloadAsync() {
 async function openApp() {
     const [serveraddress, serverport, servername, serverprotocol] = parseForm();
 
-    const serverip = serverprotocol + ":%2F%2F" + serveraddress
+    const serverip = serverprotocol + ":%2F%2F" + serveraddress;
 
     const params = new URLSearchParams({
         servername,
@@ -90,22 +98,24 @@ function setPlatform(platform) {
 
     if (currentPlatform) {
         setEnabled(currentPlatform, false);
-        document.getElementById(currentPlatform).classList.remove("text-primary");
+        document
+            .getElementById(currentPlatform)
+            .classList.remove("text-primary");
     }
 
     // HTTPS is mandatory on ios/android
     const httpRadio = document.getElementById("http");
     const httpsRadio = document.getElementById("https");
-    if ('android' == platform || 'ios' == platform) {
+    if ("android" == platform || "ios" == platform) {
         httpsSetExplicitly = httpsRadio.checked;
         httpsRadio.checked = true;
         httpRadio.disabled = true;
-        setPortIfDefault('https');
+        setPortIfDefault("https");
     } else {
         httpRadio.disabled = false;
         if (false == httpsSetExplicitly) {
             httpRadio.checked = true;
-            setPortIfDefault('http');
+            setPortIfDefault("http");
         }
     }
 
@@ -116,8 +126,8 @@ function setPlatform(platform) {
 }
 
 function setPortIfDefault(protocol) {
-    const oldPort = protocol == 'http' ? '443' : '22000';
-    const newPort = protocol == 'http' ? '22000' : '443';
+    const oldPort = protocol == "http" ? "443" : "22000";
+    const newPort = protocol == "http" ? "22000" : "443";
     const portField = document.getElementById("port");
     if (portField.value == oldPort) {
         portField.value = newPort;
@@ -128,52 +138,52 @@ function generateRegionInfo(name, fqdn, port, protocol) {
     const regions = [
         // Add default regions so they also show up in the menu
         {
-            "$type": "StaticHttpRegionInfo, Assembly-CSharp",
-            "Name": "North America",
-            "PingServer": "matchmaker.among.us",
-            "Servers": [
+            $type: "StaticHttpRegionInfo, Assembly-CSharp",
+            Name: "North America",
+            PingServer: "matchmaker.among.us",
+            Servers: [
                 {
-                    "Name": "Http-1",
-                    "Ip": "https://matchmaker.among.us",
-                    "Port": 443,
-                    "UseDtls": true,
-                    "Players": 0,
-                    "ConnectionFailures": 0
-                }
+                    Name: "Http-1",
+                    Ip: "https://matchmaker.among.us",
+                    Port: 443,
+                    UseDtls: true,
+                    Players: 0,
+                    ConnectionFailures: 0,
+                },
             ],
-            "TranslateName": 289
+            TranslateName: 289,
         },
         {
-            "$type": "StaticHttpRegionInfo, Assembly-CSharp",
-            "Name": "Europe",
-            "PingServer": "matchmaker-eu.among.us",
-            "Servers": [
+            $type: "StaticHttpRegionInfo, Assembly-CSharp",
+            Name: "Europe",
+            PingServer: "matchmaker-eu.among.us",
+            Servers: [
                 {
-                    "Name": "Http-1",
-                    "Ip": "https://matchmaker-eu.among.us",
-                    "Port": 443,
-                    "UseDtls": true,
-                    "Players": 0,
-                    "ConnectionFailures": 0
-                }
+                    Name: "Http-1",
+                    Ip: "https://matchmaker-eu.among.us",
+                    Port: 443,
+                    UseDtls: true,
+                    Players: 0,
+                    ConnectionFailures: 0,
+                },
             ],
-            "TranslateName": 290
+            TranslateName: 290,
         },
         {
-            "$type": "StaticHttpRegionInfo, Assembly-CSharp",
-            "Name": "Asia",
-            "PingServer": "matchmaker-as.among.us",
-            "Servers": [
+            $type: "StaticHttpRegionInfo, Assembly-CSharp",
+            Name: "Asia",
+            PingServer: "matchmaker-as.among.us",
+            Servers: [
                 {
-                    "Name": "Http-1",
-                    "Ip": "https://matchmaker-as.among.us",
-                    "Port": 443,
-                    "UseDtls": true,
-                    "Players": 0,
-                    "ConnectionFailures": 0
-                }
+                    Name: "Http-1",
+                    Ip: "https://matchmaker-as.among.us",
+                    Port: 443,
+                    UseDtls: true,
+                    Players: 0,
+                    ConnectionFailures: 0,
+                },
             ],
-            "TranslateName": 291
+            TranslateName: 291,
         },
         // Followed by the custom region
         {
@@ -187,8 +197,8 @@ function generateRegionInfo(name, fqdn, port, protocol) {
                     Port: port,
                     UseDtls: false, // As no custom key can be specified, we need to disable DTLS on custom servers.
                     Players: 0,
-                    ConnectionFailures: 0
-                }
+                    ConnectionFailures: 0,
+                },
             ],
             TranslateName: 1003, // StringNames.NoTranslation
         },
@@ -218,9 +228,12 @@ function saveFile(blob, fileName) {
 function fillFromLocationHash() {
     const urlServerAddress = document.location.hash.substr(1).split(":");
     const serverAddress = urlServerAddress[0];
-    const serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : DEFAULT_PORT.toString();
-    const protocol = urlServerAddress.length > 2 ? urlServerAddress[2] : 'http';
-    const serverName = urlServerAddress.length > 3 ? urlServerAddress[3] : '';
+    const serverPort =
+        urlServerAddress.length > 1
+            ? urlServerAddress[1]
+            : DEFAULT_PORT.toString();
+    let protocol = urlServerAddress.length > 2 ? urlServerAddress[2] : "http";
+    const serverName = urlServerAddress.length > 3 ? urlServerAddress[3] : "";
 
     if (serverAddress) {
         document.getElementById("address").value = serverAddress;
@@ -231,12 +244,24 @@ function fillFromLocationHash() {
     }
 
     // Set the default protocol to http
-    if ('http' != protocol && 'https' != protocol) {
-        protocol = 'http';
+    if ("http" != protocol && "https" != protocol) {
+        protocol = "http";
     }
     document.getElementById(protocol).checked = true;
 
-    document.getElementById('name').value = serverName;
+    document.getElementById("name").value = serverName;
+}
+
+function setLocationHash() {
+    document.location.hash =
+        document.getElementById("address").value +
+        ":" +
+        document.getElementById("port").value +
+        ":" +
+        (document.querySelector("input[name=serverProtocol]:checked").value ||
+            "http") +
+        ":" +
+        document.getElementById("name").value;
 }
 
 fillFromLocationHash();
