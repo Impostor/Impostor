@@ -94,18 +94,34 @@ function setPlatform(platform) {
     }
 
     // HTTPS is mandatory on ios/android
+    const httpRadio = document.getElementById("http");
+    const httpsRadio = document.getElementById("https");
     if ('android' == platform || 'ios' == platform) {
-        const httpsRadio = document.getElementById("https");
         httpsSetExplicitly = httpsRadio.checked;
         httpsRadio.checked = true;
-    } else if (false == httpsSetExplicitly) {
-        document.getElementById("http").checked = true;
+        httpRadio.disabled = true;
+        setPortIfDefault('https');
+    } else {
+        httpRadio.disabled = false;
+        if (false == httpsSetExplicitly) {
+            httpRadio.checked = true;
+            setPortIfDefault('http');
+        }
     }
 
     setEnabled(platform, true);
     document.getElementById(platform).classList.add("text-primary");
 
     currentPlatform = platform;
+}
+
+function setPortIfDefault(protocol) {
+    const oldPort = protocol == 'http' ? '443' : '22000';
+    const newPort = protocol == 'http' ? '22000' : '443';
+    const portField = document.getElementById("port");
+    if (portField.value == oldPort) {
+        portField.value = newPort;
+    }
 }
 
 function generateRegionInfo(name, fqdn, port, protocol) {
@@ -203,6 +219,8 @@ function fillFromLocationHash() {
     const urlServerAddress = document.location.hash.substr(1).split(":");
     const serverAddress = urlServerAddress[0];
     const serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : DEFAULT_PORT.toString();
+    const protocol = urlServerAddress.length > 2 ? urlServerAddress[2] : 'http';
+    const serverName = urlServerAddress.length > 3 ? urlServerAddress[3] : '';
 
     if (serverAddress) {
         document.getElementById("address").value = serverAddress;
@@ -211,6 +229,14 @@ function fillFromLocationHash() {
     if (new RegExp("^[0-9]+$", "g").test(serverPort)) {
         document.getElementById("port").value = serverPort;
     }
+
+    // Set the default protocol to http
+    if ('http' != protocol && 'https' != protocol) {
+        protocol = 'http';
+    }
+    document.getElementById(protocol).checked = true;
+
+    document.getElementById('name').value = serverName;
 }
 
 fillFromLocationHash();

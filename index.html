@@ -39,11 +39,11 @@
                             <label class="align-middle" style="display: inline" for="serverProtocol">Connection protocol</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="serverProtocol" id="http" value="http" checked>
+                            <input class="form-check-input" type="radio" name="serverProtocol" id="http" value="http" checked onclick="setPortIfDefault('http')">
                             <label class="form-check-label" for="http">http</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="serverProtocol" id="https" value="https">
+                            <input class="form-check-input" type="radio" name="serverProtocol" id="https" value="https" onclick="setPortIfDefault('https')">
                             <label class="form-check-label" for="https">https</label>
                         </div>
                     </div>
@@ -89,6 +89,8 @@
                         <p class="text-justify text-sm-center text-md-left">
                             To play on a private server, fill in the form, then click "Open in Among Us". You can then switch to your server using the Region Selection menu in the bottom right corner.<br/>
                             You may get a confirmation prompt from your browser to confirm that you want to open Among Us, which you should accept.
+                            If the region doesn't show up, keep the game running in the background and click the button again.
+                            Note for server admins: to support mobile phones, you need to support connecting over HTTPS
                         </p>
                     </div>
                 </div>
