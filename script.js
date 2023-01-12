@@ -68,7 +68,7 @@ async function downloadAsync() {
 async function openApp() {
     const [serveraddress, serverport, servername, serverprotocol] = parseForm();
 
-    const serverip = serverprotocol + ":%2F%2F" + serveraddress;
+    const serverip = serverprotocol + "://" + serveraddress;
 
     const params = new URLSearchParams({
         servername,
