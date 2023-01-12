@@ -1,47 +1,10 @@
-const DEFAULT_PORT = 22000;
-
-const IP_REGEX = /(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}/;
-
-async function parseAddressAsync(serverAddress) {
-    if (serverAddress === "localhost") {
-        serverAddress = "127.0.0.1";
-    }
-
-    if (IP_REGEX.test(serverAddress)) {
-        // TODO: wait for update fixing StaticRegionInfo
-        return [serverAddress, serverAddress];
-    }
-
-    /** @type {{ Status: number, Answer: { type: number, data: string }[] }} */
-    const dns = await (
-        await fetch(
-            "https://cloudflare-dns.com/dns-query?type=A&name=" + serverAddress,
-            {
-                headers: {
-                    Accept: "application/dns-json",
-                },
-            }
-        )
-    ).json();
-
-    if (dns && dns.Status === 0) {
-        for (const record of dns.Answer) {
-            if (record.type === 1 && IP_REGEX.test(record.data)) {
-                return [record.data, serverAddress];
-            }
-        }
-    }
-
-    const message = "Failed DNS request for " + serverAddress;
-
-    alert(message);
-    throw Error(message);
-}
+const DEFAULT_PORT_HTTP = "22000";
+const DEFAULT_PORT_HTTPS = "443";
 
 function parseForm() {
     const serverAddress = document.getElementById("address").value.trim();
     const serverPort =
-        parseInt(document.getElementById("port").value) ?? DEFAULT_PORT;
+        parseInt(document.getElementById("port").value) ?? DEFAULT_PORT_HTTP;
     const serverName = document.getElementById("name").value || "Impostor";
     const serverProtocol =
         document.querySelector("input[name=serverProtocol]:checked").value ||
@@ -126,8 +89,8 @@ function setPlatform(platform) {
 }
 
 function setPortIfDefault(protocol) {
-    const oldPort = protocol == "http" ? "443" : "22000";
-    const newPort = protocol == "http" ? "22000" : "443";
+    const oldPort = protocol == "http" ? DEFAULT_PORT_HTTPS : DEFAULT_PORT_HTTP;
+    const newPort = protocol == "http" ? DEFAULT_PORT_HTTP : DEFAULT_PORT_HTTPS;
     const portField = document.getElementById("port");
     if (portField.value == oldPort) {
         portField.value = newPort;
