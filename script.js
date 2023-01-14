@@ -194,7 +194,7 @@ function fillFromLocationHash() {
     const serverPort =
         urlServerAddress.length > 1
             ? urlServerAddress[1]
-            : DEFAULT_PORT.toString();
+            : DEFAULT_PORT_HTTP.toString();
     let protocol = urlServerAddress.length > 2 ? urlServerAddress[2] : "http";
     const serverName = urlServerAddress.length > 3 ? urlServerAddress[3] : "";
 
