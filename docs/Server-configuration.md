@@ -93,3 +93,66 @@ IMPOSTOR_Server__ListenPort=22023
 IMPOSTOR_AntiCheat__Enabled=true
 IMPOSTOR_AntiCheat__BanIpFromGame=true
 ```
+
+# systemd
+
+Linux users will likely want to create a systemd service definition to manage running the Impostor application.  Benefits to using a systemd service include the following:
+
+- The server process can automatically restart if the process dies
+- Impostor can be set to start on boot (handy if you do system updates regularly)
+- You can use systemd targets to ensure the process doesn't start until the system dependencies are met
+
+Using your favorite text editor, create the following service file:
+
+```
+sudo vim /etc/systemd/system/impostor.service
+```
+
+Modify the following template to your needs and populate the service file.
+
+```
+[Unit]
+Description=Impostor private Among Us server - https://github.com/Impostor/Impostor
+
+[Service]
+# Directory where Impostor is installed
+WorkingDirectory=/opt/impostor
+# Path to Impostor binary
+ExecStart=/opt/impostor/Impostor.Server
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=log.impostor
+
+# User and group that will run the Impostor server process -- ensure that user has execute on the binary
+User=impostor
+Group=impostor
+TimeoutStopSec=10
+
+[Install]
+# Wait until most system services have started before starting Impostor
+WantedBy=multi-user.target
+```
+
+Reload all systemd unit files to source in the new file you've created.
+
+```
+sudo systemctl daemon-reload
+```
+
+Start the service and verify that it starts correctly.  Hint: Use the Q key to quit out of journalctl.
+
+```
+sudo systemctl start impostor.service
+```
+
+```
+sudo journalctl -u impostor.service
+```
+
+If everything has started correctly, ensure the service is set to start on boot.
+
+```
+sudo systemctl enable impostor.service
+```
