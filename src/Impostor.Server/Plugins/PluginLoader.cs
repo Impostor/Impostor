@@ -27,7 +27,7 @@ namespace Impostor.Server.Plugins
             CheckPaths(pluginPaths);
             CheckPaths(libraryPaths);
 
-            // Add library path for ASP.Net Core. This is useful for plugins that depend on ASP.Net Core,
+            // Add library path for ASP.NET Core. This is useful for plugins that depend on ASP.NET Core,
             // like Impostor.Http. The path contains the .NET version number, so it changes regularly.
             var aspNetPath = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory()
                 .Replace("Microsoft.NETCore.App", "Microsoft.AspNetCore.App");
@@ -37,7 +37,7 @@ namespace Impostor.Server.Plugins
             }
             else
             {
-                Logger.Information("ASP.Net Core not installed, this may cause issues if you have plugins that depend on it");
+                Logger.Information("ASP.NET Core not installed, this may cause issues if you have plugins that depend on it");
             }
 
             var rootFolder = Directory.GetCurrentDirectory();
