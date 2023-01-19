@@ -34,8 +34,14 @@ RUN case "$TARGETARCH" in \
   dotnet publish -c release -o /app -r "$NETCORE_PLATFORM" -p:VersionSuffix="$VERSIONSUFFIX" --no-restore ./src/Impostor.Server/Impostor.Server.csproj
 
 # Final image.
-FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime:7.0
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 COPY --from=build /app ./
-EXPOSE 22023/udp
+
+# Add Impostor.Http as a default plugin
+ADD https://github.com/Impostor/Impostor.Http/releases/download/v0.4.0/Impostor.Http.dll /app/plugins/
+# Make it listen to 0.0.0.0 to expose it to the outside world. Override ASPNETCORE_URLS to stop warning.
+ENV IMPOSTOR_HTTP_HttpServer__ListenIp=0.0.0.0 ASPNETCORE_URLS=
+
+EXPOSE 22000/tcp 22023/udp
 ENTRYPOINT ["./Impostor.Server"]
