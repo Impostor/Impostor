@@ -123,7 +123,7 @@ Restart=always
 # Restart service after 10 seconds if the dotnet service crashes
 RestartSec=10
 KillSignal=SIGTERM
-SyslogIdentifier=log.impostor
+SyslogIdentifier=impostor
 
 # User and group that will run the Impostor server process -- ensure that user is allowed to execute the binary
 User=impostor
@@ -132,6 +132,7 @@ TimeoutStopSec=10
 
 [Install]
 # Wait until most system services have started before starting Impostor
+After=multi-user.target
 WantedBy=multi-user.target
 ```
 
