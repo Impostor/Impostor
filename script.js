@@ -1,27 +1,23 @@
 const DEFAULT_PORT_HTTP = "22000";
 const DEFAULT_PORT_HTTPS = "443";
 
+/**
+ * @typedef {{ address: string, port: number, name: string, protocol: string, url: string }} ServerInfo
+ * @returns {ServerInfo}
+ */
 function parseForm() {
-    const serverAddress = document.getElementById("address").value.trim();
-    const serverPort =
-        parseInt(document.getElementById("port").value) ?? DEFAULT_PORT_HTTP;
-    const serverName = document.getElementById("name").value || "Impostor";
-    const serverProtocol =
-        document.querySelector("input[name=serverProtocol]:checked").value ||
-        "http";
+    const address = document.getElementById("address").value.trim();
+    const port = parseInt(document.getElementById("port").value) ?? DEFAULT_PORT_HTTP;
+    const name = document.getElementById("name").value || "Impostor";
+    const protocol = document.querySelector("input[name=serverProtocol]:checked").value || "http";
 
-    return [serverAddress, serverPort, serverName, serverProtocol];
+    return { address, port, name, protocol, url: `${protocol}://${address}` };
 }
 
 async function downloadAsync() {
-    const [serverAddress, serverPort, serverName, serverProtocol] = parseForm();
+    const serverInfo = parseForm();
 
-    const json = generateRegionInfo(
-        serverName,
-        serverAddress,
-        serverPort,
-        serverProtocol
-    );
+    const json = generateRegionInfo(serverInfo);
     const blob = new Blob([json], { type: "text/plain" });
     saveFile(blob, "regionInfo.json");
 
@@ -29,24 +25,21 @@ async function downloadAsync() {
 }
 
 async function openApp() {
-    const [serveraddress, serverport, servername, serverprotocol] = parseForm();
-
-    const serverip = serverprotocol + "://" + serveraddress;
+    const serverInfo = parseForm();
 
     const params = new URLSearchParams({
-        servername,
-        serverport,
-        serverip,
+        servername: serverInfo.name,
+        serverport: serverInfo.port,
+        serverip: serverInfo.url,
         usedtls: false,
     });
-    const url = `amongus://init?${params.toString()}`;
-    window.location = url;
+    window.location = `amongus://init?${params.toString()}`;
 
     return false;
 }
 
 let currentPlatform;
-let httpsSetExplicitly;
+let httpsSetExplicitly = false;
 
 function setEnabled(platform, value) {
     for (const e of document.querySelectorAll(`.${platform}-support`)) {
@@ -61,22 +54,20 @@ function setPlatform(platform) {
 
     if (currentPlatform) {
         setEnabled(currentPlatform, false);
-        document
-            .getElementById(currentPlatform)
-            .classList.remove("text-primary");
+        document.getElementById(currentPlatform).classList.remove("text-primary");
     }
 
     // HTTPS is mandatory on ios/android
     const httpRadio = document.getElementById("http");
     const httpsRadio = document.getElementById("https");
-    if ("android" == platform || "ios" == platform) {
+    if (platform === "android" || platform === "ios") {
         httpsSetExplicitly = httpsRadio.checked;
         httpsRadio.checked = true;
         httpRadio.disabled = true;
         setPortIfDefault("https");
     } else {
         httpRadio.disabled = false;
-        if (false == httpsSetExplicitly) {
+        if (!httpsSetExplicitly) {
             httpRadio.checked = true;
             setPortIfDefault("http");
         }
@@ -89,78 +80,30 @@ function setPlatform(platform) {
 }
 
 function setPortIfDefault(protocol) {
-    const oldPort = protocol == "http" ? DEFAULT_PORT_HTTPS : DEFAULT_PORT_HTTP;
-    const newPort = protocol == "http" ? DEFAULT_PORT_HTTP : DEFAULT_PORT_HTTPS;
+    const oldPort = protocol === "http" ? DEFAULT_PORT_HTTPS : DEFAULT_PORT_HTTP;
+    const newPort = protocol === "http" ? DEFAULT_PORT_HTTP : DEFAULT_PORT_HTTPS;
     const portField = document.getElementById("port");
-    if (portField.value == oldPort) {
+    if (portField.value === oldPort) {
         portField.value = newPort;
     }
 }
 
-function generateRegionInfo(name, fqdn, port, protocol) {
+/**
+ * @param {ServerInfo} serverInfo
+ * @returns {string}
+ */
+function generateRegionInfo(serverInfo) {
     const regions = [
-        // Add default regions so they also show up in the menu
         {
             $type: "StaticHttpRegionInfo, Assembly-CSharp",
-            Name: "North America",
-            PingServer: "matchmaker.among.us",
-            Servers: [
-                {
-                    Name: "Http-1",
-                    Ip: "https://matchmaker.among.us",
-                    Port: 443,
-                    UseDtls: true,
-                    Players: 0,
-                    ConnectionFailures: 0,
-                },
-            ],
-            TranslateName: 289,
-        },
-        {
-            $type: "StaticHttpRegionInfo, Assembly-CSharp",
-            Name: "Europe",
-            PingServer: "matchmaker-eu.among.us",
-            Servers: [
-                {
-                    Name: "Http-1",
-                    Ip: "https://matchmaker-eu.among.us",
-                    Port: 443,
-                    UseDtls: true,
-                    Players: 0,
-                    ConnectionFailures: 0,
-                },
-            ],
-            TranslateName: 290,
-        },
-        {
-            $type: "StaticHttpRegionInfo, Assembly-CSharp",
-            Name: "Asia",
-            PingServer: "matchmaker-as.among.us",
-            Servers: [
-                {
-                    Name: "Http-1",
-                    Ip: "https://matchmaker-as.among.us",
-                    Port: 443,
-                    UseDtls: true,
-                    Players: 0,
-                    ConnectionFailures: 0,
-                },
-            ],
-            TranslateName: 291,
-        },
-        // Followed by the custom region
-        {
-            $type: "StaticHttpRegionInfo, Assembly-CSharp",
-            Name: name,
-            PingServer: fqdn,
+            Name: serverInfo.name,
+            PingServer: serverInfo.address,
             Servers: [
                 {
                     Name: "http-1",
-                    Ip: protocol + "://" + fqdn,
-                    Port: port,
+                    Ip: serverInfo.url,
+                    Port: serverInfo.port,
                     UseDtls: false, // As no custom key can be specified, we need to disable DTLS on custom servers.
-                    Players: 0,
-                    ConnectionFailures: 0,
                 },
             ],
             TranslateName: 1003, // StringNames.NoTranslation
@@ -176,9 +119,9 @@ function generateRegionInfo(name, fqdn, port, protocol) {
 }
 
 function saveFile(blob, fileName) {
-    let url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
 
-    let a = document.createElement("a");
+    const a = document.createElement("a");
     document.body.appendChild(a);
     a.style.display = "none";
     a.href = url;
@@ -189,12 +132,9 @@ function saveFile(blob, fileName) {
 }
 
 function fillFromLocationHash() {
-    const urlServerAddress = document.location.hash.substr(1).split(":");
+    const urlServerAddress = document.location.hash.substring(1).split(":");
     const serverAddress = urlServerAddress[0];
-    const serverPort =
-        urlServerAddress.length > 1
-            ? urlServerAddress[1]
-            : DEFAULT_PORT_HTTP.toString();
+    const serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : DEFAULT_PORT_HTTP.toString();
     let protocol = urlServerAddress.length > 2 ? urlServerAddress[2] : "http";
     const serverName = urlServerAddress.length > 3 ? urlServerAddress[3] : "";
 
@@ -202,12 +142,12 @@ function fillFromLocationHash() {
         document.getElementById("address").value = serverAddress;
     }
 
-    if (new RegExp("^[0-9]+$", "g").test(serverPort)) {
+    if (parseInt(serverPort) !== NaN) {
         document.getElementById("port").value = serverPort;
     }
 
     // Set the default protocol to http
-    if ("http" != protocol && "https" != protocol) {
+    if (protocol !== "http" && protocol !== "https") {
         protocol = "http";
     }
     document.getElementById(protocol).checked = true;
@@ -216,15 +156,8 @@ function fillFromLocationHash() {
 }
 
 function setLocationHash() {
-    document.location.hash =
-        document.getElementById("address").value +
-        ":" +
-        document.getElementById("port").value +
-        ":" +
-        (document.querySelector("input[name=serverProtocol]:checked").value ||
-            "http") +
-        ":" +
-        document.getElementById("name").value;
+    const serverInfo = parseForm();
+    document.location.hash = [serverInfo.address, serverInfo.port, serverInfo.protocol, serverInfo.name].join(":");
 }
 
 fillFromLocationHash();
