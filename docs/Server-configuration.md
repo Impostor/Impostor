@@ -105,7 +105,7 @@ Linux users will likely want to create a systemd service definition to manage ru
 Using your favorite text editor, create the following service file:
 
 ```
-sudo vim /etc/systemd/system/impostor.service
+sudoedit /etc/systemd/system/impostor.service
 ```
 
 Modify the following template to your needs and populate the service file.
@@ -122,10 +122,10 @@ ExecStart=/opt/impostor/Impostor.Server
 Restart=always
 # Restart service after 10 seconds if the dotnet service crashes
 RestartSec=10
-KillSignal=SIGINT
+KillSignal=SIGTERM
 SyslogIdentifier=log.impostor
 
-# User and group that will run the Impostor server process -- ensure that user has execute on the binary
+# User and group that will run the Impostor server process -- ensure that user is allowed to execute the binary
 User=impostor
 Group=impostor
 TimeoutStopSec=10
@@ -141,11 +141,13 @@ Reload all systemd unit files to source in the new file you've created.
 sudo systemctl daemon-reload
 ```
 
-Start the service and verify that it starts correctly.  Hint: Use the Q key to quit out of journalctl.
+Start the service. 
 
 ```
 sudo systemctl start impostor.service
 ```
+
+Check the log for the service and verify it has started correctly -- Hint: Use the Q key to quit out of journalctl.
 
 ```
 sudo journalctl -u impostor.service
