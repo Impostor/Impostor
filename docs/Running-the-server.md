@@ -12,6 +12,7 @@ There are currently two modes to run the Impostor server. The first way, Single 
 4. Extract the zip.
 5. Modify `config.json` to your liking. Documentation can be found [here](Server-configuration.md) _(this step is mandatory if you want to expose this server to other devices)_
 6. Run `Impostor.Server` (Linux/macOS) or `Impostor.Server.exe` (Windows)
+7. (OPTIONAL - Linux) Configure a systemd definition file and enable the service to start on boot - [systemd configuration](Server-configuration.md#systemd)
 
 Depending on your host you may also need to port forward Impostor to the internet. By default Impostor uses port **22023** and the **UDP** protocol. As port forwarding changes per host or router configuration, port forwarding is not covered by this guide.
 
