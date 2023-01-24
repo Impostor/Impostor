@@ -1,56 +1,23 @@
-const DEFAULT_PORT = 22023;
+const DEFAULT_PORT_HTTP = "22000";
+const DEFAULT_PORT_HTTPS = "443";
 
-const IP_REGEX = /(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}/;
-
-async function parseAddressAsync(serverAddress) {
-    if (serverAddress === "localhost") {
-        serverAddress = "127.0.0.1";
-    }
-
-    if (IP_REGEX.test(serverAddress)) {
-        // TODO: wait for update fixing StaticRegionInfo
-        return [serverAddress, serverAddress];
-    }
-
-    /** @type {{ Status: number, Answer: { type: number, data: string }[] }} */
-    const dns = await (await fetch("https://cloudflare-dns.com/dns-query?type=A&name=" + serverAddress, {
-        headers: {
-            "Accept": "application/dns-json"
-        }
-    })).json();
-
-    if (dns && dns.Status === 0) {
-        for (const record of dns.Answer) {
-            if (record.type === 1 && IP_REGEX.test(record.data)) {
-                return [record.data, serverAddress];
-            }
-        }
-    }
-
-    const message = "Failed DNS request for " + serverAddress;
-
-    alert(message);
-    throw Error(message);
-}
-
+/**
+ * @typedef {{ address: string, port: number, name: string, protocol: string, url: string }} ServerInfo
+ * @returns {ServerInfo}
+ */
 function parseForm() {
-    const serverAddress = document.getElementById("address").value.trim();
-    const serverPort = parseInt(document.getElementById("port").value) ?? DEFAULT_PORT;
-    const serverName = document.getElementById("name").value || "Impostor";
+    const address = document.getElementById("address").value.trim();
+    const port = parseInt(document.getElementById("port").value) ?? DEFAULT_PORT_HTTP;
+    const name = document.getElementById("name").value || "Impostor";
+    const protocol = document.querySelector("input[name=serverProtocol]:checked").value || "http";
 
-    return [serverAddress, serverPort, serverName];
+    return { address, port, name, protocol, url: `${protocol}://${address}` };
 }
 
 async function downloadAsync() {
-    const [serverAddress, serverPort, serverName] = parseForm();
-    const [serverIp, serverFqdn] = await parseAddressAsync(serverAddress);
+    const serverInfo = parseForm();
 
-    const json = generateRegionInfo(
-        serverName,
-        serverIp,
-        serverFqdn,
-        serverPort
-    );
+    const json = generateRegionInfo(serverInfo);
     const blob = new Blob([json], { type: "text/plain" });
     saveFile(blob, "regionInfo.json");
 
@@ -58,22 +25,21 @@ async function downloadAsync() {
 }
 
 async function openApp() {
-    const [serveraddress, serverport, servername] = parseForm();
-    const [serverip, _] = await parseAddressAsync(serveraddress);
+    const serverInfo = parseForm();
 
     const params = new URLSearchParams({
-        servername,
-        serverport,
-        serverip,
+        servername: serverInfo.name,
+        serverport: serverInfo.port,
+        serverip: serverInfo.url,
         usedtls: false,
     });
-    const url = `amongus://init?${params.toString()}`;
-    window.location = url;
+    window.location = `amongus://init?${params.toString()}`;
 
     return false;
 }
 
 let currentPlatform;
+let httpsSetExplicitly = false;
 
 function setEnabled(platform, value) {
     for (const e of document.querySelectorAll(`.${platform}-support`)) {
@@ -91,51 +57,56 @@ function setPlatform(platform) {
         document.getElementById(currentPlatform).classList.remove("text-primary");
     }
 
+    // HTTPS is mandatory on ios/android
+    const httpRadio = document.getElementById("http");
+    const httpsRadio = document.getElementById("https");
+    if (platform === "android" || platform === "ios") {
+        httpsSetExplicitly = httpsRadio.checked;
+        httpsRadio.checked = true;
+        httpRadio.disabled = true;
+        setPortIfDefault("https");
+    } else {
+        httpRadio.disabled = false;
+        if (!httpsSetExplicitly) {
+            httpRadio.checked = true;
+            setPortIfDefault("http");
+        }
+    }
+
     setEnabled(platform, true);
     document.getElementById(platform).classList.add("text-primary");
 
     currentPlatform = platform;
 }
 
-function generateRegionInfo(name, ip, fqdn, port) {
+function setPortIfDefault(protocol) {
+    const oldPort = protocol === "http" ? DEFAULT_PORT_HTTPS : DEFAULT_PORT_HTTP;
+    const newPort = protocol === "http" ? DEFAULT_PORT_HTTP : DEFAULT_PORT_HTTPS;
+    const portField = document.getElementById("port");
+    if (portField.value === oldPort) {
+        portField.value = newPort;
+    }
+}
+
+/**
+ * @param {ServerInfo} serverInfo
+ * @returns {string}
+ */
+function generateRegionInfo(serverInfo) {
     const regions = [
-        // Add default regions so they also show up in the menu
         {
-            $type: "DnsRegionInfo, Assembly-CSharp",
-            Fqdn: "na.mm.among.us",
-            DefaultIp: "50.116.1.42",
-            Port: 22023,
-            Name: "North America",
-            TranslateName: 289,
-            UseDtls: true,
-        },
-        {
-            $type: "DnsRegionInfo, Assembly-CSharp",
-            Fqdn: "eu.mm.among.us",
-            DefaultIp: "172.105.251.170",
-            Port: 22023,
-            Name: "Europe",
-            TranslateName: 290,
-            UseDtls: true,
-        },
-        {
-            $type: "DnsRegionInfo, Assembly-CSharp",
-            Fqdn: "as.mm.among.us",
-            DefaultIp: "139.162.111.196",
-            Port: 22023,
-            Name: "Asia",
-            TranslateName: 291,
-            UseDtls: true,
-        },
-        // Followed by the custom region
-        {
-            $type: "DnsRegionInfo, Assembly-CSharp",
-            Fqdn: fqdn,
-            DefaultIp: ip,
-            Port: port,
-            Name: name,
+            $type: "StaticHttpRegionInfo, Assembly-CSharp",
+            Name: serverInfo.name,
+            PingServer: serverInfo.address,
+            Servers: [
+                {
+                    Name: "http-1",
+                    Ip: serverInfo.url,
+                    Port: serverInfo.port,
+                    UseDtls: false, // As no custom key can be specified, we need to disable DTLS on custom servers.
+                },
+            ],
             TranslateName: 1003, // StringNames.NoTranslation
-            UseDtls: false, // As no custom key can be specified, we need to disable DTLS on custom servers.
         },
     ];
 
@@ -148,9 +119,9 @@ function generateRegionInfo(name, ip, fqdn, port) {
 }
 
 function saveFile(blob, fileName) {
-    let url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
 
-    let a = document.createElement("a");
+    const a = document.createElement("a");
     document.body.appendChild(a);
     a.style.display = "none";
     a.href = url;
@@ -161,17 +132,32 @@ function saveFile(blob, fileName) {
 }
 
 function fillFromLocationHash() {
-    const urlServerAddress = document.location.hash.substr(1).split(":");
+    const urlServerAddress = document.location.hash.substring(1).split(":");
     const serverAddress = urlServerAddress[0];
-    const serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : DEFAULT_PORT.toString();
+    const serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : DEFAULT_PORT_HTTP.toString();
+    let protocol = urlServerAddress.length > 2 ? urlServerAddress[2] : "http";
+    const serverName = urlServerAddress.length > 3 ? urlServerAddress[3] : "";
 
     if (serverAddress) {
         document.getElementById("address").value = serverAddress;
     }
 
-    if (new RegExp("^[0-9]+$", "g").test(serverPort)) {
+    if (parseInt(serverPort) !== NaN) {
         document.getElementById("port").value = serverPort;
     }
+
+    // Set the default protocol to http
+    if (protocol !== "http" && protocol !== "https") {
+        protocol = "http";
+    }
+    document.getElementById(protocol).checked = true;
+
+    document.getElementById("name").value = serverName;
+}
+
+function setLocationHash() {
+    const serverInfo = parseForm();
+    document.location.hash = [serverInfo.address, serverInfo.port, serverInfo.protocol, serverInfo.name].join(":");
 }
 
 fillFromLocationHash();
