@@ -36,6 +36,14 @@ namespace Impostor.Server.Net
                 endpoint.Port,
                 _serverConfig.ResolvePublicIp(),
                 _serverConfig.PublicPort);
+
+            // NOTE: If this warning annoys you, set your PublicIp to "localhost"
+            if (_serverConfig.PublicIp == "127.0.0.1")
+            {
+                _logger.LogWarning("Your PublicIp is set to the default value of 127.0.0.1.");
+                _logger.LogWarning("To allow people on other devices to connect to your server, change this value to your Public IP address");
+                _logger.LogWarning("For more info on how to do this see https://github.com/Impostor/Impostor/blob/master/docs/Server-configuration.md");
+            }
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
