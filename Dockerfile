@@ -30,7 +30,7 @@ RUN case "$TARGETARCH" in \
     arm)    NETCORE_PLATFORM='linux-arm';; \
     *) echo "unsupported architecture"; exit 1 ;; \
   esac && \
-  [[ $VERSIONSUFFIX = "none" ]] && VERSIONSUFFIX=; \
+  [ $VERSIONSUFFIX = "none" ] && VERSIONSUFFIX=; \
   dotnet publish -c release -o /app -r "$NETCORE_PLATFORM" -p:VersionSuffix="$VERSIONSUFFIX" --no-restore ./src/Impostor.Server/Impostor.Server.csproj
 
 # Final image.
