@@ -21,6 +21,9 @@ namespace Impostor.Api.Innersloth
         SpanishEU = 1024,
         Arabic = 32,
         Polish = 128,
+        SChinese = 65536,
+        TChinese = 131072,
+        Irish = 262144,
         Other = 1,
     }
 }
