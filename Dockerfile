@@ -30,7 +30,7 @@ RUN case "$TARGETARCH" in \
     arm)    NETCORE_PLATFORM='linux-arm';; \
     *) echo "unsupported architecture"; exit 1 ;; \
   esac && \
-  [[ $VERSIONSUFFIX = "none" ]] && VERSIONSUFFIX=; \
+  [ $VERSIONSUFFIX = "none" ] && VERSIONSUFFIX=; \
   dotnet publish -c release -o /app -r "$NETCORE_PLATFORM" -p:VersionSuffix="$VERSIONSUFFIX" --no-restore ./src/Impostor.Server/Impostor.Server.csproj
 
 # Final image.
@@ -38,10 +38,14 @@ FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 COPY --from=build /app ./
 
-# Add Impostor.Http as a default plugin
-ADD https://github.com/Impostor/Impostor.Http/releases/download/v0.4.0/Impostor.Http.dll /app/plugins/
-# Make it listen to 0.0.0.0 to expose it to the outside world. Override ASPNETCORE_URLS to stop warning.
-ENV IMPOSTOR_HTTP_HttpServer__ListenIp=0.0.0.0 ASPNETCORE_URLS=
+# Add Impostor.Http as a default built-in plugin
+ADD https://github.com/Impostor/Impostor.Http/releases/download/v0.4.0/Impostor.Http.dll /app/builtin-plugins/
+# Make it listen to 0.0.0.0 to expose it to the outside world.
+ENV IMPOSTOR_HTTP_HttpServer__ListenIp=0.0.0.0
+# Override ASPNETCORE_URLS to stop warning.
+ENV ASPNETCORE_URLS=
+# Enable the built-in plugin folder. Use a high number to prevent conflicts with existing configurations
+ENV IMPOSTOR_PluginLoader__Paths__76=/app/builtin-plugins
 
 EXPOSE 22000/tcp 22023/udp
 ENTRYPOINT ["./Impostor.Server"]
