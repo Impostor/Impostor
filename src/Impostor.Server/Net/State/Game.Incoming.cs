@@ -166,14 +166,6 @@ namespace Impostor.Server.Net.State
                 }
             }
 
-            // Check if;
-            // - The player is already in this game.
-            // - The game is full.
-            if (player?.Game != this && _players.Count >= Options.MaxPlayers)
-            {
-                return GameJoinResult.FromError(GameJoinError.GameFull);
-            }
-
             if (GameState == GameStates.Starting || GameState == GameStates.Started)
             {
                 return GameJoinResult.FromError(GameJoinError.GameStarted);
@@ -182,6 +174,14 @@ namespace Impostor.Server.Net.State
             if (GameState == GameStates.Destroyed)
             {
                 return GameJoinResult.FromError(GameJoinError.GameDestroyed);
+            }
+
+            // Check if;
+            // - The player is already in this game.
+            // - The game is full.
+            if (player?.Game != this && _players.Count >= Options.MaxPlayers)
+            {
+                return GameJoinResult.FromError(GameJoinError.GameFull);
             }
 
             var isNew = false;
