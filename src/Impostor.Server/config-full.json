@@ -9,6 +9,10 @@
     "Enabled": true,
     "BanIpFromGame": true
   },
+  "Timeout": {
+    "SpawnTimeout": 2500,
+    "ConnectionTimeout": 2500
+  },
   "Compatibility": {
     "AllowFutureGameVersions": false,
     "AllowVersionMixing": false
