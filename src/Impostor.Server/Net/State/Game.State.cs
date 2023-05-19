@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
@@ -76,7 +76,7 @@ namespace Impostor.Server.Net.State
             // Player can refuse to be kicked and keep the connection open, check for this.
             _ = Task.Run(async () =>
             {
-                await Task.Delay(Constants.ConnectionTimeout);
+                await Task.Delay(_timeoutConfig.ConnectionTimeout);
 
                 if (player.Client.Connection.IsConnected && player.Client.Connection is HazelConnection hazel)
                 {
