@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -99,6 +99,7 @@ namespace Impostor.Server
                     services.Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section));
                     services.Configure<CompatibilityConfig>(host.Configuration.GetSection(CompatibilityConfig.Section));
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
+                    services.Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section));
 
                     services.AddSingleton<ClientManager>();
                     services.AddSingleton<IClientManager>(p => p.GetRequiredService<ClientManager>());
