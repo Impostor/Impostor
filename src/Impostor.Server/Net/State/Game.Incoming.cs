@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Games;
@@ -188,7 +188,7 @@ namespace Impostor.Server.Net.State
 
             if (player == null || player.Game != this)
             {
-                var clientPlayer = new ClientPlayer(_serviceProvider.GetRequiredService<ILogger<ClientPlayer>>(), client, this);
+                var clientPlayer = new ClientPlayer(_serviceProvider.GetRequiredService<ILogger<ClientPlayer>>(), client, this, _timeoutConfig.SpawnTimeout);
 
                 if (!_clientManager.Validate(client))
                 {

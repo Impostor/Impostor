@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
@@ -13,11 +13,13 @@ namespace Impostor.Server.Net.State
     {
         private readonly ILogger<ClientPlayer> _logger;
         private readonly Timer _spawnTimeout;
+        private readonly int _spawnTimeoutTime;
 
-        public ClientPlayer(ILogger<ClientPlayer> logger, ClientBase client, Game game)
+        public ClientPlayer(ILogger<ClientPlayer> logger, ClientBase client, Game game, int timeOutTime)
         {
             _logger = logger;
             _spawnTimeout = new Timer(RunSpawnTimeout!, null, -1, -1);
+            _spawnTimeoutTime = timeOutTime;
 
             Game = game;
             Client = client;
@@ -41,7 +43,7 @@ namespace Impostor.Server.Net.State
 
         public void InitializeSpawnTimeout()
         {
-            _spawnTimeout.Change(Constants.SpawnTimeout, -1);
+            _spawnTimeout.Change(_spawnTimeoutTime, -1);
         }
 
         public void DisableSpawnTimeout()

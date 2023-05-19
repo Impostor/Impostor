@@ -30,6 +30,7 @@ namespace Impostor.Server.Net.State
         private readonly HashSet<IPAddress> _bannedIps;
         private readonly IEventManager _eventManager;
         private readonly CompatibilityConfig _compatibilityConfig;
+        private readonly TimeoutConfig _timeoutConfig;
 
         public Game(
             ILogger<Game> logger,
@@ -41,7 +42,8 @@ namespace Impostor.Server.Net.State
             GameFilterOptions filterOptions,
             ClientManager clientManager,
             IEventManager eventManager,
-            IOptions<CompatibilityConfig> compatibilityConfig)
+            IOptions<CompatibilityConfig> compatibilityConfig,
+            IOptions<TimeoutConfig> timeoutConfig)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
@@ -59,6 +61,7 @@ namespace Impostor.Server.Net.State
             _clientManager = clientManager;
             _eventManager = eventManager;
             _compatibilityConfig = compatibilityConfig.Value;
+            _timeoutConfig = timeoutConfig.Value;
             Items = new ConcurrentDictionary<object, object>();
         }
 
