@@ -513,36 +513,40 @@ namespace Impostor.Server.Net.Inner.Objects
             }
             else
             {
-                if (!RequestedPlayerName.Any())
+                if (RequestedPlayerName.Any())
                 {
-                    _logger.LogWarning($"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it");
-                    return false;
-                }
+                    var expected = RequestedPlayerName.Dequeue();
 
-                var expected = RequestedPlayerName.Dequeue();
-
-                if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == expected))
-                {
-                    var i = 1;
-                    while (true)
+                    if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == expected))
                     {
-                        var text = expected + " " + i;
-
-                        if (Game.Players.All(x => x.Character == null || x.Character == this || x.Character.PlayerInfo.PlayerName != text))
+                        var i = 1;
+                        while (true)
                         {
-                            expected = text;
-                            break;
-                        }
+                            var text = expected + " " + i;
 
-                        i++;
+                            if (Game.Players.All(x => x.Character == null || x.Character == this || x.Character.PlayerInfo.PlayerName != text))
+                            {
+                                expected = text;
+                                break;
+                            }
+
+                            i++;
+                        }
+                    }
+
+                    if (name != expected)
+                    {
+                        _logger.LogWarning($"Client sent {nameof(RpcCalls.SetName)} with incorrect name");
+                        await SetNameAsync(expected);
+                        return false;
                     }
                 }
-
-                if (name != expected)
+                else
                 {
-                    _logger.LogWarning($"Client sent {nameof(RpcCalls.SetName)} with incorrect name");
-                    await SetNameAsync(expected);
-                    return false;
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, $"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it"))
+                    {
+                        return false;
+                    }
                 }
             }
 
