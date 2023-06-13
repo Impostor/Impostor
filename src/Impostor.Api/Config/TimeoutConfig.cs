@@ -5,6 +5,7 @@ namespace Impostor.Api.Config
         public const string Section = "Timeout";
 
         public int SpawnTimeout { get; set; } = 2500;
+
         public int ConnectionTimeout { get; set; } = 2500;
     }
 }
