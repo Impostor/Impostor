@@ -8,19 +8,18 @@ This section applies to both the normal installation as well as the Docker (Comp
 
 To connect to the server, you need to configure and install a region file on https://impostor.github.io/Impostor/
 
-Depending on your host you may also need to port forward Impostor to the internet or pass Impostor traffic by your firewall. By default Impostor uses two ports:
+Among Us connects to the server using two network services: the (TCP) HTTP service points Among Us to the UDP service, then the UDP service hosts the actual game traffic. Because of this, Impostor uses port 22023 using **both** the TCP and UDP protocols.
 
-- Port **22023** using the **UDP** protocol
-- Port **22000** using the **TCP** protocol
+As the phone version of Among Us requires this HTTP connection to be secure, we recommend using a HTTP reverse proxy to terminate SSL on the HTTP service. Setup instructions for this are in the [Impostor.Http readme](https://github.com/Impostor/Impostor.Http#readme).
 
-As port forwarding changes per host or router configuration, port forwarding is not covered by this guide.
+Depending on your host you may also need to port forward Impostor to the internet or pass Impostor traffic by your firewall. Port 22023 UDP needs to be accessible for everyone that wants to play on the server, then you also need to portforward your HTTP reverse proxy or port 22023 TCP if you don't use a reverse proxy. As port forwarding changes per host or router configuration, port forwarding is not covered by this guide.
 
 ## Normal installation
 
 1. Install [.NET 7.0](https://dotnet.microsoft.com/download/dotnet/7.0). We recommend either the ASP.NET Core Runtime or the SDK. The SDK is necessary in case you want to develop Impostor or Impostor plugins.
-2. Download the [latest release](https://github.com/Impostor/Impostor/releases) or the [latest CI build](https://nightly.link/Impostor/Impostor/workflows/ci/master). Note that Impostor is built for multiple CPU-architectures and operating systems, you most likely want the x64 version, unless you are running on a Raspberry Pi or another device with an ARM processor.
+2. Download the [latest release](https://github.com/Impostor/Impostor/releases) or the [latest CI build](https://nightly.link/Impostor/Impostor/workflows/ci/master). Note that Impostor is built for multiple CPU-architectures and operating systems, you most likely want the x64 version, unless you are running on a Raspberry Pi or another device with an Arm processor.
 3. Extract the zip.
-4. Download the [Impostor.Http](https://github.com/Impostor/Impostor.Http) plugin and put it in your `plugins` folder.
+4. Download the [Impostor.Http](https://github.com/Impostor/Impostor.Http) plugin and put it in your `plugins` folder. Please note the Reverse Proxy configuration: you either need to configure a reverse proxy to terminate SSL or expose the service to the world by changing ListenIp.
 5. Modify `config.json` to your liking. Documentation can be found [here](Server-configuration.md). You need to at least change `PublicIp` to the address people will connect to your server to.
 6. Run `Impostor.Server` (Linux/macOS) or `Impostor.Server.exe` (Windows)
 7. (OPTIONAL - Linux) Configure a systemd definition file and enable the service to start on boot - [systemd configuration](Server-configuration.md#systemd)
@@ -35,7 +34,7 @@ Docker is a program that allows you to run programs like Impostor in a container
 After installing Docker, you can just start a Docker container with `docker run`:
 
 ```
-docker run -p 22000:22000/tcp -p 22023:22023/udp -e IMPOSTOR_Server__PublicIp=your.public.ip.here aeonlucid/impostor:nightly
+docker run -p 127.0.0.1:22023:22023/tcp -p 22023:22023/udp -e IMPOSTOR_Server__PublicIp=your.public.ip.here aeonlucid/impostor:nightly
 ```
 
 Please replace `your.public.ip.here` with the public IP address of your server. This is the address Among Us will try to reach your client at.
@@ -54,7 +53,7 @@ services:
     image: aeonlucid/impostor:nightly
     container_name: impostor
     ports:
-      - 22000:22000/tcp
+      - 127.0.0.1:22023:22023/tcp
       - 22023:22023/udp
     environment: # Either configure Impostor using environment variables or mount a copy of config.json
       - IMPOSTOR_Server__PublicIp=your.public.ip.here
