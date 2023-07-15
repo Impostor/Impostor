@@ -100,6 +100,7 @@ namespace Impostor.Server
                     services.Configure<CompatibilityConfig>(host.Configuration.GetSection(CompatibilityConfig.Section));
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                     services.Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section));
+                    services.Configure<ModConfig>(host.Configuration.GetSection(ModConfig.Section));
 
                     services.AddSingleton<ClientManager>();
                     services.AddSingleton<IClientManager>(p => p.GetRequiredService<ClientManager>());

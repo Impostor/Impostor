@@ -23,5 +23,6 @@
         public const string VersionServerTooOld = "Your client is too new, please update your Impostor server to play.";
 
         public const string VersionUnsupported = "Your client version is unsupported, please update your Game and/or Impostor server.";
+        public const string NoAllowModVersion = "Server does not allow Mod version";
     }
 }

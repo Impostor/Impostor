@@ -22,15 +22,29 @@ namespace Impostor.Server.Net
     {
         private readonly ILogger<Client> _logger;
         private readonly AntiCheatConfig _antiCheatConfig;
+        private readonly ModConfig _modConfig;
         private readonly ClientManager _clientManager;
         private readonly GameManager _gameManager;
         private readonly ICustomMessageManager<ICustomRootMessage> _customMessageManager;
 
-        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, string name, int gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, IHazelConnection connection)
+        public Client(
+            ILogger<Client> logger,
+            IOptions<AntiCheatConfig> antiCheatOptions,
+            IOptions<ModConfig> modConfigOptions,
+            ClientManager clientManager,
+            GameManager gameManager,
+            ICustomMessageManager<ICustomRootMessage> customMessageManager,
+            string name,
+            int gameVersion,
+            Language language,
+            QuickChatModes chatMode,
+            PlatformSpecificData platformSpecificData,
+            IHazelConnection connection)
             : base(name, gameVersion, language, chatMode, platformSpecificData, connection)
         {
             _logger = logger;
             _antiCheatConfig = antiCheatOptions.Value;
+            _modConfig = modConfigOptions.Value;
             _clientManager = clientManager;
             _gameManager = gameManager;
             _customMessageManager = customMessageManager;
@@ -38,7 +52,7 @@ namespace Impostor.Server.Net
 
         public override async ValueTask<bool> ReportCheatAsync(CheatContext context, string message)
         {
-            if (!_antiCheatConfig.Enabled)
+            if (!_antiCheatConfig.Enabled || _modConfig.Enabled)
             {
                 return false;
             }

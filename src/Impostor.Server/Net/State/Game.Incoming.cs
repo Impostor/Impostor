@@ -154,7 +154,8 @@ namespace Impostor.Server.Net.State
 
             // Check if the player is running the same version as the host
             if (_compatibilityConfig.AllowVersionMixing == false &&
-                this.Host != null && client.GameVersion != this.Host.Client.GameVersion)
+                this.Host != null && client.GameVersion != this.Host.Client.GameVersion &&
+                this.Host.Client.GameVersion != GameVersion.GetVersion(2022, 0, 0))
             {
                 if (client.GameVersion < this.Host.Client.GameVersion)
                 {

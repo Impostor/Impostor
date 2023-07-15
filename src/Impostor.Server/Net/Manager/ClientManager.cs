@@ -30,20 +30,24 @@ namespace Impostor.Server.Net.Manager
             GameVersion.GetVersion(2023, 5, 20), // 2023.7.11
         };
 
+        private static readonly int ModVersion = GameVersion.GetVersion(2222, 0, 0);
+
         private readonly ILogger<ClientManager> _logger;
         private readonly IEventManager _eventManager;
         private readonly ConcurrentDictionary<int, ClientBase> _clients;
         private readonly CompatibilityConfig _compatibilityConfig;
+        private readonly ModConfig _modConfig;
         private readonly IClientFactory _clientFactory;
         private int _idLast;
 
-        public ClientManager(ILogger<ClientManager> logger, IEventManager eventManager, IClientFactory clientFactory, IOptions<CompatibilityConfig> compatibilityConfig)
+        public ClientManager(ILogger<ClientManager> logger, IEventManager eventManager, IClientFactory clientFactory, IOptions<CompatibilityConfig> compatibilityConfig, IOptions<ModConfig> modConfig)
         {
             _logger = logger;
             _eventManager = eventManager;
             _clientFactory = clientFactory;
             _clients = new ConcurrentDictionary<int, ClientBase>();
             _compatibilityConfig = compatibilityConfig.Value;
+            _modConfig = modConfig.Value;
         }
 
         private enum VersionCompareResult
@@ -51,6 +55,7 @@ namespace Impostor.Server.Net.Manager
             Compatible,
             ClientTooOld,
             ServerTooOld,
+            NoAllowModVersion,
             Unknown,
         }
 
@@ -91,6 +96,7 @@ namespace Impostor.Server.Net.Manager
                 {
                     VersionCompareResult.ClientTooOld => DisconnectMessages.VersionClientTooOld,
                     VersionCompareResult.ServerTooOld => DisconnectMessages.VersionServerTooOld,
+                    VersionCompareResult.NoAllowModVersion => DisconnectMessages.NoAllowModVersion,
                     VersionCompareResult.Unknown => DisconnectMessages.VersionUnsupported,
                     _ => throw new ArgumentOutOfRangeException(),
                 };
@@ -136,6 +142,18 @@ namespace Impostor.Server.Net.Manager
 
         private VersionCompareResult CompareVersion(int clientVersion)
         {
+            if (clientVersion == ModVersion)
+            {
+                if (_modConfig.AllowModVersion)
+                {
+                    return VersionCompareResult.Compatible;
+                }
+                else
+                {
+                    return VersionCompareResult.NoAllowModVersion;
+                }
+            }
+
             foreach (var serverVersion in SupportedVersions)
             {
                 if (clientVersion == serverVersion)
