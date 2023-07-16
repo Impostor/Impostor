@@ -126,7 +126,8 @@ namespace Impostor.Server.Plugins
 
             builder.ConfigureServices(services =>
             {
-                services.AddHostedService(provider => ActivatorUtilities.CreateInstance<PluginLoaderService>(provider, orderedPlugins));
+                services.AddSingleton<PluginLoaderService>(provider => ActivatorUtilities.CreateInstance<PluginLoaderService>(provider, orderedPlugins));
+                services.AddSingleton<IHostedService>(p => p.GetRequiredService<PluginLoaderService>());
 
                 foreach (var plugin in orderedPlugins)
                 {

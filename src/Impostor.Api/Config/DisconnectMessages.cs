@@ -23,5 +23,7 @@
         public const string VersionServerTooOld = "Your client is too new, please update your Impostor server to play.";
 
         public const string VersionUnsupported = "Your client version is unsupported, please update your Game and/or Impostor server.";
+
+        public const string UdpMatchmakingUnsupported = "UDP matchmaking is not supported anymore, migrate to a HTTP connection.";
     }
 }
