@@ -156,11 +156,13 @@ namespace Impostor.Server.Net.State
             if (_compatibilityConfig.AllowVersionMixing == false &&
                 this.Host != null && client.GameVersion != this.Host.Client.GameVersion)
             {
-                if (client.GameVersion < this.Host.Client.GameVersion)
+                _compatibilityManager.TryGetCompatibilityGroup(client.GameVersion, out var clientCompatGroup);
+                _compatibilityManager.TryGetCompatibilityGroup(Host.Client.GameVersion, out var hostCompatGroup);
+                if (clientCompatGroup < hostCompatGroup)
                 {
                     return GameJoinResult.FromError(GameJoinError.ClientOutdated);
                 }
-                else
+                else if (clientCompatGroup > hostCompatGroup)
                 {
                     return GameJoinResult.FromError(GameJoinError.ClientTooNew);
                 }
