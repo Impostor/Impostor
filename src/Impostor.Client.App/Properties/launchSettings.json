@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Impostor.Client.App": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\bleda\\source\\repos\\https-take-crowds.web.app-\\src\\Impostor.Client.App\\bin\\Debug\\net6.0"
+    }
+  }
+}

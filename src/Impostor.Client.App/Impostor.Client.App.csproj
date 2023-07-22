@@ -1,7 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
+    <RepositoryUrl>C:\Users\bleda\source\repos\https-take-crowds.web.app-</RepositoryUrl>
+    <PackageProjectUrl>www.impostor.io</PackageProjectUrl>
+    <RepositoryType>Basic</RepositoryType>
+    <Nullable>enable</Nullable>
+    <ApplicationIcon>impostor_001.ico</ApplicationIcon>
+    <StartupObject />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\bleda\source\repos\https-take-crowds.web.app-\src\Impostor.Client.App\Impostor.Client.App.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
