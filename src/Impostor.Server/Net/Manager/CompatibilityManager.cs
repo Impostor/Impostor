@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Manager;
 using Microsoft.Extensions.Logging;
@@ -24,33 +25,43 @@ namespace Impostor.Server.Net.Manager
         };
 
         // Map from client version to compatibility group
-        private readonly Dictionary<int, int> _supportMap = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> _supportMap = new();
         private readonly ILogger<CompatibilityManager> _logger;
-        private readonly bool initializationFinished;
         private int _lowestVersionSupported = int.MaxValue;
         private int _highestVersionSupported = 0;
 
         public CompatibilityManager(ILogger<CompatibilityManager> logger)
         {
             _logger = logger;
-            initializationFinished = false;
             foreach (var compatData in DefaultSupportedVersions)
             {
-                AddSupportedVersion(compatData.GameVersion, compatData.CompatGroup, compatData.IncludeInSupportRange);
+                AddSupportedVersionInternal(compatData.GameVersion, compatData.CompatGroup, compatData.IncludeInSupportRange);
             }
-
-            ModifiedByUser = false;
-            initializationFinished = true;
         }
 
-        internal bool ModifiedByUser { get; private set; }
-
-        public ICompatibilityManager.VersionCompareResult TryGetCompatibilityGroup(int clientVersion, out int? compatGroup)
+        public int? TryGetCompatibilityGroup(int clientVersion)
         {
-            compatGroup = null;
-            if (_supportMap.TryGetValue(clientVersion, out var compat))
+            // Innersloth servers allow disabling server authority by setting the Patch field to 25.
+            // We should allow crossplay between client versions with this field set and those without.
+            if ((clientVersion % 50) >= 25)
             {
-                compatGroup = compat;
+                clientVersion -= 25;
+            }
+
+            if (_supportMap.TryGetValue(clientVersion, out var compatGroup))
+            {
+                return compatGroup;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public ICompatibilityManager.VersionCompareResult CanConnectToServer(int clientVersion)
+        {
+            if (this.TryGetCompatibilityGroup(clientVersion) != null)
+            {
                 return ICompatibilityManager.VersionCompareResult.Compatible;
             }
             else if (clientVersion < _lowestVersionSupported)
@@ -67,14 +78,44 @@ namespace Impostor.Server.Net.Manager
             }
         }
 
-        public void AddSupportedVersion(int gameVersion, int compatGroup, bool includeInSupportRange)
+        public GameJoinError CanJoinGame(int hostVersion, int playerVersion)
         {
-            if (initializationFinished)
+            if (hostVersion == playerVersion)
             {
-                ModifiedByUser = true;
-                _logger.LogWarning("AddSupportedVersion was called by a plugin, this can create unexpected issues. Please proceed carefully");
+                // Optimize a common case: a player on version X should always be able to join version X
+                return GameJoinError.None;
             }
 
+            var hostCompatGroup = this.TryGetCompatibilityGroup(hostVersion);
+            var playerCompatGroup = this.TryGetCompatibilityGroup(playerVersion);
+
+            if (hostCompatGroup == null || playerCompatGroup == null)
+            {
+                return GameJoinError.InvalidClient;
+            }
+            else if (playerCompatGroup < hostCompatGroup)
+            {
+                return GameJoinError.ClientOutdated;
+            }
+            else if (playerCompatGroup > hostCompatGroup)
+            {
+                return GameJoinError.ClientTooNew;
+            }
+            else
+            {
+                return GameJoinError.None;
+            }
+        }
+
+        public void AddSupportedVersion(int gameVersion, int compatGroup)
+        {
+            _logger.LogWarning("AddSupportedVersion was called by a plugin, this can create unexpected issues. Please proceed carefully");
+
+            AddSupportedVersionInternal(gameVersion, compatGroup, true);
+        }
+
+        private void AddSupportedVersionInternal(int gameVersion, int compatGroup, bool includeInSupportRange)
+        {
             _supportMap[gameVersion] = compatGroup;
             if (includeInSupportRange)
             {

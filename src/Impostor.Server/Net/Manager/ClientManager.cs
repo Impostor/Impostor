@@ -56,7 +56,7 @@ namespace Impostor.Server.Net.Manager
 
         public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion, Language language, QuickChatModes chatMode, PlatformSpecificData? platformSpecificData)
         {
-            var versionCompare = _compatibilityManager.TryGetCompatibilityGroup(clientVersion, out _);
+            var versionCompare = _compatibilityManager.CanConnectToServer(clientVersion);
             if (versionCompare == ICompatibilityManager.VersionCompareResult.ServerTooOld && _compatibilityConfig.AllowFutureGameVersions && platformSpecificData != null)
             {
                 GameVersion.ParseVersion(clientVersion, out var year, out var month, out var day, out var revision);

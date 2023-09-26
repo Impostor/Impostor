@@ -12,6 +12,7 @@ using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Manager;
 using Impostor.Server.Events;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,8 +30,16 @@ namespace Impostor.Server.Net.Manager
         private readonly IServiceProvider _serviceProvider;
         private readonly IEventManager _eventManager;
         private readonly IGameCodeFactory _gameCodeFactory;
+        private readonly ICompatibilityManager _compatibilityManager;
 
-        public GameManager(ILogger<GameManager> logger, IOptions<ServerConfig> config, IServiceProvider serviceProvider, IEventManager eventManager, IGameCodeFactory gameCodeFactory, IOptions<CompatibilityConfig> compatibilityConfig)
+        public GameManager(
+            ILogger<GameManager> logger,
+            IOptions<ServerConfig> config,
+            IServiceProvider serviceProvider,
+            IEventManager eventManager,
+            IGameCodeFactory gameCodeFactory,
+            IOptions<CompatibilityConfig> compatibilityConfig,
+            ICompatibilityManager compatibilityManager)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
@@ -39,6 +48,7 @@ namespace Impostor.Server.Net.Manager
             _publicIp = new IPEndPoint(IPAddress.Parse(config.Value.ResolvePublicIp()), config.Value.PublicPort);
             _games = new ConcurrentDictionary<int, Game>();
             _compatibilityConfig = compatibilityConfig.Value;
+            _compatibilityManager = compatibilityManager;
         }
 
         IEnumerable<IGame> IGameManager.Games => _games.Select(kv => kv.Value);
@@ -51,7 +61,13 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        public IEnumerable<Game> FindListings(MapFlags map, int impostorCount, GameKeywords language, int gameVersion, HashSet<string> filterTags, int count = 10)
+        public IEnumerable<Game> FindListings(
+            MapFlags map,
+            int impostorCount,
+            GameKeywords language,
+            int gameVersion,
+            HashSet<string> filterTags,
+            int count = 10)
         {
             var results = 0;
 
@@ -60,7 +76,8 @@ namespace Impostor.Server.Net.Manager
                 x.Value.IsPublic &&
                 x.Value.GameState == GameStates.NotStarted &&
                 x.Value.PlayerCount < x.Value.Options.MaxPlayers &&
-                (_compatibilityConfig.AllowVersionMixing || x.Value.Host == null || x.Value.Host.Client.GameVersion == gameVersion)))
+                (_compatibilityConfig.AllowVersionMixing || x.Value.Host == null ||
+                 this._compatibilityManager.CanJoinGame(x.Value.Host.Client.GameVersion, gameVersion) == GameJoinError.None)))
             {
                 // Check for options.
                 if (!map.HasFlag((MapFlags)(1 << (byte)game.Options.Map)))
