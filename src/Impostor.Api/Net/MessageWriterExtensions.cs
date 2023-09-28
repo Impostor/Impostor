@@ -1,5 +1,6 @@
 using System.Numerics;
 using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Unity;
 
@@ -7,6 +8,11 @@ namespace Impostor.Api.Net;
 
 public static class MessageWriterExtensions
 {
+    public static void Write(this IMessageWriter writer, GameVersion value)
+    {
+        writer.Write(value.Value);
+    }
+
     public static void Serialize(this GameCode gameCode, IMessageWriter writer)
     {
         writer.Write(gameCode.Value);

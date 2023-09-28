@@ -54,18 +54,16 @@ namespace Impostor.Server.Net.Manager
             return clientId;
         }
 
-        public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, int clientVersion, Language language, QuickChatModes chatMode, PlatformSpecificData? platformSpecificData)
+        public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, GameVersion clientVersion, Language language, QuickChatModes chatMode, PlatformSpecificData? platformSpecificData)
         {
             var versionCompare = _compatibilityManager.CanConnectToServer(clientVersion);
             if (versionCompare == ICompatibilityManager.VersionCompareResult.ServerTooOld && _compatibilityConfig.AllowFutureGameVersions && platformSpecificData != null)
             {
-                GameVersion.ParseVersion(clientVersion, out var year, out var month, out var day, out var revision);
-                _logger.LogWarning("Client connected using future version: {clientVersion} ({version}). Unsupported, continue at your own risk.", clientVersion, $"{year}.{month}.{day}{(revision == 0 ? string.Empty : "." + revision)}");
+                _logger.LogWarning("Client connected using future version: {clientVersion} ({version}). Unsupported, continue at your own risk.", clientVersion.Value, clientVersion.ToString());
             }
             else if (versionCompare != ICompatibilityManager.VersionCompareResult.Compatible || platformSpecificData == null)
             {
-                GameVersion.ParseVersion(clientVersion, out var year, out var month, out var day, out var revision);
-                _logger.LogTrace("Client connected using unsupported version: {clientVersion} ({version})", clientVersion, $"{year}.{month}.{day}{(revision == 0 ? string.Empty : "." + revision)}");
+                _logger.LogTrace("Client connected using unsupported version: {clientVersion} ({version})", clientVersion.Value, clientVersion.ToString());
 
                 using var packet = MessageWriter.Get(MessageType.Reliable);
 

@@ -10,7 +10,7 @@ namespace Impostor.Server.Net
 {
     internal abstract class ClientBase : IClient
     {
-        protected ClientBase(string name, int gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, IHazelConnection connection)
+        protected ClientBase(string name, GameVersion gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, IHazelConnection connection)
         {
             Name = name;
             GameVersion = gameVersion;
@@ -31,7 +31,7 @@ namespace Impostor.Server.Net
 
         public PlatformSpecificData PlatformSpecificData { get; }
 
-        public int GameVersion { get; }
+        public GameVersion GameVersion { get; }
 
         public IHazelConnection Connection { get; }
 

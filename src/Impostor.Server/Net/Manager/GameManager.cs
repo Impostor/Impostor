@@ -65,7 +65,7 @@ namespace Impostor.Server.Net.Manager
             MapFlags map,
             int impostorCount,
             GameKeywords language,
-            int gameVersion,
+            GameVersion gameVersion,
             HashSet<string> filterTags,
             int count = 10)
         {

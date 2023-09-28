@@ -165,7 +165,7 @@ namespace Impostor.Tools.ServerReplay
                     var addressPort = reader.ReadUInt16();
                     var address = new IPEndPoint(new IPAddress(addressBytes), addressPort);
                     var name = reader.ReadString();
-                    var gameVersion = reader.ReadInt32();
+                    var gameVersion = new GameVersion(reader.ReadInt32());
 
                     // Create and register connection.
                     var connection = new MockHazelConnection(address);

@@ -1,141 +1,222 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Manager;
 using Microsoft.Extensions.Logging;
 
-namespace Impostor.Server.Net.Manager
+namespace Impostor.Server.Net.Manager;
+
+using CompatibilityGroup = ICompatibilityManager.CompatibilityGroup;
+using VersionCompareResult = ICompatibilityManager.VersionCompareResult;
+
+internal class CompatibilityManager : ICompatibilityManager
 {
-    internal class CompatibilityManager : ICompatibilityManager
+    private static readonly CompatibilityGroup[] DefaultSupportedVersions =
     {
-        private static readonly CompatData[] DefaultSupportedVersions =
+        new[]
         {
-            new(GameVersion.GetVersion(2022, 11, 1), GameVersion.GetVersion(2022, 11, 1), true), // 2022.12.8
+            new GameVersion(2022, 11, 1), // 2022.12.8
+        },
 
-            new(GameVersion.GetVersion(2022, 11, 9), GameVersion.GetVersion(2022, 11, 9), true), // 2022.12.14
-
-            new(GameVersion.GetVersion(2022, 12, 2), GameVersion.GetVersion(2022, 12, 2), true), // 2023.2.28
-
-            new(GameVersion.GetVersion(2023, 1, 11), GameVersion.GetVersion(2023, 1, 11), true), // 2023.3.28s
-            new(GameVersion.GetVersion(2023, 3, 13), GameVersion.GetVersion(2023, 1, 11), true), // 2023.3.28a
-            new(GameVersion.GetVersion(2023, 4, 21), GameVersion.GetVersion(2023, 1, 11), true), // 2023.6.13
-
-            new(GameVersion.GetVersion(2023, 5, 20), GameVersion.GetVersion(2023, 5, 20), true), // 2023.7.11
-            new(GameVersion.GetVersion(2222, 0, 0), GameVersion.GetVersion(2023, 5, 20), false), // 2023.7.11 for host-only mods
-        };
-
-        // Map from client version to compatibility group
-        private readonly Dictionary<int, int> _supportMap = new();
-        private readonly ILogger<CompatibilityManager> _logger;
-        private int _lowestVersionSupported = int.MaxValue;
-        private int _highestVersionSupported = 0;
-
-        public CompatibilityManager(ILogger<CompatibilityManager> logger)
+        new[]
         {
-            _logger = logger;
-            foreach (var compatData in DefaultSupportedVersions)
+            new GameVersion(2022, 11, 9), // 2022.12.14
+        },
+
+        new[]
+        {
+            new GameVersion(2022, 12, 2), // 2023.2.28
+        },
+
+        new[]
+        {
+            new GameVersion(2023, 1, 11), // 2023.3.28s
+            new GameVersion(2023, 3, 13), // 2023.3.28a
+            new GameVersion(2023, 4, 21), // 2023.6.13
+        },
+
+        new[]
+        {
+            new GameVersion(2023, 5, 20), // 2023.7.11
+            new GameVersion(2222, 0, 0), // 2023.7.11 for host-only mods
+        },
+    };
+
+    private readonly List<CompatibilityGroup> _compatibilityGroups = new();
+    private readonly Dictionary<GameVersion, CompatibilityGroup> _supportMap = new();
+    private readonly ILogger<CompatibilityManager> _logger;
+    private GameVersion _lowestVersionSupported = new(int.MaxValue);
+    private GameVersion _highestVersionSupported = new(0);
+
+    public CompatibilityManager(ILogger<CompatibilityManager> logger) : this(logger, DefaultSupportedVersions)
+    {
+    }
+
+    internal CompatibilityManager(ILogger<CompatibilityManager> logger, IEnumerable<CompatibilityGroup> defaultSupportedVersions)
+    {
+        _logger = logger;
+
+        foreach (var compatibilityGroup in defaultSupportedVersions)
+        {
+            AddCompatibilityGroup(compatibilityGroup);
+        }
+    }
+
+    public IEnumerable<CompatibilityGroup> CompatibilityGroups => _compatibilityGroups;
+
+    private CompatibilityGroup? TryGetCompatibilityGroup(GameVersion clientVersion)
+    {
+        // Innersloth servers allow disabling server authority by incrementing the version revision by 25.
+        // We should allow crossplay between client versions with this flag set and those without.
+        clientVersion = clientVersion.ExtractDisableServerAuthority(out _);
+
+        if (_supportMap.TryGetValue(clientVersion, out var compatibilityGroup))
+        {
+            return compatibilityGroup;
+        }
+
+        return null;
+    }
+
+    public VersionCompareResult CanConnectToServer(GameVersion clientVersion)
+    {
+        if (this.TryGetCompatibilityGroup(clientVersion) != null)
+        {
+            return VersionCompareResult.Compatible;
+        }
+
+        if (clientVersion < _lowestVersionSupported)
+        {
+            return VersionCompareResult.ClientTooOld;
+        }
+
+        if (clientVersion > _highestVersionSupported)
+        {
+            return VersionCompareResult.ServerTooOld;
+        }
+
+        return VersionCompareResult.Unknown;
+    }
+
+    public GameJoinError CanJoinGame(GameVersion hostVersion, GameVersion clientVersion)
+    {
+        if (hostVersion == clientVersion)
+        {
+            // Optimize a common case: a player on version X should always be able to join version X
+            return GameJoinError.None;
+        }
+
+        var hostCompatGroup = this.TryGetCompatibilityGroup(hostVersion);
+        var playerCompatGroup = this.TryGetCompatibilityGroup(clientVersion);
+
+        if (hostCompatGroup == null || playerCompatGroup == null)
+        {
+            return GameJoinError.InvalidClient;
+        }
+
+        if (hostCompatGroup != playerCompatGroup)
+        {
+            return clientVersion < hostVersion
+                ? GameJoinError.ClientOutdated
+                : GameJoinError.ClientTooNew;
+        }
+
+        return GameJoinError.None;
+    }
+
+    void ICompatibilityManager.AddCompatibilityGroup(CompatibilityGroup compatibilityGroup)
+    {
+        _logger.LogWarning($"{nameof(AddCompatibilityGroup)} was called by a plugin, this can create unexpected issues. Please proceed carefully");
+
+        AddCompatibilityGroup(compatibilityGroup);
+    }
+
+    void ICompatibilityManager.AddSupportedVersion(CompatibilityGroup compatibilityGroup, GameVersion gameVersion)
+    {
+        _logger.LogWarning($"{nameof(AddSupportedVersion)} was called by a plugin, this can create unexpected issues. Please proceed carefully");
+
+        if (compatibilityGroup.GameVersions.Contains(gameVersion))
+        {
+            return;
+        }
+
+        AddSupportedVersion(compatibilityGroup, gameVersion, true);
+    }
+
+    private void AddCompatibilityGroup(CompatibilityGroup compatibilityGroup)
+    {
+        foreach (var gameVersion in compatibilityGroup.GameVersions)
+        {
+            if (_supportMap.ContainsKey(gameVersion))
             {
-                AddSupportedVersionInternal(compatData.GameVersion, compatData.CompatGroup, compatData.IncludeInSupportRange);
+                throw new InvalidOperationException($"Can't add this compatibility group because one if its versions ({gameVersion}) is already added");
             }
         }
 
-        public int? TryGetCompatibilityGroup(int clientVersion)
-        {
-            // Innersloth servers allow disabling server authority by setting the Patch field to 25.
-            // We should allow crossplay between client versions with this field set and those without.
-            if ((clientVersion % 50) >= 25)
-            {
-                clientVersion -= 25;
-            }
+        _compatibilityGroups.Add(compatibilityGroup);
 
-            if (_supportMap.TryGetValue(clientVersion, out var compatGroup))
-            {
-                return compatGroup;
-            }
-            else
-            {
-                return null;
-            }
+        foreach (var gameVersion in compatibilityGroup.GameVersions)
+        {
+            AddSupportedVersion(compatibilityGroup, gameVersion, false);
+        }
+    }
+
+    private void AddSupportedVersion(CompatibilityGroup compatibilityGroup, GameVersion gameVersion, bool addToGroup)
+    {
+        if (!_compatibilityGroups.Contains(compatibilityGroup))
+        {
+            throw new InvalidOperationException("You have to add the compatibility group first");
         }
 
-        public ICompatibilityManager.VersionCompareResult CanConnectToServer(int clientVersion)
+        if (_supportMap.ContainsKey(gameVersion))
         {
-            if (this.TryGetCompatibilityGroup(clientVersion) != null)
-            {
-                return ICompatibilityManager.VersionCompareResult.Compatible;
-            }
-            else if (clientVersion < _lowestVersionSupported)
-            {
-                return ICompatibilityManager.VersionCompareResult.ClientTooOld;
-            }
-            else if (clientVersion > _highestVersionSupported)
-            {
-                return ICompatibilityManager.VersionCompareResult.ServerTooOld;
-            }
-            else
-            {
-                return ICompatibilityManager.VersionCompareResult.Unknown;
-            }
+            throw new InvalidOperationException("Can't add this game version because it's already in another compatibility group");
         }
 
-        public GameJoinError CanJoinGame(int hostVersion, int playerVersion)
+        if (addToGroup)
         {
-            if (hostVersion == playerVersion)
-            {
-                // Optimize a common case: a player on version X should always be able to join version X
-                return GameJoinError.None;
-            }
-
-            var hostCompatGroup = this.TryGetCompatibilityGroup(hostVersion);
-            var playerCompatGroup = this.TryGetCompatibilityGroup(playerVersion);
-
-            if (hostCompatGroup == null || playerCompatGroup == null)
-            {
-                return GameJoinError.InvalidClient;
-            }
-            else if (playerCompatGroup < hostCompatGroup)
-            {
-                return GameJoinError.ClientOutdated;
-            }
-            else if (playerCompatGroup > hostCompatGroup)
-            {
-                return GameJoinError.ClientTooNew;
-            }
-            else
-            {
-                return GameJoinError.None;
-            }
+            compatibilityGroup.Add(gameVersion);
         }
 
-        public void AddSupportedVersion(int gameVersion, int compatGroup)
-        {
-            _logger.LogWarning("AddSupportedVersion was called by a plugin, this can create unexpected issues. Please proceed carefully");
+        _supportMap.Add(gameVersion, compatibilityGroup);
 
-            AddSupportedVersionInternal(gameVersion, compatGroup, true);
-        }
+        // We special case the host-only 2023.7.11 here
+        // Ideally it should never have existed so remove once 2023.7.11 is unsupported TODO
+        var includeInSupportRange = gameVersion != new GameVersion(2222, 0, 0);
 
-        private void AddSupportedVersionInternal(int gameVersion, int compatGroup, bool includeInSupportRange)
+        if (includeInSupportRange)
         {
-            _supportMap[gameVersion] = compatGroup;
-            if (includeInSupportRange)
+            if (gameVersion < _lowestVersionSupported)
             {
-                if (gameVersion < _lowestVersionSupported)
-                {
-                    _lowestVersionSupported = gameVersion;
-                }
+                _lowestVersionSupported = gameVersion;
+            }
 
-                if (gameVersion > _highestVersionSupported)
-                {
-                    _highestVersionSupported = gameVersion;
-                }
+            if (gameVersion > _highestVersionSupported)
+            {
+                _highestVersionSupported = gameVersion;
             }
         }
+    }
 
-        public bool RemoveSupportedVersion(int removedVersion)
+    public bool RemoveSupportedVersion(GameVersion removedVersion)
+    {
+        if (_supportMap.Remove(removedVersion, out var compatibilityGroup))
         {
-            return _supportMap.Remove(removedVersion);
+            if (!compatibilityGroup.Remove(removedVersion))
+            {
+                throw new InvalidOperationException("Removed the version from the support map but it was missing from it's compatibility group");
+            }
+
+            if (!compatibilityGroup.GameVersions.Any())
+            {
+                _compatibilityGroups.Remove(compatibilityGroup);
+            }
+
+            return true;
         }
 
-        internal record CompatData(int GameVersion, int CompatGroup, bool IncludeInSupportRange);
+        return false;
     }
 }

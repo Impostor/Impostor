@@ -1,13 +1,14 @@
+using System.Collections.Generic;
+using System.Linq;
 using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
 
 namespace Impostor.Api.Net.Manager
 {
-    /**
-     * <summary>
-     * Maintain an internal compatibility list of versions that are allowed to connect to the server, and which game
-     * versions they are allowed to play with.
-     * </summary>
-     */
+    /// <summary>
+    /// Maintains an internal compatibility list of versions that are allowed to connect to the server, and which game
+    /// versions they are allowed to play with.
+    /// </summary>
     public interface ICompatibilityManager
     {
         public enum VersionCompareResult
@@ -19,36 +20,49 @@ namespace Impostor.Api.Net.Manager
         }
 
         /// <summary>
+        /// Gets the compatibility groups.
+        /// </summary>
+        public IEnumerable<CompatibilityGroup> CompatibilityGroups { get; }
+
+        /// <summary>
         /// Check if a client can join the server according to the currently accepted game versions.
         /// </summary>
         /// <param name="clientVersion">The client version to check for.</param>
         /// <returns>
         /// Whether this version is supported by the server at the moment and if not, whether it is too old or too new.
         /// </returns>
-        public VersionCompareResult CanConnectToServer(int clientVersion);
+        public VersionCompareResult CanConnectToServer(GameVersion clientVersion);
 
         /// <summary>Check if a player can join an existing game.</summary>
         /// <param name="hostVersion">The client version of the host.</param>
-        /// <param name="playerVersion">The client version of the player that is joining.</param>
+        /// <param name="clientVersion">The client version of the player that is joining.</param>
         /// <returns>
         /// - GameJoinError.None if everything is OK
         /// - GameJoinError.ClientOutdated if the player runs a too old game version
-        /// - GameJoinError.ClientTooNew if the player runs a too new game version
+        /// - GameJoinError.ClientTooNew if the player runs a too new game version.
         /// </returns>
-        public GameJoinError CanJoinGame(int hostVersion, int playerVersion);
+        public GameJoinError CanJoinGame(GameVersion hostVersion, GameVersion clientVersion);
 
         /// <summary>
-        /// Add a supported game version to the internal version compatibility list. If this version is already on the
-        /// compatibility list, modify its configuration.
+        /// Add a new compatibility group.
         ///
         /// WARNING: this method does not magically make changes to Impostor to properly support these versions. If
         /// Impostor cannot support the game versions you're trying to add or that the game versions you're making
         /// compatible do not crossplay correctly, weird behaviour may occur. Here be dragons.
         /// </summary>
-        /// <param name="gameVersion">The game version to add details to.</param>
-        /// <param name="compatGroup">The compatibility group to add this version to. Customary is to use the broadcast
-        /// version of the lowest game version it is compatible with.</param>
-        public void AddSupportedVersion(int gameVersion, int compatGroup);
+        /// <param name="compatibilityGroup">The compatibility group to add.</param>
+        public void AddCompatibilityGroup(CompatibilityGroup compatibilityGroup);
+
+        /// <summary>
+        /// Add a supported game version to the specified compatibility group.
+        ///
+        /// WARNING: this method does not magically make changes to Impostor to properly support these versions. If
+        /// Impostor cannot support the game versions you're trying to add or that the game versions you're making
+        /// compatible do not crossplay correctly, weird behaviour may occur. Here be dragons.
+        /// </summary>
+        /// <param name="compatibilityGroup">The compatibility group to add this version to.</param>
+        /// <param name="gameVersion">The game version to add.</param>
+        public void AddSupportedVersion(CompatibilityGroup compatibilityGroup, GameVersion gameVersion);
 
         /// <summary>
         /// Remove a version from the internal version compatibility list.
@@ -57,6 +71,30 @@ namespace Impostor.Api.Net.Manager
         /// connections.
         /// <param name="removedVersion">The version to remove from the list.</param>
         /// <returns>True iff this version was on the current compatibility list.</returns>
-        public bool RemoveSupportedVersion(int removedVersion);
+        public bool RemoveSupportedVersion(GameVersion removedVersion);
+
+        public sealed class CompatibilityGroup
+        {
+            private readonly List<GameVersion> _gameVersions;
+
+            public CompatibilityGroup(IEnumerable<GameVersion> gameVersions)
+            {
+                _gameVersions = gameVersions.ToList();
+            }
+
+            public IReadOnlyList<GameVersion> GameVersions => _gameVersions;
+
+            public static implicit operator CompatibilityGroup(GameVersion[] gameVersions) => new(gameVersions);
+
+            internal void Add(GameVersion gameVersion)
+            {
+                _gameVersions.Add(gameVersion);
+            }
+
+            internal bool Remove(GameVersion gameVersion)
+            {
+                return _gameVersions.Remove(gameVersion);
+            }
+        }
     }
 }
