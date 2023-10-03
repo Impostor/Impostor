@@ -5,6 +5,10 @@ namespace Impostor.Api.Innersloth
 {
     public readonly struct GameVersion : IEquatable<GameVersion>, IComparable<GameVersion>, IComparisonOperators<GameVersion, GameVersion, bool>
     {
+        private const int YearMask = 25000;
+        private const int MonthMask = 1800;
+        private const int DayMask = 50;
+
         public GameVersion(int value)
         {
             Value = value;
@@ -12,10 +16,18 @@ namespace Impostor.Api.Innersloth
 
         public GameVersion(int year, int month, int day, int revision = 0)
         {
-            Value = (year * 25000) + (month * 1800) + (day * 50) + revision;
+            Value = (year * YearMask) + (month * MonthMask) + (day * DayMask) + revision;
         }
 
         public int Value { get; }
+
+        public int Year => Value / YearMask;
+
+        public int Month => (Value % YearMask) / MonthMask;
+
+        public int Day => ((Value % YearMask) % MonthMask) / DayMask;
+
+        public int Revision => Value % DayMask;
 
         public static bool operator ==(GameVersion left, GameVersion right) => left.Value == right.Value;
 
@@ -32,19 +44,19 @@ namespace Impostor.Api.Innersloth
         public void GetComponents(out int year, out int month, out int day, out int revision)
         {
             var value = Value;
-            year = value / 25000;
-            value %= 25000;
-            month = value / 1800;
-            value %= 1800;
-            day = value / 50;
-            revision = value % 50;
+            year = value / YearMask;
+            value %= YearMask;
+            month = value / MonthMask;
+            value %= MonthMask;
+            day = value / DayMask;
+            revision = value % DayMask;
         }
 
         public GameVersion ExtractDisableServerAuthority(out bool disableServerAuthority)
         {
             const int DisableServerAuthorityFlag = 25;
 
-            var revision = Value % 50;
+            var revision = Value % DayMask;
             if (revision >= DisableServerAuthorityFlag)
             {
                 disableServerAuthority = true;
