@@ -9,6 +9,8 @@ namespace Impostor.Api.Innersloth
         private const int MonthMask = 1800;
         private const int DayMask = 50;
 
+        private const int DisableServerAuthorityFlag = 25;
+
         public GameVersion(int value)
         {
             Value = value;
@@ -28,6 +30,17 @@ namespace Impostor.Api.Innersloth
         public int Day => ((Value % YearMask) % MonthMask) / DayMask;
 
         public int Revision => Value % DayMask;
+
+        /// <summary>
+        /// Gets a value indicating whether the DisableServerAuthority flag is present.
+        /// </summary>
+        public bool HasDisableServerAuthorityFlag
+        {
+            get
+            {
+                return Revision >= DisableServerAuthorityFlag;
+            }
+        }
 
         public static bool operator ==(GameVersion left, GameVersion right) => left.Value == right.Value;
 
@@ -52,19 +65,13 @@ namespace Impostor.Api.Innersloth
             revision = value % DayMask;
         }
 
-        public GameVersion ExtractDisableServerAuthority(out bool disableServerAuthority)
+        /// <summary>
+        /// Normalizes this game version by removing all the special flags.
+        /// </summary>
+        /// <returns>This GameVersion but stripped of special flags.</returns>
+        public GameVersion Normalize()
         {
-            const int DisableServerAuthorityFlag = 25;
-
-            var revision = Value % DayMask;
-            if (revision >= DisableServerAuthorityFlag)
-            {
-                disableServerAuthority = true;
-                return new GameVersion(Value - DisableServerAuthorityFlag);
-            }
-
-            disableServerAuthority = false;
-            return this;
+            return HasDisableServerAuthorityFlag ? new GameVersion(Value - DisableServerAuthorityFlag) : this;
         }
 
         public override string ToString()

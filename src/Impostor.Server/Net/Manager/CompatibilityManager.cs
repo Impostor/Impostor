@@ -70,7 +70,7 @@ internal class CompatibilityManager : ICompatibilityManager
     {
         // Innersloth servers allow disabling server authority by incrementing the version revision by 25.
         // We should allow crossplay between client versions with this flag set and those without.
-        clientVersion = clientVersion.ExtractDisableServerAuthority(out _);
+        clientVersion = clientVersion.Normalize();
 
         if (_supportMap.TryGetValue(clientVersion, out var compatibilityGroup))
         {
