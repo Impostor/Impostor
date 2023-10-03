@@ -37,9 +37,11 @@ namespace Impostor.Api.Net.Manager
         /// <param name="hostVersion">The client version of the host.</param>
         /// <param name="clientVersion">The client version of the player that is joining.</param>
         /// <returns>
-        /// - GameJoinError.None if everything is OK
-        /// - GameJoinError.ClientOutdated if the player runs a too old game version
-        /// - GameJoinError.ClientTooNew if the player runs a too new game version.
+        /// <list type="bullet">
+        ///   <item><see cref="GameJoinError.None"/> if everything is OK.</item>
+        ///   <item><see cref="GameJoinError.ClientOutdated"/> if the player runs a too old game version.</item>
+        ///   <item><see cref="GameJoinError.ClientTooNew"/> if the player runs a too new game version.</item>
+        /// </list>
         /// </returns>
         public GameJoinError CanJoinGame(GameVersion hostVersion, GameVersion clientVersion);
 
