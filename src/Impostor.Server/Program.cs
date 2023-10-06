@@ -233,11 +233,6 @@ namespace Impostor.Server
                         serverOptions.Listen(IPAddress.Parse(httpConfig.ListenIp), httpConfig.ListenPort, listenOptions =>
                         {
                             listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
-
-                            if (httpConfig.UseHttps)
-                            {
-                                listenOptions.UseHttps(httpConfig.CertificatePath);
-                            }
                         });
                     });
                 });

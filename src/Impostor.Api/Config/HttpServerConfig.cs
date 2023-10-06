@@ -24,16 +24,4 @@ public class HttpServerConfig
     /// </summary>
     /// For port forwarding purposes, this is a TCP port.
     public ushort ListenPort { get; set; } = 22023;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether Https is enabled or not.
-    /// </summary>
-    /// If true, CertificatePath needs to be set to a SSL certificate.
-    public bool UseHttps { get; set; }
-
-    /// <summary>
-    /// Gets or sets the path to the SSL certificate.
-    /// </summary>
-    /// This field is ignored if SSL is not used.
-    public string CertificatePath { get; set; } = string.Empty;
 }
