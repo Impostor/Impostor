@@ -259,9 +259,8 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.GetGameListV2:
                 {
-                    Message16GetGameListC2S.Deserialize(reader, out _, out _, out _, out _);
                     await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.UdpMatchmakingUnsupported);
-                    break;
+                    return;
                 }
 
                 case MessageFlags.SetActivePodType:
