@@ -1,5 +1,6 @@
 using System.Numerics;
 using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Unity;
 
@@ -7,6 +8,11 @@ namespace Impostor.Api.Net;
 
 public static class MessageReaderExtensions
 {
+    public static GameVersion ReadGameVersion(this IMessageReader reader)
+    {
+        return new GameVersion(reader.ReadInt32());
+    }
+
     public static T? ReadNetObject<T>(this IMessageReader reader, IGame game)
         where T : IInnerNetObject
     {

@@ -4,9 +4,9 @@ namespace Impostor.Api.Net.Messages.C2S
 {
     public static class HandshakeC2S
     {
-        public static void Deserialize(IMessageReader reader, out int clientVersion, out string name, out Language language, out QuickChatModes chatMode, out PlatformSpecificData? platformSpecificData)
+        public static void Deserialize(IMessageReader reader, out GameVersion clientVersion, out string name, out Language language, out QuickChatModes chatMode, out PlatformSpecificData? platformSpecificData)
         {
-            clientVersion = reader.ReadInt32();
+            clientVersion = reader.ReadGameVersion();
             name = reader.ReadString();
 
             if (clientVersion >= Version.V1)
@@ -44,13 +44,13 @@ namespace Impostor.Api.Net.Messages.C2S
 
         private static class Version
         {
-            public static readonly int V1 = GameVersion.GetVersion(2021, 4, 25);
+            public static readonly GameVersion V1 = new(2021, 4, 25);
 
-            public static readonly int V2 = GameVersion.GetVersion(2021, 6, 30);
+            public static readonly GameVersion V2 = new(2021, 6, 30);
 
-            public static readonly int V3 = GameVersion.GetVersion(2021, 11, 9);
+            public static readonly GameVersion V3 = new(2021, 11, 9);
 
-            public static readonly int V4 = GameVersion.GetVersion(2021, 12, 14);
+            public static readonly GameVersion V4 = new(2021, 12, 14);
         }
     }
 }

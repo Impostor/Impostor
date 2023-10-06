@@ -12,6 +12,7 @@ using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Manager;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Server.Events;
 using Impostor.Server.Net.Manager;
@@ -29,6 +30,7 @@ namespace Impostor.Server.Net.State
         private readonly ConcurrentDictionary<int, ClientPlayer> _players;
         private readonly HashSet<IPAddress> _bannedIps;
         private readonly IEventManager _eventManager;
+        private readonly ICompatibilityManager _compatibilityManager;
         private readonly CompatibilityConfig _compatibilityConfig;
         private readonly TimeoutConfig _timeoutConfig;
 
@@ -42,6 +44,7 @@ namespace Impostor.Server.Net.State
             GameFilterOptions filterOptions,
             ClientManager clientManager,
             IEventManager eventManager,
+            ICompatibilityManager compatibilityManager,
             IOptions<CompatibilityConfig> compatibilityConfig,
             IOptions<TimeoutConfig> timeoutConfig)
         {
@@ -60,6 +63,7 @@ namespace Impostor.Server.Net.State
             FilterOptions = filterOptions;
             _clientManager = clientManager;
             _eventManager = eventManager;
+            _compatibilityManager = compatibilityManager;
             _compatibilityConfig = compatibilityConfig.Value;
             _timeoutConfig = timeoutConfig.Value;
             Items = new ConcurrentDictionary<object, object>();
