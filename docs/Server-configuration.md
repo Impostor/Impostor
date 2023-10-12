@@ -11,7 +11,17 @@ Some information about all the possible configurations. Click [here](https://git
 | **PublicIp**   | `127.0.0.1` | This needs to the public IPv4 address of the server which you give to others to connect. You can find your IPv4 address [on this website](http://whatismyip.host/). Unless you are only planning to use Impostor privately, on your local network, you should change this to your public ip. It is also possible to use hostnames instead of IPv4 addresses, which will be resolved to IPv4 addresses. |
 | **PublicPort** | `22023`     | The public port of the server which you give to others to connect. (**This is the external port you configure on your router when port forwarding.**) Usually `22023`.                                                                                                                                                                                                                                 |
 | **ListenIp**   | `0.0.0.0`   | The network interface to listen on. If you do not know what to put here, use `0.0.0.0`. Since 1.2.2 it is also possible to use hostnames instead of IPv4 addresses, these must resolve to a valid IPv4 address.                                                                                                                                                                                        |
-| **ListenPort** | `22023`     | The listen port of the server, usually `22023`.                                                                                                                                                                                                                                                                                                                                                        |
+| **ListenPort** | `22023`     | The listen port of the server, usually `22023`. For port forwarding purposes: this is an UDP port                                                                                                                                                                                                                                                                                                                                                       |
+
+### HttpServer
+
+Impostor has an Http Server that is used by recent versions of Among Us to connect to. See [the Http Server page](Http-server.md) for more details on how to set this up.
+
+| Key            | Default     | Description                                                                                                                                                                                  |
+|----------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Enabled**    | `true`      | Whether the http server should be enabled.                                                                                                                                                   |
+| **ListenIp**   | `127.0.0.1` | The network interface to listen on. Use `127.0.0.1` if you use a reverse proxy or just run locally. Use `0.0.0.0` if you are directly exposing this server to the internet (not recommended) |
+| **ListenPort** | `22023`     | The listen port of this server. For port forwarding purposes, this is an TCP port.                                                                                                           |
 
 ### AntiCheat
 
