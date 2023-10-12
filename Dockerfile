@@ -38,14 +38,10 @@ FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 COPY --from=build /app ./
 
-# Add Impostor.Http as a default built-in plugin
-ADD https://github.com/Impostor/Impostor.Http/releases/download/v0.5.0/Impostor.Http.dll /app/builtin-plugins/
-# Make it listen to 0.0.0.0 to expose it to the outside world.
-ENV IMPOSTOR_HTTP_HttpServer__ListenIp=0.0.0.0
+# Make the HttpServer listen to 0.0.0.0 to expose it to the outside world.
+ENV IMPOSTOR_HttpServer__ListenIp=0.0.0.0
 # Override ASPNETCORE_URLS to stop warning.
 ENV ASPNETCORE_URLS=
-# Enable the built-in plugin folder. Use a high number to prevent conflicts with existing configurations
-ENV IMPOSTOR_PluginLoader__Paths__76=/app/builtin-plugins
 
 EXPOSE 22023/tcp 22023/udp
 ENTRYPOINT ["./Impostor.Server"]
