@@ -122,7 +122,7 @@ namespace Impostor.Server.Net.State
 
                     if (GameNet.ShipStatus != null)
                     {
-                        await player.Character!.NetworkTransform.SetPositionAsync(player, GameNet.ShipStatus.GetSpawnLocation(player.Character, PlayerCount, true), Vector2.Zero);
+                        await player.Character!.NetworkTransform.SetPositionAsync(player, GameNet.ShipStatus.GetSpawnLocation(player.Character, PlayerCount, true));
                     }
                 }
 
