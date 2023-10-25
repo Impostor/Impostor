@@ -159,21 +159,14 @@ internal class CompatibilityManager : ICompatibilityManager
 
         _supportMap.Add(gameVersion, compatibilityGroup);
 
-        // We special case the host-only 2023.7.11 here
-        // Ideally it should never have existed so remove once 2023.7.11 is unsupported TODO
-        var includeInSupportRange = gameVersion != new GameVersion(2222, 0, 0);
-
-        if (includeInSupportRange)
+        if (gameVersion < _lowestVersionSupported)
         {
-            if (gameVersion < _lowestVersionSupported)
-            {
-                _lowestVersionSupported = gameVersion;
-            }
+            _lowestVersionSupported = gameVersion;
+        }
 
-            if (gameVersion > _highestVersionSupported)
-            {
-                _highestVersionSupported = gameVersion;
-            }
+        if (gameVersion > _highestVersionSupported)
+        {
+            _highestVersionSupported = gameVersion;
         }
     }
 
