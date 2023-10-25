@@ -17,30 +17,7 @@ internal class CompatibilityManager : ICompatibilityManager
     {
         new[]
         {
-            new GameVersion(2022, 11, 1), // 2022.12.8
-        },
-
-        new[]
-        {
-            new GameVersion(2022, 11, 9), // 2022.12.14
-        },
-
-        new[]
-        {
-            new GameVersion(2022, 12, 2), // 2023.2.28
-        },
-
-        new[]
-        {
-            new GameVersion(2023, 1, 11), // 2023.3.28s
-            new GameVersion(2023, 3, 13), // 2023.3.28a
-            new GameVersion(2023, 4, 21), // 2023.6.13
-        },
-
-        new[]
-        {
-            new GameVersion(2023, 5, 20), // 2023.7.11
-            new GameVersion(2222, 0, 0), // 2023.7.11 for host-only mods
+            new GameVersion(2023, 10, 1), // 2023.10.24
         },
     };
 
