@@ -1,5 +1,5 @@
 using System;
-﻿using System.Linq;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api;
@@ -48,7 +48,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
             throw new NotImplementedException();
-            if (initialState)
+            /*if (initialState)
             {
                 writer.Write(_lastSequenceId);
                 writer.Write(Position);
@@ -60,7 +60,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
             writer.Write(_lastSequenceId);
             writer.Write(Position);
-            return new ValueTask<bool>(true);
+            return new ValueTask<bool>(true);*/
         }
 
         public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
@@ -81,7 +81,8 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
                 var positions = reader.ReadPackedInt32();
 
-                for (var i=0; i < positions; i++) {
+                for (var i = 0; i < positions; i++)
+                {
                     var position = reader.ReadVector2();
                     var newSid = (ushort)(sequenceId + i);
                     if (SidGreaterThan(newSid, _lastSequenceId))
