@@ -25,12 +25,14 @@ namespace Impostor.Server.Net.Inner.Objects
     {
         private static readonly byte ColorsCount = (byte)Enum.GetValues<ColorType>().Length;
 
+        private readonly Game _game;
         private readonly ILogger<InnerPlayerControl> _logger;
         private readonly IEventManager _eventManager;
         private readonly IDateTimeProvider _dateTimeProvider;
 
         public InnerPlayerControl(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager, IDateTimeProvider dateTimeProvider) : base(customMessageManager, game)
         {
+            _game = game;
             _logger = logger;
             _eventManager = eventManager;
             _dateTimeProvider = dateTimeProvider;
@@ -250,8 +252,8 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc12MurderPlayer.Deserialize(reader, Game, out var murdered);
-                    return await HandleMurderPlayer(sender, murdered);
+                    Rpc12MurderPlayer.Deserialize(reader, Game, out var murdered, out var result);
+                    return await HandleMurderPlayer(sender, murdered, result);
                 }
 
                 case RpcCalls.SendChat:
@@ -652,8 +654,6 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            PlayerInfo.LastMurder = _dateTimeProvider.UtcNow - TimeSpan.FromMilliseconds(sender.Client.Connection.AveragePing);
-
             if (target == null || target.PlayerInfo.IsImpostor)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, "Client tried to murder invalid target"))
@@ -662,12 +662,26 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
+            PlayerInfo.LastMurder = _dateTimeProvider.UtcNow - TimeSpan.FromMilliseconds(sender.Client.Connection.AveragePing);
             IsMurdering = target;
 
-            return true;
+            // Check if host authority mode is on
+            if (_game.IsHostModded()) {
+                // Pass the RPC on unharmed, the client will handle it
+                return true;
+            }
+
+            // TODO check if protected by GA
+
+            if (target != null)
+            {
+                MurderPlayerAsync(target);
+            }
+
+            return false;
         }
 
-        private async ValueTask<bool> HandleMurderPlayer(ClientPlayer sender, IInnerPlayerControl? target)
+        private async ValueTask<bool> HandleMurderPlayer(ClientPlayer sender, IInnerPlayerControl? target, MurderResultFlags result)
         {
             if (target == null || target.PlayerInfo.IsImpostor)
             {

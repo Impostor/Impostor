@@ -145,5 +145,14 @@ namespace Impostor.Server.Net.State
                 .Select(p => p.Client.Connection)
                 .Where(c => c != null && c.IsConnected)!;
         }
+
+        internal bool IsHostModded()
+        {
+            if (Host == null) {
+                return false;
+            } else {
+                return Host.Client.GameVersion.Revision >= 25;
+            }
+        }
     }
 }

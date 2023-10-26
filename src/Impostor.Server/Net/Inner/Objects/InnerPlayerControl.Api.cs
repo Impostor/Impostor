@@ -102,7 +102,7 @@ namespace Impostor.Server.Net.Inner.Objects
             ((InnerPlayerControl)target).Die(DeathReason.Kill);
 
             using var writer = Game.StartRpc(NetId, RpcCalls.MurderPlayer);
-            Rpc12MurderPlayer.Serialize(writer, target);
+            Rpc12MurderPlayer.Serialize(writer, target, MurderResultFlags.Succeeded);
             await Game.FinishRpcAsync(writer);
 
             await _eventManager.CallAsync(new PlayerMurderEvent(Game, Game.GetClientPlayer(OwnerId)!, this, target));
