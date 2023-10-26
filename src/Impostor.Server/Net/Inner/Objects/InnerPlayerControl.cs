@@ -666,7 +666,8 @@ namespace Impostor.Server.Net.Inner.Objects
             IsMurdering = target;
 
             // Check if host authority mode is on
-            if (_game.IsHostModded()) {
+            if (_game.IsHostAuthoritive())
+            {
                 // Pass the RPC on unharmed, the client will handle it
                 return true;
             }
@@ -675,7 +676,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (target != null)
             {
-                MurderPlayerAsync(target);
+                await MurderPlayerAsync(target);
             }
 
             return false;

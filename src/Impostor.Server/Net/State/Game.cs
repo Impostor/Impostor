@@ -146,12 +146,15 @@ namespace Impostor.Server.Net.State
                 .Where(c => c != null && c.IsConnected)!;
         }
 
-        internal bool IsHostModded()
+        internal bool IsHostAuthoritive()
         {
-            if (Host == null) {
+            if (Host == null)
+            {
                 return false;
-            } else {
-                return Host.Client.GameVersion.Revision >= 25;
+            }
+            else
+            {
+                return Host.Client.GameVersion.HasDisableServerAuthorityFlag;
             }
         }
     }
