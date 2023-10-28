@@ -24,6 +24,6 @@
 
         public const string VersionUnsupported = "Your client version is unsupported, please update your Game and/or Impostor server.";
 
-        public const string UdpMatchmakingUnsupported = "UDP matchmaking is not supported anymore, migrate to a HTTP connection.";
+        public const string UdpMatchmakingUnsupported = "Sorry, UDP Matchmaking is no longer supported. See Impostor documentation on how to migrate to HTTP Matchmaking";
     }
 }
