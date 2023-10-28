@@ -82,7 +82,7 @@ namespace Impostor.Server.Net.Inner.Objects
             await Game.FinishRpcAsync(writer, player.OwnerId);
         }
 
-        public async ValueTask MurderPlayerAsync(IInnerPlayerControl target)
+        public async ValueTask MurderPlayerAsync(IInnerPlayerControl target, MurderResultFlags result = MurderResultFlags.Succeeded)
         {
             if (!PlayerInfo.IsImpostor)
             {
@@ -99,13 +99,35 @@ namespace Impostor.Server.Net.Inner.Objects
                 throw new ImpostorProtocolException("Tried to murder a player, but target was not alive.");
             }
 
-            ((InnerPlayerControl)target).Die(DeathReason.Kill);
+            if (result == MurderResultFlags.Succeeded)
+            {
+                ((InnerPlayerControl)target).Die(DeathReason.Kill);
+            }
 
             using var writer = Game.StartRpc(NetId, RpcCalls.MurderPlayer);
-            Rpc12MurderPlayer.Serialize(writer, target, MurderResultFlags.Succeeded);
+            Rpc12MurderPlayer.Serialize(writer, target, result);
             await Game.FinishRpcAsync(writer);
 
             await _eventManager.CallAsync(new PlayerMurderEvent(Game, Game.GetClientPlayer(OwnerId)!, this, target));
+        }
+
+        public async ValueTask MurderPlayerAsync(IInnerPlayerControl target)
+        {
+            await MurderPlayerAsync(target, MurderResultFlags.Succeeded);
+        }
+
+        public async ValueTask ProtectPlayerAsync(IInnerPlayerControl target)
+        {
+            if (target.PlayerInfo.RoleType == RoleTypes.GuardianAngel)
+            {
+                throw new ImpostorProtocolException("Tried to protect another Guardian Angel");
+            }
+
+            ((InnerPlayerControl)target).Protect(this);
+
+            using var writer = Game.StartRpc(NetId, RpcCalls.ProtectPlayer);
+            Rpc45ProtectPlayer.Serialize(writer, target, PlayerInfo.CurrentOutfit.Color);
+            await Game.FinishRpcAsync(writer);
         }
 
         public async ValueTask ExileAsync()
