@@ -82,7 +82,7 @@ namespace Impostor.Server.Net.Inner.Objects
             await Game.FinishRpcAsync(writer, player.OwnerId);
         }
 
-        public async ValueTask MurderPlayerAsync(IInnerPlayerControl target, MurderResultFlags result = MurderResultFlags.Succeeded)
+        public async ValueTask MurderPlayerAsync(IInnerPlayerControl target, MurderResultFlags result)
         {
             if (!PlayerInfo.IsImpostor)
             {
@@ -99,7 +99,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 throw new ImpostorProtocolException("Tried to murder a player, but target was not alive.");
             }
 
-            if (result == MurderResultFlags.Succeeded)
+            if ((result & (MurderResultFlags.FailedError | MurderResultFlags.FailedProtected)) == 0)
             {
                 ((InnerPlayerControl)target).Die(DeathReason.Kill);
             }
@@ -108,7 +108,7 @@ namespace Impostor.Server.Net.Inner.Objects
             Rpc12MurderPlayer.Serialize(writer, target, result);
             await Game.FinishRpcAsync(writer);
 
-            await _eventManager.CallAsync(new PlayerMurderEvent(Game, Game.GetClientPlayer(OwnerId)!, this, target));
+            await _eventManager.CallAsync(new PlayerMurderEvent(Game, Game.GetClientPlayer(OwnerId)!, this, target, result));
         }
 
         public async ValueTask MurderPlayerAsync(IInnerPlayerControl target)

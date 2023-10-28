@@ -92,6 +92,21 @@ namespace Impostor.Server.Net.State
 
         public IEnumerable<IClientPlayer> Players => _players.Select(p => p.Value);
 
+        public bool IsHostAuthoritive
+        {
+            get
+            {
+                if (Host == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return Host.Client.GameVersion.HasDisableServerAuthorityFlag;
+                }
+            }
+        }
+
         internal GameNet GameNet { get; }
 
         public bool TryGetPlayer(int id, [MaybeNullWhen(false)] out ClientPlayer player)
@@ -144,18 +159,6 @@ namespace Impostor.Server.Net.State
                 .Where(filter)
                 .Select(p => p.Client.Connection)
                 .Where(c => c != null && c.IsConnected)!;
-        }
-
-        internal bool IsHostAuthoritive()
-        {
-            if (Host == null)
-            {
-                return false;
-            }
-            else
-            {
-                return Host.Client.GameVersion.HasDisableServerAuthorityFlag;
-            }
         }
     }
 }

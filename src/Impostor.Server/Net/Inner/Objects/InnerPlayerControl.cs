@@ -696,7 +696,7 @@ namespace Impostor.Server.Net.Inner.Objects
             IsMurdering = target;
 
             // Check if host authority mode is on
-            if (_game.IsHostAuthoritive())
+            if (_game.IsHostAuthoritive)
             {
                 // Pass the RPC on unharmed, the client will handle it
                 return true;
@@ -706,8 +706,15 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 var tgt = (InnerPlayerControl)target;
                 var result = tgt.IsProtected() ? MurderResultFlags.FailedProtected : MurderResultFlags.Succeeded;
-                tgt.ProtectedOn = null; // Clear GA protection in all cases
-                await MurderPlayerAsync(target, result);
+
+                var evt = new PlayerCheckMurderEvent(Game, sender, this, target, result);
+                await _eventManager.CallAsync(evt);
+
+                if (!evt.IsCancelled)
+                {
+                    tgt.ProtectedOn = null; // Clear GA protection in all cases
+                    await MurderPlayerAsync(target, evt.Result);
+                }
             }
 
             return false;
@@ -715,7 +722,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleMurderPlayer(ClientPlayer sender, IInnerPlayerControl? target, MurderResultFlags result)
         {
-            if (!_game.IsHostAuthoritive())
+            if (!_game.IsHostAuthoritive)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder directly"))
                 {
@@ -742,8 +749,12 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (target != null && !target.PlayerInfo.IsDead)
             {
-                ((InnerPlayerControl)target).Die(DeathReason.Kill);
-                await _eventManager.CallAsync(new PlayerMurderEvent(Game, sender, this, target));
+                if ((result & (MurderResultFlags.FailedError | MurderResultFlags.FailedProtected)) == 0)
+                {
+                    ((InnerPlayerControl)target).Die(DeathReason.Kill);
+                }
+
+                await _eventManager.CallAsync(new PlayerMurderEvent(Game, sender, this, target, result));
             }
 
             IsMurdering = null;
@@ -771,7 +782,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            if (_game.IsHostAuthoritive())
+            if (_game.IsHostAuthoritive)
             {
                 return true;
             }
