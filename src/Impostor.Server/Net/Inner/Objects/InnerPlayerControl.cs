@@ -201,47 +201,47 @@ namespace Impostor.Server.Net.Inner.Objects
                     return await HandleSetColor(sender, color);
                 }
 
-                case RpcCalls.SetHat:
+                case RpcCalls.SetHatStr:
                 {
                     if (!await ValidateOwnership(call, sender))
                     {
                         return false;
                     }
 
-                    Rpc39SetHat.Deserialize(reader, out var hat);
+                    Rpc39SetHatStr.Deserialize(reader, out var hat);
                     return true;
                 }
 
-                case RpcCalls.SetSkin:
+                case RpcCalls.SetSkinStr:
                 {
                     if (!await ValidateOwnership(call, sender))
                     {
                         return false;
                     }
 
-                    Rpc40SetSkin.Deserialize(reader, out var skin);
+                    Rpc40SetSkinStr.Deserialize(reader, out var skin);
                     return true;
                 }
 
-                case RpcCalls.SetVisor:
+                case RpcCalls.SetVisorStr:
                 {
                     if (!await ValidateOwnership(call, sender))
                     {
                         return false;
                     }
 
-                    // Rpc42SetVistor.Deserialize(reader, out var visor);
+                    Rpc42SetVisorStr.Deserialize(reader, out var visor);
                     return true;
                 }
 
-                case RpcCalls.SetNamePlate:
+                case RpcCalls.SetNamePlateStr:
                 {
                     if (!await ValidateOwnership(call, sender))
                     {
                         return false;
                     }
 
-                    // Rpc43SetNamePlate.Deserialize(reader, out var namePlate);
+                    Rpc43SetNamePlateStr.Deserialize(reader, out var namePlate);
                     return true;
                 }
 
@@ -252,7 +252,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    // Rpc38SetLevel.Deserialize(reader, out var level);
+                    Rpc38SetLevel.Deserialize(reader, out var level);
                     return true;
                 }
 
@@ -323,14 +323,14 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
                 }
 
-                case RpcCalls.SetPet:
+                case RpcCalls.SetPetStr:
                 {
                     if (!await ValidateOwnership(call, sender))
                     {
                         return false;
                     }
 
-                    Rpc41SetPet.Deserialize(reader, out var pet);
+                    Rpc41SetPetStr.Deserialize(reader, out var pet);
                     return await HandleSetPet(sender, pet);
                 }
 

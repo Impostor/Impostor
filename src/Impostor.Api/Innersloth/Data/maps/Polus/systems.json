@@ -1,0 +1,10 @@
+{
+  "Electrical": "SwitchSystem",
+  "MedBay": "MedScanSystem",
+  "Doors": "DoorsSystemType",
+  "Comms": "HudOverrideSystemType",
+  "Security": "SecurityCameraSystemType",
+  "Ventilation": "VentilationSystem",
+  "Laboratory": "ReactorSystemType",
+  "Sabotage": "SabotageSystemType"
+}

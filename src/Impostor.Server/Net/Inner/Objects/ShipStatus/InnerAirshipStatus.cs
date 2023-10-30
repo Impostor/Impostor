@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Impostor.Api.Innersloth;
-using Impostor.Api.Innersloth.Maps;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner.Objects.ShipStatus;
 using Impostor.Server.Net.Inner.Objects.Systems;
@@ -13,19 +11,9 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 {
     internal class InnerAirshipStatus : InnerShipStatus, IInnerAirshipStatus
     {
-        public InnerAirshipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game)
+        public InnerAirshipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game, MapTypes.Airship)
         {
         }
-
-        public override IMapData Data => IMapData.Maps[MapTypes.Airship];
-
-        public override Dictionary<int, bool> Doors { get; } = new Dictionary<int, bool>(21);
-
-        public override float SpawnRadius => throw new NotSupportedException();
-
-        public override Vector2 InitialSpawnCenter => throw new NotSupportedException();
-
-        public override Vector2 MeetingSpawnCenter => throw new NotSupportedException();
 
         public Vector2 PreSpawnLocation { get; } = new Vector2(-25f, 40f);
 
