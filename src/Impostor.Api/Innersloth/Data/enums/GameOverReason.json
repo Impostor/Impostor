@@ -1,0 +1,11 @@
+{
+  "HumansByVote": 0,
+  "HumansByTask": 1,
+  "ImpostorByVote": 2,
+  "ImpostorByKill": 3,
+  "ImpostorBySabotage": 4,
+  "ImpostorDisconnect": 5,
+  "HumansDisconnect": 6,
+  "HideAndSeek_ByTimer": 7,
+  "HideAndSeek_ByKills": 8
+}

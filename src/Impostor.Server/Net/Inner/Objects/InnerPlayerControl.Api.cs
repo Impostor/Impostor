@@ -41,7 +41,7 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerInfo.CurrentOutfit.HatId = hatId;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetHat);
-            Rpc39SetHat.Serialize(writer, hatId);
+            Rpc39SetHatStr.Serialize(writer, hatId);
             await Game.FinishRpcAsync(writer);
         }
 
@@ -50,7 +50,7 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerInfo.CurrentOutfit.PetId = petId;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetPet);
-            Rpc41SetPet.Serialize(writer, petId);
+            Rpc41SetPetStr.Serialize(writer, petId);
             await Game.FinishRpcAsync(writer);
         }
 
@@ -59,7 +59,7 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerInfo.CurrentOutfit.SkinId = skinId;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetSkin);
-            Rpc40SetSkin.Serialize(writer, skinId);
+            Rpc40SetSkinStr.Serialize(writer, skinId);
             await Game.FinishRpcAsync(writer);
         }
 

@@ -1,0 +1,122 @@
+{
+  "0": {
+    "name": "ElectricalVent",
+    "position": {
+      "x": 1.9289999,
+      "y": -9.558001
+    },
+    "left": 2,
+    "center": null,
+    "right": 1
+  },
+  "1": {
+    "name": "ElecFenceVent",
+    "position": {
+      "x": 6.9,
+      "y": -14.41
+    },
+    "left": 2,
+    "center": null,
+    "right": 0
+  },
+  "2": {
+    "name": "LifeSuppVent",
+    "position": {
+      "x": 3.51,
+      "y": -16.58
+    },
+    "left": 1,
+    "center": null,
+    "right": 0
+  },
+  "3": {
+    "name": "CommsVent",
+    "position": {
+      "x": 12.304,
+      "y": -18.897999
+    },
+    "left": 8,
+    "center": null,
+    "right": 4
+  },
+  "4": {
+    "name": "OfficeVent",
+    "position": {
+      "x": 16.379,
+      "y": -19.599
+    },
+    "left": 3,
+    "center": null,
+    "right": 8
+  },
+  "5": {
+    "name": "AdminVent",
+    "position": {
+      "x": 20.089003,
+      "y": -25.517
+    },
+    "left": 11,
+    "center": null,
+    "right": 7
+  },
+  "6": {
+    "name": "BathroomVent",
+    "position": {
+      "x": 32.963,
+      "y": -9.526
+    },
+    "left": null,
+    "center": null,
+    "right": 7
+  },
+  "7": {
+    "name": "SubBathroomVent",
+    "position": {
+      "x": 30.907003,
+      "y": -11.860001
+    },
+    "left": 6,
+    "center": null,
+    "right": 5
+  },
+  "8": {
+    "name": "StorageVent",
+    "position": {
+      "x": 22,
+      "y": -12.190001
+    },
+    "left": 3,
+    "center": null,
+    "right": 4
+  },
+  "9": {
+    "name": "ScienceBuildingVent",
+    "position": {
+      "x": 23.72,
+      "y": -7.82
+    },
+    "left": 10,
+    "center": null,
+    "right": null
+  },
+  "10": {
+    "name": "ElectricBuildingVent",
+    "position": {
+      "x": 9.64,
+      "y": -7.72
+    },
+    "left": 9,
+    "center": null,
+    "right": null
+  },
+  "11": {
+    "name": "SouthVent",
+    "position": {
+      "x": 18.93,
+      "y": -24.85
+    },
+    "left": null,
+    "center": null,
+    "right": 5
+  }
+}

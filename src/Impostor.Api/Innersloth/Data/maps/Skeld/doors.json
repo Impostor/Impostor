@@ -1,0 +1,93 @@
+{
+  "0": {
+    "room": "Cafeteria",
+    "position": {
+      "x": -6.3936,
+      "y": 1.33848
+    }
+  },
+  "1": {
+    "room": "Storage",
+    "position": {
+      "x": -5.268,
+      "y": -14.2884
+    }
+  },
+  "2": {
+    "room": "UpperEngine",
+    "position": {
+      "x": -16.930801,
+      "y": -2.1276002
+    }
+  },
+  "3": {
+    "room": "Cafeteria",
+    "position": {
+      "x": -0.708,
+      "y": -4.992
+    }
+  },
+  "4": {
+    "room": "LowerEngine",
+    "position": {
+      "x": -14.6808,
+      "y": -11.472
+    }
+  },
+  "5": {
+    "room": "UpperEngine",
+    "position": {
+      "x": -14.676002,
+      "y": 1.3406401
+    }
+  },
+  "6": {
+    "room": "Security",
+    "position": {
+      "x": -14.734801,
+      "y": -5.1417603
+    }
+  },
+  "7": {
+    "room": "Storage",
+    "position": {
+      "x": 1.1316001,
+      "y": -11.98128
+    }
+  },
+  "8": {
+    "room": "Cafeteria",
+    "position": {
+      "x": 5.1432004,
+      "y": 1.3355999
+    }
+  },
+  "9": {
+    "room": "Electrical",
+    "position": {
+      "x": -9.53616,
+      "y": -13.416001
+    }
+  },
+  "10": {
+    "room": "MedBay",
+    "position": {
+      "x": -9.1452,
+      "y": -0.4439999
+    }
+  },
+  "11": {
+    "room": "LowerEngine",
+    "position": {
+      "x": -16.930801,
+      "y": -8.9664
+    }
+  },
+  "12": {
+    "room": "Storage",
+    "position": {
+      "x": -0.70919997,
+      "y": -8.560801
+    }
+  }
+}

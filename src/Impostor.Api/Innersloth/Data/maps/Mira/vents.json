@@ -1,0 +1,112 @@
+{
+  "1": {
+    "name": "BalconyVent",
+    "position": {
+      "x": 23.769999,
+      "y": -1.9399999
+    },
+    "left": 8,
+    "center": null,
+    "right": 2
+  },
+  "2": {
+    "name": "YHallRightVent",
+    "position": {
+      "x": 23.9,
+      "y": 7.1800003
+    },
+    "left": 6,
+    "center": null,
+    "right": 1
+  },
+  "3": {
+    "name": "ReactorVent",
+    "position": {
+      "x": 0.48000014,
+      "y": 10.6970005
+    },
+    "left": 4,
+    "center": 9,
+    "right": 11
+  },
+  "4": {
+    "name": "LabVent",
+    "position": {
+      "x": 11.606001,
+      "y": 13.816
+    },
+    "left": 3,
+    "center": 9,
+    "right": 5
+  },
+  "5": {
+    "name": "OfficeVent",
+    "position": {
+      "x": 13.280001,
+      "y": 20.13
+    },
+    "left": 4,
+    "center": 6,
+    "right": 7
+  },
+  "6": {
+    "name": "AdminVent",
+    "position": {
+      "x": 22.390001,
+      "y": 17.23
+    },
+    "left": 7,
+    "center": 2,
+    "right": 5
+  },
+  "7": {
+    "name": "AgriVent",
+    "position": {
+      "x": 17.85,
+      "y": 25.23
+    },
+    "left": 6,
+    "center": null,
+    "right": 5
+  },
+  "8": {
+    "name": "MedVent",
+    "position": {
+      "x": 15.41,
+      "y": -1.8199997
+    },
+    "left": 1,
+    "center": null,
+    "right": 10
+  },
+  "9": {
+    "name": "DeconVent",
+    "position": {
+      "x": 6.83,
+      "y": 3.145
+    },
+    "left": 3,
+    "center": 10,
+    "right": 4
+  },
+  "10": {
+    "name": "LockerVent",
+    "position": {
+      "x": 4.29,
+      "y": 0.52999973
+    },
+    "left": 8,
+    "center": 11,
+    "right": 9
+  },
+  "11": {
+    "name": "LaunchVent",
+    "position": {
+      "x": -6.1800003,
+      "y": 3.5600002
+    },
+    "left": 3,
+    "center": null,
+    "right": 10
+  }
+}

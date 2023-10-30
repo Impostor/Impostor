@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Maps;
 
 namespace Impostor.Api.Net.Inner.Objects
 {
@@ -7,7 +7,7 @@ namespace Impostor.Api.Net.Inner.Objects
     {
         uint Id { get; }
 
-        ITask? Task { get; }
+        TaskData? Task { get; }
 
         bool Complete { get; }
 

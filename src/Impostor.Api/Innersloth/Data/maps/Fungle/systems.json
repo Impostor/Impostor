@@ -1,0 +1,8 @@
+{
+  "Ventilation": "VentilationSystem",
+  "Comms": "HqHudSystemType",
+  "Reactor": "ReactorSystemType",
+  "Doors": "DoorsSystemType",
+  "MushroomMixupSabotage": "MushroomMixupSabotageSystem",
+  "Sabotage": "SabotageSystemType"
+}

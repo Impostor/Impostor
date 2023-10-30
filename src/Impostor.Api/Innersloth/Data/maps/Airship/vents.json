@@ -1,0 +1,122 @@
+{
+  "0": {
+    "name": "VaultVent",
+    "position": {
+      "x": -12.632198,
+      "y": 8.4735
+    },
+    "left": 1,
+    "center": null,
+    "right": null
+  },
+  "1": {
+    "name": "CockpitVent",
+    "position": {
+      "x": -22.098999,
+      "y": -1.5120001
+    },
+    "left": 0,
+    "center": null,
+    "right": 2
+  },
+  "2": {
+    "name": "EjectionVent",
+    "position": {
+      "x": -15.658999,
+      "y": -11.6991005
+    },
+    "left": 1,
+    "center": null,
+    "right": null
+  },
+  "3": {
+    "name": "EngineVent",
+    "position": {
+      "x": 0.20299996,
+      "y": -2.5361004
+    },
+    "left": 4,
+    "center": null,
+    "right": 5
+  },
+  "4": {
+    "name": "KitchenVent",
+    "position": {
+      "x": -2.6018999,
+      "y": -9.338
+    },
+    "left": 3,
+    "center": null,
+    "right": 5
+  },
+  "5": {
+    "name": "HallwayVent1",
+    "position": {
+      "x": 7.0210004,
+      "y": -3.7309995
+    },
+    "left": 3,
+    "center": null,
+    "right": 4
+  },
+  "6": {
+    "name": "HallwayVent2",
+    "position": {
+      "x": 9.814,
+      "y": 3.2060003
+    },
+    "left": 8,
+    "center": null,
+    "right": 7
+  },
+  "7": {
+    "name": "GaproomVent2",
+    "position": {
+      "x": 12.663,
+      "y": 5.922
+    },
+    "left": 8,
+    "center": null,
+    "right": 6
+  },
+  "8": {
+    "name": "GaproomVent1",
+    "position": {
+      "x": 3.6049998,
+      "y": 6.9230003
+    },
+    "left": 7,
+    "center": null,
+    "right": 6
+  },
+  "9": {
+    "name": "ShowersVent",
+    "position": {
+      "x": 23.9869,
+      "y": -1.386
+    },
+    "left": 10,
+    "center": null,
+    "right": 11
+  },
+  "10": {
+    "name": "RecordsVent",
+    "position": {
+      "x": 23.279898,
+      "y": 8.259998
+    },
+    "left": 9,
+    "center": null,
+    "right": 11
+  },
+  "11": {
+    "name": "StorageVent",
+    "position": {
+      "x": 30.440897,
+      "y": -3.5770001
+    },
+    "left": 9,
+    "center": null,
+    "right": 10
+  }
+}

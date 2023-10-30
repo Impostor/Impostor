@@ -1,0 +1,9 @@
+{
+  "Electrical": "SwitchSystem",
+  "MedBay": "MedScanSystem",
+  "Comms": "HqHudSystemType",
+  "Reactor": "ReactorSystemType",
+  "LifeSupp": "LifeSuppSystemType",
+  "Ventilation": "VentilationSystem",
+  "Sabotage": "SabotageSystemType"
+}

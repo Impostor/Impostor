@@ -73,7 +73,7 @@ namespace Impostor.Server.Net
 
                     if (game == null)
                     {
-                        await DisconnectAsync(DisconnectReason.GameMissing);
+                        await DisconnectAsync(DisconnectReason.GameNotFound);
                         return;
                     }
 
@@ -94,7 +94,7 @@ namespace Impostor.Server.Net
                     var game = _gameManager.Find(gameCode);
                     if (game == null)
                     {
-                        await DisconnectAsync(DisconnectReason.GameMissing);
+                        await DisconnectAsync(DisconnectReason.GameNotFound);
                         return;
                     }
 

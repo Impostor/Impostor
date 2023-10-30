@@ -1,0 +1,142 @@
+{
+  "0": {
+    "name": "AdminVent",
+    "position": {
+      "x": 2.544,
+      "y": -9.955201
+    },
+    "left": 2,
+    "center": null,
+    "right": 1
+  },
+  "1": {
+    "name": "BigYVent",
+    "position": {
+      "x": 9.384,
+      "y": -6.438
+    },
+    "left": 0,
+    "center": null,
+    "right": 2
+  },
+  "2": {
+    "name": "CafeVent",
+    "position": {
+      "x": 4.2588,
+      "y": -0.27600002
+    },
+    "left": 0,
+    "center": null,
+    "right": 1
+  },
+  "3": {
+    "name": "ElecVent",
+    "position": {
+      "x": -9.7764,
+      "y": -8.034
+    },
+    "left": 5,
+    "center": null,
+    "right": 6
+  },
+  "4": {
+    "name": "LEngineVent",
+    "position": {
+      "x": -15.288,
+      "y": 2.52
+    },
+    "left": 11,
+    "center": null,
+    "right": null
+  },
+  "5": {
+    "name": "SecurityVent",
+    "position": {
+      "x": -12.534,
+      "y": -6.9492
+    },
+    "left": 6,
+    "center": null,
+    "right": 3
+  },
+  "6": {
+    "name": "MedVent",
+    "position": {
+      "x": -10.608001,
+      "y": -4.176
+    },
+    "left": 3,
+    "center": null,
+    "right": 5
+  },
+  "7": {
+    "name": "WeaponsVent",
+    "position": {
+      "x": 8.820001,
+      "y": 3.3240001
+    },
+    "left": null,
+    "center": null,
+    "right": 12
+  },
+  "8": {
+    "name": "ReactorVent",
+    "position": {
+      "x": -20.796001,
+      "y": -6.9528003
+    },
+    "left": null,
+    "center": null,
+    "right": 9
+  },
+  "9": {
+    "name": "REngineVent",
+    "position": {
+      "x": -15.2508,
+      "y": -13.656001
+    },
+    "left": 8,
+    "center": null,
+    "right": null
+  },
+  "10": {
+    "name": "ShieldsVent",
+    "position": {
+      "x": 9.5232,
+      "y": -14.337601
+    },
+    "left": null,
+    "center": null,
+    "right": 13
+  },
+  "11": {
+    "name": "UpperReactorVent",
+    "position": {
+      "x": -21.876,
+      "y": -3.0516002
+    },
+    "left": null,
+    "center": null,
+    "right": 4
+  },
+  "12": {
+    "name": "NavVentNorth",
+    "position": {
+      "x": 16.008001,
+      "y": -3.1680002
+    },
+    "left": 7,
+    "center": null,
+    "right": null
+  },
+  "13": {
+    "name": "NavVentSouth",
+    "position": {
+      "x": 16.008001,
+      "y": -6.3840003
+    },
+    "left": 10,
+    "center": null,
+    "right": null
+  }
+}
