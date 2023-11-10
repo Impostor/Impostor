@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -47,20 +46,19 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
         public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
-            throw new NotImplementedException();
-            /*if (initialState)
+            if (initialState)
             {
                 writer.Write(_lastSequenceId);
                 writer.Write(Position);
                 return new ValueTask<bool>(true);
             }
 
-            // TODO: DirtyBits == 0 return false.
-            _lastSequenceId++;
-
             writer.Write(_lastSequenceId);
+
+            // Impostor doesn't keep a memory of positions, so just send the last one
+            writer.WritePacked(1);
             writer.Write(Position);
-            return new ValueTask<bool>(true);*/
+            return new ValueTask<bool>(true);
         }
 
         public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
