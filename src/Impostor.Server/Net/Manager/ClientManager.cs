@@ -63,7 +63,7 @@ namespace Impostor.Server.Net.Manager
             }
             else if (versionCompare != ICompatibilityManager.VersionCompareResult.Compatible || platformSpecificData == null)
             {
-                _logger.LogTrace("Client connected using unsupported version: {clientVersion} ({version})", clientVersion.Value, clientVersion.ToString());
+                _logger.LogInformation("Client connected using unsupported version: {clientVersion} ({version})", clientVersion.Value, clientVersion.ToString());
 
                 using var packet = MessageWriter.Get(MessageType.Reliable);
 
