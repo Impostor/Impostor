@@ -8,7 +8,7 @@ namespace Impostor.Api.Net.Messages.Rpcs
     {
         public static void Serialize(IMessageWriter writer, IInnerPlayerControl playerControl, ColorType color)
         {
-            writer.WritePacked(playerControl.NetId);
+            writer.Write(playerControl);
             writer.Write((byte)color);
         }
 
