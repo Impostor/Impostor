@@ -92,18 +92,6 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
                     break;
                 }
 
-                case RpcCalls.RepairSystem:
-                {
-                    Rpc28RepairSystem.Deserialize(reader, Game, out var systemType, out var player, out var amount);
-
-                    if (systemType == SystemTypes.Sabotage && !await ValidateImpostor(call, sender, sender.Character!.PlayerInfo))
-                    {
-                        return false;
-                    }
-
-                    break;
-                }
-
                 case RpcCalls.UpdateSystem:
                 {
                     // TODO: properly deserialize this RPC
