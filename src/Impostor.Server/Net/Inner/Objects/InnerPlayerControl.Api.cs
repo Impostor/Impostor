@@ -99,7 +99,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 throw new ImpostorProtocolException("Tried to murder a player, but target was not alive.");
             }
 
-            if ((result & (MurderResultFlags.FailedError | MurderResultFlags.FailedProtected)) == 0)
+            if (!result.IsFailed())
             {
                 ((InnerPlayerControl)target).Die(DeathReason.Kill);
             }
