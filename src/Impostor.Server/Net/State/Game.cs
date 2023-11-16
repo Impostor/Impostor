@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
@@ -32,6 +33,7 @@ namespace Impostor.Server.Net.State
         private readonly ICompatibilityManager _compatibilityManager;
         private readonly CompatibilityConfig _compatibilityConfig;
         private readonly TimeoutConfig _timeoutConfig;
+        private readonly SemaphoreSlim _lock;
 
         public Game(
             ILogger<Game> logger,
@@ -66,6 +68,7 @@ namespace Impostor.Server.Net.State
             _compatibilityConfig = compatibilityConfig.Value;
             _timeoutConfig = timeoutConfig.Value;
             Items = new ConcurrentDictionary<object, object>();
+            _lock = new SemaphoreSlim(1, 1);
         }
 
         public IPEndPoint PublicIp { get; }
@@ -111,6 +114,11 @@ namespace Impostor.Server.Net.State
         public IClientPlayer? GetClientPlayer(int clientId)
         {
             return _players.TryGetValue(clientId, out var clientPlayer) ? clientPlayer : null;
+        }
+
+        public async Task<LockGuard> LockAsync()
+        {
+            return await LockGuard.LockAsync(_lock);
         }
 
         internal async ValueTask StartedAsync()
