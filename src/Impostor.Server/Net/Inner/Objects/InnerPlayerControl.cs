@@ -109,7 +109,6 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            _logger.LogTrace("Got RPC {0}", call);
             switch (call)
             {
                 case RpcCalls.PlayAnimation:
