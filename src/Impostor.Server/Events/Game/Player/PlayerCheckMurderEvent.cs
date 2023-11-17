@@ -6,9 +6,9 @@ using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Events.Player
 {
-    public class PlayerMurderEvent : IPlayerMurderEvent
+    public class PlayerCheckMurderEvent : IPlayerCheckMurderEvent
     {
-        public PlayerMurderEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, IInnerPlayerControl victim, MurderResultFlags result)
+        public PlayerCheckMurderEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, IInnerPlayerControl victim, MurderResultFlags result)
         {
             Game = game;
             ClientPlayer = clientPlayer;
@@ -25,6 +25,8 @@ namespace Impostor.Server.Events.Player
 
         public IInnerPlayerControl Victim { get; }
 
-        public MurderResultFlags Result { get; }
+        public MurderResultFlags Result { get; set; }
+
+        public bool IsCancelled { get; set; }
     }
 }

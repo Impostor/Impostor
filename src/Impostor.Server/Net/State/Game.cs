@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
-using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
@@ -93,6 +92,8 @@ namespace Impostor.Server.Net.State
 
         public IEnumerable<IClientPlayer> Players => _players.Select(p => p.Value);
 
+        public bool IsHostAuthoritive => Host != null && Host.Client.GameVersion.HasDisableServerAuthorityFlag;
+
         internal GameNet GameNet { get; }
 
         public bool TryGetPlayer(int id, [MaybeNullWhen(false)] out ClientPlayer player)
@@ -122,7 +123,7 @@ namespace Impostor.Server.Net.State
 
                     if (GameNet.ShipStatus != null)
                     {
-                        await player.Character!.NetworkTransform.SetPositionAsync(player, GameNet.ShipStatus.GetSpawnLocation(player.Character, PlayerCount, true), Vector2.Zero);
+                        await player.Character!.NetworkTransform.SetPositionAsync(player, GameNet.ShipStatus.GetSpawnLocation(player.Character, PlayerCount, true));
                     }
                 }
 

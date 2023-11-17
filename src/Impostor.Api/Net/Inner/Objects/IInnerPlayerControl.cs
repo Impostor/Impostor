@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net.Inner.Objects.Components;
 
@@ -90,7 +91,18 @@ namespace Impostor.Api.Net.Inner.Objects
         ValueTask SendChatToPlayerAsync(string text, IInnerPlayerControl? player = null);
 
         /// <summary>
-        ///     Murder <paramref name="target" /> player.
+        ///     Murder <paramref name="target" /> player or remove their protective shield.
+        /// </summary>
+        /// <param name="target">Target player to murder.</param>
+        /// <param name="result">The result of the murder operation.</param>
+        /// <exception cref="ImpostorProtocolException">Thrown when player is not the impostor.</exception>
+        /// <exception cref="ImpostorProtocolException">Thrown when player is dead.</exception>
+        /// <exception cref="ImpostorProtocolException">Thrown when target is dead.</exception>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask MurderPlayerAsync(IInnerPlayerControl target, MurderResultFlags result);
+
+        /// <summary>
+        ///     Murder <paramref name="target" /> player successfully.
         /// </summary>
         /// <param name="target">Target player to murder.</param>
         /// <exception cref="ImpostorProtocolException">Thrown when player is not the impostor.</exception>
@@ -98,6 +110,14 @@ namespace Impostor.Api.Net.Inner.Objects
         /// <exception cref="ImpostorProtocolException">Thrown when target is dead.</exception>
         /// <returns>Task that must be awaited.</returns>
         ValueTask MurderPlayerAsync(IInnerPlayerControl target);
+
+        /// <summary>
+        ///     Protect <paramref name="target" /> player.
+        /// </summary>
+        /// <param name="target">Target player to protect.</param>
+        /// <exception cref="ImpostorProtocolException">Thrown when target is a guardian angel.</exception>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask ProtectPlayerAsync(IInnerPlayerControl target);
 
         /// <summary>
         ///     Exile the current player. This doesn't produce a body to be reported.
