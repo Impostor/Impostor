@@ -398,6 +398,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.Shapeshift:
                 {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
                     if (!await ValidateRole(call, sender, PlayerInfo, RoleTypes.Shapeshifter))
                     {
                         return false;
@@ -410,6 +415,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.CheckMurder:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     if (!await ValidateImpostor(call, sender, PlayerInfo))
                     {
                         return false;
@@ -421,12 +431,83 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.CheckProtect:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     if (!await ValidateRole(call, sender, PlayerInfo, RoleTypes.GuardianAngel))
                     {
                         return false;
                     }
 
                     Rpc48CheckProtect.Deserialize(reader, Game, out _);
+                    break;
+                }
+
+                case RpcCalls.CheckZipline:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc51CheckZipline.Deserialize(reader, out var fromTop);
+                    break;
+                }
+
+                case RpcCalls.UseZipline:
+                {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc52UseZipline.Deserialize(reader, out var fromTop);
+                    break;
+                }
+
+                case RpcCalls.TriggerSpores:
+                {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc53TriggerSpores.Deserialize(reader, out var mushroomId);
+                    break;
+                }
+
+                case RpcCalls.CheckSpore:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc54CheckSpore.Deserialize(reader, out var mushroomId);
+                    break;
+                }
+
+                case RpcCalls.CheckShapeshift:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc46Shapeshift.Deserialize(reader, Game, out var playerControl, out var shouldAnimate);
+                    break;
+                }
+
+                case RpcCalls.RejectShapeshift:
+                {
+                    if (!await ValidateHost(call, sender))
+                    {
+                        return false;
+                    }
+
+                    Rpc56RejectShapeshift.Deserialize(reader);
                     break;
                 }
 
