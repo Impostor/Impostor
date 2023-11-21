@@ -249,6 +249,10 @@ namespace Impostor.Server.Net.State
                     {
                         var clientId = reader.ReadPackedInt32();
                         _logger.LogTrace("> IsReady {0}", clientId);
+                        // Allow the host to snap immediately because the host tends to transmit a SnapTo to spawn immediately when starting the game
+                        if (clientId == HostId) {
+                            Host?.Character?.NetworkTransform.OnPlayerSpawn(true);
+                        }
                         break;
                     }
 
@@ -355,7 +359,7 @@ namespace Impostor.Server.Net.State
                 {
                     foreach (var player in _players.Values)
                     {
-                        player.Character?.NetworkTransform.OnPlayerSpawn();
+                        player.Character?.NetworkTransform.OnPlayerSpawn(false);
                     }
 
                     await _eventManager.CallAsync(new MeetingStartedEvent(this, meetingHud));

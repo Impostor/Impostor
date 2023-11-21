@@ -26,6 +26,8 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
         private ushort _lastSequenceId;
         private AirshipSpawnState _spawnState;
+        private bool _spawnSnapAllowed;
+        private bool _initialSpawn;
 
         public InnerCustomNetworkTransform(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool) : base(customMessageManager, game)
         {
@@ -33,6 +35,8 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             _playerControl = playerControl;
             _eventManager = eventManager;
             _pool = pool;
+            _spawnSnapAllowed = false;
+            _initialSpawn = true;
         }
 
         private enum AirshipSpawnState : byte
@@ -103,6 +107,26 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
                 Rpc21SnapTo.Deserialize(reader, out var position, out var minSid);
 
+                _logger.LogInformation("SnapTo for {0}", NetId);
+                if (_spawnSnapAllowed)
+                {
+                    _logger.LogInformation("SnapTo allowed for {0} {1}", NetId, _spawnSnapAllowed);
+                    _spawnSnapAllowed = false;
+
+                    // Check if the snap position is the expected spawn point
+                    var expectedPosition = Game.GameNet.ShipStatus?.GetSpawnLocation(_playerControl, Game.PlayerCount, _initialSpawn);
+                    _logger.LogTrace("{0} / {1}", position, expectedPosition);
+                    if (!Approximately(position, expectedPosition ?? Vector2.Zero))
+                    {
+                        if (await sender.Client.ReportCheatAsync(call, "Failed to snap to the correct spawn point"))
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+
                 if (Game.GameNet.ShipStatus is InnerAirshipStatus airshipStatus)
                 {
                     // As part of airship spawning, clients are sending snap to -25 40 to move themself out of view
@@ -169,8 +193,11 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             _pool.Return(playerMovementEvent);
         }
 
-        internal void OnPlayerSpawn()
+        internal void OnPlayerSpawn(bool initialSpawn)
         {
+            _logger.LogInformation("Allowing spawn snap for {0}", NetId);
+            _spawnSnapAllowed = true;
+            _initialSpawn = initialSpawn;
             _spawnState = AirshipSpawnState.PreSpawn;
         }
 
