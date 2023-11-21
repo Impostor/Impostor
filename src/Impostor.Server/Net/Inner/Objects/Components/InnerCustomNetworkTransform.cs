@@ -8,7 +8,6 @@ using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Player;
-using Impostor.Server.Net.Inner.Objects.ShipStatus;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
@@ -25,7 +24,6 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly ObjectPool<PlayerMovementEvent> _pool;
 
         private ushort _lastSequenceId;
-        private AirshipSpawnState _spawnState;
 
         public InnerCustomNetworkTransform(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool) : base(customMessageManager, game)
         {
@@ -103,51 +101,19 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
                 Rpc21SnapTo.Deserialize(reader, out var position, out var minSid);
 
-                if (Game.GameNet.ShipStatus is InnerAirshipStatus airshipStatus)
+                if (Game.GameNet.ShipStatus is { } shipStatus)
                 {
-                    // As part of airship spawning, clients are sending snap to -25 40 to move themself out of view
-                    if (_spawnState == AirshipSpawnState.PreSpawn && Approximately(position, airshipStatus.PreSpawnLocation))
-                    {
-                        _spawnState = AirshipSpawnState.SelectingSpawn;
-                        return true;
-                    }
-
-                    // Once the spawn has been selected, the client sends a second snap to the select spawn location
-                    if (_spawnState == AirshipSpawnState.SelectingSpawn && airshipStatus.SpawnLocations.Any(location => Approximately(position, location)))
-                    {
-                        _spawnState = AirshipSpawnState.Spawned;
-                        return true;
-                    }
-                }
-
-                if (!await ValidateCanVent(call, sender, _playerControl.PlayerInfo))
-                {
-                    return false;
-                }
-
-                if (Game.GameNet.ShipStatus == null)
-                {
-                    // Cannot perform vent position check on unknown ship statuses
-                    if (await sender.Client.ReportCheatAsync(call, "Failed vent position check on unknown map"))
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    var vents = Game.GameNet.ShipStatus!.Data.Vents.Values;
+                    var vents = shipStatus.Data.Vents.Values;
 
                     var vent = vents.SingleOrDefault(x => Approximately(x.Position, position + ColliderOffset));
 
-                    if (vent == null)
+                    if (vent != null)
                     {
-                        if (await sender.Client.ReportCheatAsync(call, "Failed vent position check"))
+                        if (!await ValidateCanVent(call, sender, _playerControl.PlayerInfo))
                         {
                             return false;
                         }
-                    }
-                    else
-                    {
+
                         await _eventManager.CallAsync(new PlayerVentEvent(Game, sender, _playerControl, vent));
                     }
                 }
@@ -167,11 +133,6 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             playerMovementEvent.Reset(Game, sender, _playerControl);
             await _eventManager.CallAsync(playerMovementEvent);
             _pool.Return(playerMovementEvent);
-        }
-
-        internal void OnPlayerSpawn()
-        {
-            _spawnState = AirshipSpawnState.PreSpawn;
         }
 
         private static bool SidGreaterThan(ushort newSid, ushort prevSid)
