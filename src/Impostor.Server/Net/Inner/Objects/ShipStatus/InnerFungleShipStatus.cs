@@ -20,7 +20,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
             systems.Add(SystemTypes.Comms, new HudOverrideSystemType());
             systems.Add(SystemTypes.Reactor, new ReactorSystemType());
             systems.Add(SystemTypes.Doors, new DoorsSystemType(Doors));
-            // systems.Add(SystemTypes.MushroomMixupSabotage, );
+            systems.Add(SystemTypes.MushroomMixupSabotage, new MushroomMixupSabotageSystemType());
         }
     }
 }
