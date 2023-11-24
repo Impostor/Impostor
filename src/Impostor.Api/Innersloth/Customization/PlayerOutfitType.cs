@@ -4,5 +4,7 @@ namespace Impostor.Api.Innersloth.Customization
     {
         Default,
         Shapeshifted,
+        HorseWrangler,
+        MushroomMixup,
     }
 }
