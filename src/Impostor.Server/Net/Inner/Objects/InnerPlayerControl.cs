@@ -15,6 +15,7 @@ using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Api.Utils;
+using Impostor.Server.Events;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner.Objects.Components;
 using Impostor.Server.Net.State;
@@ -142,6 +143,9 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc02SyncSettings.DeserializeInto(reader, Game.Options);
+                    await _eventManager.CallAsync(new GameOptionsChangedEvent(
+                        Game,
+                        Api.Events.IGameOptionsChangedEvent.ChangeReason.Rpc));
                     break;
                 }
 

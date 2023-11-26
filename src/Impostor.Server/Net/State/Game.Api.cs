@@ -6,12 +6,16 @@ using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
 using Impostor.Hazel;
+using Impostor.Server.Events;
 using Impostor.Server.Net.Inner;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.State
 {
     internal partial class Game : IGame
     {
+        private bool alreadyCallingOptionsChangedEvent = false;
+
         IClientPlayer? IGame.Host => Host;
 
         IGameNet IGame.GameNet => GameNet;
@@ -59,6 +63,20 @@ namespace Impostor.Server.Net.State
             writer.EndMessage();
 
             await SendToAllAsync(writer);
+
+            // Prevent bad plugins from causing a server crash by recursing into this function
+            if (alreadyCallingOptionsChangedEvent)
+            {
+                _logger.LogError("Plugin called SyncSettingsAsync while processing a GameOptionsChangedEvent, aborting to prevent recursion");
+            }
+            else
+            {
+                alreadyCallingOptionsChangedEvent = true;
+                await _eventManager.CallAsync(new GameOptionsChangedEvent(
+                    this,
+                    Api.Events.IGameOptionsChangedEvent.ChangeReason.Api));
+                alreadyCallingOptionsChangedEvent = false;
+            }
         }
 
         public async ValueTask SetPrivacyAsync(bool isPublic)
