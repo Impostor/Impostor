@@ -1,4 +1,5 @@
-﻿using Impostor.Api.Net.Custom;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner.Objects.GameManager;
 using Impostor.Server.Net.Inner.Objects.GameManager.Logic.HideAndSeek;
 using Impostor.Server.Net.State;
@@ -8,7 +9,7 @@ namespace Impostor.Server.Net.Inner.Objects.GameManager;
 
 internal partial class InnerHideAndSeekManager : InnerGameManager, IInnerHideAndSeekManager
 {
-    public InnerHideAndSeekManager(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerGameManager> logger) : base(customMessageManager, game, logger)
+    public InnerHideAndSeekManager(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerGameManager> logger, IEventManager eventManager) : base(customMessageManager, game, logger)
     {
         LogicMusic = AddGameLogic(new LogicHnSMusic());
         LogicMinigame = AddGameLogic(new LogicMinigameHnS());
@@ -16,7 +17,7 @@ internal partial class InnerHideAndSeekManager : InnerGameManager, IInnerHideAnd
         LogicFlow = AddGameLogic(LogicFlowHnS);
         LogicUsables = AddGameLogic(new LogicUsablesHnS());
         LogicRoleSelection = AddGameLogic(new LogicRoleSelectionHnS());
-        LogicOptionsHnS = new LogicOptionsHnS(game);
+        LogicOptionsHnS = new LogicOptionsHnS(game, eventManager);
         LogicOptions = AddGameLogic(this.LogicOptionsHnS);
         LogicDangerLevel = AddGameLogic(new LogicHnSDangerLevel());
         LogicPing = AddGameLogic(new LogicPingsHnS());

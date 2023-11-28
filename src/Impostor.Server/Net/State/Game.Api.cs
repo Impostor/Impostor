@@ -71,11 +71,17 @@ namespace Impostor.Server.Net.State
             }
             else
             {
-                alreadyCallingOptionsChangedEvent = true;
-                await _eventManager.CallAsync(new GameOptionsChangedEvent(
-                    this,
-                    Api.Events.IGameOptionsChangedEvent.ChangeReason.Api));
-                alreadyCallingOptionsChangedEvent = false;
+                try
+                {
+                    alreadyCallingOptionsChangedEvent = true;
+                    await _eventManager.CallAsync(new GameOptionsChangedEvent(
+                        this,
+                        Api.Events.IGameOptionsChangedEvent.ChangeReason.Api));
+                }
+                finally
+                {
+                    alreadyCallingOptionsChangedEvent = false;
+                }
             }
         }
 

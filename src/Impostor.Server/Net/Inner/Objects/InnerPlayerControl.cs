@@ -143,9 +143,6 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc02SyncSettings.DeserializeInto(reader, Game.Options);
-                    await _eventManager.CallAsync(new GameOptionsChangedEvent(
-                        Game,
-                        Api.Events.IGameOptionsChangedEvent.ChangeReason.Rpc));
                     break;
                 }
 
