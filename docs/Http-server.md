@@ -13,7 +13,7 @@ In config.json, set "ListenIp" to "0.0.0.0" in the "HttpServer" section. If you 
 
 ## Use a reverse proxy
 
-A reverse proxy allows you to forward HTTP requests from users to multiple services. If you already have one, you should configure it to add Impostor. This page contains an Nginx configuration.
+A reverse proxy allows you to forward HTTP requests from users to multiple services. If you already have one, you should configure it to add Impostor. This page contains an Nginx configuration you can use for reference.
 
 If you have never set up a reverse proxy before, we recommend you to set up [Caddy](https://caddyserver.com/). It is easy to set up and comes with support for requesting SSL certificates out of the box.
 
@@ -22,7 +22,7 @@ If you have never set up a reverse proxy before, we recommend you to set up [Cad
 To install Caddy, follow the [official installation guide](https://caddyserver.com/docs/install). Then use the following lines as your `Caddyfile` configuration file:
 
 ```
-example.com # replace this with your domain name
+example.com # replace example.com with your domain name
 
 reverse_proxy :22023
 ```
@@ -34,14 +34,17 @@ If this works, you should set up [Caddy to run in the background](https://caddys
 
 Nginx is an alternative to Caddy that is a bit harder to set up. If you already use Nginx, you can use our snippet to add Impostor:
 
+<details><summary>Nginx configuration</summary>
+
 ```nginx
 server {
     listen 443 ssl http2;
-    server_name YOUR_DOMAIN_NAME_HERE;
+    server_name example.com; # replace example.com with your domain name
 
-    ssl_certificate /etc/letsencrypt/live/YOUR_DOMAIN_NAME_HERE/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/YOUR_DOMAIN_NAME_HERE/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/YOUR_DOMAIN_NAME_HERE/fullchain.pem;
+    # Assuming you're using Certbot, replace example.com with your domain name
+    ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
 
     # generated 2023-10-07, Mozilla Guideline v5.7, nginx 1.17.7, OpenSSL 1.1.1k, intermediate configuration
     # https://ssl-config.mozilla.org/#server=nginx&version=1.17.7&config=intermediate&openssl=1.1.1k&hsts=false&guideline=5.7
@@ -75,4 +78,14 @@ server {
         proxy_http_version 1.1;  # recommended with keepalive connections
     }
 }
+
+# Redirect all traffic to HTTPS
+server {
+    listen 80 default_server;
+    location / {
+        return 307 https://$host$request_uri;
+    }
+}
 ```
+
+</details>
