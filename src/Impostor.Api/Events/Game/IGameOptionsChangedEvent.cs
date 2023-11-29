@@ -1,5 +1,4 @@
 using Impostor.Api.Games;
-using Impostor.Api.Net.Messages.Rpcs;
 
 namespace Impostor.Api.Events
 {
@@ -18,8 +17,7 @@ namespace Impostor.Api.Events
         public enum ChangeReason
         {
             /// <summary>
-            /// The options were changed by the host using
-            /// <see cref="Rpc02SyncSettings"/>.
+            /// The options were changed by the host using LogicOptions deserialization.
             /// </summary>
             /// <remarks>
             /// This event does not change the message sent to other players,

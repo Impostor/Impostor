@@ -15,7 +15,6 @@ using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Api.Utils;
-using Impostor.Server.Events;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner.Objects.Components;
 using Impostor.Server.Net.State;
@@ -142,7 +141,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc02SyncSettings.DeserializeInto(reader, Game.Options);
+                    // Clients no longer handle this packet since 2022.12.8 but continue to send it
                     break;
                 }
 
