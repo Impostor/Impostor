@@ -66,7 +66,7 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
         throw new System.NotImplementedException();
     }
 
-    public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+    public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
     {
         while (reader.Position < reader.Length)
         {
@@ -80,7 +80,7 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
 
             var component = this._logicComponents[tag];
 
-            component.Deserialize(innerReader, initialState);
+            await component.DeserializeAsync(innerReader, initialState);
 
             if (innerReader.Position < innerReader.Length)
             {
@@ -92,7 +92,5 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
                     innerReader.Length);
             }
         }
-
-        return ValueTask.CompletedTask;
     }
 }

@@ -16,7 +16,7 @@ internal abstract class GameLogicComponent
         throw new NotImplementedException();
     }
 
-    public virtual ValueTask Deserialize(IMessageReader reader, bool initialState)
+    public virtual ValueTask DeserializeAsync(IMessageReader reader, bool initialState)
     {
         return default;
     }

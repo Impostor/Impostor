@@ -23,12 +23,12 @@ internal abstract class LogicOptions : GameLogicComponent
         return true;
     }
 
-    public override async ValueTask Deserialize(IMessageReader reader, bool initialState)
+    public override async ValueTask DeserializeAsync(IMessageReader reader, bool initialState)
     {
         GameOptionsFactory.DeserializeInto(reader, _game.Options);
         await _eventManager.CallAsync(new GameOptionsChangedEvent(
             _game,
-            Api.Events.IGameOptionsChangedEvent.ChangeReason.Host)
-        );
+            Api.Events.IGameOptionsChangedEvent.ChangeReason.Host
+        ));
     }
 }

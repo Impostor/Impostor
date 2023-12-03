@@ -76,8 +76,8 @@ namespace Impostor.Server.Net.State
                     _alreadyCallingOptionsChangedEvent = true;
                     await _eventManager.CallAsync(new GameOptionsChangedEvent(
                         this,
-                        Api.Events.IGameOptionsChangedEvent.ChangeReason.Api)
-                    );
+                        Api.Events.IGameOptionsChangedEvent.ChangeReason.Api
+                    ));
                 }
                 finally
                 {

@@ -9,7 +9,7 @@ internal class LogicGameFlowHnS : LogicGameFlow, ILogicGameFlowHnS
 
     public float CurrentHideTime { get; private set; }
 
-    public override ValueTask Deserialize(IMessageReader reader, bool initialState)
+    public override ValueTask DeserializeAsync(IMessageReader reader, bool initialState)
     {
         var num = reader.ReadSingle();
 
