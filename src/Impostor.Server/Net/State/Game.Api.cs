@@ -14,7 +14,7 @@ namespace Impostor.Server.Net.State
 {
     internal partial class Game : IGame
     {
-        private bool alreadyCallingOptionsChangedEvent = false;
+        private bool _alreadyCallingOptionsChangedEvent = false;
 
         IClientPlayer? IGame.Host => Host;
 
@@ -65,7 +65,7 @@ namespace Impostor.Server.Net.State
             await SendToAllAsync(writer);
 
             // Prevent bad plugins from causing a server crash by recursing into this function
-            if (alreadyCallingOptionsChangedEvent)
+            if (_alreadyCallingOptionsChangedEvent)
             {
                 _logger.LogError("Plugin called SyncSettingsAsync while processing a GameOptionsChangedEvent, aborting to prevent recursion");
             }
@@ -73,14 +73,15 @@ namespace Impostor.Server.Net.State
             {
                 try
                 {
-                    alreadyCallingOptionsChangedEvent = true;
+                    _alreadyCallingOptionsChangedEvent = true;
                     await _eventManager.CallAsync(new GameOptionsChangedEvent(
                         this,
-                        Api.Events.IGameOptionsChangedEvent.ChangeReason.Api));
+                        Api.Events.IGameOptionsChangedEvent.ChangeReason.Api)
+                    );
                 }
                 finally
                 {
-                    alreadyCallingOptionsChangedEvent = false;
+                    _alreadyCallingOptionsChangedEvent = false;
                 }
             }
         }

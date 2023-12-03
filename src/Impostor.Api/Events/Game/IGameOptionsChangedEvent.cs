@@ -24,7 +24,7 @@ namespace Impostor.Api.Events
             /// so changes made to Game.Options are not synced until
             /// SyncSettingsAsync is called afterwards.
             /// </remarks>
-            Rpc,
+            Host,
 
             /// <summary>
             /// The options were changed by a plugin using the

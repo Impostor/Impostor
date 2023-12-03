@@ -80,7 +80,7 @@ namespace Impostor.Plugins.Example.Handlers
         }
 
         [EventListener]
-        public async void OnGameOptionsChanged(IGameOptionsChangedEvent e)
+        public void OnGameOptionsChanged(IGameOptionsChangedEvent e)
         {
             _logger.LogInformation(
                 "Game {code} > new options because of {source}",

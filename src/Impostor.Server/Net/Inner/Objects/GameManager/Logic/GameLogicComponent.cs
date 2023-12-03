@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Impostor.Api.Net.Inner;
 
 namespace Impostor.Server.Net.Inner.Objects.GameManager.Logic;
@@ -15,7 +16,8 @@ internal abstract class GameLogicComponent
         throw new NotImplementedException();
     }
 
-    public virtual void Deserialize(IMessageReader reader, bool initialState)
+    public virtual ValueTask Deserialize(IMessageReader reader, bool initialState)
     {
+        return default;
     }
 }
