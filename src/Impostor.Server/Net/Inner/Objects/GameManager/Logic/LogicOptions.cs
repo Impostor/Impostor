@@ -17,10 +17,10 @@ internal abstract class LogicOptions : GameLogicComponent
         _eventManager = eventManager;
     }
 
-    public override bool Serialize(IMessageWriter writer, bool initialState)
+    public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
     {
         GameOptionsFactory.Serialize(writer, _game.Options);
-        return true;
+        return ValueTask.FromResult(true);
     }
 
     public override async ValueTask DeserializeAsync(IMessageReader reader, bool initialState)

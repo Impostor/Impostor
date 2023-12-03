@@ -56,7 +56,7 @@ namespace Impostor.Server.Net.State
             writer.WritePacked(GameNet.GameManager.NetId);
 
             writer.StartMessage((byte)gameOptionsTag);
-            GameNet.GameManager.LogicOptions.Serialize(writer, false);
+            await GameNet.GameManager.LogicOptions.SerializeAsync(writer, false);
 
             writer.EndMessage();
             writer.EndMessage();

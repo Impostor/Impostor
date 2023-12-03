@@ -51,14 +51,14 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
         return _logicComponents.IndexOf(logic);
     }
 
-    public override ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
     {
         foreach (var logicComponent in _logicComponents)
         {
-            logicComponent.HandleRpc(call, reader);
+            await logicComponent.HandleRpcAsync(call, reader);
         }
 
-        return ValueTask.FromResult(true);
+        return true;
     }
 
     public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
