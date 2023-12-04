@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using CSharpPoet;
 using Impostor.Api.Innersloth.Generator.Generators;
 using Microsoft.CodeAnalysis;
@@ -8,7 +9,24 @@ namespace Impostor.Api.Innersloth.Generator;
 [Generator(LanguageNames.CSharp)]
 public sealed class SourceGenerator : IIncrementalGenerator
 {
-    private record struct Options(string ProjectDirectory);
+    private const string DataPath = "Innersloth/Data/";
+
+    private readonly record struct Options(string ProjectDirectory)
+    {
+        public bool TryGetRelativePath(string path, [NotNullWhen(true)] out string? relativePath)
+        {
+            if (
+                path.NormalizePath().TryTrimStart(ProjectDirectory, out relativePath) &&
+                relativePath.TryTrimStart(DataPath, out relativePath)
+            )
+            {
+                return true;
+            }
+
+            relativePath = null;
+            return false;
+        }
+    }
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -20,22 +38,26 @@ public sealed class SourceGenerator : IIncrementalGenerator
                     throw new Exception("Couldn't get project directory");
                 }
 
-                return new Options(projectDirectory);
+                return new Options(projectDirectory.NormalizePath());
             });
 
         var filesProvider = context.AdditionalTextsProvider.Combine(optionsProvider)
             .Where(static pair =>
             {
                 var (file, options) = pair;
-                return file.Path.StartsWith(options.ProjectDirectory) &&
-                       file.Path[options.ProjectDirectory.Length..].StartsWith("Innersloth/Data/") &&
-                       file.Path.EndsWith(".json");
+                return options.TryGetRelativePath(file.Path, out var relativePath) && relativePath.EndsWith(".json");
             })
             .Select(static (pair, cancellationToken) =>
             {
                 var (file, options) = pair;
+
+                if (!options.TryGetRelativePath(file.Path, out var relativePath))
+                {
+                    throw new InvalidOperationException();
+                }
+
                 return (
-                    RelativePath: file.Path[(options.ProjectDirectory.Length + "Innersloth/Data/".Length)..],
+                    RelativePath: relativePath,
                     Content: file.GetText(cancellationToken)!.ToString()
                 );
             })
@@ -43,6 +65,11 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(filesProvider, (spc, files) =>
         {
+            if (files.IsEmpty)
+            {
+                throw new InvalidOperationException($"No json files found in Impostor.Api/{DataPath}");
+            }
+
             var enumGenerator = new EnumGenerator(spc, files);
 
             enumGenerator.Generate("ColorType", "Impostor.Api.Innersloth.Customization");

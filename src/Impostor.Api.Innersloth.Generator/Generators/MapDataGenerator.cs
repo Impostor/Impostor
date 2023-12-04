@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Numerics;
 using System.Text.Json;
 using CSharpPoet;
@@ -102,7 +103,7 @@ public sealed class MapDataGenerator : BaseGenerator
 
                 new CSharpBlankLine(),
 
-                CreateSimpleProperty("float", "SpawnRadius", spawnInfo.SpawnRadius + "f"),
+                CreateSimpleProperty("float", "SpawnRadius", spawnInfo.SpawnRadius.ToString(CultureInfo.InvariantCulture) + "f"),
                 CreateSimpleProperty("Vector2", "InitialSpawnCenter", spawnInfo.InitialSpawnCenter.ToCSharpString()),
                 CreateSimpleProperty("Vector2", "MeetingSpawnCenter", spawnInfo.MeetingSpawnCenter.ToCSharpString()),
                 CreateSimpleProperty("Vector2", "MeetingSpawnCenter2", spawnInfo.MeetingSpawnCenter2.ToCSharpString()),
