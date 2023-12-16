@@ -1,0 +1,13 @@
+{
+  "Electrical": "SwitchSystem",
+  "MedBay": "MedScanSystem",
+  "Doors": "DoorsSystemType",
+  "Comms": "HudOverrideSystemType",
+  "GapRoom": "MovingPlatformBehaviour",
+  "HeliSabotage": "HeliSabotageSystem",
+  "Decontamination": "ElectricalDoors",
+  "Decontamination2": "AutoDoorsSystemType",
+  "Security": "SecurityCameraSystemType",
+  "Ventilation": "VentilationSystem",
+  "Sabotage": "SabotageSystemType"
+}

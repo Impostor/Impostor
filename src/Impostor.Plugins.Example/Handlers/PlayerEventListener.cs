@@ -111,19 +111,19 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnPlayerEnterVentEvent(IPlayerEnterVentEvent e)
         {
-            _logger.LogInformation("Player {player} entered the vent in {vent}", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name);
+            _logger.LogInformation("Player {player} entered the vent in {vent} ({ventId})", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name, e.Vent.Id);
         }
 
         [EventListener]
         public void OnPlayerExitVentEvent(IPlayerExitVentEvent e)
         {
-            _logger.LogInformation("Player {player} exited the vent in {vent}", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name);
+            _logger.LogInformation("Player {player} exited the vent in {vent} ({ventId})", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name, e.Vent.Id);
         }
 
         [EventListener]
         public void OnPlayerVentEvent(IPlayerVentEvent e)
         {
-            _logger.LogInformation("Player {player} vented to {vent}", e.PlayerControl.PlayerInfo.PlayerName, e.NewVent.Name);
+            _logger.LogInformation("Player {player} vented to {vent} ({ventId})", e.PlayerControl.PlayerInfo.PlayerName, e.NewVent.Name, e.NewVent.Id);
         }
 
         [EventListener]

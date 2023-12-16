@@ -21,20 +21,20 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
     {
         private readonly Dictionary<SystemTypes, ISystemType> _systems = new Dictionary<SystemTypes, ISystemType>();
 
-        protected InnerShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game)
+        protected InnerShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, MapTypes mapType) : base(customMessageManager, game)
         {
             Components.Add(this);
+
+            MapType = mapType;
+            Data = MapData.Maps[mapType];
+            Doors = new Dictionary<int, bool>(Data.Doors.Count);
         }
 
-        public abstract IMapData Data { get; }
+        public MapTypes MapType { get; }
 
-        public abstract Dictionary<int, bool> Doors { get; }
+        public MapData Data { get; }
 
-        public abstract float SpawnRadius { get; }
-
-        public abstract Vector2 InitialSpawnCenter { get; }
-
-        public abstract Vector2 MeetingSpawnCenter { get; }
+        public Dictionary<int, bool> Doors { get; }
 
         internal override ValueTask OnSpawnAsync()
         {
@@ -110,8 +110,8 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
         {
             var vector = new Vector2(0, 1);
             vector = Rotate(vector, (player.PlayerId - 1) * (360f / numPlayers));
-            vector *= this.SpawnRadius;
-            return (initialSpawn ? this.InitialSpawnCenter : this.MeetingSpawnCenter) + vector + new Vector2(0f, 0.3636f);
+            vector *= Data.SpawnRadius;
+            return (initialSpawn ? Data.InitialSpawnCenter : Data.MeetingSpawnCenter) + vector + new Vector2(0f, 0.3636f);
         }
 
         protected virtual void AddSystems(Dictionary<SystemTypes, ISystemType> systems)

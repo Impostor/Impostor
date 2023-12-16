@@ -114,7 +114,7 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             switch (call)
             {
-                case RpcCalls.Close:
+                case RpcCalls.CloseMeeting:
                 {
                     if (!await ValidateHost(call, sender))
                     {
