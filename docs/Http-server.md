@@ -46,36 +46,10 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
     ssl_trusted_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
 
-    # generated 2023-10-07, Mozilla Guideline v5.7, nginx 1.17.7, OpenSSL 1.1.1k, intermediate configuration
-    # https://ssl-config.mozilla.org/#server=nginx&version=1.17.7&config=intermediate&openssl=1.1.1k&hsts=false&guideline=5.7
-    ssl_session_timeout 1d;
-    ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
-    ssl_session_tickets off;
-    # curl https://ssl-config.mozilla.org/ffdhe2048.txt > /path/to/dhparam
-    ssl_dhparam /path/to/dhparam;
-
-    # intermediate configuration
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305;
-    ssl_prefer_server_ciphers off;
-
-    # OCSP stapling
-    ssl_stapling on;
-    ssl_stapling_verify on;
-
-    # replace with the IP address of your resolver
-    resolver 127.0.0.1;
-
     location / {
         proxy_pass http://localhost:22023; # Change the port to your HttpServer's ListenPort
-        proxy_pass_header Server;
-        proxy_buffering off;
-        proxy_redirect off;
-        proxy_set_header X-Real-IP $remote_addr;  # http://wiki.nginx.org/HttpProxyModule
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Host $host;
-        proxy_http_version 1.1;  # recommended with keepalive connections
     }
 }
 
