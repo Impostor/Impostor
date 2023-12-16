@@ -53,7 +53,7 @@ services:
     image: aeonlucid/impostor:nightly
     container_name: impostor
     ports:
-      - 127.0.0.1:22023:22023/tcp # Remove "127.0.0.1" if you want to expose Impostor's HTTP server directly to the internet
+      - 127.0.0.1:22023:22023/tcp # Remove "127.0.0.1:" if you want to expose Impostor's HTTP server directly to the internet
       - 22023:22023/udp
     environment: # Either configure Impostor using environment variables or mount a copy of config.json
       - IMPOSTOR_Server__PublicIp=your.public.ip.here
