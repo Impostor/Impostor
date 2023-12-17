@@ -61,56 +61,6 @@ namespace Impostor.Server.Net.Manager
             return game;
         }
 
-        public IEnumerable<Game> FindListings(
-            MapFlags map,
-            int impostorCount,
-            GameKeywords language,
-            GameVersion gameVersion,
-            HashSet<string> filterTags,
-            int count = 10)
-        {
-            var results = 0;
-
-            // Find games that have not started yet.
-            foreach (var (_, game) in _games.Where(x =>
-                x.Value.IsPublic &&
-                x.Value.GameState == GameStates.NotStarted &&
-                x.Value.PlayerCount < x.Value.Options.MaxPlayers &&
-                (_compatibilityConfig.AllowVersionMixing || x.Value.Host == null ||
-                 this._compatibilityManager.CanJoinGame(x.Value.Host.Client.GameVersion, gameVersion) == GameJoinError.None)))
-            {
-                // Check for options.
-                if (!map.HasFlag((MapFlags)(1 << (byte)game.Options.Map)))
-                {
-                    continue;
-                }
-
-                if (!language.HasFlag(game.Options.Keywords))
-                {
-                    continue;
-                }
-
-                if (impostorCount != 0 && game.Options.NumImpostors != impostorCount)
-                {
-                    continue;
-                }
-
-                if (!game.FilterOptions.FilterTags.SetEquals(filterTags))
-                {
-                    continue;
-                }
-
-                // Add to result.
-                yield return game;
-
-                // Break out if we have enough.
-                if (++results == count)
-                {
-                    yield break;
-                }
-            }
-        }
-
         public async ValueTask RemoveAsync(GameCode gameCode)
         {
             if (_games.TryGetValue(gameCode, out var game) && game.PlayerCount > 0)
