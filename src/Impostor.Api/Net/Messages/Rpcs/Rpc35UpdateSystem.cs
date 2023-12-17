@@ -9,7 +9,7 @@ namespace Impostor.Api.Net.Messages.Rpcs
         public static void Serialize(IMessageWriter writer, SystemTypes systemType, IInnerPlayerControl playerControl, ushort sequenceId, byte state, byte ventId)
         {
             writer.Write((byte)systemType);
-            writer.Write(playerControl.NetId);
+            writer.Write(playerControl);
             writer.Write(sequenceId);
             writer.Write(state);
             writer.Write(ventId);

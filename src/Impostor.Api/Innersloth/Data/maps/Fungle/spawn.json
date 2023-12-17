@@ -1,0 +1,15 @@
+{
+  "initialSpawnCenter": {
+    "x": -9.81,
+    "y": 1
+  },
+  "meetingSpawnCenter": {
+    "x": -3,
+    "y": -2.1
+  },
+  "meetingSpawnCenter2": {
+    "x": 0,
+    "y": 0
+  },
+  "spawnRadius": 1.5
+}

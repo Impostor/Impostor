@@ -7,7 +7,7 @@ namespace Impostor.Api.Net.Messages.Rpcs
     {
         public static void Serialize(IMessageWriter writer, IInnerPlayerControl playerControl, bool shouldAnimate)
         {
-            writer.Write(playerControl.NetId);
+            writer.Write(playerControl);
             writer.Write(shouldAnimate);
         }
 

@@ -30,19 +30,20 @@ namespace Impostor.Server.Net.State
         /// </summary>
         private const int CurrentClient = -3;
 
-        private static readonly Type[] SpawnableObjects =
+        private static readonly Dictionary<uint, Type> SpawnableObjects = new()
         {
-            typeof(InnerSkeldShipStatus),
-            typeof(InnerMeetingHud),
-            typeof(InnerLobbyBehaviour),
-            typeof(InnerGameData),
-            typeof(InnerPlayerControl),
-            typeof(InnerMiraShipStatus),
-            typeof(InnerPolusShipStatus),
-            typeof(InnerSkeldShipStatus), // April fools skeld
-            typeof(InnerAirshipStatus),
-            typeof(InnerHideAndSeekManager),
-            typeof(InnerNormalGameManager),
+            [0] = typeof(InnerSkeldShipStatus),
+            [1] = typeof(InnerMeetingHud),
+            [2] = typeof(InnerLobbyBehaviour),
+            [3] = typeof(InnerGameData),
+            [4] = typeof(InnerPlayerControl),
+            [5] = typeof(InnerMiraShipStatus),
+            [6] = typeof(InnerPolusShipStatus),
+            [7] = typeof(InnerShipStatus),
+            [8] = typeof(InnerAirshipStatus),
+            [9] = typeof(InnerHideAndSeekManager),
+            [10] = typeof(InnerNormalGameManager),
+            [13] = typeof(InnerFungleShipStatus),
         };
 
         private readonly List<InnerNetObject> _allObjects = new List<InnerNetObject>();
@@ -130,9 +131,9 @@ namespace Impostor.Server.Net.State
                         }
 
                         var objectId = reader.ReadPackedUInt32();
-                        if (objectId < SpawnableObjects.Length)
+                        if (SpawnableObjects.TryGetValue(objectId, out var spawnableObjectType))
                         {
-                            var innerNetObject = (InnerNetObject)ActivatorUtilities.CreateInstance(_serviceProvider, SpawnableObjects[objectId], this);
+                            var innerNetObject = (InnerNetObject)ActivatorUtilities.CreateInstance(_serviceProvider, spawnableObjectType, this);
                             var ownerClientId = reader.ReadPackedInt32();
 
                             innerNetObject.SpawnFlags = (SpawnFlags)reader.ReadByte();
@@ -354,7 +355,10 @@ namespace Impostor.Server.Net.State
                 {
                     foreach (var player in _players.Values)
                     {
-                        player.Character?.NetworkTransform.OnPlayerSpawn();
+                        if (GameNet.ShipStatus != null)
+                        {
+                            await player.Character!.NetworkTransform.SetPositionAsync(player, GameNet.ShipStatus.GetSpawnLocation(player.Character, PlayerCount, false));
+                        }
                     }
 
                     await _eventManager.CallAsync(new MeetingStartedEvent(this, meetingHud));

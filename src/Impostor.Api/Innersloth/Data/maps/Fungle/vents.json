@@ -1,0 +1,102 @@
+{
+  "0": {
+    "name": "CommunicationsVent",
+    "position": {
+      "x": 25.220001,
+      "y": 10.965
+    },
+    "left": 2,
+    "center": null,
+    "right": 5
+  },
+  "1": {
+    "name": "KitchenVent",
+    "position": {
+      "x": -15.359,
+      "y": -9.783001
+    },
+    "left": 6,
+    "center": null,
+    "right": null
+  },
+  "2": {
+    "name": "LookoutVent",
+    "position": {
+      "x": 9.366,
+      "y": 0.63
+    },
+    "left": 0,
+    "center": null,
+    "right": 5
+  },
+  "3": {
+    "name": "StorageVent",
+    "position": {
+      "x": 2.864,
+      "y": 0.9180002
+    },
+    "left": 9,
+    "center": null,
+    "right": 4
+  },
+  "4": {
+    "name": "NorthWestJungleVent",
+    "position": {
+      "x": -2.518,
+      "y": -8.986
+    },
+    "left": 8,
+    "center": null,
+    "right": 3
+  },
+  "5": {
+    "name": "NorthEastJungleVent",
+    "position": {
+      "x": 22.677,
+      "y": -8.497
+    },
+    "left": 2,
+    "center": null,
+    "right": 0
+  },
+  "6": {
+    "name": "SouthWestJungleVent",
+    "position": {
+      "x": 1.3000002,
+      "y": -10.515
+    },
+    "left": 1,
+    "center": null,
+    "right": 7
+  },
+  "7": {
+    "name": "SouthEastJungleVent",
+    "position": {
+      "x": 15.150001,
+      "y": -16.42
+    },
+    "left": 6,
+    "center": null,
+    "right": null
+  },
+  "8": {
+    "name": "RecRoomVent",
+    "position": {
+      "x": -16.9,
+      "y": -2.571
+    },
+    "left": 9,
+    "center": null,
+    "right": 4
+  },
+  "9": {
+    "name": "MeetingRoomVent",
+    "position": {
+      "x": -12.233,
+      "y": 8.061
+    },
+    "left": 8,
+    "center": null,
+    "right": 3
+  }
+}

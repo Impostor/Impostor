@@ -61,6 +61,23 @@
         "resolved": "1.0.0",
         "contentHash": "x56AEsY5fKU2Z5O7ZrzEqKfr62kq/C05Aevcciwz5yMfOQlpwuFI1awgNGJsoe+bcx+XnFc3+l+eadtY72aZsg=="
       },
+      "Microsoft.AspNetCore.Http.Abstractions": {
+        "type": "Transitive",
+        "resolved": "2.2.0",
+        "contentHash": "Nxs7Z1q3f1STfLYKJSVXCs1iBl+Ya6E8o4Oy1bCxJ/rNI44E/0f6tbsrVqAWfB7jlnJfyaAtIalBVxPKUPQb4Q==",
+        "dependencies": {
+          "Microsoft.AspNetCore.Http.Features": "2.2.0",
+          "System.Text.Encodings.Web": "4.5.0"
+        }
+      },
+      "Microsoft.AspNetCore.Http.Features": {
+        "type": "Transitive",
+        "resolved": "2.2.0",
+        "contentHash": "ziFz5zH8f33En4dX81LW84I6XrYXKf9jg6aM39cM+LffN9KJahViKZ61dGMSO2gd3e+qe5yBRwsesvyqlZaSMg==",
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "2.2.0"
+        }
+      },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
         "resolved": "17.4.1",
@@ -1398,6 +1415,7 @@
         "type": "Project",
         "dependencies": {
           "Impostor.Hazel.Abstractions": "[1.0.0, )",
+          "Microsoft.AspNetCore.Http.Abstractions": "[2.2.0, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[7.0.0, )",
           "Microsoft.Extensions.Logging.Abstractions": "[7.0.0, )"
         }
@@ -1405,7 +1423,7 @@
       "impostor.server": {
         "type": "Project",
         "dependencies": {
-          "Impostor.Api": "[1.7.3-dev, )",
+          "Impostor.Api": "[1.8.4-dev, )",
           "Impostor.Hazel": "[1.0.0, )",
           "Microsoft.Extensions.FileSystemGlobbing": "[7.0.0, )",
           "Microsoft.Extensions.Hosting": "[7.0.0, )",

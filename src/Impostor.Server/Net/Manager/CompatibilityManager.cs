@@ -17,30 +17,8 @@ internal class CompatibilityManager : ICompatibilityManager
     {
         new[]
         {
-            new GameVersion(2022, 11, 1), // 2022.12.8
-        },
-
-        new[]
-        {
-            new GameVersion(2022, 11, 9), // 2022.12.14
-        },
-
-        new[]
-        {
-            new GameVersion(2022, 12, 2), // 2023.2.28
-        },
-
-        new[]
-        {
-            new GameVersion(2023, 1, 11), // 2023.3.28s
-            new GameVersion(2023, 3, 13), // 2023.3.28a
-            new GameVersion(2023, 4, 21), // 2023.6.13
-        },
-
-        new[]
-        {
-            new GameVersion(2023, 5, 20), // 2023.7.11
-            new GameVersion(2222, 0, 0), // 2023.7.11 for host-only mods
+            new GameVersion(2023, 10, 1), // 2023.10.24
+            new GameVersion(2023, 11, 15), // 2023.11.28
         },
     };
 
@@ -182,21 +160,14 @@ internal class CompatibilityManager : ICompatibilityManager
 
         _supportMap.Add(gameVersion, compatibilityGroup);
 
-        // We special case the host-only 2023.7.11 here
-        // Ideally it should never have existed so remove once 2023.7.11 is unsupported TODO
-        var includeInSupportRange = gameVersion != new GameVersion(2222, 0, 0);
-
-        if (includeInSupportRange)
+        if (gameVersion < _lowestVersionSupported)
         {
-            if (gameVersion < _lowestVersionSupported)
-            {
-                _lowestVersionSupported = gameVersion;
-            }
+            _lowestVersionSupported = gameVersion;
+        }
 
-            if (gameVersion > _highestVersionSupported)
-            {
-                _highestVersionSupported = gameVersion;
-            }
+        if (gameVersion > _highestVersionSupported)
+        {
+            _highestVersionSupported = gameVersion;
         }
     }
 

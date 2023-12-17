@@ -10,6 +10,7 @@ WORKDIR /source
 
 # Copy csproj and restore.
 COPY src/Impostor.Server/Impostor.Server.csproj ./src/Impostor.Server/Impostor.Server.csproj
+COPY src/Impostor.Api.Innersloth.Generator/Impostor.Api.Innersloth.Generator.csproj ./src/Impostor.Api.Innersloth.Generator/Impostor.Api.Innersloth.Generator.csproj
 COPY src/Impostor.Api/Impostor.Api.csproj ./src/Impostor.Api/Impostor.Api.csproj
 COPY src/Directory.Build.props ./src/Directory.Build.props
 
@@ -20,6 +21,7 @@ RUN case "$TARGETARCH" in \
     *) echo "unsupported architecture"; exit 1 ;; \
   esac && \
   dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Server/Impostor.Server.csproj && \
+  dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Api.Innersloth.Generator/Impostor.Api.Innersloth.Generator.csproj && \
   dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Api/Impostor.Api.csproj
 
 # Copy everything else.

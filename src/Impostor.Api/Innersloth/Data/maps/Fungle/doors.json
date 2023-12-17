@@ -1,0 +1,58 @@
+{
+  "0": {
+    "room": "Comms",
+    "position": {
+      "x": 24.067001,
+      "y": 11.974
+    }
+  },
+  "1": {
+    "room": "Comms",
+    "position": {
+      "x": 18.48,
+      "y": 13.298
+    }
+  },
+  "2": {
+    "room": "Kitchen",
+    "position": {
+      "x": -15.509,
+      "y": -5.913
+    }
+  },
+  "3": {
+    "room": "Laboratory",
+    "position": {
+      "x": -4.3,
+      "y": -7.759
+    }
+  },
+  "4": {
+    "room": "Lookout",
+    "position": {
+      "x": 11.063,
+      "y": 3.1330001
+    }
+  },
+  "5": {
+    "room": "MiningPit",
+    "position": {
+      "x": 12.733,
+      "y": 6.4160004
+    }
+  },
+  "6": {
+    "room": "Reactor",
+    "position": {
+      "x": 19.43,
+      "y": -6.59
+    }
+  },
+  "7": {
+    "room": "Storage",
+    "position": {
+      "x": -1.6159999,
+      "y": 4.6280003
+    }
+  }
+}

@@ -22,6 +22,8 @@ namespace Impostor.Server.Plugins
             _plugins = plugins;
         }
 
+        public IReadOnlyList<PluginInformation> Plugins => _plugins;
+
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Loading plugins.");

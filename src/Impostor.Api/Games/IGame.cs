@@ -39,6 +39,14 @@ namespace Impostor.Api.Games
 
         int HostId { get; }
 
+        /// <summary>
+        /// Gets a value indicating whether the Host of the game has requested host authority.
+        /// </summary>
+        /// <remarks>
+        /// Vanilla Among Us does not request this, but certain client-side mods will.
+        /// </remarks>
+        bool IsHostAuthoritive { get; }
+
         IClientPlayer? GetClientPlayer(int clientId);
 
         T? FindObjectByNetId<T>(uint netId)

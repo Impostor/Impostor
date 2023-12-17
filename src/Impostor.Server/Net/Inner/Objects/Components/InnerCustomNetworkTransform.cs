@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api;
@@ -8,7 +8,6 @@ using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Player;
-using Impostor.Server.Net.Inner.Objects.ShipStatus;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
@@ -25,7 +24,6 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly ObjectPool<PlayerMovementEvent> _pool;
 
         private ushort _lastSequenceId;
-        private AirshipSpawnState _spawnState;
 
         public InnerCustomNetworkTransform(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, IEventManager eventManager, ObjectPool<PlayerMovementEvent> pool) : base(customMessageManager, game)
         {
@@ -44,24 +42,20 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
         public Vector2 Position { get; private set; }
 
-        public Vector2 Velocity { get; private set; }
-
         public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
             if (initialState)
             {
                 writer.Write(_lastSequenceId);
                 writer.Write(Position);
-                writer.Write(Velocity);
                 return new ValueTask<bool>(true);
             }
 
-            // TODO: DirtyBits == 0 return false.
-            _lastSequenceId++;
-
             writer.Write(_lastSequenceId);
+
+            // Impostor doesn't keep a memory of positions, so just send the last one
+            writer.WritePacked(1);
             writer.Write(Position);
-            writer.Write(Velocity);
             return new ValueTask<bool>(true);
         }
 
@@ -72,7 +66,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             if (initialState)
             {
                 _lastSequenceId = sequenceId;
-                await SetPositionAsync(sender, reader.ReadVector2(), reader.ReadVector2());
+                await SetPositionAsync(sender, reader.ReadVector2());
             }
             else
             {
@@ -81,13 +75,18 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     return;
                 }
 
-                if (!SidGreaterThan(sequenceId, _lastSequenceId))
-                {
-                    return;
-                }
+                var positions = reader.ReadPackedInt32();
 
-                _lastSequenceId = sequenceId;
-                await SetPositionAsync(sender, reader.ReadVector2(), reader.ReadVector2());
+                for (var i = 0; i < positions; i++)
+                {
+                    var position = reader.ReadVector2();
+                    var newSid = (ushort)(sequenceId + i);
+                    if (SidGreaterThan(newSid, _lastSequenceId))
+                    {
+                        _lastSequenceId = newSid;
+                        await SetPositionAsync(sender, position);
+                    }
+                }
             }
         }
 
@@ -102,51 +101,19 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
                 Rpc21SnapTo.Deserialize(reader, out var position, out var minSid);
 
-                if (Game.GameNet.ShipStatus is InnerAirshipStatus airshipStatus)
+                if (Game.GameNet.ShipStatus is { } shipStatus)
                 {
-                    // As part of airship spawning, clients are sending snap to -25 40 to move themself out of view
-                    if (_spawnState == AirshipSpawnState.PreSpawn && Approximately(position, airshipStatus.PreSpawnLocation))
-                    {
-                        _spawnState = AirshipSpawnState.SelectingSpawn;
-                        return true;
-                    }
-
-                    // Once the spawn has been selected, the client sends a second snap to the select spawn location
-                    if (_spawnState == AirshipSpawnState.SelectingSpawn && airshipStatus.SpawnLocations.Any(location => Approximately(position, location)))
-                    {
-                        _spawnState = AirshipSpawnState.Spawned;
-                        return true;
-                    }
-                }
-
-                if (!await ValidateCanVent(call, sender, _playerControl.PlayerInfo))
-                {
-                    return false;
-                }
-
-                if (Game.GameNet.ShipStatus == null)
-                {
-                    // Cannot perform vent position check on unknown ship statuses
-                    if (await sender.Client.ReportCheatAsync(call, "Failed vent position check on unknown map"))
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    var vents = Game.GameNet.ShipStatus!.Data.Vents.Values;
+                    var vents = shipStatus.Data.Vents.Values;
 
                     var vent = vents.SingleOrDefault(x => Approximately(x.Position, position + ColliderOffset));
 
-                    if (vent == null)
+                    if (vent != null)
                     {
-                        if (await sender.Client.ReportCheatAsync(call, "Failed vent position check"))
+                        if (!await ValidateCanVent(call, sender, _playerControl.PlayerInfo))
                         {
                             return false;
                         }
-                    }
-                    else
-                    {
+
                         await _eventManager.CallAsync(new PlayerVentEvent(Game, sender, _playerControl, vent));
                     }
                 }
@@ -158,20 +125,14 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             return await base.HandleRpcAsync(sender, target, call, reader);
         }
 
-        internal async ValueTask SetPositionAsync(IClientPlayer sender, Vector2 position, Vector2 velocity)
+        internal async ValueTask SetPositionAsync(IClientPlayer sender, Vector2 position)
         {
             Position = position;
-            Velocity = velocity;
 
             var playerMovementEvent = _pool.Get();
             playerMovementEvent.Reset(Game, sender, _playerControl);
             await _eventManager.CallAsync(playerMovementEvent);
             _pool.Return(playerMovementEvent);
-        }
-
-        internal void OnPlayerSpawn()
-        {
-            _spawnState = AirshipSpawnState.PreSpawn;
         }
 
         private static bool SidGreaterThan(ushort newSid, ushort prevSid)
@@ -197,7 +158,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             }
 
             _lastSequenceId = minSid;
-            return SetPositionAsync(sender, position, Velocity);
+            return SetPositionAsync(sender, position);
         }
     }
 }
