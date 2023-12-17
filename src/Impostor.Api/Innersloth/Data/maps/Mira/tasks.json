@@ -1,0 +1,520 @@
+{
+  "0": {
+    "type": "NormalPlayerTask",
+    "taskType": "FixWiring",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Storage",
+        "position": {
+          "x": 18.39,
+          "y": 1.2
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Hallway",
+        "position": {
+          "x": 12.096,
+          "y": 8.04
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Laboratory",
+        "position": {
+          "x": 6.125,
+          "y": 14.958
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "LockerRoom",
+        "position": {
+          "x": 4.3559995,
+          "y": 2.5340002
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Greenhouse",
+        "position": {
+          "x": 16.980001,
+          "y": 21.394
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "1": {
+    "type": "NormalPlayerTask",
+    "taskType": "EnterIdCode",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Admin",
+        "position": {
+          "x": 19.894001,
+          "y": 19.024
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "2": {
+    "type": "NormalPlayerTask",
+    "taskType": "SubmitScan",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "MedBay",
+        "position": {
+          "x": 16.233,
+          "y": 0.262
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "3": {
+    "type": "NormalPlayerTask",
+    "taskType": "ClearAsteroids",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Weapons",
+        "position": {
+          "x": 19.213,
+          "y": -2.414
+        },
+        "usableDistance": 1.8
+      }
+    ]
+  },
+  "4": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Reactor",
+        "position": {
+          "x": 0.77700007,
+          "y": 11.484
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "5": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Reactor",
+        "position": {
+          "x": 0.77700007,
+          "y": 11.484
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "6": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Reactor",
+        "position": {
+          "x": 0.77700007,
+          "y": 11.484
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "7": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Reactor",
+        "position": {
+          "x": 0.77700007,
+          "y": 11.484
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "8": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Reactor",
+        "position": {
+          "x": 0.77700007,
+          "y": 11.484
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "9": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Reactor",
+        "position": {
+          "x": 0.77700007,
+          "y": 11.484
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "10": {
+    "type": "NormalPlayerTask",
+    "taskType": "WaterPlants",
+    "length": "Long",
+    "consoles": []
+  },
+  "11": {
+    "type": "NormalPlayerTask",
+    "taskType": "StartReactor",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Reactor",
+        "position": {
+          "x": 2.549,
+          "y": 12.407001
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "12": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Reactor",
+        "position": {
+          "x": 0.77700007,
+          "y": 11.484
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "13": {
+    "type": "NormalPlayerTask",
+    "taskType": "ChartCourse",
+    "length": "Short",
+    "consoles": []
+  },
+  "14": {
+    "type": "NormalPlayerTask",
+    "taskType": "CleanO2Filter",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Greenhouse",
+        "position": {
+          "x": 17.221,
+          "y": 24.505001
+        },
+        "usableDistance": 2
+      }
+    ]
+  },
+  "15": {
+    "type": "NormalPlayerTask",
+    "taskType": "FuelEngines",
+    "length": "Short",
+    "consoles": []
+  },
+  "16": {
+    "type": "NormalPlayerTask",
+    "taskType": "AssembleArtifact",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 1,
+        "room": "Laboratory",
+        "position": {
+          "x": 9.402,
+          "y": 14.568001
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "17": {
+    "type": "NormalPlayerTask",
+    "taskType": "SortSamples",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Laboratory",
+        "position": {
+          "x": 9.660001,
+          "y": 11.115001
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "18": {
+    "type": "NormalPlayerTask",
+    "taskType": "PrimeShields",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Admin",
+        "position": {
+          "x": 21.169,
+          "y": 17.945
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "19": {
+    "type": "NormalPlayerTask",
+    "taskType": "EmptyGarbage",
+    "length": "Short",
+    "consoles": []
+  },
+  "20": {
+    "type": "NormalPlayerTask",
+    "taskType": "MeasureWeather",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Balcony",
+        "position": {
+          "x": 28.911999,
+          "y": -1.701
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "21": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Reactor",
+        "position": {
+          "x": 0.77700007,
+          "y": 11.484
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "22": {
+    "type": "NormalPlayerTask",
+    "taskType": "BuyBeverage",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 2,
+        "room": "Cafeteria",
+        "position": {
+          "x": 27.49,
+          "y": 5.665
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "23": {
+    "type": "NormalPlayerTask",
+    "taskType": "ProcessData",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 2,
+        "room": "Office",
+        "position": {
+          "x": 15.776001,
+          "y": 21.403
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "24": {
+    "type": "NormalPlayerTask",
+    "taskType": "RunDiagnostics",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Launchpad",
+        "position": {
+          "x": -2.499,
+          "y": 1.8730001
+        },
+        "usableDistance": 1.5
+      }
+    ]
+  },
+  "25": {
+    "type": "NormalPlayerTask",
+    "taskType": "UnlockManifolds",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 2,
+        "room": "Reactor",
+        "position": {
+          "x": 0.44200015,
+          "y": 13.2560005
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "26": {
+    "type": "NormalPlayerTask",
+    "taskType": "VentCleaning",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 11,
+        "room": "Launchpad",
+        "position": {
+          "x": -6.1800003,
+          "y": 3.5600002
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Balcony",
+        "position": {
+          "x": 23.769999,
+          "y": -1.9399999
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Hallway",
+        "position": {
+          "x": 23.9,
+          "y": 7.1800003
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Reactor",
+        "position": {
+          "x": 0.48000014,
+          "y": 10.6970005
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Laboratory",
+        "position": {
+          "x": 11.606001,
+          "y": 13.816
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 10,
+        "room": "LockerRoom",
+        "position": {
+          "x": 4.29,
+          "y": 0.52999973
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 6,
+        "room": "Admin",
+        "position": {
+          "x": 22.390001,
+          "y": 17.23
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Office",
+        "position": {
+          "x": 13.280001,
+          "y": 20.13
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 7,
+        "room": "Greenhouse",
+        "position": {
+          "x": 17.85,
+          "y": 25.23
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 8,
+        "room": "MedBay",
+        "position": {
+          "x": 15.41,
+          "y": -1.8199997
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 9,
+        "room": "Decontamination",
+        "position": {
+          "x": 6.83,
+          "y": 3.145
+        },
+        "usableDistance": 1
+      }
+    ]
+  }
+}

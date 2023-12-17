@@ -1,0 +1,851 @@
+{
+  "0": {
+    "type": "NormalPlayerTask",
+    "taskType": "SwipeCard",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Office",
+        "position": {
+          "x": 24.816444,
+          "y": -16.217522
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "1": {
+    "type": "NormalPlayerTask",
+    "taskType": "InsertKeys",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 2,
+        "room": "Dropship",
+        "position": {
+          "x": 17.38076,
+          "y": 0.08402014
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "2": {
+    "type": "NormalPlayerTask",
+    "taskType": "ScanBoardingPass",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Office",
+        "position": {
+          "x": 25.75001,
+          "y": -16.03081
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "3": {
+    "type": "NormalPlayerTask",
+    "taskType": "FixWiring",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": 3.0672798,
+          "y": -8.691476
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "LifeSupp",
+        "position": {
+          "x": 6.499,
+          "y": -18.458
+        },
+        "usableDistance": 0.77
+      },
+      {
+        "id": 2,
+        "room": "Office",
+        "position": {
+          "x": 16.373749,
+          "y": -18.505589
+        },
+        "usableDistance": 0.8
+      },
+      {
+        "id": 3,
+        "room": "Decontamination",
+        "position": {
+          "x": 40.61,
+          "y": -8.96
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Laboratory",
+        "position": {
+          "x": 37.321003,
+          "y": -8.944
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Laboratory",
+        "position": {
+          "x": 32.975002,
+          "y": -9.031365
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "4": {
+    "type": "UploadDataTask",
+    "taskType": "UploadData",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Comms",
+        "position": {
+          "x": 11.71978,
+          "y": -15.145192
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "5": {
+    "type": "UploadDataTask",
+    "taskType": "UploadData",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Comms",
+        "position": {
+          "x": 11.71978,
+          "y": -15.145192
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "6": {
+    "type": "UploadDataTask",
+    "taskType": "UploadData",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Comms",
+        "position": {
+          "x": 11.71978,
+          "y": -15.145192
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "7": {
+    "type": "UploadDataTask",
+    "taskType": "UploadData",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Comms",
+        "position": {
+          "x": 11.71978,
+          "y": -15.145192
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "8": {
+    "type": "UploadDataTask",
+    "taskType": "UploadData",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Comms",
+        "position": {
+          "x": 11.71978,
+          "y": -15.145192
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "9": {
+    "type": "NormalPlayerTask",
+    "taskType": "StartReactor",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Specimens",
+        "position": {
+          "x": 34.757774,
+          "y": -18.878536
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "10": {
+    "type": "NormalPlayerTask",
+    "taskType": "FuelEngines",
+    "length": "Long",
+    "consoles": []
+  },
+  "11": {
+    "type": "WaterWayTask",
+    "taskType": "OpenWaterways",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "BoilerRoom",
+        "position": {
+          "x": 3.669,
+          "y": -24.15
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "BoilerRoom",
+        "position": {
+          "x": 0.9430001,
+          "y": -24.15
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "BoilerRoom",
+        "position": {
+          "x": 18.417002,
+          "y": -23.72
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "12": {
+    "type": "NormalPlayerTask",
+    "taskType": "InspectSample",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Hallway",
+        "position": {
+          "x": 36.52848,
+          "y": -5.5693474
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "13": {
+    "type": "NormalPlayerTask",
+    "taskType": "ReplaceWaterJug",
+    "length": "Long",
+    "consoles": []
+  },
+  "14": {
+    "type": "WeatherNodeTask",
+    "taskType": "FixWeatherNode",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Hallway",
+        "position": {
+          "x": 23.04,
+          "y": -6.94
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Hallway",
+        "position": {
+          "x": 8.37,
+          "y": -15.46
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Hallway",
+        "position": {
+          "x": 7.16,
+          "y": -25.36
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Hallway",
+        "position": {
+          "x": 14.96,
+          "y": -25.44
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Hallway",
+        "position": {
+          "x": 14.48,
+          "y": -12.17
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Hallway",
+        "position": {
+          "x": 30.86,
+          "y": -12.23
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "15": {
+    "type": "WeatherNodeTask",
+    "taskType": "FixWeatherNode",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Hallway",
+        "position": {
+          "x": 23.04,
+          "y": -6.94
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Hallway",
+        "position": {
+          "x": 8.37,
+          "y": -15.46
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Hallway",
+        "position": {
+          "x": 7.16,
+          "y": -25.36
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Hallway",
+        "position": {
+          "x": 14.96,
+          "y": -25.44
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Hallway",
+        "position": {
+          "x": 14.48,
+          "y": -12.17
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Hallway",
+        "position": {
+          "x": 30.86,
+          "y": -12.23
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "16": {
+    "type": "WeatherNodeTask",
+    "taskType": "FixWeatherNode",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Hallway",
+        "position": {
+          "x": 23.04,
+          "y": -6.94
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Hallway",
+        "position": {
+          "x": 8.37,
+          "y": -15.46
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Hallway",
+        "position": {
+          "x": 7.16,
+          "y": -25.36
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Hallway",
+        "position": {
+          "x": 14.96,
+          "y": -25.44
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Hallway",
+        "position": {
+          "x": 14.48,
+          "y": -12.17
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Hallway",
+        "position": {
+          "x": 30.86,
+          "y": -12.23
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "17": {
+    "type": "WeatherNodeTask",
+    "taskType": "FixWeatherNode",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Hallway",
+        "position": {
+          "x": 23.04,
+          "y": -6.94
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Hallway",
+        "position": {
+          "x": 8.37,
+          "y": -15.46
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Hallway",
+        "position": {
+          "x": 7.16,
+          "y": -25.36
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Hallway",
+        "position": {
+          "x": 14.96,
+          "y": -25.44
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Hallway",
+        "position": {
+          "x": 14.48,
+          "y": -12.17
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Hallway",
+        "position": {
+          "x": 30.86,
+          "y": -12.23
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "18": {
+    "type": "NormalPlayerTask",
+    "taskType": "RebootWifi",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Comms",
+        "position": {
+          "x": 11.047999,
+          "y": -15.297912
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "19": {
+    "type": "NormalPlayerTask",
+    "taskType": "MonitorOxygen",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Hallway",
+        "position": {
+          "x": 1.654,
+          "y": -16.012001
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "20": {
+    "type": "NormalPlayerTask",
+    "taskType": "UnlockManifolds",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Specimens",
+        "position": {
+          "x": 34.381306,
+          "y": -19.486675
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "21": {
+    "type": "NormalPlayerTask",
+    "taskType": "StoreArtifacts",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Specimens",
+        "position": {
+          "x": 36.481117,
+          "y": -18.82867
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "22": {
+    "type": "NormalPlayerTask",
+    "taskType": "FillCanisters",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "LifeSupp",
+        "position": {
+          "x": 1.1431961,
+          "y": -19.525873
+        },
+        "usableDistance": 0.6
+      }
+    ]
+  },
+  "23": {
+    "type": "NormalPlayerTask",
+    "taskType": "EmptyGarbage",
+    "length": "Short",
+    "consoles": []
+  },
+  "24": {
+    "type": "NormalPlayerTask",
+    "taskType": "ChartCourse",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 2,
+        "room": "Dropship",
+        "position": {
+          "x": 15.974811,
+          "y": 0.08402014
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "25": {
+    "type": "NormalPlayerTask",
+    "taskType": "SubmitScan",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "MedBay",
+        "position": {
+          "x": 40.327003,
+          "y": -7.082
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "26": {
+    "type": "NormalPlayerTask",
+    "taskType": "ClearAsteroids",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Weapons",
+        "position": {
+          "x": 9.929073,
+          "y": -22.390993
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "27": {
+    "type": "WeatherNodeTask",
+    "taskType": "FixWeatherNode",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Hallway",
+        "position": {
+          "x": 23.04,
+          "y": -6.94
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Hallway",
+        "position": {
+          "x": 8.37,
+          "y": -15.46
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Hallway",
+        "position": {
+          "x": 7.16,
+          "y": -25.36
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Hallway",
+        "position": {
+          "x": 14.96,
+          "y": -25.44
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Hallway",
+        "position": {
+          "x": 14.48,
+          "y": -12.17
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Hallway",
+        "position": {
+          "x": 30.86,
+          "y": -12.23
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "28": {
+    "type": "WeatherNodeTask",
+    "taskType": "FixWeatherNode",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Hallway",
+        "position": {
+          "x": 23.04,
+          "y": -6.94
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Hallway",
+        "position": {
+          "x": 8.37,
+          "y": -15.46
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Hallway",
+        "position": {
+          "x": 7.16,
+          "y": -25.36
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Hallway",
+        "position": {
+          "x": 14.96,
+          "y": -25.44
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Hallway",
+        "position": {
+          "x": 14.48,
+          "y": -12.17
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Hallway",
+        "position": {
+          "x": 30.86,
+          "y": -12.23
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "29": {
+    "type": "NormalPlayerTask",
+    "taskType": "AlignTelescope",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Laboratory",
+        "position": {
+          "x": 33.868427,
+          "y": -5.4712653
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "30": {
+    "type": "NormalPlayerTask",
+    "taskType": "RepairDrill",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Laboratory",
+        "position": {
+          "x": 27.42095,
+          "y": -6.982279
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "31": {
+    "type": "NormalPlayerTask",
+    "taskType": "RecordTemperature",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Laboratory",
+        "position": {
+          "x": 31.34464,
+          "y": -6.67142
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "Outside",
+        "position": {
+          "x": 30.93255,
+          "y": -15.324791
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "32": {
+    "type": "NormalPlayerTask",
+    "taskType": "RecordTemperature",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Laboratory",
+        "position": {
+          "x": 31.34464,
+          "y": -6.67142
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "Outside",
+        "position": {
+          "x": 30.93255,
+          "y": -15.324791
+        },
+        "usableDistance": 1
+      }
+    ]
+  }
+}

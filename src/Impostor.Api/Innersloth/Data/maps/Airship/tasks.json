@@ -1,0 +1,1131 @@
+{
+  "0": {
+    "type": "NormalPlayerTask",
+    "taskType": "FixWiring",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 1,
+        "room": "Engine",
+        "position": {
+          "x": -7.021,
+          "y": 1.4909999
+        },
+        "usableDistance": 0.7
+      },
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": -10.290699,
+          "y": -11.334398
+        },
+        "usableDistance": 0.7
+      },
+      {
+        "id": 2,
+        "room": "MainHall",
+        "position": {
+          "x": 16.212,
+          "y": 2.8630004
+        },
+        "usableDistance": 0.7
+      },
+      {
+        "id": 3,
+        "room": "Showers",
+        "position": {
+          "x": 17.0821,
+          "y": 5.481
+        },
+        "usableDistance": 0.7
+      },
+      {
+        "id": 4,
+        "room": "Lounge",
+        "position": {
+          "x": 27.3574,
+          "y": 10.388
+        },
+        "usableDistance": 0.7
+      },
+      {
+        "id": 5,
+        "room": "CargoBay",
+        "position": {
+          "x": 35.154,
+          "y": 3.9129996
+        },
+        "usableDistance": 0.7
+      },
+      {
+        "id": 6,
+        "room": "MeetingRoom",
+        "position": {
+          "x": 14.077001,
+          "y": 16.484999
+        },
+        "usableDistance": 0.7
+      }
+    ]
+  },
+  "1": {
+    "type": "NormalPlayerTask",
+    "taskType": "EnterIdCode",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Cockpit",
+        "position": {
+          "x": 16.201427,
+          "y": 16.331
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "2": {
+    "type": "NormalPlayerTask",
+    "taskType": "CalibrateDistributor",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": 16.346632,
+          "y": -5.4998994
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "3": {
+    "type": "NormalPlayerTask",
+    "taskType": "ResetBreakers",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": 17.29,
+          "y": -10.1535
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Electrical",
+        "position": {
+          "x": 20.267416,
+          "y": -10.1535
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Electrical",
+        "position": {
+          "x": 18.424,
+          "y": -7.7385
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Electrical",
+        "position": {
+          "x": 17.29,
+          "y": -7.7385
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Electrical",
+        "position": {
+          "x": 12.334001,
+          "y": -7.7385
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Electrical",
+        "position": {
+          "x": 18.417,
+          "y": -5.3375
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 6,
+        "room": "Electrical",
+        "position": {
+          "x": 15.365001,
+          "y": -7.7385
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "4": {
+    "type": "AirshipUploadTask",
+    "taskType": "UploadData",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": -14.4641,
+          "y": -16.387701
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": 10.4685,
+          "y": -16.218298
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "5": {
+    "type": "AirshipUploadTask",
+    "taskType": "UploadData",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": -14.4641,
+          "y": -16.387701
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": 10.4685,
+          "y": -16.218298
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "6": {
+    "type": "AirshipUploadTask",
+    "taskType": "UploadData",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": -14.4641,
+          "y": -16.387701
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": 10.4685,
+          "y": -16.218298
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "7": {
+    "type": "AirshipUploadTask",
+    "taskType": "UploadData",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": -14.4641,
+          "y": -16.387701
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": 10.4685,
+          "y": -16.218298
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "8": {
+    "type": "AirshipUploadTask",
+    "taskType": "UploadData",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": -14.4641,
+          "y": -16.387701
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": 10.4685,
+          "y": -16.218298
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "9": {
+    "type": "NormalPlayerTask",
+    "taskType": "UnlockSafe",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "CargoBay",
+        "position": {
+          "x": 36.302,
+          "y": -2.688
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "10": {
+    "type": "NormalPlayerTask",
+    "taskType": "StartFans",
+    "length": "Long",
+    "consoles": []
+  },
+  "11": {
+    "type": "NormalPlayerTask",
+    "taskType": "EmptyGarbage",
+    "length": "Long",
+    "consoles": []
+  },
+  "12": {
+    "type": "NormalPlayerTask",
+    "taskType": "EmptyGarbage",
+    "length": "Long",
+    "consoles": []
+  },
+  "13": {
+    "type": "NormalPlayerTask",
+    "taskType": "EmptyGarbage",
+    "length": "Long",
+    "consoles": []
+  },
+  "14": {
+    "type": "NormalPlayerTask",
+    "taskType": "DevelopPhotos",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "MainHall",
+        "position": {
+          "x": 13.527709,
+          "y": 2.3494914
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "15": {
+    "type": "NormalPlayerTask",
+    "taskType": "FuelEngines",
+    "length": "Long",
+    "consoles": []
+  },
+  "16": {
+    "type": "NormalPlayerTask",
+    "taskType": "RewindTapes",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Security",
+        "position": {
+          "x": 8.1305,
+          "y": -11.535298
+        },
+        "usableDistance": 1.4
+      }
+    ]
+  },
+  "17": {
+    "type": "NormalPlayerTask",
+    "taskType": "EmptyGarbage",
+    "length": "Long",
+    "consoles": []
+  },
+  "18": {
+    "type": "NormalPlayerTask",
+    "taskType": "EmptyGarbage",
+    "length": "Long",
+    "consoles": []
+  },
+  "19": {
+    "type": "NormalPlayerTask",
+    "taskType": "PolishRuby",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "VaultRoom",
+        "position": {
+          "x": -8.851499,
+          "y": 9.099999
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "20": {
+    "type": "NormalPlayerTask",
+    "taskType": "StabilizeSteering",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Cockpit",
+        "position": {
+          "x": -19.676998,
+          "y": -0.791
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "21": {
+    "type": "AirshipUploadTask",
+    "taskType": "UploadData",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": -14.4641,
+          "y": -16.387701
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": 10.4685,
+          "y": -16.218298
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "22": {
+    "type": "AirshipUploadTask",
+    "taskType": "UploadData",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": -14.4641,
+          "y": -16.387701
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": 10.4685,
+          "y": -16.218298
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "23": {
+    "type": "AirshipUploadTask",
+    "taskType": "UploadData",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": -14.4641,
+          "y": -16.387701
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": 10.4685,
+          "y": -16.218298
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "24": {
+    "type": "AirshipUploadTask",
+    "taskType": "UploadData",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": -14.4641,
+          "y": -16.387701
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": 10.4685,
+          "y": -16.218298
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "25": {
+    "type": "AirshipUploadTask",
+    "taskType": "UploadData",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": -14.4641,
+          "y": -16.387701
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "ViewingDeck",
+        "position": {
+          "x": 10.4685,
+          "y": -16.218298
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "26": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": 17.59529,
+          "y": -3.7142
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "27": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": 17.59529,
+          "y": -3.7142
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "28": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": 17.59529,
+          "y": -3.7142
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "29": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": 17.59529,
+          "y": -3.7142
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "30": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": 17.59529,
+          "y": -3.7142
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "31": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": 17.59529,
+          "y": -3.7142
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "32": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": 17.59529,
+          "y": -3.7142
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "33": {
+    "type": "TowelTask",
+    "taskType": "PickUpTowels",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Showers",
+        "position": {
+          "x": 17.3159,
+          "y": 4.7469535
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Showers",
+        "position": {
+          "x": 20.3819,
+          "y": 4.5709996
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Showers",
+        "position": {
+          "x": 21.8169,
+          "y": 2.464
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Showers",
+        "position": {
+          "x": 18.848902,
+          "y": -0.90999997
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Showers",
+        "position": {
+          "x": 24.0359,
+          "y": -2.1839998
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Showers",
+        "position": {
+          "x": 20.5499,
+          "y": -1.736
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 6,
+        "room": "Showers",
+        "position": {
+          "x": 22.0129,
+          "y": -1.428
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 7,
+        "room": "Showers",
+        "position": {
+          "x": 20.0809,
+          "y": -0.04199996
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 8,
+        "room": "Showers",
+        "position": {
+          "x": 19.1849,
+          "y": 3.3669999
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 9,
+        "room": "Showers",
+        "position": {
+          "x": 22.9649,
+          "y": 0.055999946
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 10,
+        "room": "Showers",
+        "position": {
+          "x": 18.134901,
+          "y": 2.072
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 11,
+        "room": "Showers",
+        "position": {
+          "x": 23.041899,
+          "y": -1.491
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 12,
+        "room": "Showers",
+        "position": {
+          "x": 22.917301,
+          "y": -1.3524001
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 13,
+        "room": "Showers",
+        "position": {
+          "x": 23.1231,
+          "y": -1.4
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 255,
+        "room": "Showers",
+        "position": {
+          "x": 18.7929,
+          "y": 5.138
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "34": {
+    "type": "NormalPlayerTask",
+    "taskType": "CleanToilet",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Lounge",
+        "position": {
+          "x": 29.191824,
+          "y": 7.739511
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Lounge",
+        "position": {
+          "x": 30.808395,
+          "y": 7.7209997
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Lounge",
+        "position": {
+          "x": 32.320076,
+          "y": 7.764191
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Lounge",
+        "position": {
+          "x": 33.735863,
+          "y": 7.791699
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "35": {
+    "type": "NormalPlayerTask",
+    "taskType": "DressMannequin",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "VaultRoom",
+        "position": {
+          "x": -7.3842983,
+          "y": 6.4301996
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "36": {
+    "type": "NormalPlayerTask",
+    "taskType": "SortRecords",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 5,
+        "room": "Records",
+        "position": {
+          "x": 17.935398,
+          "y": 11.4016
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 6,
+        "room": "Records",
+        "position": {
+          "x": 21.8547,
+          "y": 11.4163
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "Records",
+        "position": {
+          "x": 19.893847,
+          "y": 9.273678
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Records",
+        "position": {
+          "x": 18.687897,
+          "y": 12.503397
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Records",
+        "position": {
+          "x": 19.2549,
+          "y": 12.7015
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Records",
+        "position": {
+          "x": 20.519602,
+          "y": 12.718999
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Records",
+        "position": {
+          "x": 21.107098,
+          "y": 12.527897
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 7,
+        "room": "Records",
+        "position": {
+          "x": 21.5992,
+          "y": 7.07
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 8,
+        "room": "Records",
+        "position": {
+          "x": 18.186699,
+          "y": 7.0651
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "37": {
+    "type": "NormalPlayerTask",
+    "taskType": "PutAwayPistols",
+    "length": "Short",
+    "consoles": []
+  },
+  "38": {
+    "type": "NormalPlayerTask",
+    "taskType": "PutAwayRifles",
+    "length": "Short",
+    "consoles": []
+  },
+  "39": {
+    "type": "NormalPlayerTask",
+    "taskType": "Decontaminate",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "MainHall",
+        "position": {
+          "x": 14.791556,
+          "y": 3.7029998
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "Hallway",
+        "position": {
+          "x": 14.791556,
+          "y": 3.7029998
+        },
+        "usableDistance": 0.8
+      }
+    ]
+  },
+  "40": {
+    "type": "NormalPlayerTask",
+    "taskType": "MakeBurger",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Kitchen",
+        "position": {
+          "x": -5.1793,
+          "y": -8.5239
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "41": {
+    "type": "NormalPlayerTask",
+    "taskType": "FixShower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Showers",
+        "position": {
+          "x": 20.8159,
+          "y": 3.2759998
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "42": {
+    "type": "NormalPlayerTask",
+    "taskType": "VentCleaning",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 1,
+        "room": "Cockpit",
+        "position": {
+          "x": -22.098999,
+          "y": -1.5120001
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Engine",
+        "position": {
+          "x": 0.20299996,
+          "y": -2.5361004
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "VaultRoom",
+        "position": {
+          "x": -12.632198,
+          "y": 8.4735
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Kitchen",
+        "position": {
+          "x": -2.6018999,
+          "y": -9.338
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "ViewingDeck",
+        "position": {
+          "x": -15.658999,
+          "y": -11.6991005
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 8,
+        "room": "GapRoom",
+        "position": {
+          "x": 3.6049998,
+          "y": 6.9230003
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 7,
+        "room": "GapRoom",
+        "position": {
+          "x": 12.663,
+          "y": 5.922
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "MainHall",
+        "position": {
+          "x": 7.0210004,
+          "y": -3.7309995
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 6,
+        "room": "MainHall",
+        "position": {
+          "x": 9.814,
+          "y": 3.2060003
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 9,
+        "room": "Showers",
+        "position": {
+          "x": 23.9869,
+          "y": -1.386
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 10,
+        "room": "Records",
+        "position": {
+          "x": 23.279898,
+          "y": 8.259998
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 11,
+        "room": "CargoBay",
+        "position": {
+          "x": 30.440897,
+          "y": -3.5770001
+        },
+        "usableDistance": 1
+      }
+    ]
+  }
+}

@@ -5,7 +5,6 @@ using Impostor.Api;
 using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
-using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
@@ -73,7 +72,7 @@ namespace Impostor.Server.Net
 
                     if (game == null)
                     {
-                        await DisconnectAsync(DisconnectReason.GameMissing);
+                        await DisconnectAsync(DisconnectReason.GameNotFound);
                         return;
                     }
 
@@ -94,7 +93,7 @@ namespace Impostor.Server.Net
                     var game = _gameManager.Find(gameCode);
                     if (game == null)
                     {
-                        await DisconnectAsync(DisconnectReason.GameMissing);
+                        await DisconnectAsync(DisconnectReason.GameNotFound);
                         return;
                     }
 
@@ -260,9 +259,8 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.GetGameListV2:
                 {
-                    Message16GetGameListC2S.Deserialize(reader, out var options, out _, out _, out var filterOptions);
-                    await OnRequestGameListAsync(options, filterOptions);
-                    break;
+                    await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.UdpMatchmakingUnsupported);
+                    return;
                 }
 
                 case MessageFlags.SetActivePodType:
@@ -350,22 +348,6 @@ namespace Impostor.Server.Net
             }
 
             return true;
-        }
-
-        /// <summary>
-        ///     Triggered when the connected client requests the game listing.
-        /// </summary>
-        /// <param name="options">Options specific to the game mode. At this moment, the client can only specify the map, impostor count and chat language.</param>
-        /// <param name="filterOptions">Filter options not specific to the game mode.</param>
-        private ValueTask OnRequestGameListAsync(IGameOptions options, GameFilterOptions filterOptions)
-        {
-            using var message = MessageWriter.Get(MessageType.Reliable);
-
-            var games = _gameManager.FindListings((MapFlags)options.Map, options.NumImpostors, options.Keywords, this.GameVersion, filterOptions.FilterTags);
-
-            Message16GetGameListS2C.Serialize(message, games);
-
-            return Connection.SendAsync(message);
         }
 
         /// <summary>

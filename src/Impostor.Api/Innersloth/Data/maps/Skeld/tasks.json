@@ -1,0 +1,613 @@
+{
+  "0": {
+    "type": "NormalPlayerTask",
+    "taskType": "SwipeCard",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Admin",
+        "position": {
+          "x": 5.6352005,
+          "y": -8.632801
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "1": {
+    "type": "NormalPlayerTask",
+    "taskType": "FixWiring",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 2,
+        "room": "Admin",
+        "position": {
+          "x": 1.392,
+          "y": -6.4092
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Cafeteria",
+        "position": {
+          "x": -5.2811995,
+          "y": 5.2464
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Nav",
+        "position": {
+          "x": 14.5199995,
+          "y": -3.7740002
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": -7.7279997,
+          "y": -7.6668
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Storage",
+        "position": {
+          "x": -1.932,
+          "y": -8.7204
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Security",
+        "position": {
+          "x": -15.5592,
+          "y": -4.5923996
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "2": {
+    "type": "NormalPlayerTask",
+    "taskType": "ClearAsteroids",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Weapons",
+        "position": {
+          "x": 9.087601,
+          "y": 1.812
+        },
+        "usableDistance": 1.2
+      }
+    ]
+  },
+  "3": {
+    "type": "NormalPlayerTask",
+    "taskType": "AlignEngineOutput",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 1,
+        "room": "LowerEngine",
+        "position": {
+          "x": -19.150799,
+          "y": -12.618
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "UpperEngine",
+        "position": {
+          "x": -19.176,
+          "y": -0.41442212
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "4": {
+    "type": "NormalPlayerTask",
+    "taskType": "SubmitScan",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "MedBay",
+        "position": {
+          "x": -7.3284,
+          "y": -5.2476006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "5": {
+    "type": "NormalPlayerTask",
+    "taskType": "InspectSample",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "MedBay",
+        "position": {
+          "x": -6.144,
+          "y": -4.2599998
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "6": {
+    "type": "NormalPlayerTask",
+    "taskType": "FuelEngines",
+    "length": "Long",
+    "consoles": []
+  },
+  "7": {
+    "type": "NormalPlayerTask",
+    "taskType": "StartReactor",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 2,
+        "room": "Reactor",
+        "position": {
+          "x": -21.792,
+          "y": -5.5728
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "8": {
+    "type": "NormalPlayerTask",
+    "taskType": "EmptyChute",
+    "length": "Long",
+    "consoles": []
+  },
+  "9": {
+    "type": "NormalPlayerTask",
+    "taskType": "EmptyGarbage",
+    "length": "Long",
+    "consoles": []
+  },
+  "10": {
+    "type": "UploadDataTask",
+    "taskType": "UploadData",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Admin",
+        "position": {
+          "x": 2.5079997,
+          "y": -6.2652006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "11": {
+    "type": "NormalPlayerTask",
+    "taskType": "CalibrateDistributor",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": -5.8644004,
+          "y": -7.4772
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "12": {
+    "type": "NormalPlayerTask",
+    "taskType": "ChartCourse",
+    "length": "Short",
+    "consoles": []
+  },
+  "13": {
+    "type": "NormalPlayerTask",
+    "taskType": "CleanO2Filter",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "LifeSupp",
+        "position": {
+          "x": 5.7432,
+          "y": -2.9772
+        },
+        "usableDistance": 0.8
+      }
+    ]
+  },
+  "14": {
+    "type": "NormalPlayerTask",
+    "taskType": "UnlockManifolds",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 2,
+        "room": "Reactor",
+        "position": {
+          "x": -22.536001,
+          "y": -2.4996
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "15": {
+    "type": "UploadDataTask",
+    "taskType": "UploadData",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Admin",
+        "position": {
+          "x": 2.5079997,
+          "y": -6.2652006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "16": {
+    "type": "NormalPlayerTask",
+    "taskType": "StabilizeSteering",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Nav",
+        "position": {
+          "x": 18.732,
+          "y": -4.728
+        },
+        "usableDistance": 1.25
+      }
+    ]
+  },
+  "17": {
+    "type": "UploadDataTask",
+    "taskType": "UploadData",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Admin",
+        "position": {
+          "x": 2.5079997,
+          "y": -6.2652006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "18": {
+    "type": "NormalPlayerTask",
+    "taskType": "PrimeShields",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Shields",
+        "position": {
+          "x": 7.526399,
+          "y": -13.981199
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "19": {
+    "type": "UploadDataTask",
+    "taskType": "UploadData",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Admin",
+        "position": {
+          "x": 2.5079997,
+          "y": -6.2652006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "20": {
+    "type": "UploadDataTask",
+    "taskType": "UploadData",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Admin",
+        "position": {
+          "x": 2.5079997,
+          "y": -6.2652006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "21": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": -9,
+          "y": -7.2936006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "22": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": -9,
+          "y": -7.2936006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "23": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": -9,
+          "y": -7.2936006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "24": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": -9,
+          "y": -7.2936006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "25": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": -9,
+          "y": -7.2936006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "26": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": -9,
+          "y": -7.2936006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "27": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": -9,
+          "y": -7.2936006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "28": {
+    "type": "DivertPowerTask",
+    "taskType": "DivertPower",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Electrical",
+        "position": {
+          "x": -9,
+          "y": -7.2936006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "29": {
+    "type": "NormalPlayerTask",
+    "taskType": "VentCleaning",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Admin",
+        "position": {
+          "x": 2.544,
+          "y": -9.955201
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Cafeteria",
+        "position": {
+          "x": 4.2588,
+          "y": -0.27600002
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 13,
+        "room": "Nav",
+        "position": {
+          "x": 16.008001,
+          "y": -6.3840003
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 12,
+        "room": "Nav",
+        "position": {
+          "x": 16.008001,
+          "y": -3.1680002
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 7,
+        "room": "Weapons",
+        "position": {
+          "x": 8.820001,
+          "y": 3.3240001
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 10,
+        "room": "Shields",
+        "position": {
+          "x": 9.5232,
+          "y": -14.337601
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Hallway",
+        "position": {
+          "x": 9.384,
+          "y": -6.438
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Electrical",
+        "position": {
+          "x": -9.7764,
+          "y": -8.034
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 8,
+        "room": "Reactor",
+        "position": {
+          "x": -20.796001,
+          "y": -6.9528003
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 11,
+        "room": "Reactor",
+        "position": {
+          "x": -21.876,
+          "y": -3.0516002
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 9,
+        "room": "LowerEngine",
+        "position": {
+          "x": -15.2508,
+          "y": -13.656001
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "UpperEngine",
+        "position": {
+          "x": -15.288,
+          "y": 2.52
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Security",
+        "position": {
+          "x": -12.534,
+          "y": -6.9492
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 6,
+        "room": "MedBay",
+        "position": {
+          "x": -10.608001,
+          "y": -4.176
+        },
+        "usableDistance": 1
+      }
+    ]
+  }
+}

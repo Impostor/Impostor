@@ -1,4 +1,4 @@
-using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Maps;
 
 namespace Impostor.Api.Events.Player
 {
@@ -10,6 +10,6 @@ namespace Impostor.Api.Events.Player
         /// <summary>
         ///     Gets the vent player moved to.
         /// </summary>
-        public IVent NewVent { get; }
+        public VentData NewVent { get; }
     }
 }

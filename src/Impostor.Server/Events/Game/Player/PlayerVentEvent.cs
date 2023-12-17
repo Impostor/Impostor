@@ -1,6 +1,6 @@
 using Impostor.Api.Events.Player;
 using Impostor.Api.Games;
-using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Maps;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 
@@ -8,7 +8,7 @@ namespace Impostor.Server.Events.Player
 {
     public class PlayerVentEvent : IPlayerVentEvent
     {
-        public PlayerVentEvent(IGame game, IClientPlayer sender, IInnerPlayerControl innerPlayerPhysics, IVent vent)
+        public PlayerVentEvent(IGame game, IClientPlayer sender, IInnerPlayerControl innerPlayerPhysics, VentData vent)
         {
             Game = game;
             ClientPlayer = sender;
@@ -22,6 +22,6 @@ namespace Impostor.Server.Events.Player
 
         public IInnerPlayerControl PlayerControl { get; }
 
-        public IVent NewVent { get; }
+        public VentData NewVent { get; }
     }
 }

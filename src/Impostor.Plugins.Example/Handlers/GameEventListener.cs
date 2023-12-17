@@ -1,6 +1,4 @@
 ﻿using Impostor.Api.Events;
-using Impostor.Api.Games;
-using Impostor.Api.Innersloth;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example.Handlers

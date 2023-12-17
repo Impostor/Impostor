@@ -1,0 +1,520 @@
+{
+  "0": {
+    "type": "NormalPlayerTask",
+    "taskType": "CollectSamples",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Laboratory",
+        "position": {
+          "x": -6.373,
+          "y": -8.884999
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "1": {
+    "type": "NormalPlayerTask",
+    "taskType": "EnterIdCode",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 1,
+        "room": "Lookout",
+        "position": {
+          "x": 8.446,
+          "y": 5.27
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "2": {
+    "type": "NormalPlayerTask",
+    "taskType": "ReplaceParts",
+    "length": "Common",
+    "consoles": []
+  },
+  "3": {
+    "type": "NormalPlayerTask",
+    "taskType": "RoastMarshmallow",
+    "length": "Common",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Beach",
+        "position": {
+          "x": -9.788,
+          "y": 1.641
+        },
+        "usableDistance": 1.35
+      },
+      {
+        "id": 1,
+        "room": "Beach",
+        "position": {
+          "x": -18.372,
+          "y": -3.849
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Beach",
+        "position": {
+          "x": -20.07,
+          "y": 3.303
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Beach",
+        "position": {
+          "x": -11.333,
+          "y": 7.898
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "Beach",
+        "position": {
+          "x": -9.309,
+          "y": -3.507
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "4": {
+    "type": "NormalPlayerTask",
+    "taskType": "CatchFish",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "FishingDock",
+        "position": {
+          "x": -24.359001,
+          "y": -6.8320003
+        },
+        "usableDistance": 1.28
+      },
+      {
+        "id": 1,
+        "room": "Kitchen",
+        "position": {
+          "x": -12.645,
+          "y": -9.364001
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "5": {
+    "type": "NormalPlayerTask",
+    "taskType": "CollectVegetables",
+    "length": "Long",
+    "consoles": []
+  },
+  "6": {
+    "type": "NormalPlayerTask",
+    "taskType": "ExtractFuel",
+    "length": "Long",
+    "consoles": []
+  },
+  "7": {
+    "type": "NormalPlayerTask",
+    "taskType": "HelpCritter",
+    "length": "Long",
+    "consoles": []
+  },
+  "8": {
+    "type": "NormalPlayerTask",
+    "taskType": "HoistSupplies",
+    "length": "Long",
+    "consoles": []
+  },
+  "9": {
+    "type": "NormalPlayerTask",
+    "taskType": "PolishGem",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "MiningPit",
+        "position": {
+          "x": 14.353,
+          "y": 10.241
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "10": {
+    "type": "NormalPlayerTask",
+    "taskType": "MineOres",
+    "length": "Long",
+    "consoles": [
+      {
+        "id": 1,
+        "room": "MiningPit",
+        "position": {
+          "x": 11.076,
+          "y": 10.651
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "11": {
+    "type": "NormalPlayerTask",
+    "taskType": "ReplaceWaterJug",
+    "length": "Long",
+    "consoles": []
+  },
+  "12": {
+    "type": "NormalPlayerTask",
+    "taskType": "WaterPlants",
+    "length": "Long",
+    "consoles": []
+  },
+  "13": {
+    "type": "NormalPlayerTask",
+    "taskType": "AssembleArtifact",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 1,
+        "room": "Laboratory",
+        "position": {
+          "x": -6.2650003,
+          "y": -9.592999
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "14": {
+    "type": "NormalPlayerTask",
+    "taskType": "BuildSandcastle",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 1,
+        "room": "RecRoom",
+        "position": {
+          "x": -21.474998,
+          "y": 0.36600006
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "15": {
+    "type": "NormalPlayerTask",
+    "taskType": "CollectShells",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 2,
+        "room": "RecRoom",
+        "position": {
+          "x": -20.28,
+          "y": -2.4299998
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "Beach",
+        "position": {
+          "x": 3.16,
+          "y": 1.51
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Beach",
+        "position": {
+          "x": -7.95,
+          "y": -1.9399999
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Beach",
+        "position": {
+          "x": -3.178,
+          "y": 8.14
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "16": {
+    "type": "NormalPlayerTask",
+    "taskType": "CrankGenerator",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 1,
+        "room": "Comms",
+        "position": {
+          "x": 20.751,
+          "y": 14.603
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "Kitchen",
+        "position": {
+          "x": -12.999001,
+          "y": -6.3429995
+        },
+        "usableDistance": 1.25
+      }
+    ]
+  },
+  "17": {
+    "type": "NormalPlayerTask",
+    "taskType": "EmptyGarbage",
+    "length": "Short",
+    "consoles": []
+  },
+  "18": {
+    "type": "NormalPlayerTask",
+    "taskType": "EmptyGarbage",
+    "length": "Short",
+    "consoles": []
+  },
+  "19": {
+    "type": "NormalPlayerTask",
+    "taskType": "FixAntenna",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Comms",
+        "position": {
+          "x": 23.389,
+          "y": 14.826
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "20": {
+    "type": "NormalPlayerTask",
+    "taskType": "FixWiring",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 4,
+        "room": "Comms",
+        "position": {
+          "x": 19.373001,
+          "y": 14.288
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Dropship",
+        "position": {
+          "x": -11.108,
+          "y": 13.398
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "21": {
+    "type": "NormalPlayerTask",
+    "taskType": "LiftWeights",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 1,
+        "room": "RecRoom",
+        "position": {
+          "x": -19.151,
+          "y": 0.88100004
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "22": {
+    "type": "NormalPlayerTask",
+    "taskType": "MonitorMushroom",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Jungle",
+        "position": {
+          "x": 12.791,
+          "y": -15.567999
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "23": {
+    "type": "NormalPlayerTask",
+    "taskType": "PlayVideogame",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "SleepingQuarters",
+        "position": {
+          "x": 3.251,
+          "y": -1.0879999
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "24": {
+    "type": "NormalPlayerTask",
+    "taskType": "RecordTemperature",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Greenhouse",
+        "position": {
+          "x": 8.677,
+          "y": -11.279
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Laboratory",
+        "position": {
+          "x": -2.8840003,
+          "y": -7.8939996
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "Reactor",
+        "position": {
+          "x": 23.401001,
+          "y": -6.928
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "25": {
+    "type": "NormalPlayerTask",
+    "taskType": "RecordTemperature",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Greenhouse",
+        "position": {
+          "x": 8.677,
+          "y": -11.279
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Laboratory",
+        "position": {
+          "x": -2.8840003,
+          "y": -7.8939996
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "Reactor",
+        "position": {
+          "x": 23.401001,
+          "y": -6.928
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "26": {
+    "type": "NormalPlayerTask",
+    "taskType": "RecordTemperature",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Greenhouse",
+        "position": {
+          "x": 8.677,
+          "y": -11.279
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Laboratory",
+        "position": {
+          "x": -2.8840003,
+          "y": -7.8939996
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 0,
+        "room": "Reactor",
+        "position": {
+          "x": 23.401001,
+          "y": -6.928
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "27": {
+    "type": "NormalPlayerTask",
+    "taskType": "TestFrisbee",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 1,
+        "room": "RecRoom",
+        "position": {
+          "x": -18.647,
+          "y": -0.88699996
+        },
+        "usableDistance": 1
+      }
+    ]
+  },
+  "28": {
+    "type": "NormalPlayerTask",
+    "taskType": "TuneRadio",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Comms",
+        "position": {
+          "x": 19.62,
+          "y": 12.764
+        },
+        "usableDistance": 1
+      }
+    ]
+  }
+}

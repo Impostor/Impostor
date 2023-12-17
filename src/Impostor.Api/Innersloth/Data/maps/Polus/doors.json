@@ -1,0 +1,114 @@
+{
+  "0": {
+    "room": "Electrical",
+    "position": {
+      "x": 11.255,
+      "y": -9.4473
+    }
+  },
+  "1": {
+    "room": "Electrical",
+    "position": {
+      "x": 7.4827003,
+      "y": -10.922001
+    }
+  },
+  "2": {
+    "room": "Electrical",
+    "position": {
+      "x": 5.4228,
+      "y": -13.496
+    }
+  },
+  "3": {
+    "room": "LifeSupp",
+    "position": {
+      "x": 5.492,
+      "y": -18.301
+    }
+  },
+  "4": {
+    "room": "LifeSupp",
+    "position": {
+      "x": 5.9068003,
+      "y": -22.348
+    }
+  },
+  "5": {
+    "room": "Weapons",
+    "position": {
+      "x": 13.0322,
+      "y": -20.701
+    }
+  },
+  "6": {
+    "room": "Comms",
+    "position": {
+      "x": 10.8987,
+      "y": -19.159
+    }
+  },
+  "7": {
+    "room": "Office",
+    "position": {
+      "x": 28.757002,
+      "y": -17.0636
+    }
+  },
+  "8": {
+    "room": "Office",
+    "position": {
+      "x": 17.417002,
+      "y": -21.7231
+    }
+  },
+  "9": {
+    "room": "Laboratory",
+    "position": {
+      "x": 26.608002,
+      "y": -8.808
+    }
+  },
+  "10": {
+    "room": "Laboratory",
+    "position": {
+      "x": 24.780003,
+      "y": -9.5651
+    }
+  },
+  "11": {
+    "room": "Storage",
+    "position": {
+      "x": 17.293001,
+      "y": -10.882
+    }
+  },
+  "12": {
+    "room": "Decontamination",
+    "position": {
+      "x": 25.512001,
+      "y": -24.559002
+    }
+  },
+  "13": {
+    "room": "Decontamination",
+    "position": {
+      "x": 23.897001,
+      "y": -23.512001
+    }
+  },
+  "14": {
+    "room": "Decontamination",
+    "position": {
+      "x": 37.992004,
+      "y": -9.6214
+    }
+  },
+  "15": {
+    "room": "Decontamination",
+    "position": {
+      "x": 39.067,
+      "y": -11.361
+    }
+  }
+}
