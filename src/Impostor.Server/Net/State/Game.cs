@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
@@ -14,6 +13,7 @@ using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Net.Messages.S2C;
+using Impostor.Api.Utils;
 using Impostor.Server.Events;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
@@ -33,7 +33,7 @@ namespace Impostor.Server.Net.State
         private readonly ICompatibilityManager _compatibilityManager;
         private readonly CompatibilityConfig _compatibilityConfig;
         private readonly TimeoutConfig _timeoutConfig;
-        private readonly SemaphoreSlim _lock;
+        private readonly AsyncLock _lock = new();
 
         public Game(
             ILogger<Game> logger,
@@ -68,7 +68,6 @@ namespace Impostor.Server.Net.State
             _compatibilityConfig = compatibilityConfig.Value;
             _timeoutConfig = timeoutConfig.Value;
             Items = new ConcurrentDictionary<object, object>();
-            _lock = new SemaphoreSlim(1, 1);
         }
 
         public IPEndPoint PublicIp { get; }
@@ -116,9 +115,9 @@ namespace Impostor.Server.Net.State
             return _players.TryGetValue(clientId, out var clientPlayer) ? clientPlayer : null;
         }
 
-        public async Task<LockGuard> LockAsync()
+        public ValueTask<AsyncLock.Releaser> LockAsync()
         {
-            return await LockGuard.LockAsync(_lock);
+            return _lock.LockAsync();
         }
 
         internal async ValueTask StartedAsync()
