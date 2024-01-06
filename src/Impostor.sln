@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Plugins.Example", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Api.Innersloth.Generator", "Impostor.Api.Innersloth.Generator\Impostor.Api.Innersloth.Generator.csproj", "{8B6C3AC5-E2B2-49F8-854D-22DFB4AB3D31}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugin", "Plugin", "{DC83EB58-B165-4C89-A2BB-5B7052A1AC1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,5 +61,6 @@ Global
 		SolutionGuid = {06245255-E585-483C-A4AD-71B7B568C6C8}
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{70F97BB7-12A1-4C7A-B2A5-B962D14B813E} = {DC83EB58-B165-4C89-A2BB-5B7052A1AC1A}
 	EndGlobalSection
 EndGlobal

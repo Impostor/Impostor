@@ -35,13 +35,12 @@ else
 //////////////////////////////////////////////////////////////////////
 
 // Remove unnecessary files for packaging.
-private void ImpostorPublish(string name, string project, string runtime, bool isServer = false) {
+private void ImpostorPublish(string name, string project, string runtime) {
     var projBuildDir = buildDir.Combine(name + "_" + runtime);
     var projBuildName = name + "_" + buildVersion + "_" + runtime;
 
     DotNetPublish(project, new DotNetPublishSettings {
         Configuration = configuration,
-        NoRestore = true,
         Runtime = runtime,
         SelfContained = false,
         PublishSingleFile = true,
@@ -50,14 +49,13 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
         MSBuildSettings = msbuildSettings
     });
 
-    if (isServer) {
-        CreateDirectory(projBuildDir.Combine("Plugins"));
-        CreateDirectory(projBuildDir.Combine("Lib"));
-        CreateDirectory(projBuildDir.Combine("Core"));
 
-        if (runtime == "win-x64") {
-            FileWriteText(projBuildDir.CombineWithFilePath("run.bat"), "@echo off\r\nImpostor.Server.exe\r\npause");
-        }
+    CreateDirectory(projBuildDir.Combine("Plugins"));
+    CreateDirectory(projBuildDir.Combine("Lib"));
+    CreateDirectory(projBuildDir.Combine("Core"));
+
+    if (runtime == "win-x64") {
+       FileWriteText(projBuildDir.CombineWithFilePath("run.bat"), "@echo off\r\nImpostor.Server.exe\r\npause");
     }
 
     if (runtime == "win-x64") {
@@ -69,22 +67,6 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
     if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
         BuildSystem.GitHubActions.Commands.UploadArtifact(projBuildDir, projBuildName);
     }
-}
-
-private void ImpostorPublishNF(string name, string project) {
-    var runtime = "win-x64";
-    var projBuildDir = buildDir.Combine(name + "_" + runtime);
-    var projBuildZip = buildDir.CombineWithFilePath(name + "_" + buildVersion + "_" + runtime + ".zip");
-
-    DotNetPublish(project, new DotNetPublishSettings {
-        Configuration = configuration,
-        NoRestore = true,
-        Framework = "net472",
-        OutputDirectory = projBuildDir,
-        MSBuildSettings = msbuildSettings
-    });
-
-    Zip(projBuildDir, projBuildZip);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -110,11 +92,11 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() => {
         // Server.
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64", true);
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "osx-x64", true);
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-x64", true);
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm", true);
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm64", true);
+        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64");
+        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "osx-x64");
+        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-x64");
+        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm");
+        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm64");
 
         // API.
         DotNetPack("./src/Impostor.Api/Impostor.Api.csproj", new DotNetPackSettings {

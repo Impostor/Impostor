@@ -32,21 +32,11 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.x
 
       - name: Run the Cake script
-        uses: cake-build/cake-action@v1
+        uses: cake-build/cake-action@v1.4.1
         with:
           verbosity: Diagnostic
-
-      - uses: softprops/action-gh-release@v1
-        if: github.ref_type == 'tag'
-        with:
-          draft: true
-          files: |
-            ./build/*.zip
-            ./build/*.tar.gz
-            ./build/*.nupkg
-            ./build/*.snupkg
