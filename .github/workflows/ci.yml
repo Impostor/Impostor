@@ -50,8 +50,3 @@ jobs:
             ./build/*.tar.gz
             ./build/*.nupkg
             ./build/*.snupkg
-
-      - name: Push NuGet package
-        if: github.ref_type == 'tag'
-        run: |
-          dotnet nuget push ./build/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_IMPOSTOR }}

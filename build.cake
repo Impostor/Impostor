@@ -51,8 +51,9 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
     });
 
     if (isServer) {
-        CreateDirectory(projBuildDir.Combine("plugins"));
-        CreateDirectory(projBuildDir.Combine("libraries"));
+        CreateDirectory(projBuildDir.Combine("Plugins"));
+        CreateDirectory(projBuildDir.Combine("Lib"));
+        CreateDirectory(projBuildDir.Combine("Core"));
 
         if (runtime == "win-x64") {
             FileWriteText(projBuildDir.CombineWithFilePath("run.bat"), "@echo off\r\nImpostor.Server.exe\r\npause");
@@ -104,21 +105,9 @@ Task("Restore")
         DotNetRestore("./src/Impostor.sln");
     });
 
-Task("Replay")
-    .Does(() => {
-        // D:\Projects\GitHub\Impostor\Impostor\src\Impostor.Tools.ServerReplay\sessions
-        DotNetRun(
-            "./src/Impostor.Tools.ServerReplay/Impostor.Tools.ServerReplay.csproj", 
-            "./src/Impostor.Tools.ServerReplay/sessions", new DotNetRunSettings {
-                Configuration = configuration,
-                NoRestore = true,
-            });
-    });
-
 Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
-    .IsDependentOn("Replay")
     .Does(() => {
         // Tests.
         DotNetBuild("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetBuildSettings {
@@ -147,15 +136,6 @@ Task("Build")
                 BuildSystem.GitHubActions.Commands.UploadArtifact(file, "Impostor.Api");
             }
         }
-    });
-
-Task("Test")
-    .IsDependentOn("Build")
-    .Does(() => {
-        DotNetTest("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetTestSettings {
-            Configuration = configuration,
-            NoBuild = true
-        });
     });
 
 //////////////////////////////////////////////////////////////////////

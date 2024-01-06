@@ -66,10 +66,8 @@ internal class HazelConnection : IHazelConnection
                 break;
             }
 
-            using (var message = e.Message.ReadMessage())
-            {
-                await Client.HandleMessageAsync(message, e.Type);
-            }
+            using var message = e.Message.ReadMessage();
+            await Client.HandleMessageAsync(message, e.Type);
         }
     }
 }

@@ -2,16 +2,9 @@
 
 namespace Impostor.Server.Plugins;
 
-public class DependencyInformation
+public class DependencyInformation(ImpostorDependencyAttribute attribute)
 {
-    private readonly ImpostorDependencyAttribute _attribute;
+    public string Id => attribute.Id;
 
-    public DependencyInformation(ImpostorDependencyAttribute attribute)
-    {
-        _attribute = attribute;
-    }
-
-    public string Id => _attribute.Id;
-
-    public DependencyType DependencyType => _attribute.DependencyType;
+    public DependencyType DependencyType => attribute.DependencyType;
 }

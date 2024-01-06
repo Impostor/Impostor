@@ -14,25 +14,13 @@ using Microsoft.Extensions.ObjectPool;
 
 namespace Impostor.Server.Net;
 
-internal class Matchmaker
+internal class Matchmaker(
+    IEventManager eventManager,
+    ClientManager clientManager,
+    ObjectPool<MessageReader> readerPool,
+    ILogger<HazelConnection> connectionLogger)
 {
-    private readonly ClientManager _clientManager;
-    private readonly ILogger<HazelConnection> _connectionLogger;
-    private readonly IEventManager _eventManager;
-    private readonly ObjectPool<MessageReader> _readerPool;
     private UdpConnectionListener? _connection;
-
-    public Matchmaker(
-        IEventManager eventManager,
-        ClientManager clientManager,
-        ObjectPool<MessageReader> readerPool,
-        ILogger<HazelConnection> connectionLogger)
-    {
-        _eventManager = eventManager;
-        _clientManager = clientManager;
-        _readerPool = readerPool;
-        _connectionLogger = connectionLogger;
-    }
 
     public async ValueTask StartAsync(IPEndPoint ipEndPoint)
     {
@@ -43,7 +31,7 @@ internal class Matchmaker
             _ => throw new InvalidOperationException(),
         };
 
-        _connection = new UdpConnectionListener(ipEndPoint, _readerPool, mode)
+        _connection = new UdpConnectionListener(ipEndPoint, readerPool, mode)
         {
             NewConnection = OnNewConnection,
         };
@@ -62,15 +50,13 @@ internal class Matchmaker
     private async ValueTask OnNewConnection(NewConnectionEventArgs e)
     {
         // Handshake.
-        HandshakeC2S.Deserialize(e.HandshakeData, out var clientVersion, out var name, out var language,
-            out var chatMode, out var platformSpecificData);
+        HandshakeC2S.Deserialize(e.HandshakeData, out var clientVersion, out var name, out var language, out var chatMode, out var platformSpecificData);
 
-        var connection = new HazelConnection(e.Connection, _connectionLogger);
+        var connection = new HazelConnection(e.Connection, connectionLogger);
 
-        await _eventManager.CallAsync(new ClientConnectionEvent(connection, e.HandshakeData));
+        await eventManager.CallAsync(new ClientConnectionEvent(connection, e.HandshakeData));
 
         // Register client
-        await _clientManager.RegisterConnectionAsync(connection, name, clientVersion, language, chatMode,
-            platformSpecificData);
+        await clientManager.RegisterConnectionAsync(connection, name, clientVersion, language, chatMode, platformSpecificData);
     }
 }

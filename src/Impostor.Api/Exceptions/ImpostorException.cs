@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace Impostor.Api;
 
 public class ImpostorException : Exception
 {
-    public ImpostorException()
+    protected ImpostorException()
     {
     }
 
@@ -13,11 +12,7 @@ public class ImpostorException : Exception
     {
     }
 
-    public ImpostorException(string? message, Exception? innerException) : base(message, innerException)
-    {
-    }
-
-    protected ImpostorException(SerializationInfo info, StreamingContext context) : base(info, context)
+    protected ImpostorException(string? message, Exception? innerException) : base(message, innerException)
     {
     }
 }

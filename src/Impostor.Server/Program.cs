@@ -22,6 +22,7 @@ using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Server.Plugins;
 using Impostor.Server.Recorder;
+using Impostor.Server.ServerCore;
 using Impostor.Server.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -77,17 +78,30 @@ internal static class Program
     private static IHostBuilder CreateHostBuilder(string[] args)
     {
         var configuration = CreateConfiguration(args);
-        var pluginConfig = configuration.GetSection("PluginLoader")
+
+        var pluginConfig = configuration
+            .GetSection("PluginLoader")
             .Get<PluginConfig>() ?? new PluginConfig();
-        var httpConfig = configuration.GetSection(HttpServerConfig.Section)
-            .Get<HttpServerConfig>() ?? new HttpServerConfig();
+
+        var serverConfig = configuration
+            .GetSection(ServerConfig.Section)
+            .Get<ServerConfig>()!;
+
+        var httpConfig = configuration
+            .GetSection(HttpServerConfig.Section)
+            .Get<HttpServerConfig>() ?? new HttpServerConfig
+        {
+            Enabled = true,
+            ListenIp = serverConfig.ListenIp,
+            ListenPort = serverConfig.ListenPort,
+        };
 
         var hostBuilder = Host.CreateDefaultBuilder(args)
             .UseContentRoot(Directory.GetCurrentDirectory())
 #if DEBUG
             .UseEnvironment(Environment.GetEnvironmentVariable("IMPOSTOR_ENV") ?? "Development")
 #else
-                .UseEnvironment("Production")
+            .UseEnvironment("Production")
 #endif
             .ConfigureAppConfiguration(builder =>
             {
@@ -139,9 +153,7 @@ internal static class Program
 
                 services.AddEventPools();
                 services.AddHazel();
-                services
-                    .AddSingleton<ICustomMessageManager<ICustomRootMessage>,
-                        CustomMessageManager<ICustomRootMessage>>();
+                services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
                 services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
                 services.AddSingleton<IMessageWriterProvider, MessageWriterProvider>();
                 services.AddSingleton<IGameCodeFactory, GameCodeFactory>();
@@ -154,7 +166,7 @@ internal static class Program
 #if DEBUG
                 var logLevel = LogEventLevel.Debug;
 #else
-                    var logLevel = LogEventLevel.Information;
+                var logLevel = LogEventLevel.Information;
 #endif
 
                 if (args.Contains("--verbose"))
@@ -165,6 +177,22 @@ internal static class Program
                 {
                     logLevel = LogEventLevel.Error;
                 }
+
+                AssemblyLoadContext.Default.Resolving += LoadSerilogAssembly;
+                loggerConfiguration
+                    .MinimumLevel.Is(logLevel)
+#if DEBUG
+                    .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
+#else
+                    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+#endif
+                    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console()
+                    .ReadFrom.Configuration(context.Configuration, new ConfigurationReaderOptions(ConfigurationAssemblySource.AlwaysScanDllFiles));
+
+                AssemblyLoadContext.Default.Resolving -= LoadSerilogAssembly;
+                return;
 
                 static Assembly? LoadSerilogAssembly(AssemblyLoadContext loadContext, AssemblyName name)
                 {
@@ -182,29 +210,17 @@ internal static class Program
 
                     return null;
                 }
-
-                AssemblyLoadContext.Default.Resolving += LoadSerilogAssembly;
-
-                loggerConfiguration
-                    .MinimumLevel.Is(logLevel)
-#if DEBUG
-                    .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
-#else
-                        .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-#endif
-                    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-                    .Enrich.FromLogContext()
-                    .WriteTo.Console()
-                    .ReadFrom.Configuration(context.Configuration, ConfigurationAssemblySource.AlwaysScanDllFiles);
-
-                AssemblyLoadContext.Default.Resolving -= LoadSerilogAssembly;
             })
             .UseConsoleLifetime()
+            .UseServerCoreLoader()
             .UsePluginLoader(pluginConfig);
 
-        if (httpConfig.Enabled)
+        if (!httpConfig.Enabled)
         {
-            hostBuilder.ConfigureWebHostDefaults(builder =>
+            return hostBuilder;
+        }
+
+        hostBuilder.ConfigureWebHostDefaults(builder =>
             {
                 builder.ConfigureServices(services =>
                 {
@@ -234,11 +250,10 @@ internal static class Program
                 {
                     serverOptions.Listen(IPAddress.Parse(httpConfig.ListenIp), httpConfig.ListenPort, listenOptions =>
                     {
-                        listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                        listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
                     });
                 });
             });
-        }
 
         return hostBuilder;
     }

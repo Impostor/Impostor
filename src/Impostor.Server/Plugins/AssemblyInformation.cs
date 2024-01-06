@@ -4,22 +4,15 @@ using System.Runtime.Loader;
 
 namespace Impostor.Server.Plugins;
 
-public class AssemblyInformation : IAssemblyInformation
+public class AssemblyInformation(AssemblyName assemblyName, string path, bool isPlugin) : IAssemblyInformation
 {
     private Assembly? _assembly;
 
-    public AssemblyInformation(AssemblyName assemblyName, string path, bool isPlugin)
-    {
-        AssemblyName = assemblyName;
-        Path = path;
-        IsPlugin = isPlugin;
-    }
+    public string Path { get; } = path;
 
-    public string Path { get; }
+    public bool IsPlugin { get; } = isPlugin;
 
-    public bool IsPlugin { get; }
-
-    public AssemblyName AssemblyName { get; }
+    public AssemblyName AssemblyName { get; } = assemblyName;
 
     public Assembly Load(AssemblyLoadContext context)
     {

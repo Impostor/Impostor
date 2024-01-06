@@ -17,8 +17,4 @@ public class PluginLoaderException : ImpostorException
     public PluginLoaderException(string? message, Exception? innerException) : base(message, innerException)
     {
     }
-
-    protected PluginLoaderException(SerializationInfo info, StreamingContext context) : base(info, context)
-    {
-    }
 }

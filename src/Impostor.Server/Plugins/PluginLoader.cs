@@ -29,8 +29,8 @@ public static class PluginLoader
 
         var rootFolder = Directory.GetCurrentDirectory();
 
-        pluginPaths.Add(Path.Combine(rootFolder, "plugins"));
-        libraryPaths.Add(Path.Combine(rootFolder, "libraries"));
+        pluginPaths.Add(Path.Combine(rootFolder, "Plugins"));
+        libraryPaths.Add(Path.Combine(rootFolder, "Lib"));
 
         var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
         matcher.AddInclude("*.dll");
@@ -84,8 +84,7 @@ public static class PluginLoader
             var plugin = assembly
                 .GetTypes()
                 .Where(t => typeof(IPlugin).IsAssignableFrom(t)
-                            && t.IsClass
-                            && !t.IsAbstract
+                            && t is { IsClass: true, IsAbstract: false }
                             && t.GetCustomAttribute<ImpostorPluginAttribute>() != null)
                 .ToList();
 
