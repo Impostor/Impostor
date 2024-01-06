@@ -42,6 +42,7 @@ private void ImpostorPublish(string name, string project, string runtime) {
     DotNetPublish(project, new DotNetPublishSettings {
         Configuration = configuration,
         Runtime = runtime,
+        NoRestore = true,
         SelfContained = false,
         PublishSingleFile = true,
         PublishTrimmed = false,
@@ -57,8 +58,12 @@ private void ImpostorPublish(string name, string project, string runtime) {
     CreateDirectory(projBuildDir.Combine("Lib"));
     CreateDirectory(projBuildDir.Combine("Core"));
     
+    FileWriteText(projBuildDir.Combine("Plugins").CombineWithFilePath("Directory.txt"), "This is Plugins Directory");
+    FileWriteText(projBuildDir.Combine("Lib").CombineWithFilePath("Directory.txt"), "This is Lib Directory");
+    FileWriteText(projBuildDir.Combine("Core").CombineWithFilePath("Directory.txt"), "This is Core Directory");
+    
     if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
-       BuildSystem.GitHubActions.Commands.UploadArtifact(projBuildDir, projBuildName);
+        BuildSystem.GitHubActions.Commands.UploadArtifact(projBuildDir, projBuildName);
     }
 }
 
@@ -80,16 +85,16 @@ Task("Restore")
         DotNetRestore("./src/Impostor.sln");
     });
 
-Task("CreateDirectory")
-    .Does(() => {
-    });
-
 Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
     .Does(() => {
         // Server.
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64");
+                ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64");
+                ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "osx-x64");
+                ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-x64");
+                ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm");
+                ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm64");
     });
 
 //////////////////////////////////////////////////////////////////////
