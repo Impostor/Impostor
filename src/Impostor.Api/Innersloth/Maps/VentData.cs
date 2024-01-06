@@ -5,13 +5,13 @@ namespace Impostor.Api.Innersloth.Maps;
 
 public class VentData
 {
-    private readonly Lazy<VentData>? _left;
-
     private readonly Lazy<VentData>? _center;
+    private readonly Lazy<VentData>? _left;
 
     private readonly Lazy<VentData>? _right;
 
-    internal VentData(MapData data, int id, string name, Vector2 position, int? left = null, int? center = null, int? right = null)
+    internal VentData(MapData data, int id, string name, Vector2 position, int? left = null, int? center = null,
+        int? right = null)
     {
         Id = id;
         Name = name;

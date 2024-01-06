@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
@@ -15,7 +16,8 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
     private readonly ILogger<InnerGameManager> _logger;
     private readonly List<GameLogicComponent> _logicComponents = new();
 
-    public InnerGameManager(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerGameManager> logger) : base(customMessageManager, game)
+    public InnerGameManager(ICustomMessageManager<ICustomRpc> customMessageManager, Game game,
+        ILogger<InnerGameManager> logger) : base(customMessageManager, game)
     {
         _logger = logger;
 
@@ -40,18 +42,19 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
     }
 
     /// <summary>
-    ///     Finds the tag of the registered <see cref="GameLogicComponent"/>.
+    ///     Finds the tag of the registered <see cref="GameLogicComponent" />.
     /// </summary>
     /// <param name="logic">Instance to search for.</param>
     /// <typeparam name="T">Intance type to search for.</typeparam>
-    /// <returns>Tag of the registered <see cref="GameLogicComponent"/>, or -1 if not found.</returns>
+    /// <returns>Tag of the registered <see cref="GameLogicComponent" />, or -1 if not found.</returns>
     internal int GetGameLogicTag<T>(T logic)
         where T : GameLogicComponent
     {
         return _logicComponents.IndexOf(logic);
     }
 
-    public override ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+    public override ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
+        IMessageReader reader)
     {
         foreach (var logicComponent in _logicComponents)
         {
@@ -63,22 +66,23 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
 
     public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
-    public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+    public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader,
+        bool initialState)
     {
         while (reader.Position < reader.Length)
         {
             var innerReader = reader.ReadMessage();
             var tag = (int)innerReader.Tag;
-            if (tag < 0 || tag > this._logicComponents.Count)
+            if (tag < 0 || tag > _logicComponents.Count)
             {
                 _logger.LogError("Out of bounds in DeserializeAsync of InnerGameManager");
                 continue;
             }
 
-            var component = this._logicComponents[tag];
+            var component = _logicComponents[tag];
 
             component.Deserialize(innerReader, initialState);
 

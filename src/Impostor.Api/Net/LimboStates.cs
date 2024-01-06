@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace Impostor.Api.Net
+namespace Impostor.Api.Net;
+
+[Flags]
+public enum LimboStates
 {
-    [Flags]
-    public enum LimboStates
-    {
-        PreSpawn = 1,
-        NotLimbo = 2,
-        WaitingForHost = 4,
-        All = PreSpawn | NotLimbo | WaitingForHost,
-    }
+    PreSpawn = 1,
+    NotLimbo = 2,
+    WaitingForHost = 4,
+    All = PreSpawn | NotLimbo | WaitingForHost,
 }

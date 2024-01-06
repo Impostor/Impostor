@@ -1,10 +1,9 @@
-﻿namespace Impostor.Server.Recorder
+﻿namespace Impostor.Server.Recorder;
+
+internal enum RecordedPacketType : byte
 {
-    internal enum RecordedPacketType : byte
-    {
-        Connect = 1,
-        Disconnect = 2,
-        Message = 3,
-        GameCreated = 4,
-    }
+    Connect = 1,
+    Disconnect = 2,
+    Message = 3,
+    GameCreated = 4,
 }

@@ -2,10 +2,9 @@
 using Impostor.Api.Net;
 using Impostor.Api.Net.Manager;
 
-namespace Impostor.Server.Net.Manager
+namespace Impostor.Server.Net.Manager;
+
+internal partial class ClientManager : IClientManager
 {
-    internal partial class ClientManager : IClientManager
-    {
-        IEnumerable<IClient> IClientManager.Clients => _clients.Values;
-    }
+    IEnumerable<IClient> IClientManager.Clients => _clients.Values;
 }

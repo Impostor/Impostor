@@ -1,9 +1,8 @@
-﻿namespace Impostor.Api.Innersloth
+﻿namespace Impostor.Api.Innersloth;
+
+public enum DeathReason
 {
-    public enum DeathReason
-    {
-        Exile = 0,
-        Kill = 1,
-        Disconnect = 2,
-    }
+    Exile = 0,
+    Kill = 1,
+    Disconnect = 2,
 }

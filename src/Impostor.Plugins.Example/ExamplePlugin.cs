@@ -5,42 +5,41 @@ using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Plugins;
 using Microsoft.Extensions.Logging;
 
-namespace Impostor.Plugins.Example
+namespace Impostor.Plugins.Example;
+
+[ImpostorPlugin("gg.impostor.example")]
+public class ExamplePlugin : PluginBase
 {
-    [ImpostorPlugin("gg.impostor.example")]
-    public class ExamplePlugin : PluginBase
+    private readonly IGameManager _gameManager;
+    private readonly ILogger<ExamplePlugin> _logger;
+
+    public ExamplePlugin(ILogger<ExamplePlugin> logger, IGameManager gameManager)
     {
-        private readonly ILogger<ExamplePlugin> _logger;
-        private readonly IGameManager _gameManager;
+        _logger = logger;
+        _gameManager = gameManager;
+    }
 
-        public ExamplePlugin(ILogger<ExamplePlugin> logger, IGameManager gameManager)
+    public override async ValueTask EnableAsync()
+    {
+        _logger.LogInformation("Example is being enabled.");
+
+        var game = await _gameManager.CreateAsync(new NormalGameOptions(), GameFilterOptions.CreateDefault());
+        if (game == null)
         {
-            _logger = logger;
-            _gameManager = gameManager;
+            _logger.LogWarning("Example game creation was cancelled");
         }
-
-        public override async ValueTask EnableAsync()
+        else
         {
-            _logger.LogInformation("Example is being enabled.");
+            game.DisplayName = "Example game";
+            await game.SetPrivacyAsync(true);
 
-            var game = await _gameManager.CreateAsync(new NormalGameOptions(), GameFilterOptions.CreateDefault());
-            if (game == null)
-            {
-                _logger.LogWarning("Example game creation was cancelled");
-            }
-            else
-            {
-                game.DisplayName = "Example game";
-                await game.SetPrivacyAsync(true);
-
-                _logger.LogInformation("Created game {0}.", game.Code.Code);
-            }
+            _logger.LogInformation("Created game {0}.", game.Code.Code);
         }
+    }
 
-        public override ValueTask DisableAsync()
-        {
-            _logger.LogInformation("Example is being disabled.");
-            return default;
-        }
+    public override ValueTask DisableAsync()
+    {
+        _logger.LogInformation("Example is being disabled.");
+        return default;
     }
 }

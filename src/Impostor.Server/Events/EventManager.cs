@@ -9,153 +9,152 @@ using Impostor.Server.Events.Register;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Impostor.Server.Events
+namespace Impostor.Server.Events;
+
+internal class EventManager : IEventManager
 {
-    internal class EventManager : IEventManager
+    private readonly ConcurrentDictionary<Type, List<EventHandler>> _cachedEventHandlers;
+    private readonly ILogger<EventManager> _logger;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ConcurrentDictionary<Type, TemporaryEventRegister> _temporaryEventListeners;
+
+    public EventManager(ILogger<EventManager> logger, IServiceProvider serviceProvider)
     {
-        private readonly ConcurrentDictionary<Type, TemporaryEventRegister> _temporaryEventListeners;
-        private readonly ConcurrentDictionary<Type, List<EventHandler>> _cachedEventHandlers;
-        private readonly ILogger<EventManager> _logger;
-        private readonly IServiceProvider _serviceProvider;
+        _logger = logger;
+        _serviceProvider = serviceProvider;
+        _temporaryEventListeners = new ConcurrentDictionary<Type, TemporaryEventRegister>();
+        _cachedEventHandlers = new ConcurrentDictionary<Type, List<EventHandler>>();
+    }
 
-        public EventManager(ILogger<EventManager> logger, IServiceProvider serviceProvider)
+    /// <inheritdoc />
+    public IDisposable RegisterListener<TListener>(TListener listener, Func<Func<Task>, Task>? invoker = null)
+        where TListener : IEventListener
+    {
+        if (listener == null)
         {
-            _logger = logger;
-            _serviceProvider = serviceProvider;
-            _temporaryEventListeners = new ConcurrentDictionary<Type, TemporaryEventRegister>();
-            _cachedEventHandlers = new ConcurrentDictionary<Type, List<EventHandler>>();
+            throw new ArgumentNullException(nameof(listener));
         }
 
-        /// <inheritdoc />
-        public IDisposable RegisterListener<TListener>(TListener listener, Func<Func<Task>, Task>? invoker = null)
-            where TListener : IEventListener
+        var eventListeners = RegisteredEventListener.FromType(listener.GetType());
+        var disposes = new List<IDisposable>(eventListeners.Count);
+
+        foreach (var eventListener in eventListeners)
         {
-            if (listener == null)
+            IRegisteredEventListener wrappedEventListener = new WrappedRegisteredEventListener(eventListener, listener);
+
+            if (invoker != null)
             {
-                throw new ArgumentNullException(nameof(listener));
+                wrappedEventListener = new InvokedRegisteredEventListener(wrappedEventListener, invoker);
             }
 
-            var eventListeners = RegisteredEventListener.FromType(listener.GetType());
-            var disposes = new List<IDisposable>(eventListeners.Count);
+            var register = _temporaryEventListeners.GetOrAdd(
+                wrappedEventListener.EventType,
+                _ => new TemporaryEventRegister());
 
-            foreach (var eventListener in eventListeners)
-            {
-                IRegisteredEventListener wrappedEventListener = new WrappedRegisteredEventListener(eventListener, listener);
-
-                if (invoker != null)
-                {
-                    wrappedEventListener = new InvokedRegisteredEventListener(wrappedEventListener, invoker);
-                }
-
-                var register = _temporaryEventListeners.GetOrAdd(
-                    wrappedEventListener.EventType,
-                    _ => new TemporaryEventRegister());
-
-                disposes.Add(register.Add(wrappedEventListener));
-            }
-
-            if (eventListeners.Count > 0)
-            {
-                _cachedEventHandlers.TryRemove(typeof(TListener), out _);
-            }
-
-            return new MultiDisposable(disposes);
+            disposes.Add(register.Add(wrappedEventListener));
         }
 
-        /// <inheritdoc />
-        public bool IsRegistered<TEvent>()
-            where TEvent : IEvent
+        if (eventListeners.Count > 0)
         {
-            if (_cachedEventHandlers.TryGetValue(typeof(TEvent), out var handlers))
-            {
-                return handlers.Count > 0;
-            }
-
-            return GetHandlers<TEvent>().Any();
+            _cachedEventHandlers.TryRemove(typeof(TListener), out _);
         }
 
-        /// <inheritdoc />
-        public async ValueTask CallAsync<T>(T @event)
-            where T : IEvent
-        {
-            try
-            {
-                if (!_cachedEventHandlers.TryGetValue(typeof(T), out var handlers))
-                {
-                    handlers = CacheEventHandlers<T>();
-                }
+        return new MultiDisposable(disposes);
+    }
 
-                foreach (var (handler, eventListener) in handlers)
-                {
-                    await eventListener.InvokeAsync(handler, @event, _serviceProvider);
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Invocation of event {0} threw an exception.", @event.GetType().Name);
-            }
+    /// <inheritdoc />
+    public bool IsRegistered<TEvent>()
+        where TEvent : IEvent
+    {
+        if (_cachedEventHandlers.TryGetValue(typeof(TEvent), out var handlers))
+        {
+            return handlers.Count > 0;
         }
 
-        private List<EventHandler> CacheEventHandlers<TEvent>()
-            where TEvent : IEvent
+        return GetHandlers<TEvent>().Any();
+    }
+
+    /// <inheritdoc />
+    public async ValueTask CallAsync<T>(T @event)
+        where T : IEvent
+    {
+        try
         {
-            var handlers = GetHandlers<TEvent>()
-                .OrderByDescending(e => e.Listener.Priority)
-                .ToList();
+            if (!_cachedEventHandlers.TryGetValue(typeof(T), out var handlers))
+            {
+                handlers = CacheEventHandlers<T>();
+            }
 
-            _cachedEventHandlers[typeof(TEvent)] = handlers;
-
-            return handlers;
+            foreach (var (handler, eventListener) in handlers)
+            {
+                await eventListener.InvokeAsync(handler, @event, _serviceProvider);
+            }
         }
-
-        /// <summary>
-        ///     Get all the event listeners for the given event type.
-        /// </summary>
-        /// <returns>The event listeners.</returns>
-        private IEnumerable<EventHandler> GetHandlers<TEvent>()
-            where TEvent : IEvent
+        catch (Exception e)
         {
-            var eventType = typeof(TEvent);
-            var interfaces = eventType.GetInterfaces();
+            _logger.LogError(e, "Invocation of event {0} threw an exception.", @event.GetType().Name);
+        }
+    }
 
-            foreach (var @interface in interfaces)
+    private List<EventHandler> CacheEventHandlers<TEvent>()
+        where TEvent : IEvent
+    {
+        var handlers = GetHandlers<TEvent>()
+            .OrderByDescending(e => e.Listener.Priority)
+            .ToList();
+
+        _cachedEventHandlers[typeof(TEvent)] = handlers;
+
+        return handlers;
+    }
+
+    /// <summary>
+    ///     Get all the event listeners for the given event type.
+    /// </summary>
+    /// <returns>The event listeners.</returns>
+    private IEnumerable<EventHandler> GetHandlers<TEvent>()
+        where TEvent : IEvent
+    {
+        var eventType = typeof(TEvent);
+        var interfaces = eventType.GetInterfaces();
+
+        foreach (var @interface in interfaces)
+        {
+            if (_temporaryEventListeners.TryGetValue(@interface, out var cb))
             {
-                if (_temporaryEventListeners.TryGetValue(@interface, out var cb))
-                {
-                    foreach (var eventListener in cb.GetEventListeners())
-                    {
-                        yield return new EventHandler(null, eventListener);
-                    }
-                }
-            }
-
-            foreach (var handler in _serviceProvider.GetServices<IEventListener>())
-            {
-                if (handler is IManualEventListener manualEventListener && manualEventListener.CanExecute<TEvent>())
-                {
-                    yield return new EventHandler(handler, new ManualRegisteredEventListener(manualEventListener));
-                    continue;
-                }
-
-                var events = RegisteredEventListener.FromType(handler.GetType());
-
-                foreach (var eventHandler in events)
-                {
-                    if (eventHandler.EventType != typeof(TEvent) && !interfaces.Contains(eventHandler.EventType))
-                    {
-                        continue;
-                    }
-
-                    yield return new EventHandler(handler, eventHandler);
-                }
-            }
-
-            if (_temporaryEventListeners.TryGetValue(eventType, out var cb2))
-            {
-                foreach (var eventListener in cb2.GetEventListeners())
+                foreach (var eventListener in cb.GetEventListeners())
                 {
                     yield return new EventHandler(null, eventListener);
                 }
+            }
+        }
+
+        foreach (var handler in _serviceProvider.GetServices<IEventListener>())
+        {
+            if (handler is IManualEventListener manualEventListener && manualEventListener.CanExecute<TEvent>())
+            {
+                yield return new EventHandler(handler, new ManualRegisteredEventListener(manualEventListener));
+                continue;
+            }
+
+            var events = RegisteredEventListener.FromType(handler.GetType());
+
+            foreach (var eventHandler in events)
+            {
+                if (eventHandler.EventType != typeof(TEvent) && !interfaces.Contains(eventHandler.EventType))
+                {
+                    continue;
+                }
+
+                yield return new EventHandler(handler, eventHandler);
+            }
+        }
+
+        if (_temporaryEventListeners.TryGetValue(eventType, out var cb2))
+        {
+            foreach (var eventListener in cb2.GetEventListeners())
+            {
+                yield return new EventHandler(null, eventListener);
             }
         }
     }

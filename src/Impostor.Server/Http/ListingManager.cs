@@ -12,16 +12,17 @@ using Microsoft.Extensions.Options;
 namespace Impostor.Server.Http;
 
 /// <summary>
-/// Perform game listing filtering.
+///     Perform game listing filtering.
 /// </summary>
 public sealed class ListingManager
 {
+    private readonly CompatibilityConfig _compatibilityConfig;
+    private readonly ICompatibilityManager _compatibilityManager;
     private readonly IGameManager _gameManager;
     private readonly IEnumerable<IListingFilter> _listingFilters;
-    private readonly ICompatibilityManager _compatibilityManager;
-    private readonly CompatibilityConfig _compatibilityConfig;
 
-    public ListingManager(IGameManager gameManager, IEnumerable<IListingFilter> listingFilters, ICompatibilityManager compatibilityManager, IOptions<CompatibilityConfig> compatibilityConfig)
+    public ListingManager(IGameManager gameManager, IEnumerable<IListingFilter> listingFilters,
+        ICompatibilityManager compatibilityManager, IOptions<CompatibilityConfig> compatibilityConfig)
     {
         _gameManager = gameManager;
         _listingFilters = listingFilters;
@@ -30,7 +31,7 @@ public sealed class ListingManager
     }
 
     /// <summary>
-    /// Find listings that match the requested settings.
+    ///     Find listings that match the requested settings.
     /// </summary>
     /// <param name="ctx">The context of this http request.</param>
     /// <param name="map">The selected maps.</param>
@@ -39,7 +40,8 @@ public sealed class ListingManager
     /// <param name="gameVersion">Game version of the client.</param>
     /// <param name="maxListings">Maximum amount of games to return.</param>
     /// <returns>Listings that match the required criteria.</returns>
-    public IEnumerable<IGame> FindListings(HttpContext ctx, int map, int impostorCount, GameKeywords language, GameVersion gameVersion, int maxListings = 10)
+    public IEnumerable<IGame> FindListings(HttpContext ctx, int map, int impostorCount, GameKeywords language,
+        GameVersion gameVersion, int maxListings = 10)
     {
         var resultCount = 0;
 
@@ -52,9 +54,10 @@ public sealed class ListingManager
         // 2. Failing that, display compatible games the player could join (public games with spots available)
 
         // .Where filters out games that can't be joined.
-        foreach (var game in this._gameManager.Games)
+        foreach (var game in _gameManager.Games)
         {
-            if (!game.IsPublic || game.GameState != GameStates.NotStarted || game.PlayerCount >= game.Options.MaxPlayers)
+            if (!game.IsPublic || game.GameState != GameStates.NotStarted ||
+                game.PlayerCount >= game.Options.MaxPlayers)
             {
                 continue;
             }
@@ -85,7 +88,7 @@ public sealed class ListingManager
             else
             {
                 // Add to result to add afterwards. Adding is pointless if we already have enough compatible games to fill the list
-                if (compatibleGames.Count < (maxListings - resultCount))
+                if (compatibleGames.Count < maxListings - resultCount)
                 {
                     compatibleGames.Add(game);
                 }

@@ -1,6 +1,5 @@
-﻿namespace Impostor.Api.Events
+﻿namespace Impostor.Api.Events;
+
+public interface IEvent
 {
-    public interface IEvent
-    {
-    }
 }

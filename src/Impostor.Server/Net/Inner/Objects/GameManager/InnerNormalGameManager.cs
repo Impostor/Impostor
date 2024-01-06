@@ -9,7 +9,8 @@ namespace Impostor.Server.Net.Inner.Objects.GameManager;
 
 internal class InnerNormalGameManager : InnerGameManager, IInnerNormalGameManager
 {
-    public InnerNormalGameManager(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerGameManager> logger) : base(customMessageManager, game, logger)
+    public InnerNormalGameManager(ICustomMessageManager<ICustomRpc> customMessageManager, Game game,
+        ILogger<InnerGameManager> logger) : base(customMessageManager, game, logger)
     {
         LogicFlow = AddGameLogic(new LogicGameFlowNormal());
         LogicMinigame = AddGameLogic(new LogicMinigame());

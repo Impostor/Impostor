@@ -5,15 +5,8 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 public class MushroomMixupSabotageSystemType : ISystemType
 {
     private readonly Dictionary<byte, CondensedOutfit> _currentMixups = new();
-    private State _currentState;
     private float _currentSecondsUntilHeal;
-
-    private enum State
-    {
-        Inactive,
-        JustTriggered,
-        IdleButMixedUp,
-    }
+    private State _currentState;
 
     public void Serialize(IMessageWriter writer, bool initialState)
     {
@@ -42,6 +35,13 @@ public class MushroomMixupSabotageSystemType : ISystemType
 
             _currentMixups.Add(playerId, outfit);
         }
+    }
+
+    private enum State
+    {
+        Inactive,
+        JustTriggered,
+        IdleButMixedUp,
     }
 
     private readonly record struct CondensedOutfit(

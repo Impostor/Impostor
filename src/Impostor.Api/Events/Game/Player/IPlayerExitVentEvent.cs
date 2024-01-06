@@ -1,15 +1,14 @@
 using Impostor.Api.Innersloth.Maps;
 
-namespace Impostor.Api.Events.Player
+namespace Impostor.Api.Events.Player;
+
+/// <summary>
+///     Called whenever a player exits a vent.
+/// </summary>
+public interface IPlayerExitVentEvent : IPlayerEvent
 {
     /// <summary>
-    ///     Called whenever a player exits a vent.
+    ///     Gets the exited vent.
     /// </summary>
-    public interface IPlayerExitVentEvent : IPlayerEvent
-    {
-        /// <summary>
-        ///     Gets the exited vent.
-        /// </summary>
-        public VentData Vent { get; }
-    }
+    public VentData Vent { get; }
 }

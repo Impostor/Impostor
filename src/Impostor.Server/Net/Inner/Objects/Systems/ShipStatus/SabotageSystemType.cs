@@ -1,26 +1,25 @@
 ﻿using System;
 
-namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
+namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
+
+public class SabotageSystemType : ISystemType
 {
-    public class SabotageSystemType : ISystemType
+    private readonly IActivatable[] _specials;
+
+    public SabotageSystemType(IActivatable[] specials)
     {
-        private readonly IActivatable[] _specials;
+        _specials = specials;
+    }
 
-        public SabotageSystemType(IActivatable[] specials)
-        {
-            _specials = specials;
-        }
+    public float Timer { get; set; }
 
-        public float Timer { get; set; }
+    public void Serialize(IMessageWriter writer, bool initialState)
+    {
+        throw new NotImplementedException();
+    }
 
-        public void Serialize(IMessageWriter writer, bool initialState)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Deserialize(IMessageReader reader, bool initialState)
-        {
-            Timer = reader.ReadSingle();
-        }
+    public void Deserialize(IMessageReader reader, bool initialState)
+    {
+        Timer = reader.ReadSingle();
     }
 }

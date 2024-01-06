@@ -1,12 +1,11 @@
 ﻿using Impostor.Api.Games;
 
-namespace Impostor.Server.Net
+namespace Impostor.Server.Net;
+
+public class GameCodeFactory : IGameCodeFactory
 {
-    public class GameCodeFactory : IGameCodeFactory
+    public GameCode Create()
     {
-        public GameCode Create()
-        {
-            return GameCode.Create();
-        }
+        return GameCode.Create();
     }
 }

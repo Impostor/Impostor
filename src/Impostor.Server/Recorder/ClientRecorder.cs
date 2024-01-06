@@ -9,80 +9,83 @@ using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Impostor.Server.Recorder
+namespace Impostor.Server.Recorder;
+
+internal class ClientRecorder : Client
 {
-    internal class ClientRecorder : Client
+    private readonly PacketRecorder _recorder;
+    private bool _createdGame;
+    private bool _isFirst;
+    private bool _recordAfter;
+
+    public ClientRecorder(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions,
+        ClientManager clientManager, ICustomMessageManager<ICustomRootMessage> customMessageManager,
+        GameManager gameManager, string name, GameVersion gameVersion, Language language, QuickChatModes chatMode,
+        PlatformSpecificData platformSpecificData, HazelConnection connection, PacketRecorder recorder)
+        : base(logger, antiCheatOptions, clientManager, gameManager, customMessageManager, name, gameVersion, language,
+            chatMode, platformSpecificData, connection)
     {
-        private readonly PacketRecorder _recorder;
-        private bool _isFirst;
-        private bool _createdGame;
-        private bool _recordAfter;
+        _recorder = recorder;
+        _isFirst = true;
+        _createdGame = false;
+        _recordAfter = true;
+    }
 
-        public ClientRecorder(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, GameManager gameManager, string name, GameVersion gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, HazelConnection connection, PacketRecorder recorder)
-            : base(logger, antiCheatOptions, clientManager, gameManager, customMessageManager, name, gameVersion, language, chatMode, platformSpecificData, connection)
+    public override async ValueTask HandleMessageAsync(IMessageReader reader, MessageType messageType)
+    {
+        using var messageCopy = reader.Copy();
+
+        // Trigger connect event.
+        if (_isFirst)
         {
-            _recorder = recorder;
-            _isFirst = true;
+            _isFirst = false;
+
+            await _recorder.WriteConnectAsync(this);
+        }
+
+        // Check if we were in-game before handling the message.
+        var inGame = Player?.Game != null;
+
+        if (!_recordAfter)
+        {
+            // Trigger message event.
+            await _recorder.WriteMessageAsync(this, messageCopy, messageType);
+        }
+
+        // Handle the message.
+        await base.HandleMessageAsync(reader, messageType);
+
+        // Player created a game.
+        if (reader.Tag == MessageFlags.HostGame)
+        {
+            _createdGame = true;
+        }
+        else if (reader.Tag == MessageFlags.JoinGame && _createdGame)
+        {
             _createdGame = false;
-            _recordAfter = true;
+
+            // We created a game and are now in-game, store that event.
+            if (!inGame && Player?.Game != null)
+            {
+                await _recorder.WriteGameCreatedAsync(this, Player.Game.Code);
+            }
+
+            _recordAfter = false;
+
+            // Trigger message event.
+            await _recorder.WriteMessageAsync(this, messageCopy, messageType);
         }
 
-        public override async ValueTask HandleMessageAsync(IMessageReader reader, MessageType messageType)
+        if (_recordAfter)
         {
-            using var messageCopy = reader.Copy();
-
-            // Trigger connect event.
-            if (_isFirst)
-            {
-                _isFirst = false;
-
-                await _recorder.WriteConnectAsync(this);
-            }
-
-            // Check if we were in-game before handling the message.
-            var inGame = Player?.Game != null;
-
-            if (!_recordAfter)
-            {
-                // Trigger message event.
-                await _recorder.WriteMessageAsync(this, messageCopy, messageType);
-            }
-
-            // Handle the message.
-            await base.HandleMessageAsync(reader, messageType);
-
-            // Player created a game.
-            if (reader.Tag == MessageFlags.HostGame)
-            {
-                _createdGame = true;
-            }
-            else if (reader.Tag == MessageFlags.JoinGame && _createdGame)
-            {
-                _createdGame = false;
-
-                // We created a game and are now in-game, store that event.
-                if (!inGame && Player?.Game != null)
-                {
-                    await _recorder.WriteGameCreatedAsync(this, Player.Game.Code);
-                }
-
-                _recordAfter = false;
-
-                // Trigger message event.
-                await _recorder.WriteMessageAsync(this, messageCopy, messageType);
-            }
-
-            if (_recordAfter)
-            {
-                // Trigger message event.
-                await _recorder.WriteMessageAsync(this, messageCopy, messageType);
-            }
+            // Trigger message event.
+            await _recorder.WriteMessageAsync(this, messageCopy, messageType);
         }
+    }
 
-        public override async ValueTask HandleDisconnectAsync(string reason)
-        {
-            await _recorder.WriteDisconnectAsync(this, reason);
-            await base.HandleDisconnectAsync(reason);
-        }
+    public override async ValueTask HandleDisconnectAsync(string reason)
+    {
+        await _recorder.WriteDisconnectAsync(this, reason);
+        await base.HandleDisconnectAsync(reason);
     }
 }

@@ -1,6 +1,5 @@
-﻿namespace Impostor.Api.Events.Player
+﻿namespace Impostor.Api.Events.Player;
+
+public interface IPlayerSpawnedEvent : IPlayerEvent
 {
-    public interface IPlayerSpawnedEvent : IPlayerEvent
-    {
-    }
 }

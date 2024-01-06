@@ -13,27 +13,6 @@ public class NormalGameOptions : IGameOptions
         RoleOptions = new RoleOptionsCollection(version);
     }
 
-    /// <inheritdoc />
-    public byte Version { get; }
-
-    /// <inheritdoc />
-    public GameModes GameMode => GameModes.Normal;
-
-    /// <inheritdoc />
-    public byte MaxPlayers { get; set; } = 10;
-
-    /// <inheritdoc />
-    public GameKeywords Keywords { get; set; } = GameKeywords.English;
-
-    /// <inheritdoc />
-    public MapTypes Map { get; set; } = MapTypes.Skeld;
-
-    /// <inheritdoc />
-    public int NumImpostors { get; set; } = 1;
-
-    /// <inheritdoc />
-    public bool IsDefaults { get; set; } = true;
-
     /// <summary>
     ///     Gets or sets the Player speed modifier.
     /// </summary>
@@ -108,7 +87,8 @@ public class NormalGameOptions : IGameOptions
     ///     Gets or sets a value indicating whether players are able to see tasks being performed by other players.
     /// </summary>
     /// <remarks>
-    ///     By being set to true, tasks such as Empty Garbage, Submit Scan, Clear asteroids, Prime shields execution will be visible to other players.
+    ///     By being set to true, tasks such as Empty Garbage, Submit Scan, Clear asteroids, Prime shields execution will be
+    ///     visible to other players.
     /// </remarks>
     public bool VisualTasks { get; set; } = true;
 
@@ -123,6 +103,65 @@ public class NormalGameOptions : IGameOptions
     public TaskBarUpdate TaskBarUpdate { get; set; } = TaskBarUpdate.Always;
 
     public RoleOptionsCollection RoleOptions { get; set; }
+
+    /// <inheritdoc />
+    public byte Version { get; }
+
+    /// <inheritdoc />
+    public GameModes GameMode => GameModes.Normal;
+
+    /// <inheritdoc />
+    public byte MaxPlayers { get; set; } = 10;
+
+    /// <inheritdoc />
+    public GameKeywords Keywords { get; set; } = GameKeywords.English;
+
+    /// <inheritdoc />
+    public MapTypes Map { get; set; } = MapTypes.Skeld;
+
+    /// <inheritdoc />
+    public int NumImpostors { get; set; } = 1;
+
+    /// <inheritdoc />
+    public bool IsDefaults { get; set; } = true;
+
+    public void Serialize(IMessageWriter writer)
+    {
+        writer.Write(MaxPlayers);
+        writer.Write((uint)Keywords);
+        writer.Write((byte)Map);
+        writer.Write(PlayerSpeedMod);
+
+        writer.Write(CrewLightMod);
+        writer.Write(ImpostorLightMod);
+        writer.Write(KillCooldown);
+
+        writer.Write((byte)NumCommonTasks);
+        writer.Write((byte)NumLongTasks);
+        writer.Write((byte)NumShortTasks);
+
+        writer.Write(NumEmergencyMeetings);
+
+        writer.Write((byte)NumImpostors);
+        writer.Write((byte)KillDistance);
+        writer.Write(DiscussionTime);
+        writer.Write(VotingTime);
+
+        writer.Write(IsDefaults);
+
+        writer.Write((byte)EmergencyCooldown);
+        writer.Write(ConfirmImpostor);
+        writer.Write(VisualTasks);
+        writer.Write(AnonymousVotes);
+        writer.Write((byte)TaskBarUpdate);
+
+        RoleOptions.Serialize(writer);
+
+        if (Version > 7)
+        {
+            IGameOptions.ThrowUnknownVersion<NormalGameOptions>(Version);
+        }
+    }
 
     public static NormalGameOptions Deserialize(IMessageReader reader, byte version)
     {
@@ -162,44 +201,6 @@ public class NormalGameOptions : IGameOptions
         TaskBarUpdate = (TaskBarUpdate)reader.ReadByte();
 
         RoleOptions.Deserialize(reader);
-
-        if (Version > 7)
-        {
-            IGameOptions.ThrowUnknownVersion<NormalGameOptions>(Version);
-        }
-    }
-
-    public void Serialize(IMessageWriter writer)
-    {
-        writer.Write(MaxPlayers);
-        writer.Write((uint)Keywords);
-        writer.Write((byte)Map);
-        writer.Write(PlayerSpeedMod);
-
-        writer.Write(CrewLightMod);
-        writer.Write(ImpostorLightMod);
-        writer.Write(KillCooldown);
-
-        writer.Write((byte)NumCommonTasks);
-        writer.Write((byte)NumLongTasks);
-        writer.Write((byte)NumShortTasks);
-
-        writer.Write(NumEmergencyMeetings);
-
-        writer.Write((byte)NumImpostors);
-        writer.Write((byte)KillDistance);
-        writer.Write(DiscussionTime);
-        writer.Write(VotingTime);
-
-        writer.Write(IsDefaults);
-
-        writer.Write((byte)EmergencyCooldown);
-        writer.Write(ConfirmImpostor);
-        writer.Write(VisualTasks);
-        writer.Write(AnonymousVotes);
-        writer.Write((byte)TaskBarUpdate);
-
-        RoleOptions.Serialize(writer);
 
         if (Version > 7)
         {

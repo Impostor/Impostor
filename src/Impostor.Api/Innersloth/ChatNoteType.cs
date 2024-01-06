@@ -1,7 +1,6 @@
-﻿namespace Impostor.Api.Innersloth
+﻿namespace Impostor.Api.Innersloth;
+
+public enum ChatNoteType : byte
 {
-    public enum ChatNoteType : byte
-    {
-        DidVote = 0,
-    }
+    DidVote = 0,
 }

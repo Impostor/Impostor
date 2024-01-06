@@ -1,9 +1,8 @@
-﻿namespace Impostor.Api.Innersloth
+﻿namespace Impostor.Api.Innersloth;
+
+public enum TaskBarUpdate : byte
 {
-    public enum TaskBarUpdate : byte
-    {
-        Always = 0,
-        Meetings = 1,
-        Never = 2,
-    }
+    Always = 0,
+    Meetings = 1,
+    Never = 2,
 }

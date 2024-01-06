@@ -1,14 +1,13 @@
 ﻿using System.Threading.Tasks;
 using Impostor.Api.Events;
 
-namespace Impostor.Api.Plugins
+namespace Impostor.Api.Plugins;
+
+public interface IPlugin : IEventListener
 {
-    public interface IPlugin : IEventListener
-    {
-        ValueTask EnableAsync();
+    ValueTask EnableAsync();
 
-        ValueTask DisableAsync();
+    ValueTask DisableAsync();
 
-        ValueTask ReloadAsync();
-    }
+    ValueTask ReloadAsync();
 }

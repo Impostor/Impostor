@@ -15,28 +15,6 @@ public class LegacyGameOptionsData : IGameOptions
     }
 
     /// <summary>
-    ///     Gets or sets host's version of the game.
-    /// </summary>
-    public byte Version { get; set; }
-
-    public GameModes GameMode => GameModes.Normal;
-
-    /// <summary>
-    ///     Gets or sets the maximum amount of players for this lobby.
-    /// </summary>
-    public byte MaxPlayers { get; set; } = 10;
-
-    /// <summary>
-    ///     Gets or sets the language of the lobby as per <see cref="GameKeywords" /> enum.
-    /// </summary>
-    public GameKeywords Keywords { get; set; } = GameKeywords.English;
-
-    /// <summary>
-    ///     Gets or sets the Map selected for this lobby.
-    /// </summary>
-    public MapTypes Map { get; set; } = MapTypes.Skeld;
-
-    /// <summary>
     ///     Gets or sets the Player speed modifier.
     /// </summary>
     public float PlayerSpeedMod { get; set; } = 1f;
@@ -82,11 +60,6 @@ public class LegacyGameOptionsData : IGameOptions
     public int EmergencyCooldown { get; set; } = 15;
 
     /// <summary>
-    ///     Gets or sets the number of impostors for this lobby.
-    /// </summary>
-    public int NumImpostors { get; set; } = 1;
-
-    /// <summary>
     ///     Gets or sets a value indicating whether ghosts (dead crew members) can do tasks.
     /// </summary>
     public bool GhostsDoTasks { get; set; } = true;
@@ -115,7 +88,8 @@ public class LegacyGameOptionsData : IGameOptions
     ///     Gets or sets a value indicating whether players are able to see tasks being performed by other players.
     /// </summary>
     /// <remarks>
-    ///     By being set to true, tasks such as Empty Garbage, Submit Scan, Clear asteroids, Prime shields execution will be visible to other players.
+    ///     By being set to true, tasks such as Empty Garbage, Submit Scan, Clear asteroids, Prime shields execution will be
+    ///     visible to other players.
     /// </remarks>
     public bool VisualTasks { get; set; } = true;
 
@@ -132,12 +106,96 @@ public class LegacyGameOptionsData : IGameOptions
     /// <summary>
     ///     Gets or sets role options.
     /// </summary>
-    public LegacyRoleOptionsData RoleOptions { get; set; } = new LegacyRoleOptionsData();
+    public LegacyRoleOptionsData RoleOptions { get; set; } = new();
+
+    /// <summary>
+    ///     Gets or sets host's version of the game.
+    /// </summary>
+    public byte Version { get; set; }
+
+    public GameModes GameMode => GameModes.Normal;
+
+    /// <summary>
+    ///     Gets or sets the maximum amount of players for this lobby.
+    /// </summary>
+    public byte MaxPlayers { get; set; } = 10;
+
+    /// <summary>
+    ///     Gets or sets the language of the lobby as per <see cref="GameKeywords" /> enum.
+    /// </summary>
+    public GameKeywords Keywords { get; set; } = GameKeywords.English;
+
+    /// <summary>
+    ///     Gets or sets the Map selected for this lobby.
+    /// </summary>
+    public MapTypes Map { get; set; } = MapTypes.Skeld;
+
+    /// <summary>
+    ///     Gets or sets the number of impostors for this lobby.
+    /// </summary>
+    public int NumImpostors { get; set; } = 1;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the GameOptions are the default ones.
     /// </summary>
     public bool IsDefaults { get; set; } = true;
+
+    /// <summary>
+    ///     Serializes this instance of GameOptionsData object to a specified BinaryWriter.
+    /// </summary>
+    /// <param name="writer">The stream to write the message to.</param>
+    public void Serialize(IMessageWriter writer)
+    {
+        writer.Write(Version);
+        writer.Write(MaxPlayers);
+        writer.Write((uint)Keywords);
+        writer.Write((byte)Map);
+        writer.Write(PlayerSpeedMod);
+        writer.Write(CrewLightMod);
+        writer.Write(ImpostorLightMod);
+        writer.Write(KillCooldown);
+        writer.Write((byte)NumCommonTasks);
+        writer.Write((byte)NumLongTasks);
+        writer.Write((byte)NumShortTasks);
+        writer.Write(NumEmergencyMeetings);
+        writer.Write((byte)NumImpostors);
+        writer.Write((byte)KillDistance);
+        writer.Write((uint)DiscussionTime);
+        writer.Write((uint)VotingTime);
+        writer.Write(IsDefaults);
+
+        if (Version >= 2)
+        {
+            writer.Write((byte)EmergencyCooldown);
+        }
+
+        if (Version >= 3)
+        {
+            writer.Write(ConfirmImpostor);
+            writer.Write(VisualTasks);
+        }
+
+        if (Version >= 4)
+        {
+            writer.Write(AnonymousVotes);
+            writer.Write((byte)TaskBarUpdate);
+        }
+
+        if (Version >= 5)
+        {
+            RoleOptions.Serialize(writer);
+        }
+
+        if (Version >= 6)
+        {
+            // Nothing was changed in V6
+        }
+
+        if (Version > 6)
+        {
+            throw new ImpostorException($"Unknown {nameof(LegacyGameOptionsData)} version {Version}");
+        }
+    }
 
     public static LegacyGameOptionsData Deserialize(IMessageReader reader, byte version)
     {
@@ -201,63 +259,6 @@ public class LegacyGameOptionsData : IGameOptions
         if (Version > 6)
         {
             IGameOptions.ThrowUnknownVersion<LegacyGameOptionsData>(Version);
-        }
-    }
-
-    /// <summary>
-    ///     Serializes this instance of GameOptionsData object to a specified BinaryWriter.
-    /// </summary>
-    /// <param name="writer">The stream to write the message to.</param>
-    public void Serialize(IMessageWriter writer)
-    {
-        writer.Write((byte)Version);
-        writer.Write((byte)MaxPlayers);
-        writer.Write((uint)Keywords);
-        writer.Write((byte)Map);
-        writer.Write((float)PlayerSpeedMod);
-        writer.Write((float)CrewLightMod);
-        writer.Write((float)ImpostorLightMod);
-        writer.Write((float)KillCooldown);
-        writer.Write((byte)NumCommonTasks);
-        writer.Write((byte)NumLongTasks);
-        writer.Write((byte)NumShortTasks);
-        writer.Write((int)NumEmergencyMeetings);
-        writer.Write((byte)NumImpostors);
-        writer.Write((byte)KillDistance);
-        writer.Write((uint)DiscussionTime);
-        writer.Write((uint)VotingTime);
-        writer.Write((bool)IsDefaults);
-
-        if (Version >= 2)
-        {
-            writer.Write((byte)EmergencyCooldown);
-        }
-
-        if (Version >= 3)
-        {
-            writer.Write((bool)ConfirmImpostor);
-            writer.Write((bool)VisualTasks);
-        }
-
-        if (Version >= 4)
-        {
-            writer.Write((bool)AnonymousVotes);
-            writer.Write((byte)TaskBarUpdate);
-        }
-
-        if (Version >= 5)
-        {
-            RoleOptions.Serialize(writer);
-        }
-
-        if (Version >= 6)
-        {
-            // Nothing was changed in V6
-        }
-
-        if (Version > 6)
-        {
-            throw new ImpostorException($"Unknown {nameof(LegacyGameOptionsData)} version {Version}");
         }
     }
 }

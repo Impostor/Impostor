@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace Impostor.Server.Plugins
-{
-    public class PluginConfig
-    {
-        public List<string> Paths { get; set; } = new List<string>();
+namespace Impostor.Server.Plugins;
 
-        public List<string> LibraryPaths { get; set; } = new List<string>();
-    }
+public class PluginConfig
+{
+    public List<string> Paths { get; set; } = new();
+
+    public List<string> LibraryPaths { get; set; } = new();
 }

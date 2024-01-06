@@ -1,9 +1,8 @@
-﻿namespace Impostor.Api.Plugins
+﻿namespace Impostor.Api.Plugins;
+
+public enum DependencyType
 {
-    public enum DependencyType
-    {
-        HardDependency,
-        SoftDependency,
-        LoadBefore,
-    }
+    HardDependency,
+    SoftDependency,
+    LoadBefore,
 }

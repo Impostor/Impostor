@@ -12,7 +12,7 @@ public class RoleOptionsCollection
 
     public byte Version { get; }
 
-    public Dictionary<RoleTypes, RoleData> Roles { get; } = new Dictionary<RoleTypes, RoleData>();
+    public Dictionary<RoleTypes, RoleData> Roles { get; } = new();
 
     public void Deserialize(IMessageReader reader)
     {

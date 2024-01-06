@@ -19,115 +19,119 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Impostor.Server.Net.Manager
+namespace Impostor.Server.Net.Manager;
+
+internal class GameManager : IGameManager
 {
-    internal class GameManager : IGameManager
+    private readonly CompatibilityConfig _compatibilityConfig;
+    private readonly ICompatibilityManager _compatibilityManager;
+    private readonly IEventManager _eventManager;
+    private readonly IGameCodeFactory _gameCodeFactory;
+    private readonly ConcurrentDictionary<int, Game> _games;
+    private readonly ILogger<GameManager> _logger;
+    private readonly IPEndPoint _publicIp;
+    private readonly IServiceProvider _serviceProvider;
+
+    public GameManager(
+        ILogger<GameManager> logger,
+        IOptions<ServerConfig> config,
+        IServiceProvider serviceProvider,
+        IEventManager eventManager,
+        IGameCodeFactory gameCodeFactory,
+        IOptions<CompatibilityConfig> compatibilityConfig,
+        ICompatibilityManager compatibilityManager)
     {
-        private readonly ILogger<GameManager> _logger;
-        private readonly IPEndPoint _publicIp;
-        private readonly ConcurrentDictionary<int, Game> _games;
-        private readonly CompatibilityConfig _compatibilityConfig;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IEventManager _eventManager;
-        private readonly IGameCodeFactory _gameCodeFactory;
-        private readonly ICompatibilityManager _compatibilityManager;
+        _logger = logger;
+        _serviceProvider = serviceProvider;
+        _eventManager = eventManager;
+        _gameCodeFactory = gameCodeFactory;
+        _publicIp = new IPEndPoint(IPAddress.Parse(config.Value.ResolvePublicIp()), config.Value.PublicPort);
+        _games = new ConcurrentDictionary<int, Game>();
+        _compatibilityConfig = compatibilityConfig.Value;
+        _compatibilityManager = compatibilityManager;
+    }
 
-        public GameManager(
-            ILogger<GameManager> logger,
-            IOptions<ServerConfig> config,
-            IServiceProvider serviceProvider,
-            IEventManager eventManager,
-            IGameCodeFactory gameCodeFactory,
-            IOptions<CompatibilityConfig> compatibilityConfig,
-            ICompatibilityManager compatibilityManager)
+    IEnumerable<IGame> IGameManager.Games => _games.Select(kv => kv.Value);
+
+    IGame? IGameManager.Find(GameCode code)
+    {
+        return Find(code);
+    }
+
+    public ValueTask<IGame?> CreateAsync(IGameOptions options, GameFilterOptions filterOptions)
+    {
+        return CreateAsync(null, options, filterOptions);
+    }
+
+    public Game? Find(GameCode code)
+    {
+        _games.TryGetValue(code, out var game);
+        return game;
+    }
+
+    public async ValueTask RemoveAsync(GameCode gameCode)
+    {
+        if (_games.TryGetValue(gameCode, out var game) && game.PlayerCount > 0)
         {
-            _logger = logger;
-            _serviceProvider = serviceProvider;
-            _eventManager = eventManager;
-            _gameCodeFactory = gameCodeFactory;
-            _publicIp = new IPEndPoint(IPAddress.Parse(config.Value.ResolvePublicIp()), config.Value.PublicPort);
-            _games = new ConcurrentDictionary<int, Game>();
-            _compatibilityConfig = compatibilityConfig.Value;
-            _compatibilityManager = compatibilityManager;
-        }
-
-        IEnumerable<IGame> IGameManager.Games => _games.Select(kv => kv.Value);
-
-        IGame? IGameManager.Find(GameCode code) => Find(code);
-
-        public Game? Find(GameCode code)
-        {
-            _games.TryGetValue(code, out var game);
-            return game;
-        }
-
-        public async ValueTask RemoveAsync(GameCode gameCode)
-        {
-            if (_games.TryGetValue(gameCode, out var game) && game.PlayerCount > 0)
+            foreach (var player in game.Players)
             {
-                foreach (var player in game.Players)
-                {
-                    await player.KickAsync();
-                }
-
-                return;
+                await player.KickAsync();
             }
 
-            if (!_games.TryRemove(gameCode, out game))
-            {
-                return;
-            }
-
-            _logger.LogDebug("Remove game with code {0} ({1}).", GameCodeParser.IntToGameName(gameCode), gameCode);
-
-            await _eventManager.CallAsync(new GameDestroyedEvent(game));
+            return;
         }
 
-        public async ValueTask<IGame?> CreateAsync(IClient? owner, IGameOptions options, GameFilterOptions filterOptions)
+        if (!_games.TryRemove(gameCode, out game))
         {
-            var @event = new GameCreationEvent(this, owner);
-            await _eventManager.CallAsync(@event);
-
-            if (@event.IsCancelled)
-            {
-                return null;
-            }
-
-            var (success, game) = await TryCreateAsync(options, filterOptions, @event.GameCode);
-
-            for (var i = 0; i < 10 && !success; i++)
-            {
-                (success, game) = await TryCreateAsync(options, filterOptions);
-            }
-
-            if (!success || game == null)
-            {
-                throw new ImpostorException("Could not create new game"); // TODO: Fix generic exception.
-            }
-
-            return game;
+            return;
         }
 
-        public ValueTask<IGame?> CreateAsync(IGameOptions options, GameFilterOptions filterOptions)
+        _logger.LogDebug("Remove game with code {0} ({1}).", GameCodeParser.IntToGameName(gameCode), gameCode);
+
+        await _eventManager.CallAsync(new GameDestroyedEvent(game));
+    }
+
+    public async ValueTask<IGame?> CreateAsync(IClient? owner, IGameOptions options, GameFilterOptions filterOptions)
+    {
+        var @event = new GameCreationEvent(this, owner);
+        await _eventManager.CallAsync(@event);
+
+        if (@event.IsCancelled)
         {
-            return CreateAsync(null, options, filterOptions);
+            return null;
         }
 
-        private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(IGameOptions options, GameFilterOptions filterOptions, GameCode? desiredGameCode = null)
+        var (success, game) = await TryCreateAsync(options, filterOptions, @event.GameCode);
+
+        for (var i = 0; i < 10 && !success; i++)
         {
-            var gameCode = desiredGameCode ?? _gameCodeFactory.Create();
-            var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options, filterOptions);
-
-            if (!_games.TryAdd(gameCode, game))
-            {
-                return (false, null);
-            }
-
-            _logger.LogDebug("Created game with code {0}.", game.Code);
-
-            await _eventManager.CallAsync(new GameCreatedEvent(game));
-
-            return (true, game);
+            (success, game) = await TryCreateAsync(options, filterOptions);
         }
+
+        if (!success || game == null)
+        {
+            throw new ImpostorException("Could not create new game"); // TODO: Fix generic exception.
+        }
+
+        return game;
+    }
+
+    private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(IGameOptions options,
+        GameFilterOptions filterOptions, GameCode? desiredGameCode = null)
+    {
+        var gameCode = desiredGameCode ?? _gameCodeFactory.Create();
+        var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options,
+            filterOptions);
+
+        if (!_games.TryAdd(gameCode, game))
+        {
+            return (false, null);
+        }
+
+        _logger.LogDebug("Created game with code {0}.", game.Code);
+
+        await _eventManager.CallAsync(new GameCreatedEvent(game));
+
+        return (true, game);
     }
 }

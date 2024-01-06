@@ -15,18 +15,18 @@ using Microsoft.Extensions.Options;
 namespace Impostor.Server.Http;
 
 /// <summary>
-/// This controller has method to get a list of public games, join by game and create new games.
+///     This controller has method to get a list of public games, join by game and create new games.
 /// </summary>
 [Route("/api/games")]
 [ApiController]
 public sealed class GamesController : ControllerBase
 {
     private readonly IGameManager _gameManager;
-    private readonly ListingManager _listingManager;
     private readonly HostServer _hostServer;
+    private readonly ListingManager _listingManager;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="GamesController"/> class.
+    ///     Initializes a new instance of the <see cref="GamesController" /> class.
     /// </summary>
     /// <param name="gameManager">GameManager containing a list of games.</param>
     /// <param name="listingManager">ListingManager responsible for filtering.</param>
@@ -40,7 +40,7 @@ public sealed class GamesController : ControllerBase
     }
 
     /// <summary>
-    /// Get a list of active games.
+    ///     Get a list of active games.
     /// </summary>
     /// <param name="mapId">Maps that are requested.</param>
     /// <param name="lang">Preferred chat language.</param>
@@ -48,14 +48,16 @@ public sealed class GamesController : ControllerBase
     /// <param name="authorization">Authorization header containing the matchmaking token.</param>
     /// <returns>An array of game listings.</returns>
     [HttpGet]
-    public IActionResult Index(int mapId, GameKeywords lang, int numImpostors, [FromHeader] AuthenticationHeaderValue authorization)
+    public IActionResult Index(int mapId, GameKeywords lang, int numImpostors,
+        [FromHeader] AuthenticationHeaderValue authorization)
     {
         if (authorization.Scheme != "Bearer" || authorization.Parameter == null)
         {
             return BadRequest();
         }
 
-        var token = JsonSerializer.Deserialize<TokenController.Token>(Convert.FromBase64String(authorization.Parameter));
+        var token =
+            JsonSerializer.Deserialize<TokenController.Token>(Convert.FromBase64String(authorization.Parameter));
         if (token == null)
         {
             return BadRequest();
@@ -68,7 +70,7 @@ public sealed class GamesController : ControllerBase
     }
 
     /// <summary>
-    /// Get the address a certain game is hosted at.
+    ///     Get the address a certain game is hosted at.
     /// </summary>
     /// <param name="gameId">The id of the game that should be retrieved.</param>
     /// <returns>The server this game is hosted on.</returns>
@@ -88,7 +90,7 @@ public sealed class GamesController : ControllerBase
     }
 
     /// <summary>
-    /// Get the address to host a new game on.
+    ///     Get the address to host a new game on.
     /// </summary>
     /// <returns>The address of this server.</returns>
     [HttpPut]
@@ -106,11 +108,9 @@ public sealed class GamesController : ControllerBase
 
     private class HostServer
     {
-        [JsonPropertyName("Ip")]
-        public required long Ip { get; init; }
+        [JsonPropertyName("Ip")] public required long Ip { get; init; }
 
-        [JsonPropertyName("Port")]
-        public required ushort Port { get; init; }
+        [JsonPropertyName("Port")] public required ushort Port { get; init; }
 
         public static HostServer From(IPAddress ipAddress, ushort port)
         {
@@ -135,8 +135,7 @@ public sealed class GamesController : ControllerBase
             Errors = new[] { error };
         }
 
-        [JsonPropertyName("Errors")]
-        public required MatchmakerError[] Errors { get; init; }
+        [JsonPropertyName("Errors")] public required MatchmakerError[] Errors { get; init; }
     }
 
     private class MatchmakerError
@@ -147,47 +146,34 @@ public sealed class GamesController : ControllerBase
             Reason = reason;
         }
 
-        [JsonPropertyName("Reason")]
-        public required DisconnectReason Reason { get; init; }
+        [JsonPropertyName("Reason")] public required DisconnectReason Reason { get; init; }
     }
 
     private class GameListing
     {
-        [JsonPropertyName("IP")]
-        public required uint Ip { get; init; }
+        [JsonPropertyName("IP")] public required uint Ip { get; init; }
 
-        [JsonPropertyName("Port")]
-        public required ushort Port { get; init; }
+        [JsonPropertyName("Port")] public required ushort Port { get; init; }
 
-        [JsonPropertyName("GameId")]
-        public required int GameId { get; init; }
+        [JsonPropertyName("GameId")] public required int GameId { get; init; }
 
-        [JsonPropertyName("PlayerCount")]
-        public required int PlayerCount { get; init; }
+        [JsonPropertyName("PlayerCount")] public required int PlayerCount { get; init; }
 
-        [JsonPropertyName("HostName")]
-        public required string HostName { get; init; }
+        [JsonPropertyName("HostName")] public required string HostName { get; init; }
 
-        [JsonPropertyName("HostPlatformName")]
-        public required string HostPlatformName { get; init; }
+        [JsonPropertyName("HostPlatformName")] public required string HostPlatformName { get; init; }
 
-        [JsonPropertyName("Platform")]
-        public required Platforms Platform { get; init; }
+        [JsonPropertyName("Platform")] public required Platforms Platform { get; init; }
 
-        [JsonPropertyName("Age")]
-        public required int Age { get; init; }
+        [JsonPropertyName("Age")] public required int Age { get; init; }
 
-        [JsonPropertyName("MaxPlayers")]
-        public required int MaxPlayers { get; init; }
+        [JsonPropertyName("MaxPlayers")] public required int MaxPlayers { get; init; }
 
-        [JsonPropertyName("NumImpostors")]
-        public required int NumImpostors { get; init; }
+        [JsonPropertyName("NumImpostors")] public required int NumImpostors { get; init; }
 
-        [JsonPropertyName("MapId")]
-        public required MapTypes MapId { get; init; }
+        [JsonPropertyName("MapId")] public required MapTypes MapId { get; init; }
 
-        [JsonPropertyName("Language")]
-        public required GameKeywords Language { get; init; }
+        [JsonPropertyName("Language")] public required GameKeywords Language { get; init; }
 
         public static GameListing From(IGame game)
         {

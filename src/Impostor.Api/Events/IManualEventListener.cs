@@ -1,13 +1,12 @@
 ﻿using System.Threading.Tasks;
 
-namespace Impostor.Api.Events
+namespace Impostor.Api.Events;
+
+public interface IManualEventListener : IEventListener
 {
-    public interface IManualEventListener : IEventListener
-    {
-        EventPriority Priority { get; set; }
+    EventPriority Priority { get; set; }
 
-        public bool CanExecute<T>();
+    public bool CanExecute<T>();
 
-        public ValueTask Execute(IEvent @event);
-    }
+    public ValueTask Execute(IEvent @event);
 }

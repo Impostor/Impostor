@@ -1,29 +1,28 @@
 ﻿using System.Collections.Generic;
 
-namespace Impostor.Server.Net.Inner
+namespace Impostor.Server.Net.Inner;
+
+internal class GameObject
 {
-    internal class GameObject
+    public GameObject()
     {
-        public GameObject()
+        Components = new List<object>();
+    }
+
+    protected List<object> Components { get; }
+
+    public List<T> GetComponentsInChildren<T>()
+    {
+        var result = new List<T>();
+
+        foreach (var component in Components)
         {
-            Components = new List<object>();
-        }
-
-        protected List<object> Components { get; }
-
-        public List<T> GetComponentsInChildren<T>()
-        {
-            var result = new List<T>();
-
-            foreach (var component in Components)
+            if (component is T c)
             {
-                if (component is T c)
-                {
-                    result.Add(c);
-                }
+                result.Add(c);
             }
-
-            return result;
         }
+
+        return result;
     }
 }

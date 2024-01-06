@@ -1,9 +1,8 @@
 ﻿using Impostor.Api.Net.Inner.Objects;
 
-namespace Impostor.Api.Events.Meeting
+namespace Impostor.Api.Events.Meeting;
+
+public interface IMeetingEvent : IGameEvent
 {
-    public interface IMeetingEvent : IGameEvent
-    {
-        IInnerMeetingHud MeetingHud { get; }
-    }
+    IInnerMeetingHud MeetingHud { get; }
 }

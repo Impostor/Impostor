@@ -2,14 +2,13 @@
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 
-namespace Impostor.Server.Events.Register
+namespace Impostor.Server.Events.Register;
+
+internal interface IRegisteredEventListener
 {
-    internal interface IRegisteredEventListener
-    {
-        Type EventType { get; }
+    Type EventType { get; }
 
-        EventPriority Priority { get; }
+    EventPriority Priority { get; }
 
-        ValueTask InvokeAsync(object? eventHandler, object @event, IServiceProvider provider);
-    }
+    ValueTask InvokeAsync(object? eventHandler, object @event, IServiceProvider provider);
 }

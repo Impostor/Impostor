@@ -9,11 +9,17 @@ public class ScientistRoleOptions : IRoleOptions
 
     public byte Version { get; }
 
-    public RoleTypes Type => RoleTypes.Scientist;
-
     public byte Cooldown { get; set; } = 15;
 
     public byte BatteryCharge { get; set; } = 5;
+
+    public RoleTypes Type => RoleTypes.Scientist;
+
+    public void Serialize(IMessageWriter writer)
+    {
+        writer.Write(Cooldown);
+        writer.Write(BatteryCharge);
+    }
 
     public static ScientistRoleOptions Deserialize(IMessageReader reader, byte version)
     {
@@ -23,11 +29,5 @@ public class ScientistRoleOptions : IRoleOptions
         options.BatteryCharge = reader.ReadByte();
 
         return options;
-    }
-
-    public void Serialize(IMessageWriter writer)
-    {
-        writer.Write(Cooldown);
-        writer.Write(BatteryCharge);
     }
 }

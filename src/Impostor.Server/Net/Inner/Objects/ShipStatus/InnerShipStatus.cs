@@ -15,118 +15,121 @@ using Impostor.Server.Net.Inner.Objects.Systems;
 using Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 using Impostor.Server.Net.State;
 
-namespace Impostor.Server.Net.Inner.Objects.ShipStatus
+namespace Impostor.Server.Net.Inner.Objects.ShipStatus;
+
+internal abstract class InnerShipStatus : InnerNetObject, IInnerShipStatus
 {
-    internal abstract class InnerShipStatus : InnerNetObject, IInnerShipStatus
+    private readonly Dictionary<SystemTypes, ISystemType> _systems = new();
+
+    protected InnerShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, MapTypes mapType) :
+        base(customMessageManager, game)
     {
-        private readonly Dictionary<SystemTypes, ISystemType> _systems = new Dictionary<SystemTypes, ISystemType>();
+        Components.Add(this);
 
-        protected InnerShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, MapTypes mapType) : base(customMessageManager, game)
+        MapType = mapType;
+        Data = MapData.Maps[mapType];
+        Doors = new Dictionary<int, bool>(Data.Doors.Count);
+    }
+
+    public MapTypes MapType { get; }
+
+    public MapData Data { get; }
+
+    public Dictionary<int, bool> Doors { get; }
+
+    internal override ValueTask OnSpawnAsync()
+    {
+        for (var i = 0; i < Doors.Count; i++)
         {
-            Components.Add(this);
-
-            MapType = mapType;
-            Data = MapData.Maps[mapType];
-            Doors = new Dictionary<int, bool>(Data.Doors.Count);
+            Doors.Add(i, false);
         }
 
-        public MapTypes MapType { get; }
+        AddSystems(_systems);
+        _systems.Add(SystemTypes.Sabotage, new SabotageSystemType(_systems.Values.OfType<IActivatable>().ToArray()));
 
-        public MapData Data { get; }
+        return base.OnSpawnAsync();
+    }
 
-        public Dictionary<int, bool> Doors { get; }
+    public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
+    {
+        throw new NotImplementedException();
+    }
 
-        internal override ValueTask OnSpawnAsync()
+    public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader,
+        bool initialState)
+    {
+        if (!await ValidateHost(CheatContext.Deserialize, sender) ||
+            !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
         {
-            for (var i = 0; i < Doors.Count; i++)
+            return;
+        }
+
+        while (reader.Position < reader.Length)
+        {
+            var messageReader = reader.ReadMessage();
+            var type = (SystemTypes)messageReader.Tag;
+            if (_systems.TryGetValue(type, out var value))
             {
-                Doors.Add(i, false);
+                value.Deserialize(messageReader, initialState);
             }
+        }
+    }
 
-            AddSystems(_systems);
-            _systems.Add(SystemTypes.Sabotage, new SabotageSystemType(_systems.Values.OfType<IActivatable>().ToArray()));
-
-            return base.OnSpawnAsync();
+    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
+        IMessageReader reader)
+    {
+        if (!await ValidateCmd(call, sender, target))
+        {
+            return false;
         }
 
-        public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
+        switch (call)
         {
-            throw new NotImplementedException();
-        }
-
-        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
-        {
-            if (!await ValidateHost(CheatContext.Deserialize, sender) || !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
+            case RpcCalls.CloseDoorsOfType:
             {
-                return;
-            }
-
-            while (reader.Position < reader.Length)
-            {
-                var messageReader = reader.ReadMessage();
-                var type = (SystemTypes)messageReader.Tag;
-                if (_systems.TryGetValue(type, out var value))
+                if (!await ValidateImpostor(call, sender, sender.Character!.PlayerInfo))
                 {
-                    value.Deserialize(messageReader, initialState);
-                }
-            }
-        }
-
-        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
-        {
-            if (!await ValidateCmd(call, sender, target))
-            {
-                return false;
-            }
-
-            switch (call)
-            {
-                case RpcCalls.CloseDoorsOfType:
-                {
-                    if (!await ValidateImpostor(call, sender, sender.Character!.PlayerInfo))
-                    {
-                        return false;
-                    }
-
-                    Rpc27CloseDoorsOfType.Deserialize(reader, out var systemType);
-                    break;
+                    return false;
                 }
 
-                case RpcCalls.UpdateSystem:
-                {
-                    // TODO: properly deserialize this RPC
-                    // Rpc35UpdateSystem.Deserialize(reader, Game, out var systemType, out var playerControl, out var sequenceId, out var state, out var ventId);
-                    break;
-                }
-
-                default:
-                    return await base.HandleRpcAsync(sender, target, call, reader);
+                Rpc27CloseDoorsOfType.Deserialize(reader, out var systemType);
+                break;
             }
 
-            return true;
+            case RpcCalls.UpdateSystem:
+            {
+                // TODO: properly deserialize this RPC
+                // Rpc35UpdateSystem.Deserialize(reader, Game, out var systemType, out var playerControl, out var sequenceId, out var state, out var ventId);
+                break;
+            }
+
+            default:
+                return await base.HandleRpcAsync(sender, target, call, reader);
         }
 
-        public virtual Vector2 GetSpawnLocation(InnerPlayerControl player, int numPlayers, bool initialSpawn)
-        {
-            var vector = new Vector2(0, 1);
-            vector = Rotate(vector, (player.PlayerId - 1) * (360f / numPlayers));
-            vector *= Data.SpawnRadius;
-            return (initialSpawn ? Data.InitialSpawnCenter : Data.MeetingSpawnCenter) + vector + new Vector2(0f, 0.3636f);
-        }
+        return true;
+    }
 
-        protected virtual void AddSystems(Dictionary<SystemTypes, ISystemType> systems)
-        {
-            systems.Add(SystemTypes.Electrical, new SwitchSystem());
-            systems.Add(SystemTypes.MedBay, new MedScanSystem());
-        }
+    public virtual Vector2 GetSpawnLocation(InnerPlayerControl player, int numPlayers, bool initialSpawn)
+    {
+        var vector = new Vector2(0, 1);
+        vector = Rotate(vector, (player.PlayerId - 1) * (360f / numPlayers));
+        vector *= Data.SpawnRadius;
+        return (initialSpawn ? Data.InitialSpawnCenter : Data.MeetingSpawnCenter) + vector + new Vector2(0f, 0.3636f);
+    }
 
-        private static Vector2 Rotate(Vector2 self, float degrees)
-        {
-            var f = 0.017453292f * degrees;
-            var cos = MathF.Cos(f);
-            var sin = MathF.Sin(f);
+    protected virtual void AddSystems(Dictionary<SystemTypes, ISystemType> systems)
+    {
+        systems.Add(SystemTypes.Electrical, new SwitchSystem());
+        systems.Add(SystemTypes.MedBay, new MedScanSystem());
+    }
 
-            return new Vector2((self.X * cos) - (sin * self.Y), (self.X * sin) + (cos * self.Y));
-        }
+    private static Vector2 Rotate(Vector2 self, float degrees)
+    {
+        var f = 0.017453292f * degrees;
+        var cos = MathF.Cos(f);
+        var sin = MathF.Sin(f);
+
+        return new Vector2(self.X * cos - sin * self.Y, self.X * sin + cos * self.Y);
     }
 }

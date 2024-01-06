@@ -1,20 +1,19 @@
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth.Maps;
 
-namespace Impostor.Api.Net.Inner.Objects
+namespace Impostor.Api.Net.Inner.Objects;
+
+public interface ITaskInfo
 {
-    public interface ITaskInfo
-    {
-        uint Id { get; }
+    uint Id { get; }
 
-        TaskData? Task { get; }
+    TaskData? Task { get; }
 
-        bool Complete { get; }
+    bool Complete { get; }
 
-        /// <summary>
-        ///     Sets the task as complete.
-        /// </summary>
-        /// <returns>Task that must be awaited.</returns>
-        ValueTask CompleteAsync();
-    }
+    /// <summary>
+    ///     Sets the task as complete.
+    /// </summary>
+    /// <returns>Task that must be awaited.</returns>
+    ValueTask CompleteAsync();
 }

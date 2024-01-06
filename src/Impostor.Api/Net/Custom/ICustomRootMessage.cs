@@ -1,9 +1,8 @@
 using System.Threading.Tasks;
 
-namespace Impostor.Api.Net.Custom
+namespace Impostor.Api.Net.Custom;
+
+public interface ICustomRootMessage : ICustomMessage
 {
-    public interface ICustomRootMessage : ICustomMessage
-    {
-        ValueTask HandleMessageAsync(IClient client, IMessageReader reader, MessageType messageType);
-    }
+    ValueTask HandleMessageAsync(IClient client, IMessageReader reader, MessageType messageType);
 }

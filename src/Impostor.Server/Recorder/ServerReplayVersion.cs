@@ -1,18 +1,17 @@
-namespace Impostor.Server.Recorder
+namespace Impostor.Server.Recorder;
+
+/// <summary>
+///     Version of the server replay data format.
+/// </summary>
+public enum ServerReplayVersion
 {
     /// <summary>
-    ///     Version of the server replay data format.
+    ///     Initial version.
     /// </summary>
-    public enum ServerReplayVersion
-    {
-        /// <summary>
-        ///     Initial version.
-        /// </summary>
-        Initial = 1,
+    Initial = 1,
 
-        /// <summary>
-        ///     Latest version.
-        /// </summary>
-        Latest = Initial,
-    }
+    /// <summary>
+    ///     Latest version.
+    /// </summary>
+    Latest = Initial,
 }

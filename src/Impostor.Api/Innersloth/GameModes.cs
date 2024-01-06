@@ -1,9 +1,8 @@
-namespace Impostor.Api.Innersloth
+namespace Impostor.Api.Innersloth;
+
+public enum GameModes : byte
 {
-    public enum GameModes : byte
-    {
-        None,
-        Normal,
-        HideNSeek,
-    }
+    None,
+    Normal,
+    HideNSeek,
 }

@@ -1,22 +1,21 @@
 ﻿using System.Threading.Tasks;
 
-namespace Impostor.Api.Plugins
+namespace Impostor.Api.Plugins;
+
+public class PluginBase : IPlugin
 {
-    public class PluginBase : IPlugin
+    public virtual ValueTask EnableAsync()
     {
-        public virtual ValueTask EnableAsync()
-        {
-            return default;
-        }
+        return default;
+    }
 
-        public virtual ValueTask DisableAsync()
-        {
-            return default;
-        }
+    public virtual ValueTask DisableAsync()
+    {
+        return default;
+    }
 
-        public virtual ValueTask ReloadAsync()
-        {
-            return default;
-        }
+    public virtual ValueTask ReloadAsync()
+    {
+        return default;
     }
 }

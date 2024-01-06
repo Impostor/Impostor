@@ -9,13 +9,20 @@ public class GuardianAngelRoleOptions : IRoleOptions
 
     public byte Version { get; }
 
-    public RoleTypes Type => RoleTypes.GuardianAngel;
-
     public byte Cooldown { get; set; } = 60;
 
     public byte ProtectionDurationSeconds { get; set; } = 10;
 
     public bool ImpostorsCanSeeProtect { get; set; }
+
+    public RoleTypes Type => RoleTypes.GuardianAngel;
+
+    public void Serialize(IMessageWriter writer)
+    {
+        writer.Write(Cooldown);
+        writer.Write(ProtectionDurationSeconds);
+        writer.Write(ImpostorsCanSeeProtect);
+    }
 
     public static GuardianAngelRoleOptions Deserialize(IMessageReader reader, byte version)
     {
@@ -26,12 +33,5 @@ public class GuardianAngelRoleOptions : IRoleOptions
         options.ImpostorsCanSeeProtect = reader.ReadBoolean();
 
         return options;
-    }
-
-    public void Serialize(IMessageWriter writer)
-    {
-        writer.Write(Cooldown);
-        writer.Write(ProtectionDurationSeconds);
-        writer.Write(ImpostorsCanSeeProtect);
     }
 }

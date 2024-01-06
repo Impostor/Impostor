@@ -45,7 +45,8 @@ public interface IGameOptions
     {
         if (version < GameOptionsFactory.ModularOptionsDataVersion)
         {
-            throw new ImpostorException($"{typeof(TCaller).Name} didn't exist before version 7, did you mean {nameof(LegacyGameOptionsData)}?");
+            throw new ImpostorException(
+                $"{typeof(TCaller).Name} didn't exist before version 7, did you mean {nameof(LegacyGameOptionsData)}?");
         }
     }
 

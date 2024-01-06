@@ -1,9 +1,8 @@
 using System;
 
-namespace Impostor.Api.Utils
+namespace Impostor.Api.Utils;
+
+public interface IDateTimeProvider
 {
-    public interface IDateTimeProvider
-    {
-        DateTimeOffset UtcNow { get; }
-    }
+    DateTimeOffset UtcNow { get; }
 }

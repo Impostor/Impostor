@@ -1,10 +1,9 @@
-namespace Impostor.Api.Innersloth.Customization
+namespace Impostor.Api.Innersloth.Customization;
+
+public enum PlayerOutfitType
 {
-    public enum PlayerOutfitType
-    {
-        Default,
-        Shapeshifted,
-        HorseWrangler,
-        MushroomMixup,
-    }
+    Default,
+    Shapeshifted,
+    HorseWrangler,
+    MushroomMixup,
 }

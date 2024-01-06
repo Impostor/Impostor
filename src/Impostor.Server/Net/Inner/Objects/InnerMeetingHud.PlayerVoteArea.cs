@@ -1,83 +1,81 @@
-﻿using Impostor.Api.Events.Player;
-using Impostor.Api.Net.Inner.Objects;
+﻿using Impostor.Api.Net.Inner.Objects;
 using TVoteType = Impostor.Api.Events.Player.VoteType;
 
-namespace Impostor.Server.Net.Inner.Objects
+namespace Impostor.Server.Net.Inner.Objects;
+
+internal partial class InnerMeetingHud
 {
-    internal partial class InnerMeetingHud
+    public class PlayerVoteArea : IInnerMeetingHud.IPlayerVoteArea
     {
-        public class PlayerVoteArea : IInnerMeetingHud.IPlayerVoteArea
+        private byte _votedForId;
+
+        public PlayerVoteArea(InnerMeetingHud parent, InnerPlayerInfo targetPlayer, bool isDead)
         {
-            private byte _votedForId;
+            Parent = parent;
+            TargetPlayer = targetPlayer;
 
-            public PlayerVoteArea(InnerMeetingHud parent, InnerPlayerInfo targetPlayer, bool isDead)
+            VotedForId = (byte)(isDead ? TVoteType.Dead : TVoteType.HasNotVoted);
+        }
+
+        public InnerMeetingHud Parent { get; }
+
+        public InnerPlayerInfo TargetPlayer { get; }
+
+        public byte VotedForId
+        {
+            get => _votedForId;
+
+            private set
             {
-                Parent = parent;
-                TargetPlayer = targetPlayer;
+                _votedForId = value;
 
-                VotedForId = (byte)(isDead ? TVoteType.Dead : TVoteType.HasNotVoted);
-            }
-
-            public InnerMeetingHud Parent { get; }
-
-            public InnerPlayerInfo TargetPlayer { get; }
-
-            public bool IsDead => VoteType == TVoteType.Dead;
-
-            public bool DidVote => VoteType != TVoteType.HasNotVoted;
-
-            public bool DidReport { get; private set; }
-
-            public byte VotedForId
-            {
-                get => _votedForId;
-
-                private set
+                switch ((TVoteType)value)
                 {
-                    _votedForId = value;
+                    case TVoteType.Dead:
+                        VoteType = TVoteType.Dead;
+                        break;
 
-                    switch ((VoteType)value)
-                    {
-                        case TVoteType.Dead:
-                            VoteType = TVoteType.Dead;
-                            break;
+                    case TVoteType.HasNotVoted:
+                    case TVoteType.Missed:
+                    case TVoteType.Skipped:
+                        VoteType = (TVoteType)value;
+                        break;
 
-                        case TVoteType.HasNotVoted:
-                        case TVoteType.Missed:
-                        case TVoteType.Skipped:
-                            VoteType = (VoteType)value;
-                            break;
-
-                        default:
-                            VoteType = TVoteType.Player;
-                            VotedFor = Parent.Game.GameNet.GameData!.GetPlayerById(value)?.Controller;
-                            break;
-                    }
+                    default:
+                        VoteType = TVoteType.Player;
+                        VotedFor = Parent.Game.GameNet.GameData!.GetPlayerById(value)?.Controller;
+                        break;
                 }
             }
+        }
 
-            public VoteType? VoteType { get; private set; }
+        public bool IsDead => VoteType == TVoteType.Dead;
 
-            public IInnerPlayerControl? VotedFor { get; private set; }
+        public bool DidVote => VoteType != TVoteType.HasNotVoted;
 
-            IInnerPlayerInfo IInnerMeetingHud.IPlayerVoteArea.TargetPlayer => TargetPlayer;
+        public bool DidReport { get; private set; }
 
-            internal void Deserialize(IMessageReader reader, bool updateVote)
+        public TVoteType? VoteType { get; private set; }
+
+        public IInnerPlayerControl? VotedFor { get; private set; }
+
+        IInnerPlayerInfo IInnerMeetingHud.IPlayerVoteArea.TargetPlayer => TargetPlayer;
+
+        internal void Deserialize(IMessageReader reader, bool updateVote)
+        {
+            var votedForId = reader.ReadByte();
+
+            if (updateVote)
             {
-                var votedForId = reader.ReadByte();
-
-                if (updateVote)
-                {
-                    VotedForId = votedForId;
-                }
-
-                DidReport = reader.ReadBoolean();
+                VotedForId = votedForId;
             }
 
-            internal void SetVotedFor(byte votedFor)
-            {
-                VotedForId = votedFor;
-            }
+            DidReport = reader.ReadBoolean();
+        }
+
+        internal void SetVotedFor(byte votedFor)
+        {
+            VotedForId = votedFor;
         }
     }
 }

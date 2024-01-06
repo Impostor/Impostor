@@ -12,64 +12,65 @@ using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 
-namespace Impostor.Server.Net
+namespace Impostor.Server.Net;
+
+internal class Matchmaker
 {
-    internal class Matchmaker
+    private readonly ClientManager _clientManager;
+    private readonly ILogger<HazelConnection> _connectionLogger;
+    private readonly IEventManager _eventManager;
+    private readonly ObjectPool<MessageReader> _readerPool;
+    private UdpConnectionListener? _connection;
+
+    public Matchmaker(
+        IEventManager eventManager,
+        ClientManager clientManager,
+        ObjectPool<MessageReader> readerPool,
+        ILogger<HazelConnection> connectionLogger)
     {
-        private readonly IEventManager _eventManager;
-        private readonly ClientManager _clientManager;
-        private readonly ObjectPool<MessageReader> _readerPool;
-        private readonly ILogger<HazelConnection> _connectionLogger;
-        private UdpConnectionListener? _connection;
+        _eventManager = eventManager;
+        _clientManager = clientManager;
+        _readerPool = readerPool;
+        _connectionLogger = connectionLogger;
+    }
 
-        public Matchmaker(
-            IEventManager eventManager,
-            ClientManager clientManager,
-            ObjectPool<MessageReader> readerPool,
-            ILogger<HazelConnection> connectionLogger)
+    public async ValueTask StartAsync(IPEndPoint ipEndPoint)
+    {
+        var mode = ipEndPoint.AddressFamily switch
         {
-            _eventManager = eventManager;
-            _clientManager = clientManager;
-            _readerPool = readerPool;
-            _connectionLogger = connectionLogger;
-        }
+            AddressFamily.InterNetwork => IPMode.IPv4,
+            AddressFamily.InterNetworkV6 => IPMode.IPv6,
+            _ => throw new InvalidOperationException(),
+        };
 
-        public async ValueTask StartAsync(IPEndPoint ipEndPoint)
+        _connection = new UdpConnectionListener(ipEndPoint, _readerPool, mode)
         {
-            var mode = ipEndPoint.AddressFamily switch
-            {
-                AddressFamily.InterNetwork => IPMode.IPv4,
-                AddressFamily.InterNetworkV6 => IPMode.IPv6,
-                _ => throw new InvalidOperationException(),
-            };
+            NewConnection = OnNewConnection,
+        };
 
-            _connection = new UdpConnectionListener(ipEndPoint, _readerPool, mode)
-            {
-                NewConnection = OnNewConnection,
-            };
+        await _connection.StartAsync();
+    }
 
-            await _connection.StartAsync();
-        }
-
-        public async ValueTask StopAsync()
+    public async ValueTask StopAsync()
+    {
+        if (_connection != null)
         {
-            if (_connection != null)
-            {
-                await _connection.DisposeAsync();
-            }
+            await _connection.DisposeAsync();
         }
+    }
 
-        private async ValueTask OnNewConnection(NewConnectionEventArgs e)
-        {
-            // Handshake.
-            HandshakeC2S.Deserialize(e.HandshakeData, out var clientVersion, out var name, out var language, out var chatMode, out var platformSpecificData);
+    private async ValueTask OnNewConnection(NewConnectionEventArgs e)
+    {
+        // Handshake.
+        HandshakeC2S.Deserialize(e.HandshakeData, out var clientVersion, out var name, out var language,
+            out var chatMode, out var platformSpecificData);
 
-            var connection = new HazelConnection(e.Connection, _connectionLogger);
+        var connection = new HazelConnection(e.Connection, _connectionLogger);
 
-            await _eventManager.CallAsync(new ClientConnectionEvent(connection, e.HandshakeData));
+        await _eventManager.CallAsync(new ClientConnectionEvent(connection, e.HandshakeData));
 
-            // Register client
-            await _clientManager.RegisterConnectionAsync(connection, name, clientVersion, language, chatMode, platformSpecificData);
-        }
+        // Register client
+        await _clientManager.RegisterConnectionAsync(connection, name, clientVersion, language, chatMode,
+            platformSpecificData);
     }
 }

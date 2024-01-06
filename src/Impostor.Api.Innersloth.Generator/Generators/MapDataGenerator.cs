@@ -11,7 +11,8 @@ namespace Impostor.Api.Innersloth.Generator.Generators;
 
 public sealed class MapDataGenerator : BaseGenerator
 {
-    public MapDataGenerator(SourceProductionContext sourceProductionContext, ImmutableArray<(string RelativePath, string Content)> files) : base(sourceProductionContext, files)
+    public MapDataGenerator(SourceProductionContext sourceProductionContext,
+        ImmutableArray<(string RelativePath, string Content)> files) : base(sourceProductionContext, files)
     {
     }
 
@@ -47,11 +48,23 @@ public sealed class MapDataGenerator : BaseGenerator
                 var vent = pair.Value;
 
                 var connections = "";
-                if (vent.Left != null) connections += ", left: " + vent.Left.Value;
-                if (vent.Center != null) connections += ", center: " + vent.Center.Value;
-                if (vent.Right != null) connections += ", right: " + vent.Right.Value;
+                if (vent.Left != null)
+                {
+                    connections += ", left: " + vent.Left.Value;
+                }
 
-                writer.WriteLine($"[{id}] = new(this, {id}, \"{vent.Name}\", {vent.Position.ToCSharpString()}{connections}),");
+                if (vent.Center != null)
+                {
+                    connections += ", center: " + vent.Center.Value;
+                }
+
+                if (vent.Right != null)
+                {
+                    connections += ", right: " + vent.Right.Value;
+                }
+
+                writer.WriteLine(
+                    $"[{id}] = new(this, {id}, \"{vent.Name}\", {vent.Position.ToCSharpString()}{connections}),");
             }
         });
 
@@ -103,7 +116,8 @@ public sealed class MapDataGenerator : BaseGenerator
 
                 new CSharpBlankLine(),
 
-                CreateSimpleProperty("float", "SpawnRadius", spawnInfo.SpawnRadius.ToString(CultureInfo.InvariantCulture) + "f"),
+                CreateSimpleProperty("float", "SpawnRadius",
+                    spawnInfo.SpawnRadius.ToString(CultureInfo.InvariantCulture) + "f"),
                 CreateSimpleProperty("Vector2", "InitialSpawnCenter", spawnInfo.InitialSpawnCenter.ToCSharpString()),
                 CreateSimpleProperty("Vector2", "MeetingSpawnCenter", spawnInfo.MeetingSpawnCenter.ToCSharpString()),
                 CreateSimpleProperty("Vector2", "MeetingSpawnCenter2", spawnInfo.MeetingSpawnCenter2.ToCSharpString()),
@@ -129,10 +143,10 @@ public sealed class MapDataGenerator : BaseGenerator
 
     private sealed class DictionaryData
     {
-        private readonly string _keyType;
-        private readonly string _valueType;
-        private readonly string _name;
         private readonly Action<CodeWriter> _body;
+        private readonly string _keyType;
+        private readonly string _name;
+        private readonly string _valueType;
 
         public DictionaryData(string keyType, string valueType, string name, Action<CodeWriter> body)
         {
@@ -142,7 +156,8 @@ public sealed class MapDataGenerator : BaseGenerator
             _body = body;
         }
 
-        public DictionaryData(string valueType, string name, Action<CodeWriter> body) : this("int", valueType, name, body)
+        public DictionaryData(string valueType, string name, Action<CodeWriter> body) : this("int", valueType, name,
+            body)
         {
         }
 

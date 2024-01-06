@@ -1,6 +1,5 @@
-﻿namespace Impostor.Api.Events.Meeting
+﻿namespace Impostor.Api.Events.Meeting;
+
+public interface IMeetingStartedEvent : IMeetingEvent
 {
-    public interface IMeetingStartedEvent : IMeetingEvent
-    {
-    }
 }

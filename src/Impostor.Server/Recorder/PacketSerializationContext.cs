@@ -2,48 +2,41 @@
 using System.IO;
 using System.Text;
 
-namespace Impostor.Server.Recorder
+namespace Impostor.Server.Recorder;
+
+public class PacketSerializationContext
 {
-    public class PacketSerializationContext
+    private const int InitialStreamSize = 0x100;
+    private const int MaximumStreamSize = 0x100000;
+
+    private MemoryStream? _memory;
+    private BinaryWriter? _writer;
+
+    [AllowNull]
+    public MemoryStream Stream
     {
-        private const int InitialStreamSize = 0x100;
-        private const int MaximumStreamSize = 0x100000;
+        get => _memory ??= new MemoryStream(InitialStreamSize);
+        private set => _memory = value;
+    }
 
-        private MemoryStream? _memory;
-        private BinaryWriter? _writer;
+    [AllowNull]
+    public BinaryWriter Writer
+    {
+        get => _writer ??= new BinaryWriter(Stream, Encoding.UTF8, true);
+        private set => _writer = value;
+    }
 
-        [AllowNull]
-        public MemoryStream Stream
+    public void Reset()
+    {
+        if (Stream.Capacity > MaximumStreamSize)
         {
-            get
-            {
-                return _memory ??= new MemoryStream(InitialStreamSize);
-            }
-            private set => _memory = value;
+            Stream = null;
+            Writer = null;
         }
-
-        [AllowNull]
-        public BinaryWriter Writer
+        else
         {
-            get
-            {
-                return _writer ??= new BinaryWriter(Stream, Encoding.UTF8, true);
-            }
-            private set => _writer = value;
-        }
-
-        public void Reset()
-        {
-            if (Stream.Capacity > MaximumStreamSize)
-            {
-                Stream = null;
-                Writer = null;
-            }
-            else
-            {
-                Stream.Position = 0L;
-                Stream.SetLength(0L);
-            }
+            Stream.Position = 0L;
+            Stream.SetLength(0L);
         }
     }
 }

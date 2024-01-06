@@ -10,27 +10,6 @@ public class HideNSeekGameOptions : IGameOptions
         IGameOptions.EnsureVersionIsModular<HideNSeekGameOptions>(version);
     }
 
-    /// <inheritdoc />
-    public byte Version { get; }
-
-    /// <inheritdoc />
-    public GameModes GameMode => GameModes.HideNSeek;
-
-    /// <inheritdoc />
-    public byte MaxPlayers { get; set; } = 15;
-
-    /// <inheritdoc />
-    public GameKeywords Keywords { get; set; } = GameKeywords.English;
-
-    /// <inheritdoc />
-    public MapTypes Map { get; set; } = MapTypes.Skeld;
-
-    /// <inheritdoc />
-    public int NumImpostors { get; set; } = 1;
-
-    /// <inheritdoc />
-    public bool IsDefaults { get; set; } = true;
-
     /// <summary>
     ///     Gets or sets the Player speed modifier.
     /// </summary>
@@ -87,6 +66,60 @@ public class HideNSeekGameOptions : IGameOptions
 
     public float MaxPingTime { get; set; } = 6f;
 
+    /// <inheritdoc />
+    public byte Version { get; }
+
+    /// <inheritdoc />
+    public GameModes GameMode => GameModes.HideNSeek;
+
+    /// <inheritdoc />
+    public byte MaxPlayers { get; set; } = 15;
+
+    /// <inheritdoc />
+    public GameKeywords Keywords { get; set; } = GameKeywords.English;
+
+    /// <inheritdoc />
+    public MapTypes Map { get; set; } = MapTypes.Skeld;
+
+    /// <inheritdoc />
+    public int NumImpostors { get; set; } = 1;
+
+    /// <inheritdoc />
+    public bool IsDefaults { get; set; } = true;
+
+    public void Serialize(IMessageWriter writer)
+    {
+        writer.Write(MaxPlayers);
+        writer.Write((uint)Keywords);
+        writer.Write((byte)Map);
+        writer.Write(PlayerSpeedMod);
+        writer.Write(CrewLightMod);
+        writer.Write(ImpostorLightMod);
+        writer.Write((byte)NumCommonTasks);
+        writer.Write((byte)NumLongTasks);
+        writer.Write((byte)NumShortTasks);
+        writer.Write(IsDefaults);
+
+        writer.Write(CrewmateVentUses);
+        writer.Write(HidingTime);
+        writer.Write(CrewmateFlashlightSize);
+        writer.Write(ImpostorFlashlightSize);
+        writer.Write(UseFlashlight);
+        writer.Write(FinalHideSeekMap);
+        writer.Write(FinalHideTime);
+        writer.Write(FinalSeekerSpeed);
+        writer.Write(FinalHidePings);
+        writer.Write(ShowNames);
+        writer.Write(SeekerPlayerId);
+        writer.Write(MaxPingTime);
+        writer.Write(CrewmateTimeInVent);
+
+        if (Version > 7)
+        {
+            IGameOptions.ThrowUnknownVersion<HideNSeekGameOptions>(Version);
+        }
+    }
+
     public static HideNSeekGameOptions Deserialize(IMessageReader reader, byte version)
     {
         var options = new HideNSeekGameOptions(version);
@@ -120,39 +153,6 @@ public class HideNSeekGameOptions : IGameOptions
         SeekerPlayerId = reader.ReadUInt32();
         MaxPingTime = reader.ReadSingle();
         CrewmateTimeInVent = reader.ReadSingle();
-
-        if (Version > 7)
-        {
-            IGameOptions.ThrowUnknownVersion<HideNSeekGameOptions>(Version);
-        }
-    }
-
-    public void Serialize(IMessageWriter writer)
-    {
-        writer.Write(MaxPlayers);
-        writer.Write((uint)Keywords);
-        writer.Write((byte)Map);
-        writer.Write(PlayerSpeedMod);
-        writer.Write(CrewLightMod);
-        writer.Write(ImpostorLightMod);
-        writer.Write((byte)NumCommonTasks);
-        writer.Write((byte)NumLongTasks);
-        writer.Write((byte)NumShortTasks);
-        writer.Write(IsDefaults);
-
-        writer.Write(CrewmateVentUses);
-        writer.Write(HidingTime);
-        writer.Write(CrewmateFlashlightSize);
-        writer.Write(ImpostorFlashlightSize);
-        writer.Write(UseFlashlight);
-        writer.Write(FinalHideSeekMap);
-        writer.Write(FinalHideTime);
-        writer.Write(FinalSeekerSpeed);
-        writer.Write(FinalHidePings);
-        writer.Write(ShowNames);
-        writer.Write(SeekerPlayerId);
-        writer.Write(MaxPingTime);
-        writer.Write(CrewmateTimeInVent);
 
         if (Version > 7)
         {

@@ -1,7 +1,6 @@
-﻿namespace Impostor.Api.Events
+﻿namespace Impostor.Api.Events;
+
+public interface IGameAlterEvent : IGameEvent
 {
-    public interface IGameAlterEvent : IGameEvent
-    {
-        bool IsPublic { get; }
-    }
+    bool IsPublic { get; }
 }

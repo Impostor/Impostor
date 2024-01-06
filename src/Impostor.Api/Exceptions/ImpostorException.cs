@@ -1,24 +1,23 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Impostor.Api
+namespace Impostor.Api;
+
+public class ImpostorException : Exception
 {
-    public class ImpostorException : Exception
+    public ImpostorException()
     {
-        public ImpostorException()
-        {
-        }
+    }
 
-        public ImpostorException(string? message) : base(message)
-        {
-        }
+    public ImpostorException(string? message) : base(message)
+    {
+    }
 
-        public ImpostorException(string? message, Exception? innerException) : base(message, innerException)
-        {
-        }
+    public ImpostorException(string? message, Exception? innerException) : base(message, innerException)
+    {
+    }
 
-        protected ImpostorException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
+    protected ImpostorException(SerializationInfo info, StreamingContext context) : base(info, context)
+    {
     }
 }
