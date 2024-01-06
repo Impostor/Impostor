@@ -49,11 +49,6 @@ private void ImpostorPublish(string name, string project, string runtime) {
         MSBuildSettings = msbuildSettings
     });
 
-
-    CreateDirectory(projBuildDir + "/Plugins");
-    CreateDirectory(projBuildDir + "/Lib");
-    CreateDirectory(projBuildDir + "/Core");
-
     if (runtime == "win-x64") {
        FileWriteText(projBuildDir.CombineWithFilePath("run.bat"), "@echo off\r\nImpostor.Server.exe\r\npause");
     }
@@ -63,6 +58,10 @@ private void ImpostorPublish(string name, string project, string runtime) {
     } else {
         GZipCompress(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".tar.gz"));
     }
+    
+    CreateDirectory(projBuildDir.Combine("Plugins"));
+    CreateDirectory(projBuildDir.Combine("Lib");
+    CreateDirectory(projBuildDir.Combine("Core");
     
     BuildSystem.GitHubActions.Commands.UploadArtifact(projBuildDir, projBuildName);
 }
@@ -83,6 +82,10 @@ Task("Clean")
 Task("Restore")
     .Does(() => {
         DotNetRestore("./src/Impostor.sln");
+    });
+
+Task("CreateDirectory")
+    .Does(() => {
     });
 
 Task("Build")
