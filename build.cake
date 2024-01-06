@@ -52,18 +52,14 @@ private void ImpostorPublish(string name, string project, string runtime) {
     if (runtime == "win-x64") {
        FileWriteText(projBuildDir.CombineWithFilePath("run.bat"), "@echo off\r\nImpostor.Server.exe\r\npause");
     }
-
-    if (runtime == "win-x64") {
-        Zip(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".zip"));
-    } else {
-        GZipCompress(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".tar.gz"));
-    }
     
     CreateDirectory(projBuildDir.Combine("Plugins"));
-    CreateDirectory(projBuildDir.Combine("Lib");
-    CreateDirectory(projBuildDir.Combine("Core");
+    CreateDirectory(projBuildDir.Combine("Lib"));
+    CreateDirectory(projBuildDir.Combine("Core"));
     
-    BuildSystem.GitHubActions.Commands.UploadArtifact(projBuildDir, projBuildName);
+    if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
+       BuildSystem.GitHubActions.Commands.UploadArtifact(projBuildDir, projBuildName);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
