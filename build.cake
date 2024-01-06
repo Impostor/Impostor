@@ -50,7 +50,7 @@ private void ImpostorPublish(string name, string project, string runtime) {
     });
 
 
-    CreateDirectory(projBuildDir + "/Plugins"));
+    CreateDirectory(projBuildDir + "/Plugins");
     CreateDirectory(projBuildDir + "/Lib");
     CreateDirectory(projBuildDir + "/Core");
 
