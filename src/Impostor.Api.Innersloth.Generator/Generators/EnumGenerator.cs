@@ -9,16 +9,13 @@ namespace Impostor.Api.Innersloth.Generator.Generators;
 
 public sealed class EnumGenerator : BaseGenerator
 {
-    public EnumGenerator(SourceProductionContext sourceProductionContext,
-        ImmutableArray<(string RelativePath, string Content)> files) : base(sourceProductionContext, files)
+    public EnumGenerator(SourceProductionContext sourceProductionContext, ImmutableArray<(string RelativePath, string Content)> files) : base(sourceProductionContext, files)
     {
     }
 
-    public void Generate(string name, string? @namespace = null, string? sourceName = null, bool flags = false,
-        CSharpEnumUnderlyingType underlyingType = CSharpEnumUnderlyingType.Int)
+    public void Generate(string name, string? @namespace = null, string? sourceName = null, bool flags = false, CSharpEnumUnderlyingType underlyingType = CSharpEnumUnderlyingType.Int)
     {
-        var dictionary =
-            JsonSerializer.Deserialize<Dictionary<string, long>>(GetFileContent($"enums/{sourceName ?? name}.json"))!;
+        var dictionary = JsonSerializer.Deserialize<Dictionary<string, long>>(GetFileContent($"enums/{sourceName ?? name}.json"))!;
 
         var @enum = new CSharpEnum(name, underlyingType);
 
