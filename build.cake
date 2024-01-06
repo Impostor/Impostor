@@ -64,9 +64,7 @@ private void ImpostorPublish(string name, string project, string runtime) {
         GZipCompress(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".tar.gz"));
     }
     
-    if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
-        BuildSystem.GitHubActions.Commands.UploadArtifact(projBuildDir, projBuildName);
-    }
+    BuildSystem.GitHubActions.Commands.UploadArtifact(projBuildDir, projBuildName);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -97,22 +95,6 @@ Task("Build")
         ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-x64");
         ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm");
         ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm64");
-
-        // API.
-        DotNetPack("./src/Impostor.Api/Impostor.Api.csproj", new DotNetPackSettings {
-            Configuration = configuration,
-            OutputDirectory = buildDir,
-            IncludeSource = true,
-            IncludeSymbols = true,
-            MSBuildSettings = msbuildSettings
-        });
-
-        if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
-            foreach (var file in GetFiles(buildDir + "/*.{nupkg,snupkg}"))
-            {
-                BuildSystem.GitHubActions.Commands.UploadArtifact(file, "Impostor.Api");
-            }
-        }
     });
 
 //////////////////////////////////////////////////////////////////////
