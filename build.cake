@@ -50,9 +50,9 @@ private void ImpostorPublish(string name, string project, string runtime) {
     });
 
 
-    CreateDirectory(projBuildDir.Combine("Plugins"));
-    CreateDirectory(projBuildDir.Combine("Lib"));
-    CreateDirectory(projBuildDir.Combine("Core"));
+    CreateDirectory(projBuildDir + "/Plugins"));
+    CreateDirectory(projBuildDir + "/Lib");
+    CreateDirectory(projBuildDir + "/Core");
 
     if (runtime == "win-x64") {
        FileWriteText(projBuildDir.CombineWithFilePath("run.bat"), "@echo off\r\nImpostor.Server.exe\r\npause");
@@ -91,10 +91,6 @@ Task("Build")
     .Does(() => {
         // Server.
         ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64");
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "osx-x64");
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-x64");
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm");
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm64");
     });
 
 //////////////////////////////////////////////////////////////////////
