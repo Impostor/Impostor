@@ -4,8 +4,8 @@ Since Impostor 1.9.0 a HTTP service is included for matchmaking. Recent versions
 
 Depending on whether you want to support mobile players, you can set up the HTTP server in one of two ways:
 
-- Directly expose the HTTP server. Simpler, but only works if you don't want to support mobile players
-- Use a reverse proxy to expose the HTTP safer. More complex, but allows mobile players to connect
+- Directly expose the HTTP server. Simpler, but only works if you don't want to support mobile players.
+- Use a reverse proxy to expose the HTTP server. More complex, but allows mobile players to connect.
 
 ## Directly expose the HTTP server.
 
@@ -16,6 +16,8 @@ In config.json, set "ListenIp" to "0.0.0.0" in the "HttpServer" section. If you 
 A reverse proxy allows you to forward HTTP requests from users to multiple services. If you already have one, you should configure it to add Impostor. This page contains an Nginx configuration you can use for reference.
 
 If you have never set up a reverse proxy before, we recommend you to set up [Caddy](https://caddyserver.com/). It is easy to set up and comes with support for requesting SSL certificates out of the box.
+
+To prevent people from connecting directly to Impostor, we recommend changing the "ListenIp" in the "HttpServer" section to "127.0.0.1". This makes sure people can't connect to your HTTP server other than via your reverse proxy. Keep the "ListenIp" in the "Server" section at "0.0.0.0" though, running the normal game traffic through a proxy is not supported.
 
 ### Caddy
 

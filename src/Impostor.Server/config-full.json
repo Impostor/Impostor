@@ -7,7 +7,7 @@
   },
   "HttpServer": {
     "Enabled": true,
-    "ListenIp": "127.0.0.1",
+    "ListenIp": "0.0.0.0",
     "ListenPort": 22023
   },
   "AntiCheat": {

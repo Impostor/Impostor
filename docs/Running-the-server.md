@@ -34,7 +34,7 @@ Docker is a program that allows you to run programs like Impostor in a container
 After installing Docker, you can just start a Docker container with `docker run`:
 
 ```
-docker run -p 127.0.0.1:22023:22023/tcp -p 22023:22023/udp -e IMPOSTOR_Server__PublicIp=your.public.ip.here aeonlucid/impostor:nightly
+docker run -p 22023:22023/tcp -p 22023:22023/udp -e IMPOSTOR_Server__PublicIp=your.public.ip.here aeonlucid/impostor:nightly
 ```
 
 Please replace `your.public.ip.here` with the public IP address of your server. This is the address Among Us will try to reach your server at.
@@ -53,7 +53,7 @@ services:
     image: aeonlucid/impostor:nightly
     container_name: impostor
     ports:
-      - 127.0.0.1:22023:22023/tcp # Remove "127.0.0.1:" if you want to expose Impostor's HTTP server directly to the internet
+      - 22023:22023/tcp # Add "127.0.0.1:" if you're using a reverse proxy to terminate HTTPS
       - 22023:22023/udp
     environment: # Either configure Impostor using environment variables or mount a copy of config.json
       - IMPOSTOR_Server__PublicIp=your.public.ip.here
