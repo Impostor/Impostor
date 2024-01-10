@@ -26,25 +26,21 @@
                 </div>
                 <form id="serverFileForm" class="container p-0" onsubmit="return false;">
                     <div class="row justify-content-center mb-5 mb-md-4">
-                        <div class="row justify-content-center flex-nowrap" style="max-width: 350px">
+                        <div class="form-row">
+                            <div class="col">
+                            <select name="serverProtocol" id="protocol" class="custom-select" style="height: 100%">
+                                <option value="http" selected>http://</option>
+                                <option value="https">https://</option>
+                            </select>
+                            </div>
+                            <div class="col">
                             <input class="form-control form-control-lg bg-transparent text-light text-center mr-2"
                                    type="text" placeholder="Server address" id="address" name="address" required>
+                            </div>
+                            <div class="col">
                             <input class="form-control form-control-lg bg-transparent text-light" style="max-width: 110px"
                                    type="number" placeholder="Port" id="port" name="port" min="1" max="65535" required>
-                        </div>
-                    </div>
-
-                    <div class="row justify-content-center mv-5 mb-md-4">
-                        <div class="form-check form-check-inline" style="display: inline">
-                            <label class="align-middle" style="display: inline" for="serverProtocol">Connection protocol</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="serverProtocol" id="http" value="http" checked onclick="setPortIfDefault('http')">
-                            <label class="form-check-label" for="http">http</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="serverProtocol" id="https" value="https" onclick="setPortIfDefault('https')">
-                            <label class="form-check-label" for="https">https</label>
+                            </div>
                         </div>
                     </div>
 

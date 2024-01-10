@@ -9,7 +9,7 @@ function parseForm() {
     const address = document.getElementById("address").value.trim();
     const port = parseInt(document.getElementById("port").value) ?? DEFAULT_PORT_HTTP;
     const name = document.getElementById("name").value || "Impostor";
-    const protocol = document.querySelector("input[name=serverProtocol]:checked").value || "http";
+    const protocol = document.querySelector("select[name=serverProtocol]").value || "http";
 
     return { address, port, name, protocol, url: `${protocol}://${address}` };
 }
@@ -58,17 +58,15 @@ function setPlatform(platform) {
     }
 
     // HTTPS is mandatory on ios/android
-    const httpRadio = document.getElementById("http");
-    const httpsRadio = document.getElementById("https");
+    const protocol = document.getElementById("protocol");
     if (platform === "android" || platform === "ios") {
-        httpsSetExplicitly = httpsRadio.checked;
-        httpsRadio.checked = true;
-        httpRadio.disabled = true;
+        protocol.value = "https";
+        protocol.disabled = true;
         setPortIfDefault("https");
     } else {
-        httpRadio.disabled = false;
+        protocol.disabled = false;
         if (!httpsSetExplicitly) {
-            httpRadio.checked = true;
+            protocol.value = "http";
             setPortIfDefault("http");
         }
     }
@@ -150,7 +148,7 @@ function fillFromLocationHash() {
     if (protocol !== "http" && protocol !== "https") {
         protocol = "http";
     }
-    document.getElementById(protocol).checked = true;
+    document.querySelector("select[name=serverProtocol]").value = protocol;
 
     document.getElementById("name").value = serverName;
 }
@@ -160,8 +158,6 @@ function setLocationHash() {
     document.location.hash = [serverInfo.address, serverInfo.port, serverInfo.protocol, serverInfo.name].join(":");
 }
 
-fillFromLocationHash();
-
 if (["iPhone", "iPad", "iPod"].indexOf(window.navigator.platform) !== -1) {
     setPlatform("ios");
 } else if (/Android/.test(window.navigator.userAgent)) {
@@ -169,3 +165,5 @@ if (["iPhone", "iPad", "iPod"].indexOf(window.navigator.platform) !== -1) {
 } else {
     setPlatform("desktop");
 }
+
+fillFromLocationHash();
