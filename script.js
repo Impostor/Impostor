@@ -1,4 +1,4 @@
-const DEFAULT_PORT_HTTP = "22000";
+const DEFAULT_PORT_HTTP = "22023";
 const DEFAULT_PORT_HTTPS = "443";
 
 /**
