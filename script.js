@@ -60,6 +60,7 @@ function setPlatform(platform) {
     // HTTPS is mandatory on ios/android
     const protocol = document.getElementById("protocol");
     if (platform === "android" || platform === "ios") {
+        httpsSetExplicitly = protocol.value === "https";
         protocol.value = "https";
         protocol.disabled = true;
         setPortIfDefault("https");
@@ -140,7 +141,7 @@ function fillFromLocationHash() {
         document.getElementById("address").value = serverAddress;
     }
 
-    if (parseInt(serverPort) !== NaN) {
+    if (!Number.IsNan(parseInt(serverPort))) {
         document.getElementById("port").value = serverPort;
     }
 
