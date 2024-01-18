@@ -6,9 +6,9 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: rome/setup-rome@v0.4
+      - uses: biomejs/setup-biome@v2
         with:
           version: latest
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Lint and check formatting
-        run: rome ci .
+        run: biome ci .
