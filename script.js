@@ -1,52 +1,103 @@
-const DEFAULT_PORT_HTTP = "22023";
-const DEFAULT_PORT_HTTPS = "443";
+const DEFAULT_PORT_HTTP = 22023;
+const DEFAULT_PORT_HTTPS = 443;
 
 /**
- * @typedef {{ address: string, port: number, name: string, protocol: string, url: string }} ServerInfo
+ * @template {HTMLElement} T
+ * @param {string} elementId
+ * @returns {T}
+ */
+function getElementByIdOrThrow(elementId) {
+    const element = document.getElementById(elementId);
+    if (element === null) throw new Error(`Couldn't find the element with id ${elementId}`);
+    return /** @type {T} */ (element);
+}
+
+const addressInput = /** @type {HTMLInputElement} */ (getElementByIdOrThrow("address"));
+const portInput = /** @type {HTMLInputElement} */ (getElementByIdOrThrow("port"));
+const nameInput = /** @type {HTMLInputElement} */ (getElementByIdOrThrow("name"));
+const protocolSelect =
+    /** @type {Omit<HTMLSelectElement, "value"> & { value: Protocol; }} */
+    (getElementByIdOrThrow("protocol"));
+
+/**
+ * @typedef {{ protocol: Protocol, address: string, port: number, name: string, url: string }} ServerInfo
+ * @typedef {"desktop" | "android" | "ios"} Platform
+ * @typedef {"https" | "http"} Protocol
+ */
+
+/**
  * @returns {ServerInfo}
  */
 function parseForm() {
-    const address = document.getElementById("address").value.trim();
-    const port = parseInt(document.getElementById("port").value) ?? DEFAULT_PORT_HTTP;
-    const name = document.getElementById("name").value || "Impostor";
-    const protocol = document.querySelector("select[name=serverProtocol]").value || "http";
+    const protocol = protocolSelect.value;
+    const address = addressInput.value.trim();
+    const port = parseInt(portInput.value) || (protocol === "http" ? DEFAULT_PORT_HTTP : DEFAULT_PORT_HTTPS);
+    const name = nameInput.value || "Impostor";
 
-    return { address, port, name, protocol, url: `${protocol}://${address}` };
+    return { protocol, address, port, name, url: `${protocol}://${address}` };
 }
 
-async function downloadAsync() {
+function downloadAsync() {
     const serverInfo = parseForm();
+    if (!serverInfo.address) {
+        return false;
+    }
 
     const json = generateRegionInfo(serverInfo);
+
+    console.log(`Saving ${json}`);
+
     const blob = new Blob([json], { type: "text/plain" });
     saveFile(blob, "regionInfo.json");
 
     return false;
 }
 
-async function openApp() {
+function openApp() {
     const serverInfo = parseForm();
+    if (!serverInfo.address) {
+        return false;
+    }
 
     const params = new URLSearchParams({
         servername: serverInfo.name,
-        serverport: serverInfo.port,
+        serverport: serverInfo.port.toString(),
         serverip: serverInfo.url,
-        usedtls: false,
+        usedtls: false.toString(),
     });
-    window.location = `amongus://init?${params.toString()}`;
+
+    const url = `amongus://init?${params.toString()}`;
+
+    console.log(`Opening ${url}`);
+    window.location.href = url;
 
     return false;
 }
 
-let currentPlatform;
+/** @type {Record<Platform, HTMLAnchorElement>} */
+const platformButtons = {
+    desktop: getElementByIdOrThrow("desktop"),
+    android: getElementByIdOrThrow("android"),
+    ios: getElementByIdOrThrow("ios"),
+};
+
+/** @type {?Platform} */
+let currentPlatform = null;
 let httpsSetExplicitly = false;
 
+/**
+ * @param {Platform} platform
+ * @param {boolean} value
+ */
 function setEnabled(platform, value) {
-    for (const e of document.querySelectorAll(`.${platform}-support`)) {
+    for (const e of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`.${platform}-support`))) {
         e.style.display = value ? "block" : "none";
     }
 }
 
+/**
+ * @param {Platform} platform
+ */
 function setPlatform(platform) {
     if (currentPlatform === platform) {
         return;
@@ -54,37 +105,42 @@ function setPlatform(platform) {
 
     if (currentPlatform) {
         setEnabled(currentPlatform, false);
-        document.getElementById(currentPlatform).classList.remove("text-primary");
+        platformButtons[currentPlatform].classList.remove("text-primary");
     }
 
     // HTTPS is mandatory on ios/android
-    const protocol = document.getElementById("protocol");
     if (platform === "android" || platform === "ios") {
-        httpsSetExplicitly = protocol.value === "https";
-        protocol.value = "https";
-        protocol.disabled = true;
+        httpsSetExplicitly = protocolSelect.value === "https";
+        protocolSelect.value = "https";
+        protocolSelect.disabled = true;
         setPortIfDefault("https");
     } else {
-        protocol.disabled = false;
+        protocolSelect.disabled = false;
         if (!httpsSetExplicitly) {
-            protocol.value = "http";
+            protocolSelect.value = "http";
             setPortIfDefault("http");
         }
     }
 
     setEnabled(platform, true);
-    document.getElementById(platform).classList.add("text-primary");
+    platformButtons[platform].classList.add("text-primary");
 
     currentPlatform = platform;
 }
 
+/**
+ * @param {Protocol} protocol
+ */
 function setPortIfDefault(protocol) {
     const oldPort = protocol === "http" ? DEFAULT_PORT_HTTPS : DEFAULT_PORT_HTTP;
     const newPort = protocol === "http" ? DEFAULT_PORT_HTTP : DEFAULT_PORT_HTTPS;
-    const portField = document.getElementById("port");
-    if (portField.value === oldPort) {
-        portField.value = newPort;
+    if (!portInput.value || portInput.value === oldPort.toString()) {
+        portInput.value = newPort.toString();
     }
+}
+
+function onProtocolChange() {
+    setPortIfDefault(protocolSelect.value);
 }
 
 /**
@@ -114,9 +170,13 @@ function generateRegionInfo(serverInfo) {
         Regions: regions,
     };
 
-    return JSON.stringify(jsonServerData);
+    return JSON.stringify(jsonServerData, null, 4);
 }
 
+/**
+ * @param {Blob} blob
+ * @param {string} fileName
+ */
 function saveFile(blob, fileName) {
     const url = URL.createObjectURL(blob);
 
@@ -132,32 +192,34 @@ function saveFile(blob, fileName) {
 
 function fillFromLocationHash() {
     const urlServerAddress = document.location.hash.substring(1).split(":");
-    const serverAddress = urlServerAddress[0];
-    const serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : DEFAULT_PORT_HTTP.toString();
-    let protocol = urlServerAddress.length > 2 ? urlServerAddress[2] : "http";
-    const serverName = urlServerAddress.length > 3 ? urlServerAddress[3] : "";
+    const serverAddress = urlServerAddress.length > 0 ? urlServerAddress[0] : null;
+    const serverPort = urlServerAddress.length > 1 ? urlServerAddress[1] : null;
+    const protocol = urlServerAddress.length > 2 ? urlServerAddress[2] : null;
+    const serverName = urlServerAddress.length > 3 ? urlServerAddress[3] : null;
 
     if (serverAddress) {
-        document.getElementById("address").value = serverAddress;
+        addressInput.value = serverAddress;
     }
 
-    if (!Number.IsNan(parseInt(serverPort))) {
-        document.getElementById("port").value = serverPort;
+    if (serverPort && !Number.isNaN(parseInt(serverPort))) {
+        portInput.value = serverPort;
     }
 
-    // Set the default protocol to http
-    if (protocol !== "http" && protocol !== "https") {
-        protocol = "http";
+    if (protocol === "http" || protocol === "https") {
+        protocolSelect.value = protocol;
     }
-    document.querySelector("select[name=serverProtocol]").value = protocol;
 
-    document.getElementById("name").value = serverName;
+    if (serverName) {
+        nameInput.value = serverName;
+    }
 }
 
 function setLocationHash() {
     const serverInfo = parseForm();
     document.location.hash = [serverInfo.address, serverInfo.port, serverInfo.protocol, serverInfo.name].join(":");
 }
+
+fillFromLocationHash();
 
 if (["iPhone", "iPad", "iPod"].indexOf(window.navigator.platform) !== -1) {
     setPlatform("ios");
@@ -166,5 +228,3 @@ if (["iPhone", "iPad", "iPod"].indexOf(window.navigator.platform) !== -1) {
 } else {
     setPlatform("desktop");
 }
-
-fillFromLocationHash();

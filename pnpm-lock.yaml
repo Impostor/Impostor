@@ -6,8 +6,11 @@ settings:
 
 devDependencies:
   '@biomejs/biome':
-    specifier: 1.5.2
+    specifier: ^1
     version: 1.5.2
+  typescript:
+    specifier: ^5
+    version: 5.3.3
 
 packages:
 
@@ -98,3 +101,9 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /typescript@5.3.3:
+    resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+    dev: true

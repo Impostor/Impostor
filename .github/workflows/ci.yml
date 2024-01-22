@@ -6,9 +6,13 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: biomejs/setup-biome@v2
-        with:
-          version: latest
       - uses: actions/checkout@v4
-      - name: Lint and check formatting
-        run: biome ci .
+      - uses: pnpm/action-setup@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: |
+          pnpm biome ci .
+          pnpm tsc --noEmit
