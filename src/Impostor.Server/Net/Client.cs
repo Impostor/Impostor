@@ -42,6 +42,11 @@ namespace Impostor.Server.Net
                 return false;
             }
 
+            if (_antiCheatConfig.ExemptHost && Player != null && Player.IsHost)
+            {
+                return false;
+            }
+
             _logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{Context}] {Message}", Name, Id, context.Name, message);
 
             if (_antiCheatConfig.BanIpFromGame)
