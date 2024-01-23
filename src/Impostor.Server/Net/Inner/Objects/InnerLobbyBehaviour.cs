@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Impostor.Api.Config;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Server.Net.State;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
     internal class InnerLobbyBehaviour : InnerNetObject, IInnerLobbyBehaviour
     {
-        public InnerLobbyBehaviour(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game)
+        public InnerLobbyBehaviour(ICustomMessageManager<ICustomRpc> customMessageManager, IOptions<AntiCheatConfig> antiCheatConfig, Game game) : base(customMessageManager, antiCheatConfig, game)
         {
             Components.Add(this);
         }

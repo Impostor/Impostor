@@ -1,15 +1,17 @@
+using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner.Objects.GameManager;
 using Impostor.Server.Net.Inner.Objects.GameManager.Logic.HideAndSeek;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Inner.Objects.GameManager;
 
 internal partial class InnerHideAndSeekManager : InnerGameManager, IInnerHideAndSeekManager
 {
-    public InnerHideAndSeekManager(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerGameManager> logger, IEventManager eventManager) : base(customMessageManager, game, logger)
+    public InnerHideAndSeekManager(ICustomMessageManager<ICustomRpc> customMessageManager, IOptions<AntiCheatConfig> antiCheatConfig, Game game, ILogger<InnerGameManager> logger, IEventManager eventManager) : base(customMessageManager, antiCheatConfig, game, logger)
     {
         LogicMusic = AddGameLogic(new LogicHnSMusic());
         LogicMinigame = AddGameLogic(new LogicMinigameHnS());

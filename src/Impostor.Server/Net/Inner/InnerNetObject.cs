@@ -1,9 +1,11 @@
 ﻿using System.Threading.Tasks;
+using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Server.Net.State;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Inner
 {
@@ -13,9 +15,10 @@ namespace Impostor.Server.Net.Inner
 
         private readonly ICustomMessageManager<ICustomRpc> _customMessageManager;
 
-        protected InnerNetObject(ICustomMessageManager<ICustomRpc> customMessageManager, Game game)
+        protected InnerNetObject(ICustomMessageManager<ICustomRpc> customMessageManager, IOptions<AntiCheatConfig> antiCheatConfig, Game game)
         {
             _customMessageManager = customMessageManager;
+            AntiCheatConfig = antiCheatConfig.Value;
             Game = game;
         }
 
@@ -24,6 +27,8 @@ namespace Impostor.Server.Net.Inner
         public int OwnerId { get; internal set; }
 
         public Game Game { get; }
+
+        protected AntiCheatConfig AntiCheatConfig { get; private set; }
 
         IGame IInnerNetObject.Game => Game;
 
