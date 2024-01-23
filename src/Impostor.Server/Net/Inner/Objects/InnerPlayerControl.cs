@@ -567,7 +567,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleCheckName(ClientPlayer sender, string name)
         {
-            if (name.Length > 10)
+            if (AntiCheatConfig.EnableLimitChecks && name.Length > 10)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, "Client sent name exceeding 10 characters"))
                 {
@@ -575,7 +575,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(name) || !name.All(TextBox.IsCharAllowed))
+            if (AntiCheatConfig.EnableLimitChecks && (string.IsNullOrWhiteSpace(name) || !name.All(TextBox.IsCharAllowed)))
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, "Client sent name containing illegal characters"))
                 {
@@ -583,7 +583,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            if (sender.Client.Name != name)
+            if (AntiCheatConfig.EnableGameFlowChecks && sender.Client.Name != name)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, "Client sent name not matching his name from handshake"))
                 {
@@ -598,7 +598,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleSetName(ClientPlayer sender, string name)
         {
-            if (Game.GameState == GameStates.Started)
+            if (AntiCheatConfig.EnableGameFlowChecks && Game.GameState == GameStates.Started)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, "Client tried to set a name midgame"))
                 {
@@ -608,7 +608,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (sender.IsOwner(this))
             {
-                if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == name))
+                if (AntiCheatConfig.EnableLimitChecks && Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == name))
                 {
                     if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, "Client sent name that is already used"))
                     {
@@ -616,7 +616,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
                 }
 
-                if (sender.Client.Name != name)
+                if (AntiCheatConfig.EnableGameFlowChecks && sender.Client.Name != name)
                 {
                     if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, "Client sent name not matching his name from handshake"))
                     {
@@ -656,7 +656,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
                 else
                 {
-                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, $"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it"))
+                    if (AntiCheatConfig.EnableGameFlowChecks && await sender.Client.ReportCheatAsync(RpcCalls.SetName, $"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it"))
                     {
                         return false;
                     }
@@ -670,9 +670,18 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleCheckColor(ClientPlayer sender, ColorType color)
         {
+            if (AntiCheatConfig.EnableGameFlowChecks && Game.GameState == GameStates.Started)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, "Client tried to ask for a color midgame"))
+                {
+                    return false;
+                }
+            }
+
             if ((byte)color > ColorsCount)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, "Client sent invalid color"))
+                if (!AntiCheatConfig.AllowProtocolExtensions &&
+                    await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, "Client sent invalid color"))
                 {
                     return false;
                 }
@@ -685,7 +694,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleSetColor(ClientPlayer sender, ColorType color)
         {
-            if (Game.GameState == GameStates.Started)
+            if (AntiCheatConfig.EnableGameFlowChecks && Game.GameState == GameStates.Started)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, "Client tried to set a color midgame"))
                 {
@@ -695,7 +704,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (sender.IsOwner(this))
             {
-                if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == color))
+                if (AntiCheatConfig.EnableLimitChecks &&
+                    Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == color))
                 {
                     if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, "Client sent a color that is already used"))
                     {
@@ -764,7 +774,8 @@ namespace Impostor.Server.Net.Inner.Objects
                     // This request was made too quickly by spamming the kill button, cancel it if we're in server authoritive mode
                     return _game.IsHostAuthoritive;
                 }
-                else if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, "Client tried to murder too fast"))
+                else if (AntiCheatConfig.EnableGameFlowChecks &&
+                         await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, "Client tried to murder too fast"))
                 {
                     return false;
                 }
@@ -772,7 +783,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (target == null || target.PlayerInfo.IsImpostor)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, "Client tried to murder invalid target"))
+                if (AntiCheatConfig.EnableGameFlowChecks &&
+                    await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, "Client tried to murder invalid target"))
                 {
                     return false;
                 }
@@ -809,7 +821,8 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             if (!_game.IsHostAuthoritive)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder directly"))
+                if (AntiCheatConfig.EnableGameFlowChecks &&
+                    await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder directly"))
                 {
                     return false;
                 }
@@ -817,7 +830,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (target == null || target.PlayerInfo.IsImpostor)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder invalid target"))
+                if (AntiCheatConfig.EnableGameFlowChecks &&
+                    await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to murder invalid target"))
                 {
                     return false;
                 }
@@ -826,7 +840,8 @@ namespace Impostor.Server.Net.Inner.Objects
             // If the host is also the impostor that committed the murder, CheckMurder is actually sent *after* the MurderPlayer RPC
             if (sender.Character != this && target != IsMurdering)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Host tried to murder incorrect target"))
+                if (AntiCheatConfig.EnableGameFlowChecks &&
+                    await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Host tried to murder incorrect target"))
                 {
                     return false;
                 }
@@ -861,7 +876,7 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             if (target == null)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckProtect, "Client tried to protect invalid target"))
+                if (AntiCheatConfig.EnableTargetChecks && await sender.Client.ReportCheatAsync(RpcCalls.CheckProtect, "Client tried to protect invalid target"))
                 {
                     return false;
                 }
@@ -869,12 +884,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 return true;
             }
 
-            if (PlayerInfo.RoleType != RoleTypes.GuardianAngel)
+            if (await ValidateRole(RpcCalls.ProtectPlayer, sender, PlayerInfo, RoleTypes.GuardianAngel))
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckProtect, "Client tried to protect but it wasn't a guardian angel"))
-                {
                     return false;
-                }
             }
 
             ((InnerPlayerControl)target).Protect(this);
@@ -898,7 +910,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleSetPet(ClientPlayer sender, string pet)
         {
-            if (Game.GameState == GameStates.Started && await sender.Client.ReportCheatAsync(RpcCalls.SetPet, "Client tried to change pet while not in lobby"))
+            if (AntiCheatConfig.EnableGameFlowChecks &&
+                Game.GameState == GameStates.Started &&
+                await sender.Client.ReportCheatAsync(RpcCalls.SetPet, "Client tried to change pet while not in lobby"))
             {
                 return false;
             }
@@ -912,7 +926,8 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             if (!sender.IsHost && startCounter != -1)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, "Client tried to set start counter as a non-host"))
+                if (AntiCheatConfig.EnableHostPrivilegeChecks &&
+                    await sender.Client.ReportCheatAsync(RpcCalls.SetStartCounter, "Client tried to set start counter as a non-host"))
                 {
                     return false;
                 }

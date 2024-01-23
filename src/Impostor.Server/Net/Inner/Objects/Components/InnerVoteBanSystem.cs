@@ -69,7 +69,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             {
                 Rpc26AddVote.Deserialize(reader, out var clientId, out var targetClientId);
 
-                if (clientId != sender.Client.Id)
+                if (AntiCheatConfig.EnableOwnershipChecks && clientId != sender.Client.Id)
                 {
                     if (await sender.Client.ReportCheatAsync(RpcCalls.AddVote, $"Client sent {nameof(RpcCalls.AddVote)} as other client"))
                     {

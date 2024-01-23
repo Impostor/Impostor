@@ -121,10 +121,11 @@ namespace Impostor.Server.Net.State
 
                     case GameDataTag.SpawnFlag:
                     {
-                        // Only the host is allowed to despawn objects.
+                        // Only the host is allowed to spawn objects.
                         if (!sender.IsHost)
                         {
-                            if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), "Tried to send SpawnFlag as non-host."))
+                            if (_antiCheatConfig.EnableHostPrivilegeChecks &&
+                                await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), "Tried to send SpawnFlag as non-host."))
                             {
                                 return false;
                             }
@@ -259,7 +260,8 @@ namespace Impostor.Server.Net.State
 
                         if (clientId != sender.Client.Id)
                         {
-                            if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.ConsoleDeclareClientPlatformFlag)), "Client sent info with wrong client id"))
+                            if (_antiCheatConfig.EnableOwnershipChecks &&
+                                await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.ConsoleDeclareClientPlatformFlag)), "Client sent info with wrong client id"))
                             {
                                 return false;
                             }

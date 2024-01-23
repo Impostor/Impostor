@@ -69,7 +69,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
                     if (Game.GameNet.ShipStatus == null)
                     {
-                        if (await sender.Client.ReportCheatAsync(call, "Client interacted with vent on unknown map"))
+                        if (!AntiCheatConfig.AllowProtocolExtensions && await sender.Client.ReportCheatAsync(call, "Client interacted with vent on unknown map"))
                         {
                             return false;
                         }
@@ -79,7 +79,8 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
                     if (!Game.GameNet.ShipStatus.Data.Vents.TryGetValue(ventId, out var vent))
                     {
-                        if (await sender.Client.ReportCheatAsync(call, "Client interacted with nonexistent vent"))
+                        if (!AntiCheatConfig.AllowProtocolExtensions &&
+                            await sender.Client.ReportCheatAsync(call, "Client interacted with nonexistent vent"))
                         {
                             return false;
                         }

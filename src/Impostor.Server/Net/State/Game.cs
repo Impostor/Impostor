@@ -30,6 +30,7 @@ namespace Impostor.Server.Net.State
         private readonly HashSet<IPAddress> _bannedIps;
         private readonly IEventManager _eventManager;
         private readonly ICompatibilityManager _compatibilityManager;
+        private readonly AntiCheatConfig _antiCheatConfig;
         private readonly CompatibilityConfig _compatibilityConfig;
         private readonly TimeoutConfig _timeoutConfig;
 
@@ -44,6 +45,7 @@ namespace Impostor.Server.Net.State
             ClientManager clientManager,
             IEventManager eventManager,
             ICompatibilityManager compatibilityManager,
+            IOptions<AntiCheatConfig> antiCheatConfig,
             IOptions<CompatibilityConfig> compatibilityConfig,
             IOptions<TimeoutConfig> timeoutConfig)
         {
@@ -63,6 +65,7 @@ namespace Impostor.Server.Net.State
             _clientManager = clientManager;
             _eventManager = eventManager;
             _compatibilityManager = compatibilityManager;
+            _antiCheatConfig = antiCheatConfig.Value;
             _compatibilityConfig = compatibilityConfig.Value;
             _timeoutConfig = timeoutConfig.Value;
             Items = new ConcurrentDictionary<object, object>();
