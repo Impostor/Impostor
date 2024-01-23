@@ -211,7 +211,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc39SetHatStr.Deserialize(reader, out var hat);
-                    return true;
+                    return await HandleSetHat(sender, hat);
                 }
 
                 case RpcCalls.SetSkinStr:
@@ -222,7 +222,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc40SetSkinStr.Deserialize(reader, out var skin);
-                    return true;
+                    return await HandleSetSkin(sender, skin);
                 }
 
                 case RpcCalls.SetVisorStr:
@@ -233,7 +233,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc42SetVisorStr.Deserialize(reader, out var visor);
-                    return true;
+                    return await HandleSetVisor(sender, visor);
                 }
 
                 case RpcCalls.SetNamePlateStr:
@@ -244,7 +244,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc43SetNamePlateStr.Deserialize(reader, out var namePlate);
-                    return true;
+                    return await HandleSetNamePlate(sender, namePlate);
                 }
 
                 case RpcCalls.SetLevel:
@@ -743,7 +743,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleSetHat(ClientPlayer sender, string hat)
         {
-            if (Game.GameState == GameStates.Started && await sender.Client.ReportCheatAsync(RpcCalls.SetHat, "Client tried to change hat while not in lobby"))
+            if (AntiCheatConfig.EnableGameFlowChecks &&
+                Game.GameState == GameStates.Started &&
+                await sender.Client.ReportCheatAsync(RpcCalls.SetHat, "Client tried to change hat while not in lobby"))
             {
                 return false;
             }
@@ -755,12 +757,42 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleSetSkin(ClientPlayer sender, string skin)
         {
-            if (Game.GameState == GameStates.Started && await sender.Client.ReportCheatAsync(RpcCalls.SetSkin, "Client tried to change skin while not in lobby"))
+            if (AntiCheatConfig.EnableGameFlowChecks &&
+                Game.GameState == GameStates.Started &&
+                await sender.Client.ReportCheatAsync(RpcCalls.SetSkin, "Client tried to change skin while not in lobby"))
             {
                 return false;
             }
 
             PlayerInfo.CurrentOutfit.SkinId = skin;
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleSetVisor(ClientPlayer sender, string visor)
+        {
+            if (AntiCheatConfig.EnableGameFlowChecks &&
+                Game.GameState == GameStates.Started &&
+                await sender.Client.ReportCheatAsync(RpcCalls.SetVisor, "Client tried to change visor while not in lobby"))
+            {
+                return false;
+            }
+
+            PlayerInfo.CurrentOutfit.VisorId = visor;
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleSetNamePlate(ClientPlayer sender, string skin)
+        {
+            if (AntiCheatConfig.EnableGameFlowChecks &&
+                Game.GameState == GameStates.Started &&
+                await sender.Client.ReportCheatAsync(RpcCalls.SetNamePlate, "Client tried to change skin while not in lobby"))
+            {
+                return false;
+            }
+
+            PlayerInfo.CurrentOutfit.NamePlateId = skin;
 
             return true;
         }
