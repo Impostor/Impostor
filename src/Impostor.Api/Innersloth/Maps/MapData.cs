@@ -14,6 +14,7 @@ public abstract class MapData
         [MapTypes.Skeld] = new SkeldData(),
         [MapTypes.MiraHQ] = new MiraData(),
         [MapTypes.Polus] = new PolusData(),
+        [MapTypes.Dleks] = new AprilData(),
         [MapTypes.Airship] = new AirshipData(),
         [MapTypes.Fungle] = new FungleData(),
     }.AsReadOnly();
