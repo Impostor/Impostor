@@ -12,15 +12,18 @@ namespace Impostor.Server.Net
     {
         private readonly ILogger<MatchmakerService> _logger;
         private readonly ServerConfig _serverConfig;
+        private readonly HttpServerConfig _httpServerConfig;
         private readonly Matchmaker _matchmaker;
 
         public MatchmakerService(
             ILogger<MatchmakerService> logger,
             IOptions<ServerConfig> serverConfig,
+            IOptions<HttpServerConfig> httpServerConfig,
             Matchmaker matchmaker)
         {
             _logger = logger;
             _serverConfig = serverConfig.Value;
+            _httpServerConfig = httpServerConfig.Value;
             _matchmaker = matchmaker;
         }
 
@@ -37,12 +40,18 @@ namespace Impostor.Server.Net
                 _serverConfig.ResolvePublicIp(),
                 _serverConfig.PublicPort);
 
-            // NOTE: If this warning annoys you, set your PublicIp to "localhost"
+            // Only show one warning to reduce warning fatigue
             if (_serverConfig.PublicIp == "127.0.0.1")
             {
-                _logger.LogWarning("Your PublicIp is set to the default value of 127.0.0.1.");
-                _logger.LogWarning("To allow people on other devices to connect to your server, change this value to your Public IP address");
-                _logger.LogWarning("For more info on how to do this see https://github.com/Impostor/Impostor/blob/master/docs/Server-configuration.md");
+                // NOTE: If this warning annoys you, set your PublicIp to "localhost"
+                _logger.LogError("Your PublicIp is set to the default value of 127.0.0.1.");
+                _logger.LogError("To allow people on other devices to connect to your server, change this value to your Public IP address");
+                _logger.LogError("For more info on how to do this see https://github.com/Impostor/Impostor/blob/master/docs/Server-configuration.md");
+            }
+            else if (_httpServerConfig.ListenIp == "0.0.0.0")
+            {
+                _logger.LogWarning("Your HTTP server is exposed to the public internet, we recommend setting up a reverse proxy and enabling HTTPS");
+                _logger.LogWarning("See https://github.com/Impostor/Impostor/blob/master/docs/Http-server.md for instructions");
             }
         }
 
