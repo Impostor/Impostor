@@ -230,10 +230,7 @@ namespace Impostor.Server
 
                     builder.ConfigureKestrel(serverOptions =>
                     {
-                        serverOptions.Listen(IPAddress.Parse(httpConfig.ListenIp), httpConfig.ListenPort, listenOptions =>
-                        {
-                            listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
-                        });
+                        serverOptions.Listen(IPAddress.Parse(httpConfig.ListenIp), httpConfig.ListenPort);
                     });
                 });
             }
