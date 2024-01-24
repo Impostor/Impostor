@@ -1,4 +1,5 @@
-﻿using System.Net;
+using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Config;
@@ -48,7 +49,8 @@ namespace Impostor.Server.Net
                 _logger.LogError("For more info on how to do this see https://github.com/Impostor/Impostor/blob/master/docs/Server-configuration.md");
             }
 
-            if (_httpServerConfig.ListenIp == "0.0.0.0")
+            var runningOutsideContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == null;
+            if (_httpServerConfig.ListenIp == "0.0.0.0" && runningOutsideContainer)
             {
                 _logger.LogWarning("Your HTTP server is exposed to the public internet, we recommend setting up a reverse proxy and enabling HTTPS");
                 _logger.LogWarning("See https://github.com/Impostor/Impostor/blob/master/docs/Http-server.md for instructions");
