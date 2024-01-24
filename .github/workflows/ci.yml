@@ -5,13 +5,11 @@ on:
     paths:
       - '.github/workflows/ci.yml'
       - 'src/**/**'
-      - '.gitmodules'
       - 'build.cake'
   pull_request:
     paths:
       - '.github/workflows/ci.yml'
       - 'src/**/**'
-      - '.gitmodules'
       - 'build.cake'
 
 jobs:
@@ -20,9 +18,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: true
+        uses: actions/checkout@v4
 
       - uses: actions/cache@v3
         with:
