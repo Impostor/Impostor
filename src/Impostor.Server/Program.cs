@@ -193,7 +193,7 @@ namespace Impostor.Server
                         .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .WriteTo.Console()
-                        .ReadFrom.Configuration(context.Configuration, ConfigurationAssemblySource.AlwaysScanDllFiles);
+                        .ReadFrom.Configuration(context.Configuration, new ConfigurationReaderOptions(ConfigurationAssemblySource.AlwaysScanDllFiles));
 
                     AssemblyLoadContext.Default.Resolving -= LoadSerilogAssembly;
                 })
