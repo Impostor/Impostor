@@ -44,7 +44,7 @@ When the project has been created, you should have `Class.cs` and `Project.cspro
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 </Project>
 ```
@@ -270,7 +270,7 @@ Now your plugin is ready to be tested.
 
 1. Right click your project and press `Build`.
 2. Right click your project and press `Open Folder in File Explorer`.
-3. Go to `bin/Debug/net7.0/`.
+3. Go to `bin/Debug/net8.0/`.
 4. In this directory, you should find your plugin named `Project.dll`.
 5. Copy the `Project.dll` to the `plugins` directory in your Impostor server directory.
 6. (Re)start your Impostor server.
@@ -309,7 +309,7 @@ Constantly copying the plugin dll to your server directory can be pretty annoyin
   },
   "PluginLoader": {
     "Paths": [
-      "D:\\Projects\\Impostor\\src\\Impostor.Plugins.Example\\bin\\Debug\\net7.0"
+      "D:\\Projects\\Impostor\\src\\Impostor.Plugins.Example\\bin\\Debug\\net8.0"
     ],
     "LibraryPaths": []
   }

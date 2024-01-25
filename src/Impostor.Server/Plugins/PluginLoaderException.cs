@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 using Impostor.Api;
 
 namespace Impostor.Server.Plugins
@@ -15,10 +14,6 @@ namespace Impostor.Server.Plugins
         }
 
         public PluginLoaderException(string? message, Exception? innerException) : base(message, innerException)
-        {
-        }
-
-        protected PluginLoaderException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

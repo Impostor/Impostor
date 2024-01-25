@@ -18,7 +18,7 @@ namespace Impostor.Tests.Events
 
         [Theory]
         [MemberData(nameof(TestModes))]
-        public async ValueTask CallEvent(TestMode mode)
+        public async Task CallEvent(TestMode mode)
         {
             var listener = new EventListener();
             var eventManager = CreatEventManager(mode, listener);
@@ -50,7 +50,7 @@ namespace Impostor.Tests.Events
 
         [Theory]
         [MemberData(nameof(TestModes))]
-        public async ValueTask CancelEvent(TestMode mode)
+        public async Task CancelEvent(TestMode mode)
         {
             var listener = new EventListener();
             var eventManager = CreatEventManager(

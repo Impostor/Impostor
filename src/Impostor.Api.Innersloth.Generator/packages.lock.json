@@ -43,9 +43,9 @@
       },
       "PolySharp": {
         "type": "Direct",
-        "requested": "[1.14.0, )",
-        "resolved": "1.14.0",
-        "contentHash": "3K6beiIeVO0hOlHCHv2jgGW7UH3OXsOIiEW60CHpqGvbrHyy4iQfGkCOBtI92PDCaA8XC4ZM3+02g2qenRnHOA=="
+        "requested": "[1.14.1, )",
+        "resolved": "1.14.1",
+        "contentHash": "mOOmFYwad3MIOL14VCjj02LljyF1GNw1wP0YVlxtcPvqdxjGGMNdNJJxHptlry3MOd8b40Flm8RPOM8JOlN2sQ=="
       },
       "System.Text.Encodings.Web": {
         "type": "Direct",
