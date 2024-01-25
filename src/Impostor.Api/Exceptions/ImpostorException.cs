@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace Impostor.Api
 {
@@ -14,10 +13,6 @@ namespace Impostor.Api
         }
 
         public ImpostorException(string? message, Exception? innerException) : base(message, innerException)
-        {
-        }
-
-        protected ImpostorException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }
