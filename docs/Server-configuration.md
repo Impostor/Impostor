@@ -17,11 +17,11 @@ Some information about all the possible configurations. Click [here](https://git
 
 Impostor has an Http Server that is used by recent versions of Among Us to connect to. See [the Http Server page](Http-server.md) for more details on how to set this up.
 
-| Key            | Default     | Description                                                                                                                                                                                  |
-|----------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Enabled**    | `true`      | Whether the http server should be enabled.                                                                                                                                                   |
-| **ListenIp**   | `127.0.0.1` | The network interface to listen on. Use `127.0.0.1` if you use a reverse proxy or just run locally. Use `0.0.0.0` if you are directly exposing this server to the internet (not recommended) |
-| **ListenPort** | `22023`     | The listen port of this server. For port forwarding purposes, this is an TCP port.                                                                                                           |
+| Key            | Default   | Description                                                                                                                                                                |
+|----------------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Enabled**    | `true`    | Whether the http server should be enabled.                                                                                                                                 |
+| **ListenIp**   | `0.0.0.0` | The network interface to listen on. Use `127.0.0.1` if you use a reverse proxy or just run locally. Use `0.0.0.0` if you are directly exposing this server to the internet |
+| **ListenPort** | `22023`   | The listen port of this server. For port forwarding purposes, this is an TCP port.                                                                                         |
 
 ### AntiCheat
 

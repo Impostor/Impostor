@@ -16,8 +16,8 @@ public class HttpServerConfig
     /// Gets or sets the IP address the HTTP Matchmaking server will listen on.
     /// </summary>
     /// Use "127.0.0.1" if you are running behind a reverse proxy or just testing locally.
-    /// Use "0.0.0.0" if you are directly exposing this server to the internet (not recommended).
-    public string ListenIp { get; set; } = "127.0.0.1";
+    /// Use "0.0.0.0" if you are directly exposing this server to the internet.
+    public string ListenIp { get; set; } = "0.0.0.0";
 
     /// <summary>
     /// Gets or sets the port the HTTP Matchmaking server will listen on.

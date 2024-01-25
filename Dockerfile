@@ -40,8 +40,6 @@ FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 COPY --from=build /app ./
 
-# Make the HttpServer listen to 0.0.0.0 to expose it to the outside world.
-ENV IMPOSTOR_HttpServer__ListenIp=0.0.0.0
 # Override ASPNETCORE_URLS to stop warning.
 ENV ASPNETCORE_URLS=
 
