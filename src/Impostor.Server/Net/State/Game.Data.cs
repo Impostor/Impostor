@@ -39,7 +39,7 @@ namespace Impostor.Server.Net.State
             [4] = typeof(InnerPlayerControl),
             [5] = typeof(InnerMiraShipStatus),
             [6] = typeof(InnerPolusShipStatus),
-            [7] = typeof(InnerShipStatus),
+            [7] = typeof(InnerDleksShipStatus),
             [8] = typeof(InnerAirshipStatus),
             [9] = typeof(InnerHideAndSeekManager),
             [10] = typeof(InnerNormalGameManager),
