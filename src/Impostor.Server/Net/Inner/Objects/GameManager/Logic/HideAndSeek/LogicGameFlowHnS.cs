@@ -1,4 +1,5 @@
-﻿using Impostor.Api.Net.Inner.Objects.GameManager.Logic.HideAndSeek;
+using System.Threading.Tasks;
+using Impostor.Api.Net.Inner.Objects.GameManager.Logic.HideAndSeek;
 
 namespace Impostor.Server.Net.Inner.Objects.GameManager.Logic.HideAndSeek;
 
@@ -8,11 +9,12 @@ internal class LogicGameFlowHnS : LogicGameFlow, ILogicGameFlowHnS
 
     public float CurrentHideTime { get; private set; }
 
-    public override void Deserialize(IMessageReader reader, bool initialState)
+    public override ValueTask DeserializeAsync(IMessageReader reader, bool initialState)
     {
         var num = reader.ReadSingle();
 
         CurrentFinalHideTime = reader.ReadSingle();
         CurrentHideTime = num;
+        return default;
     }
 }

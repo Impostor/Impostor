@@ -78,6 +78,16 @@ namespace Impostor.Plugins.Example.Handlers
         }
 
         [EventListener]
+        public void OnGameOptionsChanged(IGameOptionsChangedEvent e)
+        {
+            _logger.LogInformation(
+                "Game {code} > new options because of {source}",
+                e.Game.Code,
+                e.ChangedBy
+            );
+        }
+
+        [EventListener]
         public void OnPlayerJoined(IGamePlayerJoinedEvent e)
         {
             _logger.LogInformation("Game {code} > {player} joined", e.Game.Code, e.Player.Client.Name);

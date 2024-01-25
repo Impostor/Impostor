@@ -141,7 +141,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc02SyncSettings.DeserializeInto(reader, Game.Options);
+                    // Clients no longer handle this packet since 2022.12.8 but continue to send it
                     break;
                 }
 
