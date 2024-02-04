@@ -17,6 +17,14 @@ public class ServerConfig
 
     public ushort ListenPort { get; set; } = 22023;
 
+    public bool UseUDP { get; set; } = true;
+
+    public bool UseOnline { get; set; } = true;
+
+    public bool UseDtl { get; set; } = false;
+
+    public string ServerCertification { get; set; } = string.Empty;
+
     public string ResolvePublicIp()
     {
         return _resolvedPublicIp ??= IpUtils.ResolveIp(PublicIp);

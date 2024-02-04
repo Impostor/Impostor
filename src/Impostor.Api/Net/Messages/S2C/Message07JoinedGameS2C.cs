@@ -18,16 +18,17 @@ public static class Message07JoinedGameS2C
         writer.Write(hostId);
         writer.WritePacked(otherPlayers.Length);
 
-        foreach (var ply in otherPlayers)
+        foreach (var otherPlayer in otherPlayers)
         {
-            writer.WritePacked(ply.Client.Id);
-            writer.Write(ply.Client.Name);
-            ply.Client.PlatformSpecificData.Serialize(writer);
-            writer.WritePacked(ply.Character?.PlayerInfo.PlayerLevel ?? 1);
+            writer.WritePacked(otherPlayer.Client.Id);
+            writer.Write(otherPlayer.Client.Name);
+            otherPlayer.Client.PlatformSpecificData.Serialize(writer);
+            writer.WritePacked(otherPlayer.Character?.PlayerInfo.PlayerLevel ?? 1);
 
+            var (puid, friendCode) = otherPlayer.GetPuidAndFriendCode();
             // ProductUserId and FriendCode are not yet known, so set them to an empty string
-            writer.Write(string.Empty);
-            writer.Write(string.Empty);
+            writer.Write(puid);
+            writer.Write(friendCode);
         }
 
         writer.EndMessage();

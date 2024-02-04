@@ -18,6 +18,11 @@ public static class ServerCoreLoader
         var rootFolder = Directory.GetCurrentDirectory();
         var serverCoreFolder = Path.Combine(rootFolder, "Core");
 
+        if (!Directory.Exists(serverCoreFolder))
+        {
+            Directory.CreateDirectory(serverCoreFolder);
+        }
+
         var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
         matcher.AddInclude("*.dll");
         matcher.AddExclude("Impostor.Api.dll");

@@ -20,9 +20,10 @@ public class Message01JoinGameS2C
         player.Client.PlatformSpecificData.Serialize(writer);
         writer.WritePacked(player.Character?.PlayerInfo.PlayerLevel ?? 1);
 
+        var (puid, friendCode) = player.GetPuidAndFriendCode();
         // ProductUserId and FriendCode are not yet known, so set them to an empty string
-        writer.Write(string.Empty);
-        writer.Write(string.Empty);
+        writer.Write(puid);
+        writer.Write(friendCode);
         writer.EndMessage();
     }
 

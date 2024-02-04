@@ -39,4 +39,6 @@ public interface IClientPlayer
     ValueTask KickAsync();
 
     ValueTask BanAsync();
+
+    (string, string) GetPuidAndFriendCode();
 }

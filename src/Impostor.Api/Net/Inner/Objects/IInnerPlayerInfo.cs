@@ -43,4 +43,8 @@ public interface IInnerPlayerInfo
     DateTimeOffset LastMurder { get; }
 
     uint PlayerLevel { get; }
+
+    string FriendCode { get; }
+
+    string Puid { get;  }
 }

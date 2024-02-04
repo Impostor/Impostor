@@ -17,26 +17,22 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net;
 
-internal class Client : ClientBase
+internal class Client(
+    ILogger<Client> logger,
+    IOptions<AntiCheatConfig> antiCheatOptions,
+    ClientManager clientManager,
+    GameManager gameManager,
+    ICustomMessageManager<ICustomRootMessage> customMessageManager,
+    string name,
+    GameVersion gameVersion,
+    SupportedLanguages language,
+    QuickChatModes chatMode,
+    PlatformSpecificData platformSpecificData,
+    IHazelConnection connection,
+    IConnectionData connectionData)
+    : ClientBase(name, gameVersion, language, chatMode, platformSpecificData, connection, connectionData)
 {
-    private readonly AntiCheatConfig _antiCheatConfig;
-    private readonly ClientManager _clientManager;
-    private readonly ICustomMessageManager<ICustomRootMessage> _customMessageManager;
-    private readonly GameManager _gameManager;
-    private readonly ILogger<Client> _logger;
-
-    public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager,
-        GameManager gameManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, string name,
-        GameVersion gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData,
-        IHazelConnection connection)
-        : base(name, gameVersion, language, chatMode, platformSpecificData, connection)
-    {
-        _logger = logger;
-        _antiCheatConfig = antiCheatOptions.Value;
-        _clientManager = clientManager;
-        _gameManager = gameManager;
-        _customMessageManager = customMessageManager;
-    }
+    private readonly AntiCheatConfig _antiCheatConfig = antiCheatOptions.Value;
 
     public override async ValueTask<bool> ReportCheatAsync(CheatContext context, string message)
     {
@@ -45,7 +41,7 @@ internal class Client : ClientBase
             return false;
         }
 
-        _logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{Context}] {Message}", Name, Id, context.Name,
+        logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{Context}] {Message}", Name, Id, context.Name,
             message);
 
         if (_antiCheatConfig.BanIpFromGame)
@@ -62,7 +58,7 @@ internal class Client : ClientBase
     {
         var flag = reader.Tag;
 
-        _logger.LogTrace("[{0}] Server got {1}.", Id, MessageFlags.FlagToString(flag));
+        logger.LogTrace("[{0}] Server got {1}.", Id, MessageFlags.FlagToString(flag));
 
         switch (flag)
         {
@@ -72,7 +68,7 @@ internal class Client : ClientBase
                 Message00HostGameC2S.Deserialize(reader, out var gameOptions, out _, out var gameFilterOptions);
 
                 // Create game.
-                var game = await _gameManager.CreateAsync(this, gameOptions, gameFilterOptions);
+                var game = await gameManager.CreateAsync(this, gameOptions, gameFilterOptions);
 
                 if (game == null)
                 {
@@ -94,7 +90,7 @@ internal class Client : ClientBase
             {
                 Message01JoinGameC2S.Deserialize(reader, out var gameCode);
 
-                var game = _gameManager.Find(gameCode);
+                var game = gameManager.Find(gameCode);
                 if (game == null)
                 {
                     await DisconnectAsync(DisconnectReason.GameNotFound);
@@ -149,7 +145,7 @@ internal class Client : ClientBase
                     return;
                 }
 
-                await Player!.Game.HandleStartGame(reader);
+                await Player!.Game.HandleStartGameAsync(reader);
                 break;
             }
 
@@ -169,7 +165,7 @@ internal class Client : ClientBase
                     out var playerId,
                     out var reason);
 
-                await Player!.Game.HandleRemovePlayer(playerId, (DisconnectReason)reason);
+                await Player!.Game.HandleRemovePlayerAsync(playerId, (DisconnectReason)reason);
                 break;
             }
 
@@ -220,7 +216,7 @@ internal class Client : ClientBase
                     reader,
                     out var gameOverReason);
 
-                await Player!.Game.HandleEndGame(reader, gameOverReason);
+                await Player!.Game.HandleEndGameAsync(reader, gameOverReason);
                 break;
             }
 
@@ -241,7 +237,7 @@ internal class Client : ClientBase
                     return;
                 }
 
-                await Player!.Game.HandleAlterGame(reader, Player, value);
+                await Player!.Game.HandleAlterGameAsync(reader, Player, value);
                 break;
             }
 
@@ -257,7 +253,7 @@ internal class Client : ClientBase
                     out var playerId,
                     out var isBan);
 
-                await Player!.Game.HandleKickPlayer(playerId, isBan);
+                await Player!.Game.HandleKickPlayerAsync(playerId, isBan);
                 break;
             }
 
@@ -281,13 +277,13 @@ internal class Client : ClientBase
             }
 
             default:
-                if (_customMessageManager.TryGet(flag, out var customRootMessage))
+                if (customMessageManager.TryGet(flag, out var customRootMessage))
                 {
                     await customRootMessage.HandleMessageAsync(this, reader, messageType);
                     break;
                 }
 
-                _logger.LogWarning("Server received unknown flag {0}.", flag);
+                logger.LogWarning("Server received unknown flag {0}.", flag);
                 break;
         }
 
@@ -297,7 +293,7 @@ internal class Client : ClientBase
             flag != MessageFlags.EndGame &&
             reader.Position < reader.Length)
         {
-            _logger.LogWarning(
+            logger.LogWarning(
                 "Server did not consume all bytes from {0} ({1} < {2}).",
                 flag,
                 reader.Position,
@@ -312,16 +308,16 @@ internal class Client : ClientBase
         {
             if (Player != null)
             {
-                await Player.Game.HandleRemovePlayer(Id, DisconnectReason.ExitGame);
+                await Player.Game.HandleRemovePlayerAsync(Id, DisconnectReason.ExitGame);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception caught in client disconnection.");
+            logger.LogError(ex, "Exception caught in client disconnection.");
         }
 
-        _logger.LogInformation("Client {0} disconnecting, reason: {1}", Id, reason);
-        _clientManager.Remove(this);
+        logger.LogInformation("Client {0} disconnecting, reason: {1}", Id, reason);
+        clientManager.Remove(this);
     }
 
     private bool IsPacketAllowed(IMessageReader message, bool hostOnly)
@@ -340,18 +336,19 @@ internal class Client : ClientBase
         }
 
         // Some packets should only be sent by the host of the game.
-        if (hostOnly)
+        if (!hostOnly)
         {
-            if (game.HostId == Id)
-            {
-                return true;
-            }
-
-            _logger.LogWarning("[{0}] Client sent packet only allowed by the host ({1}).", Id, game.HostId);
-            return false;
+            return true;
         }
 
-        return true;
+        if (game.HostId == Id)
+        {
+            return true;
+        }
+
+        logger.LogWarning("[{0}] Client sent packet only allowed by the host ({1}).", Id, game.HostId);
+        return false;
+
     }
 
     /// <summary>
@@ -364,7 +361,7 @@ internal class Client : ClientBase
     {
         using var message = MessageWriter.Get(MessageType.Reliable);
 
-        var playerSpecificData = _gameManager.Find(code)?.Players.Select(p => p.Client.PlatformSpecificData) ??
+        var playerSpecificData = gameManager.Find(code)?.Players.Select(p => p.Client.PlatformSpecificData) ??
                                  Enumerable.Empty<PlatformSpecificData>();
 
         Message22QueryPlatformIdsS2C.Serialize(message, code, playerSpecificData);

@@ -18,6 +18,8 @@ public interface IClient
     /// </remarks>
     int Id { get; set; }
 
+    IConnectionData _connectionData { get; }
+
     /// <summary>
     ///     Gets the name that was provided by the player in the client.
     /// </summary>
@@ -29,7 +31,7 @@ public interface IClient
     /// <summary>
     ///     Gets the language.
     /// </summary>
-    Language Language { get; }
+    SupportedLanguages Language { get; }
 
     /// <summary>
     ///     Gets the quick chat mode.

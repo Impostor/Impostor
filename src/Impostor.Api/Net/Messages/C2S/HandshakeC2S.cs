@@ -5,7 +5,7 @@ namespace Impostor.Api.Net.Messages.C2S;
 public static class HandshakeC2S
 {
     public static void Deserialize(IMessageReader reader, out GameVersion clientVersion, out string name,
-        out Language language, out QuickChatModes chatMode, out PlatformSpecificData? platformSpecificData)
+        out SupportedLanguages language, out QuickChatModes chatMode, out PlatformSpecificData? platformSpecificData)
     {
         clientVersion = reader.ReadGameVersion();
         name = reader.ReadString();
@@ -17,12 +17,12 @@ public static class HandshakeC2S
 
         if (clientVersion >= Version.V2)
         {
-            language = (Language)reader.ReadUInt32();
+            language = (SupportedLanguages)reader.ReadUInt32();
             chatMode = (QuickChatModes)reader.ReadByte();
         }
         else
         {
-            language = Language.English;
+            language = SupportedLanguages.English;
             chatMode = QuickChatModes.FreeChatOrQuickChat;
         }
 

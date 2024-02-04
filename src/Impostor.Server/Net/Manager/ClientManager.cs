@@ -16,26 +16,16 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Manager;
 
-internal partial class ClientManager
+internal partial class ClientManager(
+    ILogger<ClientManager> logger,
+    IEventManager eventManager,
+    IClientFactory clientFactory,
+    ICompatibilityManager compatibilityManager,
+    IOptions<CompatibilityConfig> compatibilityConfig)
 {
-    private readonly IClientFactory _clientFactory;
-    private readonly ConcurrentDictionary<int, ClientBase> _clients;
-    private readonly CompatibilityConfig _compatibilityConfig;
-    private readonly ICompatibilityManager _compatibilityManager;
-    private readonly IEventManager _eventManager;
-    private readonly ILogger<ClientManager> _logger;
+    private readonly ConcurrentDictionary<int, ClientBase> _clients = new();
+    private readonly CompatibilityConfig _compatibilityConfig = compatibilityConfig.Value;
     private int _idLast;
-
-    public ClientManager(ILogger<ClientManager> logger, IEventManager eventManager, IClientFactory clientFactory,
-        ICompatibilityManager compatibilityManager, IOptions<CompatibilityConfig> compatibilityConfig)
-    {
-        _logger = logger;
-        _eventManager = eventManager;
-        _clientFactory = clientFactory;
-        _clients = new ConcurrentDictionary<int, ClientBase>();
-        _compatibilityManager = compatibilityManager;
-        _compatibilityConfig = compatibilityConfig.Value;
-    }
 
     public IEnumerable<ClientBase> Clients => _clients.Values;
 
@@ -55,21 +45,30 @@ internal partial class ClientManager
         return clientId;
     }
 
-    public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, GameVersion clientVersion,
-        Language language, QuickChatModes chatMode, PlatformSpecificData? platformSpecificData)
+    public async ValueTask RegisterConnectionAsync(ConnectionData connectionData)
     {
-        var versionCompare = _compatibilityManager.CanConnectToServer(clientVersion);
-        if (versionCompare == ICompatibilityManager.VersionCompareResult.ServerTooOld &&
-            _compatibilityConfig.AllowFutureGameVersions && platformSpecificData != null)
+        var clientVersion = connectionData.Version!.Value;
+        var platformData = new PlatformSpecificData(
+            connectionData.Platforms,
+            connectionData.PlatformName,
+            connectionData.Platforms == Platforms.Xbox ? connectionData.PlatformId : null,
+            connectionData.Platforms == Platforms.Playstation ? connectionData.PlatformId : null
+            );
+        var versionCompare = compatibilityManager.CanConnectToServer(clientVersion);
+        if (
+            versionCompare == ICompatibilityManager.VersionCompareResult.ServerTooOld
+            &&
+            _compatibilityConfig.AllowFutureGameVersions
+            )
         {
-            _logger.LogWarning(
+            logger.LogWarning(
                 "Client connected using future version: {clientVersion} ({version}). Unsupported, continue at your own risk.",
                 clientVersion.Value, clientVersion.ToString());
         }
-        else if (versionCompare != ICompatibilityManager.VersionCompareResult.Compatible ||
-                 platformSpecificData == null)
+        else if (versionCompare != ICompatibilityManager.VersionCompareResult.Compatible)
         {
-            _logger.LogInformation("Client connected using unsupported version: {clientVersion} ({version})",
+            logger.LogInformation(
+                "Client connected using unsupported version: {clientVersion} ({version})",
                 clientVersion.Value, clientVersion.ToString());
 
             using var packet = MessageWriter.Get(MessageType.Reliable);
@@ -82,36 +81,44 @@ internal partial class ClientManager
                 _ => throw new ArgumentOutOfRangeException(),
             };
 
-            await connection.CustomDisconnectAsync(DisconnectReason.Custom, message);
+            await connectionData._connection.CustomDisconnectAsync(DisconnectReason.Custom, message);
             return;
         }
 
-        if (name.Length > 10)
+        if (connectionData.Name.Length > 10)
         {
-            await connection.CustomDisconnectAsync(DisconnectReason.Custom, DisconnectMessages.UsernameLength);
+            await connectionData._connection.CustomDisconnectAsync(DisconnectReason.Custom, DisconnectMessages.UsernameLength);
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(connectionData.Name))
         {
-            await connection.CustomDisconnectAsync(DisconnectReason.Custom,
+            await connectionData._connection.CustomDisconnectAsync(
+                DisconnectReason.Custom,
                 DisconnectMessages.UsernameIllegalCharacters);
             return;
         }
 
-        var client = _clientFactory.Create(connection, name, clientVersion, language, chatMode, platformSpecificData);
+        var client = clientFactory.Create(
+            connectionData._connection,
+            connectionData.Name,
+            connectionData.Version.Value,
+            connectionData.Language,
+            connectionData.ChatMode,
+            platformData,
+            connectionData);
         var id = NextId();
 
         client.Id = id;
-        _logger.LogTrace("Client connected.");
+        logger.LogTrace("Client connected.");
         _clients.TryAdd(id, client);
 
-        await _eventManager.CallAsync(new ClientConnectedEvent(connection, client));
+        await eventManager.CallAsync(new ClientConnectedEvent(connectionData._connection, client));
     }
 
     public void Remove(IClient client)
     {
-        _logger.LogTrace("Client disconnected.");
+        logger.LogTrace("Client disconnected.");
         _clients.TryRemove(client.Id, out _);
     }
 

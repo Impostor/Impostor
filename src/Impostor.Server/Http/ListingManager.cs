@@ -14,21 +14,13 @@ namespace Impostor.Server.Http;
 /// <summary>
 ///     Perform game listing filtering.
 /// </summary>
-public sealed class ListingManager
+public sealed class ListingManager(
+    IGameManager gameManager,
+    IEnumerable<IListingFilter> listingFilters,
+    ICompatibilityManager compatibilityManager,
+    IOptions<CompatibilityConfig> compatibilityConfig)
 {
-    private readonly CompatibilityConfig _compatibilityConfig;
-    private readonly ICompatibilityManager _compatibilityManager;
-    private readonly IGameManager _gameManager;
-    private readonly IEnumerable<IListingFilter> _listingFilters;
-
-    public ListingManager(IGameManager gameManager, IEnumerable<IListingFilter> listingFilters,
-        ICompatibilityManager compatibilityManager, IOptions<CompatibilityConfig> compatibilityConfig)
-    {
-        _gameManager = gameManager;
-        _listingFilters = listingFilters;
-        _compatibilityManager = compatibilityManager;
-        _compatibilityConfig = compatibilityConfig.Value;
-    }
+    private readonly CompatibilityConfig _compatibilityConfig = compatibilityConfig.Value;
 
     /// <summary>
     ///     Find listings that match the requested settings.
@@ -45,7 +37,7 @@ public sealed class ListingManager
     {
         var resultCount = 0;
 
-        var filters = _listingFilters.Select(f => f.GetFilter(ctx)).ToArray();
+        var filters = listingFilters.Select(f => f.GetFilter(ctx)).ToArray();
 
         var compatibleGames = new List<IGame>();
 
@@ -54,7 +46,7 @@ public sealed class ListingManager
         // 2. Failing that, display compatible games the player could join (public games with spots available)
 
         // .Where filters out games that can't be joined.
-        foreach (var game in _gameManager.Games)
+        foreach (var game in gameManager.Games)
         {
             if (!game.IsPublic || game.GameState != GameStates.NotStarted ||
                 game.PlayerCount >= game.Options.MaxPlayers)
@@ -64,7 +56,7 @@ public sealed class ListingManager
 
             if (!_compatibilityConfig.AllowVersionMixing &&
                 game.Host != null &&
-                _compatibilityManager.CanJoinGame(game.Host.Client.GameVersion, gameVersion) != GameJoinError.None)
+                compatibilityManager.CanJoinGame(game.Host.Client.GameVersion, gameVersion) != GameJoinError.None)
             {
                 continue;
             }

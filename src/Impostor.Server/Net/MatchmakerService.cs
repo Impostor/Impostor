@@ -20,7 +20,7 @@ internal class MatchmakerService(
     {
         var endpoint = new IPEndPoint(IPAddress.Parse(_serverConfig.ResolveListenIp()), _serverConfig.ListenPort);
 
-        await matchmaker.StartAsync(endpoint);
+        await matchmaker.StartAsync(endpoint, _serverConfig);
 
         logger.LogInformation(
             "Matchmaker is listening on {0}:{1}, the public server ip is {2}:{3}.",
@@ -28,6 +28,8 @@ internal class MatchmakerService(
             endpoint.Port,
             _serverConfig.ResolvePublicIp(),
             _serverConfig.PublicPort);
+
+        logger.LogInformation($"Matchmaker UseUDP : {_serverConfig.UseUDP} UseOnline : {_serverConfig.UseOnline}, UseDtl : {_serverConfig.UseDtl}");
 
         // NOTE: If this warning annoys you, set your PublicIp to "localhost"
         if (_serverConfig.PublicIp == "127.0.0.1")

@@ -6,22 +6,12 @@ namespace Impostor.Server.Net.Inner.Objects;
 
 internal partial class InnerGameData
 {
-    public partial class TaskInfo : ITaskInfo
+    public partial class TaskInfo(InnerPlayerInfo playerInfo, IEventManager eventManager, uint id, TaskData? task)
+        : ITaskInfo
     {
-        private readonly IEventManager _eventManager;
-        private readonly InnerPlayerInfo _playerInfo;
+        public uint Id { get; internal set; } = id;
 
-        public TaskInfo(InnerPlayerInfo playerInfo, IEventManager eventManager, uint id, TaskData? task)
-        {
-            _playerInfo = playerInfo;
-            _eventManager = eventManager;
-            Id = id;
-            Task = task;
-        }
-
-        public uint Id { get; internal set; }
-
-        public TaskData? Task { get; internal set; }
+        public TaskData? Task { get; internal set; } = task;
 
         public bool Complete { get; internal set; }
 

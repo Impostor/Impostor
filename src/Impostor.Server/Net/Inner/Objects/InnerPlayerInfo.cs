@@ -8,16 +8,11 @@ using Impostor.Api.Utils;
 
 namespace Impostor.Server.Net.Inner.Objects;
 
-internal partial class InnerPlayerInfo
+internal partial class InnerPlayerInfo(byte playerId)
 {
-    public InnerPlayerInfo(byte playerId)
-    {
-        PlayerId = playerId;
-    }
-
     public InnerPlayerControl? Controller { get; internal set; }
 
-    public byte PlayerId { get; }
+    public byte PlayerId { get; } = playerId;
 
     public bool Disconnected { get; internal set; }
 
@@ -42,11 +37,17 @@ internal partial class InnerPlayerInfo
 
     public bool IsDead { get; internal set; }
 
+    public bool RoleWhenAlive { get; internal set; }
+
     public DeathReason LastDeathReason { get; internal set; }
 
     public DateTimeOffset LastMurder { get; set; }
 
     public uint PlayerLevel { get; internal set; }
+
+    public string FriendCode { get; internal set; } = string.Empty;
+
+    public string Puid { get; internal set; } = string.Empty;
 
     public bool CanMurder(IGame game, IDateTimeProvider dateTimeProvider)
     {
@@ -93,6 +94,12 @@ internal partial class InnerPlayerInfo
 
         _ = (RoleTypes)reader.ReadUInt16(); // ignore the RoleType here and only trust the SetRole rpc
 
+        RoleWhenAlive = reader.ReadBoolean();
+        if (RoleWhenAlive)
+        {
+            _ = reader.ReadUInt16(); // RoleWhenAlive Value
+        }
+
         var taskCount = reader.ReadByte();
 
         if (Tasks.Count < taskCount)
@@ -104,5 +111,8 @@ internal partial class InnerPlayerInfo
         {
             Tasks[i].Deserialize(reader);
         }
+
+        FriendCode = reader.ReadString();
+        Puid = reader.ReadString();
     }
 }

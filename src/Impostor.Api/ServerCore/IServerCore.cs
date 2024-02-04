@@ -5,4 +5,6 @@ namespace Impostor.Api.ServerCore;
 public interface IServerCore
 {
     public ICompatibilityManager.CompatibilityGroup CompatibilityGroup { get; set; }
+
+    public T? Get<T>();
 }

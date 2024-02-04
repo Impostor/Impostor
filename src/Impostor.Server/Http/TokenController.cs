@@ -47,7 +47,7 @@ public sealed class TokenController : ControllerBase
 
         [JsonPropertyName("ClientVersion")] public required int ClientVersion { get; init; }
 
-        [JsonPropertyName("Language")] public required Language Language { get; init; }
+        [JsonPropertyName("Language")] public required SupportedLanguages Language { get; init; }
     }
 
     /// <summary>

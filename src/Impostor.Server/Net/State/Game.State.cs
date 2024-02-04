@@ -12,7 +12,7 @@ namespace Impostor.Server.Net.State;
 
 internal partial class Game
 {
-    private async ValueTask PlayerAdd(ClientPlayer player)
+    private async ValueTask PlayerAddAsync(ClientPlayer player)
     {
         // Store player.
         if (!_players.TryAdd(player.Client.Id, player))
@@ -26,17 +26,17 @@ internal partial class Game
             HostId = player.Client.Id;
         }
 
-        await _eventManager.CallAsync(new GamePlayerJoinedEvent(this, player));
+        await eventManager.CallAsync(new GamePlayerJoinedEvent(this, player));
     }
 
-    private async ValueTask<bool> PlayerRemove(int playerId, bool isBan = false)
+    private async ValueTask<bool> PlayerRemoveAsync(int playerId, bool isBan = false)
     {
         if (!_players.TryRemove(playerId, out var player))
         {
             return false;
         }
 
-        _logger.LogInformation("{0} - Player {1} ({2}) has left.", Code, player.Client.Name, playerId);
+        logger.LogInformation("{0} - Player {1} ({2}) has left.", Code, player.Client.Name, playerId);
 
         if (GameState == GameStates.Starting || GameState == GameStates.Started || GameState == GameStates.NotStarted)
         {
@@ -52,8 +52,8 @@ internal partial class Game
         // Host migration.
         if (HostId == playerId)
         {
-            await MigrateHost();
-            await _eventManager.CallAsync(new GameHostChangedEvent(this, player, Host));
+            await MigrateHostAsync();
+            await eventManager.CallAsync(new GameHostChangedEvent(this, player, Host));
         }
 
         // Game is empty, remove it.
@@ -62,7 +62,7 @@ internal partial class Game
             GameState = GameStates.Destroyed;
 
             // Remove instance reference.
-            await _gameManager.RemoveAsync(Code);
+            await gameManager.RemoveAsync(Code);
             return true;
         }
 
@@ -71,7 +71,7 @@ internal partial class Game
             BanIp(player.Client.Connection.EndPoint.Address);
         }
 
-        await _eventManager.CallAsync(new GamePlayerLeftEvent(this, player, isBan));
+        await eventManager.CallAsync(new GamePlayerLeftEvent(this, player, isBan));
 
         // Player can refuse to be kicked and keep the connection open, check for this.
         _ = Task.Run(async () =>
@@ -80,7 +80,7 @@ internal partial class Game
 
             if (player.Client.Connection.IsConnected && player.Client.Connection is HazelConnection hazel)
             {
-                _logger.LogInformation("{0} - Player {1} ({2}) kept connection open after leaving, disposing.", Code,
+                logger.LogInformation("{0} - Player {1} ({2}) kept connection open after leaving, disposing.", Code,
                     player.Client.Name, playerId);
                 hazel.DisposeInnerConnection();
             }
@@ -89,7 +89,7 @@ internal partial class Game
         return true;
     }
 
-    private async ValueTask MigrateHost()
+    private async ValueTask MigrateHostAsync()
     {
         // Pick the first player as new host.
         var host = _players
@@ -108,7 +108,7 @@ internal partial class Game
         }
 
         HostId = host.Client.Id;
-        _logger.LogInformation("{0} - Assigned {1} ({2}) as new host.", Code, host.Client.Name, host.Client.Id);
+        logger.LogInformation("{0} - Assigned {1} ({2}) as new host.", Code, host.Client.Name, host.Client.Id);
 
         // Check our current game state.
         if (GameState == GameStates.Ended && host.Limbo == LimboStates.WaitingForHost)
@@ -116,14 +116,14 @@ internal partial class Game
             GameState = GameStates.NotStarted;
 
             // Spawn the host.
-            await HandleJoinGameNew(host, false);
+            await HandleJoinGameNewAsync(host, false);
 
             // Pull players out of limbo.
-            await CheckLimboPlayers();
+            await CheckLimboPlayersAsync();
         }
     }
 
-    private async ValueTask CheckLimboPlayers()
+    private async ValueTask CheckLimboPlayersAsync()
     {
         using var message = MessageWriter.Get(MessageType.Reliable);
 

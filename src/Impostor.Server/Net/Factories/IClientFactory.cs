@@ -5,6 +5,6 @@ namespace Impostor.Server.Net.Factories;
 
 internal interface IClientFactory
 {
-    ClientBase Create(IHazelConnection connection, string name, GameVersion clientVersion, Language language,
-        QuickChatModes chatMode, PlatformSpecificData platformSpecificData);
+    ClientBase Create(IHazelConnection connection, string name, GameVersion clientVersion, SupportedLanguages language,
+        QuickChatModes chatMode, PlatformSpecificData platformSpecificData, IConnectionData connectionData);
 }

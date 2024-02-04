@@ -54,14 +54,6 @@ private void ImpostorPublish(string name, string project, string runtime) {
        FileWriteText(projBuildDir.CombineWithFilePath("run.bat"), "@echo off\r\nImpostor.Server.exe\r\npause");
     }
     
-    CreateDirectory(projBuildDir.Combine("Plugins"));
-    CreateDirectory(projBuildDir.Combine("Lib"));
-    CreateDirectory(projBuildDir.Combine("Core"));
-    
-    FileWriteText(projBuildDir.Combine("Plugins").CombineWithFilePath("Directory.txt"), "This is Plugins Directory");
-    FileWriteText(projBuildDir.Combine("Lib").CombineWithFilePath("Directory.txt"), "This is Lib Directory");
-    FileWriteText(projBuildDir.Combine("Core").CombineWithFilePath("Directory.txt"), "This is Core Directory");
-    
     if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
         BuildSystem.GitHubActions.Commands.UploadArtifact(projBuildDir, projBuildName);
     }

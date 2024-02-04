@@ -50,13 +50,22 @@ internal partial class ClientPlayer : IClientPlayer
     /// <inheritdoc />
     public ValueTask KickAsync()
     {
-        return Game.HandleKickPlayer(Client.Id, false);
+        return Game.HandleKickPlayerAsync(Client.Id, false);
     }
 
     /// <inheritdoc />
     public ValueTask BanAsync()
     {
-        return Game.HandleKickPlayer(Client.Id, true);
+        return Game.HandleKickPlayerAsync(Client.Id, true);
+    }
+
+    public (string, string) GetPuidAndFriendCode()
+    {
+        var puid = Character?.PlayerInfo.Puid ?? string.Empty;
+        var friendCode = (Client._connectionData.FriendCode == string.Empty
+            ? Character?.PlayerInfo.FriendCode
+            : Client._connectionData.FriendCode) ?? string.Empty;
+        return (puid, friendCode);
     }
 
     public void InitializeSpawnTimeout()

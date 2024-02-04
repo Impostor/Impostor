@@ -35,4 +35,8 @@
     <AdditionalFiles Include="Innersloth/Data/**/*.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mod\" />
+  </ItemGroup>
+
 </Project>

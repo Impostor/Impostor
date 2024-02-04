@@ -21,35 +21,20 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Manager;
 
-internal class GameManager : IGameManager
+internal class GameManager(
+    ILogger<GameManager> logger,
+    IOptions<ServerConfig> config,
+    IServiceProvider serviceProvider,
+    IEventManager eventManager,
+    IGameCodeFactory gameCodeFactory,
+    IOptions<CompatibilityConfig> compatibilityConfig,
+    ICompatibilityManager compatibilityManager)
+    : IGameManager
 {
-    private readonly CompatibilityConfig _compatibilityConfig;
-    private readonly ICompatibilityManager _compatibilityManager;
-    private readonly IEventManager _eventManager;
-    private readonly IGameCodeFactory _gameCodeFactory;
-    private readonly ConcurrentDictionary<int, Game> _games;
-    private readonly ILogger<GameManager> _logger;
-    private readonly IPEndPoint _publicIp;
-    private readonly IServiceProvider _serviceProvider;
-
-    public GameManager(
-        ILogger<GameManager> logger,
-        IOptions<ServerConfig> config,
-        IServiceProvider serviceProvider,
-        IEventManager eventManager,
-        IGameCodeFactory gameCodeFactory,
-        IOptions<CompatibilityConfig> compatibilityConfig,
-        ICompatibilityManager compatibilityManager)
-    {
-        _logger = logger;
-        _serviceProvider = serviceProvider;
-        _eventManager = eventManager;
-        _gameCodeFactory = gameCodeFactory;
-        _publicIp = new IPEndPoint(IPAddress.Parse(config.Value.ResolvePublicIp()), config.Value.PublicPort);
-        _games = new ConcurrentDictionary<int, Game>();
-        _compatibilityConfig = compatibilityConfig.Value;
-        _compatibilityManager = compatibilityManager;
-    }
+    private readonly CompatibilityConfig _compatibilityConfig = compatibilityConfig.Value;
+    private readonly ICompatibilityManager _compatibilityManager = compatibilityManager;
+    private readonly ConcurrentDictionary<int, Game> _games = new();
+    private readonly IPEndPoint _publicIp = new(IPAddress.Parse(config.Value.ResolvePublicIp()), config.Value.PublicPort);
 
     IEnumerable<IGame> IGameManager.Games => _games.Select(kv => kv.Value);
 
@@ -86,15 +71,15 @@ internal class GameManager : IGameManager
             return;
         }
 
-        _logger.LogDebug("Remove game with code {0} ({1}).", GameCodeParser.IntToGameName(gameCode), gameCode);
+        logger.LogDebug("Remove game with code {0} ({1}).", GameCodeParser.IntToGameName(gameCode), gameCode);
 
-        await _eventManager.CallAsync(new GameDestroyedEvent(game));
+        await eventManager.CallAsync(new GameDestroyedEvent(game));
     }
 
     public async ValueTask<IGame?> CreateAsync(IClient? owner, IGameOptions options, GameFilterOptions filterOptions)
     {
         var @event = new GameCreationEvent(this, owner);
-        await _eventManager.CallAsync(@event);
+        await eventManager.CallAsync(@event);
 
         if (@event.IsCancelled)
         {
@@ -119,8 +104,8 @@ internal class GameManager : IGameManager
     private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(IGameOptions options,
         GameFilterOptions filterOptions, GameCode? desiredGameCode = null)
     {
-        var gameCode = desiredGameCode ?? _gameCodeFactory.Create();
-        var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options,
+        var gameCode = desiredGameCode ?? gameCodeFactory.Create();
+        var game = ActivatorUtilities.CreateInstance<Game>(serviceProvider, _publicIp, gameCode, options,
             filterOptions);
 
         if (!_games.TryAdd(gameCode, game))
@@ -128,9 +113,9 @@ internal class GameManager : IGameManager
             return (false, null);
         }
 
-        _logger.LogDebug("Created game with code {0}.", game.Code);
+        logger.LogDebug("Created game with code {0}.", game.Code);
 
-        await _eventManager.CallAsync(new GameCreatedEvent(game));
+        await eventManager.CallAsync(new GameCreatedEvent(game));
 
         return (true, game);
     }

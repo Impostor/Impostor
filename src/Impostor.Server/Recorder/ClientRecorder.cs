@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Impostor.Api.Config;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Net;
@@ -11,25 +12,26 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Recorder;
 
-internal class ClientRecorder : Client
+internal class ClientRecorder(
+    ILogger<Client> logger,
+    IOptions<AntiCheatConfig> antiCheatOptions,
+    ClientManager clientManager,
+    ICustomMessageManager<ICustomRootMessage> customMessageManager,
+    GameManager gameManager,
+    string name,
+    GameVersion gameVersion,
+    SupportedLanguages language,
+    QuickChatModes chatMode,
+    PlatformSpecificData platformSpecificData,
+    IHazelConnection connection,
+    PacketRecorder recorder,
+    IConnectionData connectionData)
+    : Client(logger, antiCheatOptions, clientManager, gameManager, customMessageManager, name, gameVersion, language,
+        chatMode, platformSpecificData, connection, connectionData)
 {
-    private readonly PacketRecorder _recorder;
-    private bool _createdGame;
-    private bool _isFirst;
-    private bool _recordAfter;
-
-    public ClientRecorder(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions,
-        ClientManager clientManager, ICustomMessageManager<ICustomRootMessage> customMessageManager,
-        GameManager gameManager, string name, GameVersion gameVersion, Language language, QuickChatModes chatMode,
-        PlatformSpecificData platformSpecificData, HazelConnection connection, PacketRecorder recorder)
-        : base(logger, antiCheatOptions, clientManager, gameManager, customMessageManager, name, gameVersion, language,
-            chatMode, platformSpecificData, connection)
-    {
-        _recorder = recorder;
-        _isFirst = true;
-        _createdGame = false;
-        _recordAfter = true;
-    }
+    private bool _createdGame = false;
+    private bool _isFirst = true;
+    private bool _recordAfter = true;
 
     public override async ValueTask HandleMessageAsync(IMessageReader reader, MessageType messageType)
     {
@@ -40,7 +42,7 @@ internal class ClientRecorder : Client
         {
             _isFirst = false;
 
-            await _recorder.WriteConnectAsync(this);
+            await recorder.WriteConnectAsync(this);
         }
 
         // Check if we were in-game before handling the message.
@@ -49,7 +51,7 @@ internal class ClientRecorder : Client
         if (!_recordAfter)
         {
             // Trigger message event.
-            await _recorder.WriteMessageAsync(this, messageCopy, messageType);
+            await recorder.WriteMessageAsync(this, messageCopy, messageType);
         }
 
         // Handle the message.
@@ -67,25 +69,25 @@ internal class ClientRecorder : Client
             // We created a game and are now in-game, store that event.
             if (!inGame && Player?.Game != null)
             {
-                await _recorder.WriteGameCreatedAsync(this, Player.Game.Code);
+                await recorder.WriteGameCreatedAsync(this, Player.Game.Code);
             }
 
             _recordAfter = false;
 
             // Trigger message event.
-            await _recorder.WriteMessageAsync(this, messageCopy, messageType);
+            await recorder.WriteMessageAsync(this, messageCopy, messageType);
         }
 
         if (_recordAfter)
         {
             // Trigger message event.
-            await _recorder.WriteMessageAsync(this, messageCopy, messageType);
+            await recorder.WriteMessageAsync(this, messageCopy, messageType);
         }
     }
 
     public override async ValueTask HandleDisconnectAsync(string reason)
     {
-        await _recorder.WriteDisconnectAsync(this, reason);
+        await recorder.WriteDisconnectAsync(this, reason);
         await base.HandleDisconnectAsync(reason);
     }
 }

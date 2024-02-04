@@ -26,7 +26,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="8.0.0"/>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0"/>
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.1" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0"/>
     <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.1-dev-00561"/>
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1"/>
@@ -34,6 +34,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Mod\" />
   </ItemGroup>
 
 </Project>

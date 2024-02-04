@@ -81,7 +81,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
             enumGenerator.Generate("RoleTypes", underlyingType: CSharpEnumUnderlyingType.UnsignedShort);
             enumGenerator.Generate("StringNames");
             enumGenerator.Generate("SystemTypes", underlyingType: CSharpEnumUnderlyingType.Byte);
-            enumGenerator.Generate("Language", sourceName: "SupportedLangs");
+            enumGenerator.Generate("SupportedLanguages", sourceName: "SupportedLanguages");
             enumGenerator.Generate("TaskTypes");
 
             enumGenerator.Generate("RpcCalls", "Impostor.Api.Net.Inner", underlyingType: CSharpEnumUnderlyingType.Byte);

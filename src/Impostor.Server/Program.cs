@@ -8,6 +8,7 @@ using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Plugins;
@@ -96,6 +97,13 @@ internal static class Program
             ListenPort = serverConfig.ListenPort,
         };
 
+        var langConfig = configuration
+            .GetSection(LanguageConfig.Section)
+            .Get<LanguageConfig>() ?? new LanguageConfig
+        {
+            _Language = SupportedLanguages.English,
+        };
+
         var hostBuilder = Host.CreateDefaultBuilder(args)
             .UseContentRoot(Directory.GetCurrentDirectory())
 #if DEBUG
@@ -123,6 +131,7 @@ internal static class Program
                 services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                 services.Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section));
                 services.Configure<HttpServerConfig>(host.Configuration.GetSection(HttpServerConfig.Section));
+                services.AddSingleton(langConfig);
 
                 services.AddSingleton<ICompatibilityManager, CompatibilityManager>();
                 services.AddSingleton<ClientManager>();
@@ -211,6 +220,7 @@ internal static class Program
                     return null;
                 }
             })
+            .UseLanguage()
             .UseConsoleLifetime()
             .UseServerCoreLoader()
             .UsePluginLoader(pluginConfig);

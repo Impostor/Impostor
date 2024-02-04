@@ -29,8 +29,21 @@ public static class PluginLoader
 
         var rootFolder = Directory.GetCurrentDirectory();
 
+        var pluginDir = Path.Combine(rootFolder, "Plugins");
+        var libDir = Path.Combine(rootFolder, "Lib");
+
         pluginPaths.Add(Path.Combine(rootFolder, "Plugins"));
         libraryPaths.Add(Path.Combine(rootFolder, "Lib"));
+
+        if (!Directory.Exists(pluginDir))
+        {
+            Directory.CreateDirectory(pluginDir);
+        }
+
+        if (!Directory.Exists(libDir))
+        {
+            Directory.CreateDirectory(libDir);
+        }
 
         var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
         matcher.AddInclude("*.dll");

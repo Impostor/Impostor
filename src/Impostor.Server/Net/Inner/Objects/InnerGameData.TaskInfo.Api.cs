@@ -12,12 +12,12 @@ internal partial class InnerGameData
     {
         public async ValueTask CompleteAsync()
         {
-            if (_playerInfo.Controller == null)
+            if (playerInfo.Controller == null)
             {
                 throw new ImpostorException("Can't complete a task that doesn't have a player assigned");
             }
 
-            var player = _playerInfo.Controller;
+            var player = playerInfo.Controller;
 
             if (Complete)
             {
@@ -32,7 +32,7 @@ internal partial class InnerGameData
             await player.Game.FinishRpcAsync(writer);
 
             // Notify plugins.
-            await _eventManager.CallAsync(new PlayerCompletedTaskEvent(player.Game,
+            await eventManager.CallAsync(new PlayerCompletedTaskEvent(player.Game,
                 player.Game.GetClientPlayer(player.OwnerId)!, player, this));
         }
     }
