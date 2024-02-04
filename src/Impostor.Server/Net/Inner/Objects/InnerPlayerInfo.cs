@@ -20,6 +20,8 @@ internal partial class InnerPlayerInfo(byte playerId)
 
     public List<InnerGameData.TaskInfo> Tasks { get; internal set; } = new(0);
 
+    public bool RoleWhenAlive { get; internal set; }
+
     public string PlayerName { get; internal set; } = string.Empty;
 
     public Dictionary<PlayerOutfitType, PlayerOutfit> Outfits { get; } = new()
@@ -36,8 +38,6 @@ internal partial class InnerPlayerInfo(byte playerId)
     public bool IsImpostor => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.ImpostorGhost;
 
     public bool IsDead { get; internal set; }
-
-    public bool RoleWhenAlive { get; internal set; }
 
     public DeathReason LastDeathReason { get; internal set; }
 

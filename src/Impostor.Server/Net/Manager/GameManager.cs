@@ -34,7 +34,9 @@ internal class GameManager(
     private readonly CompatibilityConfig _compatibilityConfig = compatibilityConfig.Value;
     private readonly ICompatibilityManager _compatibilityManager = compatibilityManager;
     private readonly ConcurrentDictionary<int, Game> _games = new();
-    private readonly IPEndPoint _publicIp = new(IPAddress.Parse(config.Value.ResolvePublicIp()), config.Value.PublicPort);
+
+    private readonly IPEndPoint _publicIp = new(IPAddress.Parse(config.Value.ResolvePublicIp()),
+        config.Value.PublicPort);
 
     IEnumerable<IGame> IGameManager.Games => _games.Select(kv => kv.Value);
 

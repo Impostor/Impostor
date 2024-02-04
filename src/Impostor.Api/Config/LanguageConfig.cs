@@ -7,9 +7,9 @@ public class LanguageConfig
 {
     public const string Section = "LanguageManager";
 
-    public string Language { get; set; }
-
     public SupportedLanguages _Language;
+
+    public string Language { get; set; }
 
     public SupportedLanguages GetLang()
     {

@@ -1,20 +1,15 @@
-using System.Net;
 using System.Threading.Tasks;
-using Impostor.Api.Config;
-using Impostor.Hazel;
 using Impostor.Hazel.Dtls;
 using Impostor.Hazel.Udp;
-using Microsoft.Extensions.ObjectPool;
 
 namespace Impostor.Server.Net;
 
 public class AuNetListeners
 {
-    public UdpConnectionListener? _udpConnectionListener;
-
     public DtlsConnectionListener? _dtlsConnectionListener;
 
     public DtlsConnectionListener? _onlineConnectionListener;
+    public UdpConnectionListener? _udpConnectionListener;
 
     public async Task StartAsync()
     {

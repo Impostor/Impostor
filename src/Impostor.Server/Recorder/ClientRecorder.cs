@@ -5,7 +5,6 @@ using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
 using Impostor.Server.Net;
-using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -29,7 +28,7 @@ internal class ClientRecorder(
     : Client(logger, antiCheatOptions, clientManager, gameManager, customMessageManager, name, gameVersion, language,
         chatMode, platformSpecificData, connection, connectionData)
 {
-    private bool _createdGame = false;
+    private bool _createdGame;
     private bool _isFirst = true;
     private bool _recordAfter = true;
 

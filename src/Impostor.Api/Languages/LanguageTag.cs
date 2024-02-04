@@ -9,16 +9,16 @@ namespace Impostor.Api.Languages;
 [AttributeUsage(AttributeTargets.Field)]
 public class LanguageTag(SupportedLanguages language = SupportedLanguages.English) : Attribute
 {
+    public SupportedLanguages _language = language;
+
     public LanguageTag(string key) : this()
     {
-        this.Key = key;
+        Key = key;
     }
 
     public string? Key { get; private set; }
 
     public string Value { get; private set; }
-
-    public SupportedLanguages _language = language;
 
     public LanguageTag Set(string key, string value)
     {
@@ -35,7 +35,8 @@ public class LanguageTag(SupportedLanguages language = SupportedLanguages.Englis
             fieldInfos.AddRange(fields);
         }
 
-        return (from fieldInfo in fieldInfos.Where(n => n.IsStatic && n.GetCustomAttribute<LanguageTag>() != null && n.FieldType == typeof(string))
+        return (from fieldInfo in fieldInfos.Where(n =>
+                n.IsStatic && n.GetCustomAttribute<LanguageTag>() != null && n.FieldType == typeof(string))
             let languageTag = fieldInfo.GetCustomAttribute<LanguageTag>()!
             let key = languageTag.Key ?? fieldInfo.Name
             let value = fieldInfo.GetValue(null) as string

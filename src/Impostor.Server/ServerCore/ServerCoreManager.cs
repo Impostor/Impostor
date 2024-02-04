@@ -5,7 +5,10 @@ namespace Impostor.Server.ServerCore;
 
 public class ServerCoreManager : IServerCoreManager
 {
-    private List<IServerCore> _allServerCore = [];
+    private readonly List<IServerCore> _allServerCore = [];
 
-    public void AddServerCore(IServerCore serverCore) => _allServerCore.Add(serverCore);
+    public void AddServerCore(IServerCore serverCore)
+    {
+        _allServerCore.Add(serverCore);
+    }
 }

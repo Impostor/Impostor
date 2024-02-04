@@ -29,7 +29,8 @@ internal class MatchmakerService(
             _serverConfig.ResolvePublicIp(),
             _serverConfig.PublicPort);
 
-        logger.LogInformation($"Matchmaker UseUDP : {_serverConfig.UseUDP} UseOnline : {_serverConfig.UseOnline}, UseDtl : {_serverConfig.UseDtl}");
+        logger.LogInformation(
+            $"Matchmaker UseUDP : {_serverConfig.UseUDP} UseOnline : {_serverConfig.UseOnline}, UseDtl : {_serverConfig.UseDtl}");
 
         // NOTE: If this warning annoys you, set your PublicIp to "localhost"
         if (_serverConfig.PublicIp == "127.0.0.1")

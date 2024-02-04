@@ -46,5 +46,5 @@ public interface IInnerPlayerInfo
 
     string FriendCode { get; }
 
-    string Puid { get;  }
+    string Puid { get; }
 }

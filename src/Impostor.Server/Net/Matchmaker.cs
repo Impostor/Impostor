@@ -26,14 +26,14 @@ internal class Matchmaker(
     ObjectPool<MessageReader> readerPool,
     ILogger<HazelConnection> connectionLogger)
 {
+    private readonly List<ConnectionData> _connectionDataS = [];
     private AuNetListeners? _auNetListeners;
 
     private X509Certificate2? _certificate2Collection;
 
-    private string ServerCertification = string.Empty;
-    private readonly List<ConnectionData> _connectionDataS = [];
-
     private uint LastId;
+
+    private string ServerCertification = string.Empty;
 
     public ConnectionData GetOrCreateConnectionData(string matchmakerToken)
     {
@@ -53,7 +53,9 @@ internal class Matchmaker(
 
     public ConnectionData? GetConnectionData(uint lastId)
     {
-        return _connectionDataS.Exists(n => n.LastId == lastId) ? _connectionDataS.First(n => n.LastId == lastId) : null;
+        return _connectionDataS.Exists(n => n.LastId == lastId)
+            ? _connectionDataS.First(n => n.LastId == lastId)
+            : null;
     }
 
     public async ValueTask StartAsync(IPEndPoint ipEndPoint, ServerConfig serverConfig)
@@ -174,7 +176,8 @@ internal class Matchmaker(
         await clientManager.RegisterConnectionAsync(data);
     }
 
-    private async Task<AuNetListeners> CreateListenerAsync(IPEndPoint ipEndPoint, IPMode mode, ServerConfig serverConfig)
+    private async Task<AuNetListeners> CreateListenerAsync(IPEndPoint ipEndPoint, IPMode mode,
+        ServerConfig serverConfig)
     {
         if (_auNetListeners != null)
         {

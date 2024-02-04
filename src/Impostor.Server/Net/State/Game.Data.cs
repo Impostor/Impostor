@@ -126,8 +126,8 @@ internal partial class Game
                     if (!sender.IsHost)
                     {
                         if (await sender.Client.ReportCheatAsync(
-                            new CheatContext(nameof(GameDataTag.SpawnFlag)),
-                            "Tried to send SpawnFlag as non-host."))
+                                new CheatContext(nameof(GameDataTag.SpawnFlag)),
+                                "Tried to send SpawnFlag as non-host."))
                         {
                             return false;
                         }

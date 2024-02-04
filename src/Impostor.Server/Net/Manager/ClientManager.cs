@@ -53,13 +53,13 @@ internal partial class ClientManager(
             connectionData.PlatformName,
             connectionData.Platforms == Platforms.Xbox ? connectionData.PlatformId : null,
             connectionData.Platforms == Platforms.Playstation ? connectionData.PlatformId : null
-            );
+        );
         var versionCompare = compatibilityManager.CanConnectToServer(clientVersion);
         if (
             versionCompare == ICompatibilityManager.VersionCompareResult.ServerTooOld
             &&
             _compatibilityConfig.AllowFutureGameVersions
-            )
+        )
         {
             logger.LogWarning(
                 "Client connected using future version: {clientVersion} ({version}). Unsupported, continue at your own risk.",
@@ -87,7 +87,8 @@ internal partial class ClientManager(
 
         if (connectionData.Name.Length > 10)
         {
-            await connectionData._connection.CustomDisconnectAsync(DisconnectReason.Custom, DisconnectMessages.UsernameLength);
+            await connectionData._connection.CustomDisconnectAsync(DisconnectReason.Custom,
+                DisconnectMessages.UsernameLength);
             return;
         }
 

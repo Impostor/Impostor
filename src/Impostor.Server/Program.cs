@@ -162,7 +162,9 @@ internal static class Program
 
                 services.AddEventPools();
                 services.AddHazel();
-                services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
+                services
+                    .AddSingleton<ICustomMessageManager<ICustomRootMessage>,
+                        CustomMessageManager<ICustomRootMessage>>();
                 services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
                 services.AddSingleton<IMessageWriterProvider, MessageWriterProvider>();
                 services.AddSingleton<IGameCodeFactory, GameCodeFactory>();
@@ -198,7 +200,8 @@ internal static class Program
                     .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                     .Enrich.FromLogContext()
                     .WriteTo.Console()
-                    .ReadFrom.Configuration(context.Configuration, new ConfigurationReaderOptions(ConfigurationAssemblySource.AlwaysScanDllFiles));
+                    .ReadFrom.Configuration(context.Configuration,
+                        new ConfigurationReaderOptions(ConfigurationAssemblySource.AlwaysScanDllFiles));
 
                 AssemblyLoadContext.Default.Resolving -= LoadSerilogAssembly;
                 return;
@@ -231,39 +234,39 @@ internal static class Program
         }
 
         hostBuilder.ConfigureWebHostDefaults(builder =>
+        {
+            builder.ConfigureServices(services =>
             {
-                builder.ConfigureServices(services =>
-                {
-                    services.AddControllers();
-                });
+                services.AddControllers();
+            });
 
-                builder.Configure(app =>
+            builder.Configure(app =>
+            {
+                var pluginLoaderService = app.ApplicationServices.GetRequiredService<PluginLoaderService>();
+                foreach (var pluginInformation in pluginLoaderService.Plugins)
                 {
-                    var pluginLoaderService = app.ApplicationServices.GetRequiredService<PluginLoaderService>();
-                    foreach (var pluginInformation in pluginLoaderService.Plugins)
+                    if (pluginInformation.Startup is IPluginHttpStartup httpStartup)
                     {
-                        if (pluginInformation.Startup is IPluginHttpStartup httpStartup)
-                        {
-                            httpStartup.ConfigureWebApplication(app);
-                        }
+                        httpStartup.ConfigureWebApplication(app);
                     }
+                }
 
-                    app.UseRouting();
+                app.UseRouting();
 
-                    app.UseEndpoints(endpoints =>
-                    {
-                        endpoints.MapControllers();
-                    });
-                });
-
-                builder.ConfigureKestrel(serverOptions =>
+                app.UseEndpoints(endpoints =>
                 {
-                    serverOptions.Listen(IPAddress.Parse(httpConfig.ListenIp), httpConfig.ListenPort, listenOptions =>
-                    {
-                        listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
-                    });
+                    endpoints.MapControllers();
                 });
             });
+
+            builder.ConfigureKestrel(serverOptions =>
+            {
+                serverOptions.Listen(IPAddress.Parse(httpConfig.ListenIp), httpConfig.ListenPort, listenOptions =>
+                {
+                    listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+                });
+            });
+        });
 
         return hostBuilder;
     }
