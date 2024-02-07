@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
-using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
@@ -14,7 +13,6 @@ using Impostor.Server.Net.Inner.Objects.Components;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
@@ -24,7 +22,7 @@ namespace Impostor.Server.Net.Inner.Objects
         private readonly IEventManager _eventManager;
         private readonly ConcurrentDictionary<byte, InnerPlayerInfo> _allPlayers;
 
-        public InnerGameData(ICustomMessageManager<ICustomRpc> customMessageManager, IOptions<AntiCheatConfig> antiCheatConfig, Game game, ILogger<InnerGameData> logger, IEventManager eventManager, IServiceProvider serviceProvider) : base(customMessageManager, antiCheatConfig, game)
+        public InnerGameData(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerGameData> logger, IEventManager eventManager, IServiceProvider serviceProvider) : base(customMessageManager, game)
         {
             _logger = logger;
             _eventManager = eventManager;

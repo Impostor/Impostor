@@ -74,7 +74,7 @@ namespace Impostor.Api.Net
         /// </summary>
         PlatformSpecificData PlatformSpecificData { get; }
 
-        ValueTask<bool> ReportCheatAsync(CheatContext context, string message);
+        ValueTask<bool> ReportCheatAsync(CheatContext context, CheatCategory category, string message);
 
         ValueTask HandleMessageAsync(IMessageReader message, MessageType messageType);
 

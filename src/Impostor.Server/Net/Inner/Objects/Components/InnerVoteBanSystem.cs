@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
-using Impostor.Api.Config;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
@@ -10,7 +9,6 @@ using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Inner.Objects.Components
 {
@@ -19,7 +17,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly ILogger<InnerVoteBanSystem> _logger;
         private readonly Dictionary<int, int[]> _votes;
 
-        public InnerVoteBanSystem(ICustomMessageManager<ICustomRpc> customMessageManager, IOptions<AntiCheatConfig> antiCheatConfig, Game game, ILogger<InnerVoteBanSystem> logger) : base(customMessageManager, antiCheatConfig, game)
+        public InnerVoteBanSystem(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerVoteBanSystem> logger) : base(customMessageManager, game)
         {
             _logger = logger;
             _votes = new Dictionary<int, int[]>();
@@ -69,9 +67,9 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             {
                 Rpc26AddVote.Deserialize(reader, out var clientId, out var targetClientId);
 
-                if (AntiCheatConfig.EnableOwnershipChecks && clientId != sender.Client.Id)
+                if (clientId != sender.Client.Id)
                 {
-                    if (await sender.Client.ReportCheatAsync(RpcCalls.AddVote, $"Client sent {nameof(RpcCalls.AddVote)} as other client"))
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.AddVote, CheatCategory.Ownership, $"Client sent {nameof(RpcCalls.AddVote)} as other client"))
                     {
                         return false;
                     }

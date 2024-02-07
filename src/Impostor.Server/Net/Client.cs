@@ -35,19 +35,72 @@ namespace Impostor.Server.Net
             _customMessageManager = customMessageManager;
         }
 
-        public override async ValueTask<bool> ReportCheatAsync(CheatContext context, string message)
+        public override async ValueTask<bool> ReportCheatAsync(CheatContext context, CheatCategory category, string message)
         {
             if (!_antiCheatConfig.Enabled)
             {
                 return false;
             }
 
-            if (_antiCheatConfig.ExemptHost && Player != null && Player.IsHost)
+            if (_antiCheatConfig.ForbidHostCheating && Player != null && Player.IsHost)
             {
                 return false;
             }
 
-            _logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{Context}] {Message}", Name, Id, context.Name, message);
+            switch (category)
+            {
+                case CheatCategory.ProtocolExtension:
+                    if (_antiCheatConfig.ForbidProtocolExtensions)
+                    {
+                        return false;
+                    }
+
+                    break;
+                case CheatCategory.GameFlow:
+                    if (_antiCheatConfig.EnableGameFlowChecks)
+                    {
+                        return false;
+                    }
+
+                    break;
+                case CheatCategory.MustBeHost:
+                    if (_antiCheatConfig.EnableMustBeHostChecks)
+                    {
+                        return false;
+                    }
+
+                    break;
+                case CheatCategory.Limit:
+                    if (_antiCheatConfig.EnableLimitChecks)
+                    {
+                        return false;
+                    }
+
+                    break;
+                case CheatCategory.Ownership:
+                    if (_antiCheatConfig.EnableOwnershipChecks)
+                    {
+                        return false;
+                    }
+
+                    break;
+                case CheatCategory.Role:
+                    if (_antiCheatConfig.EnableRoleChecks)
+                    {
+                        return false;
+                    }
+
+                    break;
+                case CheatCategory.Target:
+                    if (_antiCheatConfig.EnableTargetChecks)
+                    {
+                        return false;
+                    }
+
+                    break;
+            }
+
+            _logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{Context}-{Category}] {Message}", Name, Id, context.Name, category, message);
 
             if (_antiCheatConfig.BanIpFromGame)
             {

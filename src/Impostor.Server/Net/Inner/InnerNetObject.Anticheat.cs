@@ -10,9 +10,9 @@ namespace Impostor.Server.Net.Inner
     {
         protected async ValueTask<bool> ValidateOwnership(CheatContext context, IClientPlayer sender)
         {
-            if (AntiCheatConfig.EnableOwnershipChecks && !sender.IsOwner(this))
+            if (!sender.IsOwner(this))
             {
-                if (await sender.Client.ReportCheatAsync(context, $"Failed ownership check on {GetType().Name}"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Ownership, $"Failed ownership check on {GetType().Name}"))
                 {
                     return false;
                 }
@@ -23,9 +23,9 @@ namespace Impostor.Server.Net.Inner
 
         protected async ValueTask<bool> ValidateHost(CheatContext context, IClientPlayer sender)
         {
-            if (AntiCheatConfig.EnableHostPrivilegeChecks && !sender.IsHost)
+            if (!sender.IsHost)
             {
-                if (await sender.Client.ReportCheatAsync(context, "Failed host check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.MustBeHost, "Failed host check"))
                 {
                     return false;
                 }
@@ -36,9 +36,9 @@ namespace Impostor.Server.Net.Inner
 
         protected async ValueTask<bool> ValidateTarget(CheatContext context, IClientPlayer sender, IClientPlayer? target)
         {
-            if (AntiCheatConfig.EnableTargetChecks && target == null)
+            if (target == null)
             {
-                if (await sender.Client.ReportCheatAsync(context, "Failed target check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Target, "Failed target check"))
                 {
                     return false;
                 }
@@ -49,9 +49,9 @@ namespace Impostor.Server.Net.Inner
 
         protected async ValueTask<bool> ValidateBroadcast(CheatContext context, IClientPlayer sender, IClientPlayer? target)
         {
-            if (AntiCheatConfig.EnableTargetChecks && target != null)
+            if (target != null)
             {
-                if (await sender.Client.ReportCheatAsync(context, "Failed broadcast check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Target, "Failed broadcast check"))
                 {
                     return false;
                 }
@@ -62,9 +62,9 @@ namespace Impostor.Server.Net.Inner
 
         protected async ValueTask<bool> ValidateCmd(CheatContext context, IClientPlayer sender, IClientPlayer? target)
         {
-            if (AntiCheatConfig.EnableTargetChecks && (target == null || !target.IsHost))
+            if (target == null || !target.IsHost)
             {
-                if (await sender.Client.ReportCheatAsync(context, "Failed cmd check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Target, "Failed cmd check"))
                 {
                     return false;
                 }
@@ -75,9 +75,9 @@ namespace Impostor.Server.Net.Inner
 
         protected async ValueTask<bool> ValidateImpostor(CheatContext context, IClientPlayer sender, InnerPlayerInfo playerInfo, bool value = true)
         {
-            if (AntiCheatConfig.EnableRoleChecks && playerInfo.IsImpostor != value)
+            if (playerInfo.IsImpostor != value)
             {
-                if (await sender.Client.ReportCheatAsync(context, "Failed impostor check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed impostor check"))
                 {
                     return false;
                 }
@@ -88,9 +88,9 @@ namespace Impostor.Server.Net.Inner
 
         protected async ValueTask<bool> ValidateCanVent(CheatContext context, IClientPlayer sender, InnerPlayerInfo playerInfo, bool value = true)
         {
-            if (AntiCheatConfig.EnableRoleChecks && playerInfo.CanVent != value)
+            if (playerInfo.CanVent != value)
             {
-                if (await sender.Client.ReportCheatAsync(context, "Failed can vent check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed can vent check"))
                 {
                     return false;
                 }
@@ -101,9 +101,9 @@ namespace Impostor.Server.Net.Inner
 
         protected async ValueTask<bool> ValidateRole(CheatContext context, IClientPlayer sender, InnerPlayerInfo playerInfo, RoleTypes role)
         {
-            if (AntiCheatConfig.EnableRoleChecks && playerInfo.RoleType != role)
+            if (playerInfo.RoleType != role)
             {
-                if (await sender.Client.ReportCheatAsync(context, $"Failed role = {role} check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, $"Failed role = {role} check"))
                 {
                     return false;
                 }
@@ -114,7 +114,7 @@ namespace Impostor.Server.Net.Inner
 
         protected async ValueTask<bool> UnregisteredCall(CheatContext context, IClientPlayer sender)
         {
-            if (!AntiCheatConfig.AllowProtocolExtensions && await sender.Client.ReportCheatAsync(context, "Client sent unregistered call"))
+            if (await sender.Client.ReportCheatAsync(context, CheatCategory.ProtocolExtension, "Client sent unregistered call"))
             {
                 return false;
             }

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api;
-using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Events.Player;
 using Impostor.Api.Innersloth;
@@ -18,7 +17,6 @@ using Impostor.Server.Events.Meeting;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
@@ -32,7 +30,7 @@ namespace Impostor.Server.Net.Inner.Objects
         [AllowNull]
         private PlayerVoteArea[] _playerStates;
 
-        public InnerMeetingHud(ICustomMessageManager<ICustomRpc> customMessageManager, IOptions<AntiCheatConfig> antiCheatConfig, Game game, ILogger<InnerMeetingHud> logger, IEventManager eventManager) : base(customMessageManager, antiCheatConfig, game)
+        public InnerMeetingHud(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerMeetingHud> logger, IEventManager eventManager) : base(customMessageManager, game)
         {
             _logger = logger;
             _eventManager = eventManager;
@@ -206,8 +204,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (playerId != sender.Character!.PlayerId)
             {
-                if (AntiCheatConfig.EnableOwnershipChecks &&
-                    await sender.Client.ReportCheatAsync(RpcCalls.CastVote, $"Client sent {nameof(RpcCalls.CastVote)} to an unowned {nameof(InnerPlayerControl)}"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, CheatCategory.Ownership, $"Client sent {nameof(RpcCalls.CastVote)} to an unowned {nameof(InnerPlayerControl)}"))
                 {
                     return false;
                 }

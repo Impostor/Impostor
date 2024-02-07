@@ -124,8 +124,7 @@ namespace Impostor.Server.Net.State
                         // Only the host is allowed to spawn objects.
                         if (!sender.IsHost)
                         {
-                            if (_antiCheatConfig.EnableHostPrivilegeChecks &&
-                                await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), "Tried to send SpawnFlag as non-host."))
+                            if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.MustBeHost, "Tried to send SpawnFlag as non-host."))
                             {
                                 return false;
                             }
@@ -260,8 +259,7 @@ namespace Impostor.Server.Net.State
 
                         if (clientId != sender.Client.Id)
                         {
-                            if (_antiCheatConfig.EnableOwnershipChecks &&
-                                await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.ConsoleDeclareClientPlatformFlag)), "Client sent info with wrong client id"))
+                            if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.ConsoleDeclareClientPlatformFlag)), CheatCategory.Ownership, "Client sent info with wrong client id"))
                             {
                                 return false;
                             }
@@ -333,7 +331,7 @@ namespace Impostor.Server.Net.State
                     }
                     else
                     {
-                        await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), "Failed to find player that spawned the InnerPlayerControl");
+                        await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.GameFlow, "Failed to find player that spawned the InnerPlayerControl");
                     }
 
                     // Hook up InnerPlayerControl <-> InnerPlayerControl.PlayerInfo.
