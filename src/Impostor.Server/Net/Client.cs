@@ -50,49 +50,49 @@ namespace Impostor.Server.Net
             switch (category)
             {
                 case CheatCategory.ProtocolExtension:
-                    if (_antiCheatConfig.ForbidProtocolExtensions)
+                    if (!_antiCheatConfig.ForbidProtocolExtensions)
                     {
                         return false;
                     }
 
                     break;
                 case CheatCategory.GameFlow:
-                    if (_antiCheatConfig.EnableGameFlowChecks)
+                    if (!_antiCheatConfig.EnableGameFlowChecks)
                     {
                         return false;
                     }
 
                     break;
                 case CheatCategory.MustBeHost:
-                    if (_antiCheatConfig.EnableMustBeHostChecks)
+                    if (!_antiCheatConfig.EnableMustBeHostChecks)
                     {
                         return false;
                     }
 
                     break;
                 case CheatCategory.Limit:
-                    if (_antiCheatConfig.EnableLimitChecks)
+                    if (!_antiCheatConfig.EnableLimitChecks)
                     {
                         return false;
                     }
 
                     break;
                 case CheatCategory.Ownership:
-                    if (_antiCheatConfig.EnableOwnershipChecks)
+                    if (!_antiCheatConfig.EnableOwnershipChecks)
                     {
                         return false;
                     }
 
                     break;
                 case CheatCategory.Role:
-                    if (_antiCheatConfig.EnableRoleChecks)
+                    if (!_antiCheatConfig.EnableRoleChecks)
                     {
                         return false;
                     }
 
                     break;
                 case CheatCategory.Target:
-                    if (_antiCheatConfig.EnableTargetChecks)
+                    if (!_antiCheatConfig.EnableTargetChecks)
                     {
                         return false;
                     }
