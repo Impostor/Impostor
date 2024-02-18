@@ -27,10 +27,18 @@ Impostor has an Http Server that is used by recent versions of Among Us to conne
 
 Impostor has an Anticheat that makes it possible to kick cheaters from games automatically. Note that the anticheat is tuned on the vanilla version of the game, so client-side modifications could trigger the Anticheat if you're playing with them.
 
-| Key               | Default | Value                                                                                                                                                                                                               |
-| ----------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Enabled**       | `true`  | Whether the anticheat should be enabled.                                                                                                                                                                            |
-| **BanIpFromGame** | `true`  | When anticheat is enabled and a player is caught hacking, they will be kicked from the server. If this value is set to `true`, the player will be banned instead and will not be able to rejoin that specific game. |
+| Key                          | Default | Value                                                                                                                                                                                                               |
+|------------------------------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Enabled**                  | `true`  | Whether the anticheat should be enabled.                                                                                                                                                                            |
+| **BanIpFromGame**            | `true`  | When anticheat is enabled and a player is caught hacking, they will be kicked from the server. If this value is set to `true`, the player will be banned instead and will not be able to rejoin that specific game. |
+| **EnableGameFlowChecks**     | `true`  | Enable checks that check if certain actions are done in the appropriate order or at the appropriate moment in the game. This includes changing cosmetics while in game or murdering too fast.                       |
+| **EnableMustBeHostChecks**   | `true`  | Enables checks that check if players are the host before they can do actions that require them to be host of the game. This includes starting the game and spawning objects.                                        |
+| **EnableLimitChecks**        | `true`  | Enables checks that checks if player names have a length that is possible to set using the user interface.                                                                                                          |
+| **EnableOwnershipChecks**    | `true`  | Enables checks that check if players are allowed to perform a certain action on themself or another player.                                                                                                         |
+| **EnableRoleChecks**         | `true`  | Enables checks that check if players have the correct role when performing certain role abilities like venting or murdering.                                                                                        |
+| **EnableTargetChecks**       | `true`  | Enables checks that check if certain packets to everyone that should only have been sent to certain players or vice versa. This includes sending votes or network objects.                                          |
+| **ForbidHostCheating**       | `true`  | If disabled makes the anticheat ignore the host. This may be necessary for host-only mods.                                                                                                                          |
+| **ForbidProtocolExtensions** | `true`  | If disabled allows players to send network packets that go beyond the network packets sent by the vanilla game. This is necessary for most mods that need all players to install it.                                |
 
 ### Compatibility
 
