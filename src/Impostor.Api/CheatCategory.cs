@@ -9,4 +9,5 @@ public enum CheatCategory
     Ownership,
     Role,
     Target,
+    Other,
 }

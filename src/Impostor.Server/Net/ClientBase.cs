@@ -46,6 +46,11 @@ namespace Impostor.Server.Net
             return new ValueTask<bool>(false);
         }
 
+        public ValueTask<bool> ReportCheatAsync(CheatContext context, string message)
+        {
+            return ReportCheatAsync(context, CheatCategory.Other, message);
+        }
+
         public abstract ValueTask HandleMessageAsync(IMessageReader message, MessageType messageType);
 
         public abstract ValueTask HandleDisconnectAsync(string reason);
