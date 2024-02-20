@@ -6,9 +6,7 @@
 
         public bool Enabled { get; set; } = true;
 
-        public bool ForbidHostCheating { get; set; } = true;
-
-        public bool ForbidProtocolExtensions { get; set; } = true;
+        public bool BanIpFromGame { get; set; } = true;
 
         public bool EnableGameFlowChecks { get; set; } = true;
 
@@ -22,6 +20,8 @@
 
         public bool EnableTargetChecks { get; set; } = true;
 
-        public bool BanIpFromGame { get; set; } = true;
+        public bool ForbidHostCheating { get; set; } = true;
+
+        public bool ForbidProtocolExtensions { get; set; } = true;
     }
 }
