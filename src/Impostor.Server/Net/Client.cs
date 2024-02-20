@@ -42,62 +42,33 @@ namespace Impostor.Server.Net
                 return false;
             }
 
-            if (_antiCheatConfig.ForbidHostCheating && Player != null && Player.IsHost)
+            if (!_antiCheatConfig.ForbidHostCheating && Player != null && Player.IsHost)
             {
                 return false;
             }
 
-            switch (category)
+            bool LogUnknownCategory(CheatCategory category)
             {
-                case CheatCategory.ProtocolExtension:
-                    if (!_antiCheatConfig.ForbidProtocolExtensions)
-                    {
-                        return false;
-                    }
+                _logger.LogWarning("Unknown cheat category {Category} was used when reporting", category);
+                return true;
+            }
 
-                    break;
-                case CheatCategory.GameFlow:
-                    if (!_antiCheatConfig.EnableGameFlowChecks)
-                    {
-                        return false;
-                    }
+            bool isCategoryEnabled = category switch
+            {
+                CheatCategory.ProtocolExtension => _antiCheatConfig.ForbidProtocolExtensions,
+                CheatCategory.GameFlow => _antiCheatConfig.EnableGameFlowChecks,
+                CheatCategory.MustBeHost => _antiCheatConfig.EnableMustBeHostChecks,
+                CheatCategory.Limit => _antiCheatConfig.EnableLimitChecks,
+                CheatCategory.Ownership => _antiCheatConfig.EnableOwnershipChecks,
+                CheatCategory.Role => _antiCheatConfig.EnableRoleChecks,
+                CheatCategory.Target => _antiCheatConfig.EnableTargetChecks,
+                CheatCategory.Other => true,
+                _ => LogUnknownCategory(category),
+            };
 
-                    break;
-                case CheatCategory.MustBeHost:
-                    if (!_antiCheatConfig.EnableMustBeHostChecks)
-                    {
-                        return false;
-                    }
-
-                    break;
-                case CheatCategory.Limit:
-                    if (!_antiCheatConfig.EnableLimitChecks)
-                    {
-                        return false;
-                    }
-
-                    break;
-                case CheatCategory.Ownership:
-                    if (!_antiCheatConfig.EnableOwnershipChecks)
-                    {
-                        return false;
-                    }
-
-                    break;
-                case CheatCategory.Role:
-                    if (!_antiCheatConfig.EnableRoleChecks)
-                    {
-                        return false;
-                    }
-
-                    break;
-                case CheatCategory.Target:
-                    if (!_antiCheatConfig.EnableTargetChecks)
-                    {
-                        return false;
-                    }
-
-                    break;
+            if (!isCategoryEnabled)
+            {
+                return false;
             }
 
             _logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{Context}-{Category}] {Message}", Name, Id, context.Name, category, message);
