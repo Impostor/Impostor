@@ -8,6 +8,8 @@
 
         public bool BanIpFromGame { get; set; } = true;
 
+        public CheatingHostMode AllowCheatingHosts { get; set; } = CheatingHostMode.Never;
+
         public bool EnableGameFlowChecks { get; set; } = true;
 
         public bool EnableMustBeHostChecks { get; set; } = true;
@@ -19,8 +21,6 @@
         public bool EnableRoleChecks { get; set; } = true;
 
         public bool EnableTargetChecks { get; set; } = true;
-
-        public bool ForbidHostCheating { get; set; } = true;
 
         public bool ForbidProtocolExtensions { get; set; } = true;
     }

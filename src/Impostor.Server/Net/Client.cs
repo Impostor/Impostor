@@ -42,9 +42,19 @@ namespace Impostor.Server.Net
                 return false;
             }
 
-            if (!_antiCheatConfig.ForbidHostCheating && Player != null && Player.IsHost)
+            if (Player != null && Player.IsHost)
             {
-                return false;
+                var isHostCheatingAllowed = _antiCheatConfig.AllowCheatingHosts switch {
+                    CheatingHostMode.Always => true,
+                    CheatingHostMode.IfRequested => GameVersion.HasDisableServerAuthorityFlag,
+                    CheatingHostMode.Never => false,
+                    _ => false,
+                };
+
+                if (isHostCheatingAllowed)
+                {
+                    return false;
+                }
             }
 
             bool LogUnknownCategory(CheatCategory category)
@@ -53,7 +63,7 @@ namespace Impostor.Server.Net
                 return true;
             }
 
-            bool isCategoryEnabled = category switch
+            var isCategoryEnabled = category switch
             {
                 CheatCategory.ProtocolExtension => _antiCheatConfig.ForbidProtocolExtensions,
                 CheatCategory.GameFlow => _antiCheatConfig.EnableGameFlowChecks,
