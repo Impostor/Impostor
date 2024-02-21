@@ -204,7 +204,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (playerId != sender.Character!.PlayerId)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, $"Client sent {nameof(RpcCalls.CastVote)} to an unowned {nameof(InnerPlayerControl)}"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, CheatCategory.Ownership, $"Client sent {nameof(RpcCalls.CastVote)} to an unowned {nameof(InnerPlayerControl)}"))
                 {
                     return false;
                 }

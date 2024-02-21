@@ -41,9 +41,14 @@ namespace Impostor.Server.Net
 
         IClientPlayer? IClient.Player => Player;
 
-        public virtual ValueTask<bool> ReportCheatAsync(CheatContext context, string message)
+        public virtual ValueTask<bool> ReportCheatAsync(CheatContext context, CheatCategory category, string message)
         {
             return new ValueTask<bool>(false);
+        }
+
+        public ValueTask<bool> ReportCheatAsync(CheatContext context, string message)
+        {
+            return ReportCheatAsync(context, CheatCategory.Other, message);
         }
 
         public abstract ValueTask HandleMessageAsync(IMessageReader message, MessageType messageType);
