@@ -16,6 +16,7 @@
   "IncorrectGame": 18,
   "ServerRequest": 19,
   "ServerFull": 20,
+  "MismatchedVersion": 21,
   "InternalPlayerMissing": 100,
   "InternalNonceFailure": 101,
   "InternalConnectionToken": 102,
@@ -42,5 +43,6 @@
   "PlatformFailedToGetUserBlock": 213,
   "ServerNotFound": 214,
   "ClientTimeout": 215,
+  "ErrorAuthNonceFailure": 216,
   "Unknown": 255
 }

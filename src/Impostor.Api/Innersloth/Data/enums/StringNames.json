@@ -506,6 +506,7 @@
   "ErrorSanction": 728,
   "ErrorClientTimeout": 729,
   "ErrorClientTimeoutConsole": 730,
+  "ErrorAuthNonceFailure": 731,
   "VentDirection": 1000,
   "VentMove": 1001,
   "MenuNavigate": 1002,
@@ -1328,6 +1329,8 @@
   "FriendsLabel": 3322,
   "ReportNotificationHeader": 3323,
   "ReportNotificationBody": 3324,
+  "MissingGuardianEmailText": 3325,
+  "AprilFoolsModeToggle": 3326,
   "MiningPit": 3400,
   "Jungle": 3401,
   "BuildSandcastle": 3402,
@@ -1395,5 +1398,6 @@
   "HttpErrorInternalServerError": 3530,
   "HttpErrorBadGateway": 3531,
   "HttpErrorServiceUnavailable": 3532,
-  "HttpErrorGatewayTimeout": 3533
+  "HttpErrorGatewayTimeout": 3533,
+  "UserVersionError": 3534
 }
