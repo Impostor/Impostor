@@ -798,9 +798,13 @@ namespace Impostor.Server.Net.Inner.Objects
                     // This request was made too quickly by spamming the kill button, cancel it if we're in server authoritive mode
                     return _game.IsHostAuthoritive;
                 }
-                else if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow, "Client tried to murder too fast"))
+                else if (!_game.IsHostAuthoritive)
                 {
-                    return false;
+                    // Host-only mods may desync the kill timeout between players
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow, "Client tried to murder too fast"))
+                    {
+                        return false;
+                    }
                 }
             }
 
