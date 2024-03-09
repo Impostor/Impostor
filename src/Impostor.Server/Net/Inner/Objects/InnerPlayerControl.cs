@@ -804,7 +804,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            if (target == null || target.PlayerInfo.IsImpostor)
+            // Host-only mods intentionally desync players, so it may appear that one killing role (like a genuine impostor) is killing another
+            // killing role (like an sheriff). So this needs to be allowed if the host requested authority.
+            if (target == null || (target.PlayerInfo.IsImpostor && !_game.IsHostAuthoritive))
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow, "Client tried to murder invalid target"))
                 {
@@ -849,7 +851,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            if (target == null || target.PlayerInfo.IsImpostor)
+            if (target == null)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, CheatCategory.GameFlow, "Client tried to murder invalid target"))
                 {
