@@ -647,9 +647,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     if (name != expected)
                     {
-                        _logger.LogWarning($"Client sent {nameof(RpcCalls.SetName)} with incorrect name");
-                        await SetNameAsync(expected);
-                        return false;
+                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.GameFlow, "Client sent SetName with incorrect name"))
+                        {
+                            await SetNameAsync(expected);
+                            return false;
+                        }
                     }
                 }
                 else
@@ -713,8 +715,10 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 if (!RequestedColorId.Any())
                 {
-                    _logger.LogWarning($"Client sent {nameof(RpcCalls.SetColor)} for a player that didn't request it");
-                    return false;
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor for a player that didn't request it"))
+                    {
+                        return false;
+                    }
                 }
 
                 var expected = RequestedColorId.Dequeue();
@@ -726,9 +730,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 if (color != expected)
                 {
-                    _logger.LogWarning($"Client sent {nameof(RpcCalls.SetColor)} with incorrect color");
-                    await SetColorAsync(expected);
-                    return false;
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor with incorrect color"))
+                    {
+                        await SetColorAsync(expected);
+                        return false;
+                    }
                 }
             }
 
