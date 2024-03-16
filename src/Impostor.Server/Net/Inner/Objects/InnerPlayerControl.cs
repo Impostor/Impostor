@@ -713,26 +713,28 @@ namespace Impostor.Server.Net.Inner.Objects
             }
             else
             {
-                if (!RequestedColorId.Any())
+                if (RequestedColorId.Any())
+                {
+                    var expected = RequestedColorId.Dequeue();
+
+                    while (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == expected))
+                    {
+                        expected = (ColorType)(((byte)expected + 1) % ColorsCount);
+                    }
+
+                    if (color != expected)
+                    {
+                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor with incorrect color"))
+                        {
+                            await SetColorAsync(expected);
+                            return false;
+                        }
+                    }
+                }
+                else
                 {
                     if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor for a player that didn't request it"))
                     {
-                        return false;
-                    }
-                }
-
-                var expected = RequestedColorId.Dequeue();
-
-                while (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == expected))
-                {
-                    expected = (ColorType)(((byte)expected + 1) % ColorsCount);
-                }
-
-                if (color != expected)
-                {
-                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor with incorrect color"))
-                    {
-                        await SetColorAsync(expected);
                         return false;
                     }
                 }
