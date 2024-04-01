@@ -6,6 +6,6 @@ namespace Impostor.Api.Innersloth
         Normal,
         HideNSeek,
         NormalFools,
-        SeekFools
+        SeekFools,
     }
 }
