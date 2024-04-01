@@ -39,8 +39,8 @@ public static class GameOptionsFactory
 
         return gameMode switch
         {
-            GameModes.Normal => NormalGameOptions.Deserialize(optionsReader, version),
-            GameModes.HideNSeek => HideNSeekGameOptions.Deserialize(optionsReader, version),
+            GameModes.Normal or GameModes.NormalFools => NormalGameOptions.Deserialize(optionsReader, version),
+            GameModes.HideNSeek or GameModes.SeekFools => HideNSeekGameOptions.Deserialize(optionsReader, version),
             _ => throw new ArgumentOutOfRangeException(),
         };
     }
@@ -62,9 +62,11 @@ public static class GameOptionsFactory
         switch (gameMode)
         {
             case GameModes.Normal:
+            case GameModes.NormalFools:
                 ((NormalGameOptions)gameOptions).Deserialize(optionsReader);
                 break;
             case GameModes.HideNSeek:
+            case GameModes.SeekFools:
                 ((HideNSeekGameOptions)gameOptions).Deserialize(optionsReader);
                 break;
             default:
