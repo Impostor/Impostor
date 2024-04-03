@@ -717,9 +717,23 @@ namespace Impostor.Server.Net.Inner.Objects
                 {
                     var expected = RequestedColorId.Dequeue();
 
-                    while (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == expected))
+                    for (var colorOffset = 0; colorOffset <= ColorsCount; colorOffset++)
                     {
-                        expected = (ColorType)(((byte)expected + 1) % ColorsCount);
+                        var possibleColor = (ColorType)((byte)(expected + colorOffset) % ColorsCount);
+                        if (!Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == possibleColor))
+                        {
+                            expected = possibleColor;
+                            break;
+                        }
+
+                        if (colorOffset == ColorsCount)
+                        {
+                            if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor but all colors are already in use"))
+                            {
+                                await SetColorAsync(expected);
+                                return false;
+                            }
+                        }
                     }
 
                     if (color != expected)
