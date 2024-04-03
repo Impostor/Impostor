@@ -567,7 +567,7 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             if (name.Length > 10)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.Limit, "Client sent name exceeding 10 characters"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.NameLimits, "Client sent name exceeding 10 characters"))
                 {
                     return false;
                 }
@@ -575,7 +575,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (string.IsNullOrWhiteSpace(name) || !name.All(TextBox.IsCharAllowed))
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.Limit, "Client sent name containing illegal characters"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.NameLimits, "Client sent name containing illegal characters"))
                 {
                     return false;
                 }
@@ -608,7 +608,7 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == name))
                 {
-                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.Limit, "Client sent name that is already used"))
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits, "Client sent name that is already used"))
                     {
                         return false;
                     }
@@ -703,7 +703,7 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == color))
                 {
-                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.Limit, "Client sent a color that is already used"))
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent a color that is already used"))
                     {
                         return false;
                     }

@@ -14,7 +14,9 @@
 
         public bool EnableMustBeHostChecks { get; set; } = true;
 
-        public bool EnableLimitChecks { get; set; } = true;
+        public bool EnableColorLimitChecks { get; set; } = true;
+
+        public bool EnableNameLimitChecks { get; set; } = true;
 
         public bool EnableOwnershipChecks { get; set; } = true;
 

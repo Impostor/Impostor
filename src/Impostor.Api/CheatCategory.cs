@@ -11,8 +11,11 @@ public enum CheatCategory
     /// <summary>A packet was sent by a non-host player that should normally only be sent by the host.</summary>
     MustBeHost,
 
-    /// <summary>A packet was sent that exceeded the limits of what is possible to enter ingame.</summary>
-    Limit,
+    /// <summary>A packet was sent that violated limits on the selection of player colors.</summary>
+    ColorLimits,
+
+    /// <summary>A packet was sent that exceeded the limits of possible nicknames to enter ingame.</summary>
+    NameLimits,
 
     /// <summary>A packet was sent on behalf of another player.</summary>
     Ownership,
