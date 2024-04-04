@@ -69,7 +69,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
                 if (clientId != sender.Client.Id)
                 {
-                    if (await sender.Client.ReportCheatAsync(RpcCalls.AddVote, $"Client sent {nameof(RpcCalls.AddVote)} as other client"))
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.AddVote, CheatCategory.Ownership, $"Client sent {nameof(RpcCalls.AddVote)} as other client"))
                     {
                         return false;
                     }

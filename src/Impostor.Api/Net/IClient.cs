@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
@@ -74,6 +75,9 @@ namespace Impostor.Api.Net
         /// </summary>
         PlatformSpecificData PlatformSpecificData { get; }
 
+        ValueTask<bool> ReportCheatAsync(CheatContext context, CheatCategory category, string message);
+
+        [Obsolete("Please use the overload that adds a cheat category")]
         ValueTask<bool> ReportCheatAsync(CheatContext context, string message);
 
         ValueTask HandleMessageAsync(IMessageReader message, MessageType messageType);

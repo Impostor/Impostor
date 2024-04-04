@@ -35,14 +35,54 @@ namespace Impostor.Server.Net
             _customMessageManager = customMessageManager;
         }
 
-        public override async ValueTask<bool> ReportCheatAsync(CheatContext context, string message)
+        public override async ValueTask<bool> ReportCheatAsync(CheatContext context, CheatCategory category, string message)
         {
             if (!_antiCheatConfig.Enabled)
             {
                 return false;
             }
 
-            _logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{Context}] {Message}", Name, Id, context.Name, message);
+            if (Player != null && Player.IsHost)
+            {
+                var isHostCheatingAllowed = _antiCheatConfig.AllowCheatingHosts switch {
+                    CheatingHostMode.Always => true,
+                    CheatingHostMode.IfRequested => GameVersion.HasDisableServerAuthorityFlag,
+                    CheatingHostMode.Never => false,
+                    _ => false,
+                };
+
+                if (isHostCheatingAllowed)
+                {
+                    return false;
+                }
+            }
+
+            bool LogUnknownCategory(CheatCategory category)
+            {
+                _logger.LogWarning("Unknown cheat category {Category} was used when reporting", category);
+                return true;
+            }
+
+            var isCategoryEnabled = category switch
+            {
+                CheatCategory.ProtocolExtension => _antiCheatConfig.ForbidProtocolExtensions,
+                CheatCategory.GameFlow => _antiCheatConfig.EnableGameFlowChecks,
+                CheatCategory.MustBeHost => _antiCheatConfig.EnableMustBeHostChecks,
+                CheatCategory.ColorLimits => _antiCheatConfig.EnableColorLimitChecks,
+                CheatCategory.NameLimits => _antiCheatConfig.EnableNameLimitChecks,
+                CheatCategory.Ownership => _antiCheatConfig.EnableOwnershipChecks,
+                CheatCategory.Role => _antiCheatConfig.EnableRoleChecks,
+                CheatCategory.Target => _antiCheatConfig.EnableTargetChecks,
+                CheatCategory.Other => true,
+                _ => LogUnknownCategory(category),
+            };
+
+            if (!isCategoryEnabled)
+            {
+                return false;
+            }
+
+            _logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{Context}-{Category}] {Message}", Name, Id, context.Name, category, message);
 
             if (_antiCheatConfig.BanIpFromGame)
             {

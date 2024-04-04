@@ -12,7 +12,7 @@ namespace Impostor.Server.Net.Inner
         {
             if (!sender.IsOwner(this))
             {
-                if (await sender.Client.ReportCheatAsync(context, $"Failed ownership check on {GetType().Name}"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Ownership, $"Failed ownership check on {GetType().Name}"))
                 {
                     return false;
                 }
@@ -25,7 +25,7 @@ namespace Impostor.Server.Net.Inner
         {
             if (!sender.IsHost)
             {
-                if (await sender.Client.ReportCheatAsync(context, "Failed host check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.MustBeHost, "Failed host check"))
                 {
                     return false;
                 }
@@ -38,7 +38,7 @@ namespace Impostor.Server.Net.Inner
         {
             if (target == null)
             {
-                if (await sender.Client.ReportCheatAsync(context, "Failed target check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Target, "Failed target check"))
                 {
                     return false;
                 }
@@ -51,7 +51,7 @@ namespace Impostor.Server.Net.Inner
         {
             if (target != null)
             {
-                if (await sender.Client.ReportCheatAsync(context, "Failed broadcast check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Target, "Failed broadcast check"))
                 {
                     return false;
                 }
@@ -64,7 +64,7 @@ namespace Impostor.Server.Net.Inner
         {
             if (target == null || !target.IsHost)
             {
-                if (await sender.Client.ReportCheatAsync(context, "Failed cmd check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Target, "Failed cmd check"))
                 {
                     return false;
                 }
@@ -77,7 +77,7 @@ namespace Impostor.Server.Net.Inner
         {
             if (playerInfo.IsImpostor != value)
             {
-                if (await sender.Client.ReportCheatAsync(context, "Failed impostor check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed impostor check"))
                 {
                     return false;
                 }
@@ -90,7 +90,7 @@ namespace Impostor.Server.Net.Inner
         {
             if (playerInfo.CanVent != value)
             {
-                if (await sender.Client.ReportCheatAsync(context, "Failed can vent check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed can vent check"))
                 {
                     return false;
                 }
@@ -103,7 +103,7 @@ namespace Impostor.Server.Net.Inner
         {
             if (playerInfo.RoleType != role)
             {
-                if (await sender.Client.ReportCheatAsync(context, $"Failed role = {role} check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, $"Failed role = {role} check"))
                 {
                     return false;
                 }
@@ -114,7 +114,7 @@ namespace Impostor.Server.Net.Inner
 
         protected async ValueTask<bool> UnregisteredCall(CheatContext context, IClientPlayer sender)
         {
-            if (await sender.Client.ReportCheatAsync(context, "Client sent unregistered call"))
+            if (await sender.Client.ReportCheatAsync(context, CheatCategory.ProtocolExtension, "Client sent unregistered call"))
             {
                 return false;
             }

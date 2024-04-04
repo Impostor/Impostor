@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
@@ -67,7 +68,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
                     if (Game.GameNet.ShipStatus == null)
                     {
-                        if (await sender.Client.ReportCheatAsync(call, "Client interacted with vent on unknown map"))
+                        if (await sender.Client.ReportCheatAsync(call, CheatCategory.ProtocolExtension, "Client interacted with vent on unknown map"))
                         {
                             return false;
                         }
@@ -77,7 +78,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
                     if (!Game.GameNet.ShipStatus.Data.Vents.TryGetValue(ventId, out var vent))
                     {
-                        if (await sender.Client.ReportCheatAsync(call, "Client interacted with nonexistent vent"))
+                        if (await sender.Client.ReportCheatAsync(call, CheatCategory.ProtocolExtension, "Client interacted with nonexistent vent"))
                         {
                             return false;
                         }
