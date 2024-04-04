@@ -1,0 +1,7 @@
+{
+	"devDependencies": {
+		"@biomejs/biome": "^1",
+		"typescript": "^5"
+	},
+	"packageManager": "pnpm@8.14.1"
+}
