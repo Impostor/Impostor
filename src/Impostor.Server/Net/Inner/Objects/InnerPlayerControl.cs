@@ -647,9 +647,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     if (name != expected)
                     {
-                        _logger.LogWarning($"Client sent {nameof(RpcCalls.SetName)} with incorrect name");
-                        await SetNameAsync(expected);
-                        return false;
+                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.GameFlow, "Client sent SetName with incorrect name"))
+                        {
+                            await SetNameAsync(expected);
+                            return false;
+                        }
                     }
                 }
                 else
@@ -711,24 +713,44 @@ namespace Impostor.Server.Net.Inner.Objects
             }
             else
             {
-                if (!RequestedColorId.Any())
+                if (RequestedColorId.Any())
                 {
-                    _logger.LogWarning($"Client sent {nameof(RpcCalls.SetColor)} for a player that didn't request it");
-                    return false;
+                    var expected = RequestedColorId.Dequeue();
+
+                    for (var colorOffset = 0; colorOffset <= ColorsCount; colorOffset++)
+                    {
+                        var possibleColor = (ColorType)((byte)(expected + colorOffset) % ColorsCount);
+                        if (!Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == possibleColor))
+                        {
+                            expected = possibleColor;
+                            break;
+                        }
+
+                        if (colorOffset == ColorsCount)
+                        {
+                            if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor but all colors are already in use"))
+                            {
+                                await SetColorAsync(expected);
+                                return false;
+                            }
+                        }
+                    }
+
+                    if (color != expected)
+                    {
+                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor with incorrect color"))
+                        {
+                            await SetColorAsync(expected);
+                            return false;
+                        }
+                    }
                 }
-
-                var expected = RequestedColorId.Dequeue();
-
-                while (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == expected))
+                else
                 {
-                    expected = (ColorType)(((byte)expected + 1) % ColorsCount);
-                }
-
-                if (color != expected)
-                {
-                    _logger.LogWarning($"Client sent {nameof(RpcCalls.SetColor)} with incorrect color");
-                    await SetColorAsync(expected);
-                    return false;
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor for a player that didn't request it"))
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -798,13 +820,19 @@ namespace Impostor.Server.Net.Inner.Objects
                     // This request was made too quickly by spamming the kill button, cancel it if we're in server authoritive mode
                     return _game.IsHostAuthoritive;
                 }
-                else if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow, "Client tried to murder too fast"))
+                else if (!_game.IsHostAuthoritive)
                 {
-                    return false;
+                    // Host-only mods may desync the kill timeout between players
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow, "Client tried to murder too fast"))
+                    {
+                        return false;
+                    }
                 }
             }
 
-            if (target == null || target.PlayerInfo.IsImpostor)
+            // Host-only mods intentionally desync players, so it may appear that one killing role (like a genuine impostor) is killing another
+            // killing role (like an sheriff). So this needs to be allowed if the host requested authority.
+            if (target == null || (target.PlayerInfo.IsImpostor && !_game.IsHostAuthoritive))
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow, "Client tried to murder invalid target"))
                 {
@@ -849,7 +877,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            if (target == null || target.PlayerInfo.IsImpostor)
+            if (target == null)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, CheatCategory.GameFlow, "Client tried to murder invalid target"))
                 {
