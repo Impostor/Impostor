@@ -504,7 +504,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc46Shapeshift.Deserialize(reader, Game, out var playerControl, out var shouldAnimate);
+                    Rpc55CheckShapeshift.Deserialize(reader, Game, out var playerControl, out var shouldAnimate);
                     break;
                 }
 
@@ -939,7 +939,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 return true;
             }
 
-            if (await ValidateRole(RpcCalls.ProtectPlayer, sender, PlayerInfo, RoleTypes.GuardianAngel))
+            if (!await ValidateRole(RpcCalls.ProtectPlayer, sender, PlayerInfo, RoleTypes.GuardianAngel))
             {
                     return false;
             }
