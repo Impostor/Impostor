@@ -147,18 +147,6 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
                 }
 
-                case RpcCalls.SetInfected:
-                {
-                    if (!await ValidateOwnership(call, sender) || !await ValidateHost(call, sender))
-                    {
-                        return false;
-                    }
-
-                    Rpc03SetInfected.Deserialize(reader, out var infectedIds);
-                    await HandleSetInfected(infectedIds);
-                    break;
-                }
-
                 case RpcCalls.CheckName:
                 {
                     if (!await ValidateOwnership(call, sender) ||
