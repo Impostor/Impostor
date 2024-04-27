@@ -180,7 +180,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetName:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -202,7 +203,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetColor:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -213,7 +215,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetHatStr:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -224,7 +227,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetSkinStr:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -235,7 +239,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetVisorStr:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -257,7 +262,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetLevel:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -365,7 +371,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetPetStr:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -376,7 +383,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetStartCounter:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -387,7 +395,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.UsePlatform:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -534,7 +543,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.UseZipline:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -545,7 +555,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.TriggerSpores:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
