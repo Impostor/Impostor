@@ -688,7 +688,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if ((byte)color > ColorsCount)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.ProtocolExtension, "Client sent invalid color"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.ColorLimits, "Client sent invalid color"))
                 {
                     return false;
                 }
@@ -736,7 +736,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                         if (colorOffset == ColorsCount)
                         {
-                            if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor but all colors are already in use"))
+                            if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent SetColor but all colors are already in use"))
                             {
                                 await SetColorAsync(expected);
                                 return false;
@@ -746,7 +746,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     if (color != expected)
                     {
-                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor with incorrect color"))
+                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent SetColor with incorrect color"))
                         {
                             await SetColorAsync(expected);
                             return false;
