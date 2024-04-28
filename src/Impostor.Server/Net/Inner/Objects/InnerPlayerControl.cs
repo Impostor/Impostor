@@ -573,6 +573,14 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleCheckName(ClientPlayer sender, string name)
         {
+            if (Game.GameState == GameStates.Started)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.GameFlow, "Client tried to set a name midgame"))
+                {
+                    return false;
+                }
+            }
+
             if (name.Length > 10)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.NameLimits, "Client sent name exceeding 10 characters"))
