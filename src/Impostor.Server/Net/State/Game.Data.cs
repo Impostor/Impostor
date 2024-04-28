@@ -267,6 +267,7 @@ namespace Impostor.Server.Net.State
                                 "Player {0} ({1}) tried to send ReadyFlag for another player.",
                                 sender.Client.Name,
                                 sender.Client.Id);
+                            return false;
                         }
 
                         _logger.LogTrace("> IsReady {0}", clientId);
