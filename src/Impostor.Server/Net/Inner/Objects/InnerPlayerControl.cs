@@ -113,7 +113,8 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 case RpcCalls.PlayAnimation:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -124,7 +125,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.CompleteTask:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -145,21 +147,10 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
                 }
 
-                case RpcCalls.SetInfected:
-                {
-                    if (!await ValidateOwnership(call, sender) || !await ValidateHost(call, sender))
-                    {
-                        return false;
-                    }
-
-                    Rpc03SetInfected.Deserialize(reader, out var infectedIds);
-                    await HandleSetInfected(infectedIds);
-                    break;
-                }
-
                 case RpcCalls.CheckName:
                 {
-                    if (!await ValidateOwnership(call, sender) || !await ValidateCmd(call, sender, target))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateCmd(call, sender, target))
                     {
                         return false;
                     }
@@ -170,7 +161,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetName:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -181,7 +173,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.CheckColor:
                 {
-                    if (!await ValidateOwnership(call, sender) || !await ValidateCmd(call, sender, target))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateCmd(call, sender, target))
                     {
                         return false;
                     }
@@ -192,7 +185,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetColor:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -203,7 +197,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetHatStr:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -214,7 +209,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetSkinStr:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -225,7 +221,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetVisorStr:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -247,7 +244,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetLevel:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -258,7 +256,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.ReportDeadBody:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -269,7 +268,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.MurderPlayer:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -280,7 +280,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SendChat:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -291,7 +292,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.StartMeeting:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -303,7 +305,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetScanner:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -314,7 +317,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SendChatNote:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -325,7 +329,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetPetStr:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -336,7 +341,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetStartCounter:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -347,7 +353,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.UsePlatform:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -358,7 +365,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SendQuickChat:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -369,7 +377,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.SetRole:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -387,7 +396,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.ProtectPlayer:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -398,12 +408,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.Shapeshift:
                 {
-                    if (!await ValidateHost(call, sender))
-                    {
-                        return false;
-                    }
-
-                    if (!await ValidateRole(call, sender, PlayerInfo, RoleTypes.Shapeshifter))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateRole(call, sender, PlayerInfo, RoleTypes.Shapeshifter) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -415,12 +422,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.CheckMurder:
                 {
-                    if (!await ValidateOwnership(call, sender))
-                    {
-                        return false;
-                    }
-
-                    if (!await ValidateImpostor(call, sender, PlayerInfo))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateImpostor(call, sender, PlayerInfo) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -431,23 +435,22 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.CheckProtect:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateRole(call, sender, PlayerInfo, RoleTypes.GuardianAngel) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
 
-                    if (!await ValidateRole(call, sender, PlayerInfo, RoleTypes.GuardianAngel))
-                    {
-                        return false;
-                    }
-
+                    // CheckProtect should only be passed to Host and not handled server side
                     Rpc48CheckProtect.Deserialize(reader, Game, out _);
                     break;
                 }
 
                 case RpcCalls.CheckZipline:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateCmd(call, sender, target))
                     {
                         return false;
                     }
@@ -458,7 +461,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.UseZipline:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -469,7 +473,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.TriggerSpores:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
@@ -480,7 +485,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.CheckSpore:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateCmd(call, sender, target))
                     {
                         return false;
                     }
@@ -491,12 +497,14 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.CheckShapeshift:
                 {
-                    if (!await ValidateOwnership(call, sender))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateRole(call, sender, PlayerInfo, RoleTypes.Shapeshifter) ||
+                        !await ValidateCmd(call, sender, target))
                     {
                         return false;
                     }
 
-                    Rpc46Shapeshift.Deserialize(reader, Game, out var playerControl, out var shouldAnimate);
+                    Rpc55CheckShapeshift.Deserialize(reader, Game, out var playerControl, out var shouldAnimate);
                     break;
                 }
 
@@ -931,7 +939,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 return true;
             }
 
-            if (await ValidateRole(RpcCalls.ProtectPlayer, sender, PlayerInfo, RoleTypes.GuardianAngel))
+            if (!await ValidateRole(RpcCalls.ProtectPlayer, sender, PlayerInfo, RoleTypes.GuardianAngel))
             {
                     return false;
             }
