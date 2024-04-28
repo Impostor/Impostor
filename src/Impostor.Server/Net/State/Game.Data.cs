@@ -230,6 +230,8 @@ namespace Impostor.Server.Net.State
                     {
                         // Sender is only allowed to change his own scene.
                         var clientId = reader.ReadPackedInt32();
+                        var scene = reader.ReadString();
+
                         if (clientId != sender.Client.Id)
                         {
                             _logger.LogWarning(
@@ -239,7 +241,17 @@ namespace Impostor.Server.Net.State
                             return false;
                         }
 
-                        sender.Scene = reader.ReadString();
+                        // According to game assembly, sender is only allowed to send OnlineGame.
+                        if (scene != "OnlineGame")
+                        {
+                            _logger.LogWarning(
+                                "Player {0} ({1}) tried to send SceneChangeFlag with disallowed scene.",
+                                sender.Client.Name,
+                                sender.Client.Id);
+                            return false;
+                        }
+
+                        sender.Scene = scene;
 
                         _logger.LogTrace("> Scene {0} to {1}", clientId, sender.Scene);
                         break;
@@ -248,6 +260,16 @@ namespace Impostor.Server.Net.State
                     case GameDataTag.ReadyFlag:
                     {
                         var clientId = reader.ReadPackedInt32();
+
+                        if (clientId != sender.Client.Id)
+                        {
+                            _logger.LogWarning(
+                                "Player {0} ({1}) tried to send ReadyFlag for another player.",
+                                sender.Client.Name,
+                                sender.Client.Id);
+                            return false;
+                        }
+
                         _logger.LogTrace("> IsReady {0}", clientId);
                         break;
                     }
