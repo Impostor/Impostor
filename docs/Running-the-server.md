@@ -16,7 +16,7 @@ Depending on your host you may also need to port forward Impostor to the interne
 
 ## Normal installation
 
-1. Install [.NET 7.0](https://dotnet.microsoft.com/download/dotnet/7.0). We recommend either the ASP.NET Core Runtime or the SDK. The SDK is necessary in case you want to develop Impostor or Impostor plugins.
+1. Install [.NET 8.0](https://dotnet.microsoft.com/download/dotnet/8.0). We recommend either the ASP.NET Core Runtime or the SDK. The SDK is necessary in case you want to develop Impostor or Impostor plugins.
 2. Download the [latest release](https://github.com/Impostor/Impostor/releases) or the [latest CI build](https://nightly.link/Impostor/Impostor/workflows/ci/master). Note that Impostor is built for multiple CPU-architectures and operating systems, you most likely want the x64 version, unless you are running on a Raspberry Pi or another device/VPS with an Arm processor.
 3. Extract the zip.
 4. Modify `config.json` to your liking. Documentation can be found [here](Server-configuration.md). You need to at least change `PublicIp` to the address people will connect to your server to.

@@ -27,17 +27,9 @@ https://dotnet.microsoft.com/download
 
 ## 2. Create a C# project
 
-The first step is creating a new C# project, it must be a **Class Library (.NET Standard)**. The target framework can be any of those compatible with .NET 7, which includes:
-
-- .NET Standard 2.0
-- .NET Standard 2.1
-- .NET 5
-- .NET 6
-- .NET 7
+The first step is creating a new C# project, it must be a **Class Library (.NET Standard)**. The target framework can be any of those compatible with .NET 8, but we recommend sticking with **.NET 8.0**.
 
 For more information about compatibility, see https://docs.microsoft.com/en-us/dotnet/standard/net-standard.
-
-> At the moment of writing this document, I recommend you to use **.NET 7.0**.
 
 When the project has been created, you should have `Class.cs` and `Project.csproj` files. Your `Project.csproj` should look something like this.
 
