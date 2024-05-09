@@ -75,7 +75,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
             enumGenerator.Generate("ColorType", "Impostor.Api.Innersloth.Customization");
 
             enumGenerator.Generate("DisconnectReason", sourceName: "DisconnectReasons");
-            enumGenerator.Generate("SanctionReason", sourceName: "SanctionReasons");
+            enumGenerator.Generate("SanctionReasons");
             enumGenerator.Generate("GameKeywords", flags: true, underlyingType: CSharpEnumUnderlyingType.UnsignedInt);
             enumGenerator.Generate("GameOverReason", underlyingType: CSharpEnumUnderlyingType.Byte);
             enumGenerator.Generate("Platforms");
