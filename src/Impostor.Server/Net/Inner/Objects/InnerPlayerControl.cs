@@ -573,6 +573,14 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleCheckName(ClientPlayer sender, string name)
         {
+            if (Game.GameState == GameStates.Started)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.GameFlow, "Client tried to set a name midgame"))
+                {
+                    return false;
+                }
+            }
+
             if (name.Length > 10)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.NameLimits, "Client sent name exceeding 10 characters"))
@@ -591,7 +599,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (sender.Client.Name != name)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.GameFlow, "Client sent name not matching his name from handshake"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.NameLimits, "Client sent name not matching his name from handshake"))
                 {
                     return false;
                 }
@@ -606,7 +614,7 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             if (Game.GameState == GameStates.Started)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client tried to set a name midgame"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.GameFlow, "Client tried to set a name midgame"))
                 {
                     return false;
                 }
@@ -624,7 +632,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 if (sender.Client.Name != name)
                 {
-                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.GameFlow, "Client sent name not matching his name from handshake"))
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits, "Client sent name not matching his name from handshake"))
                     {
                         return false;
                     }
@@ -655,7 +663,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     if (name != expected)
                     {
-                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.GameFlow, "Client sent SetName with incorrect name"))
+                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits, "Client sent SetName with incorrect name"))
                         {
                             await SetNameAsync(expected);
                             return false;
@@ -664,7 +672,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
                 else
                 {
-                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.GameFlow, $"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it"))
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits, $"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it"))
                     {
                         return false;
                     }
@@ -688,7 +696,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if ((byte)color > ColorsCount)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.ProtocolExtension, "Client sent invalid color"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.ColorLimits, "Client sent invalid color"))
                 {
                     return false;
                 }
@@ -736,7 +744,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                         if (colorOffset == ColorsCount)
                         {
-                            if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor but all colors are already in use"))
+                            if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent SetColor but all colors are already in use"))
                             {
                                 await SetColorAsync(expected);
                                 return false;
@@ -746,7 +754,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     if (color != expected)
                     {
-                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor with incorrect color"))
+                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent SetColor with incorrect color"))
                         {
                             await SetColorAsync(expected);
                             return false;
