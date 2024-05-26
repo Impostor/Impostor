@@ -81,7 +81,7 @@ namespace Impostor.Server.Net.State
                 if (player.Client.Connection.IsConnected && player.Client.Connection is HazelConnection hazel)
                 {
                     _logger.LogInformation("{0} - Player {1} ({2}) kept connection open after leaving, disposing.", Code, player.Client.Name, playerId);
-                    hazel.DisposeInnerConnection();
+                    await player.Client.DisconnectAsync(isBan ? DisconnectReason.Banned : DisconnectReason.Kicked);
                 }
             });
 
