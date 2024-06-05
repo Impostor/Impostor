@@ -23,6 +23,7 @@ internal class CompatibilityManager : ICompatibilityManager
         new[]
         {
             new GameVersion(2024, 2, 1), // 2024.3.5
+            new GameVersion(2024, 2, 3), // 2024.6.4
         },
     };
 
