@@ -53,12 +53,20 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
 
     public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
     {
+        // Let all logic components process this RPC. If at least one component handles it, return true.
+        var result = false;
         foreach (var logicComponent in _logicComponents)
         {
-            await logicComponent.HandleRpcAsync(call, reader);
+            result |= await logicComponent.HandleRpcAsync(call, reader);
         }
 
-        return true;
+        // If no component accepted it, try and find a custom RPC that can deal with it.
+        if (!result)
+        {
+            result |= await base.HandleRpcAsync(sender, target, call, reader);
+        }
+
+        return result;
     }
 
     public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
