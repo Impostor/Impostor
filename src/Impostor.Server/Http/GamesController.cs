@@ -147,8 +147,25 @@ public sealed class GamesController : ControllerBase
             Reason = reason;
         }
 
+        [SetsRequiredMembers]
+        public MatchmakerError(SanctionReasons sanctionReason, DateTimeOffset endsAt)
+        {
+            Reason = DisconnectReason.Sanctions;
+            SanctionReason = sanctionReason;
+            EndsAt = endsAt;
+        }
+
         [JsonPropertyName("Reason")]
         public required DisconnectReason Reason { get; init; }
+
+        [JsonPropertyName("SanctionReason")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public SanctionReasons SanctionReason { get; init; }
+
+        /// <remarks>A value equal to <see cref="DateTimeOffset.MaxValue"/> means the sanction is permanent.</remarks>
+        [JsonPropertyName("EndsAt")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public DateTimeOffset EndsAt { get; init; }
     }
 
     private class GameListing
