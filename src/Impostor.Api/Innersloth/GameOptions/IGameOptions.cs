@@ -10,9 +10,19 @@ public interface IGameOptions
     public byte Version { get; }
 
     /// <summary>
-    ///     Gets the currently active gamemode.
+    ///     Gets the currently active gamemode. This is currently used for the Normal and HideAndSeek gamemodes.
     /// </summary>
     public GameModes GameMode { get; }
+
+    /// <summary>
+    ///    Gets the currently active special gamemode. This is currently used for the AprilFools gamemode.
+    /// </summary>
+    public SpecialGameModes SpecialMode { get; }
+
+    /// <summary>
+    ///    Gets the rule preset.
+    /// </summary>
+    public RulesPresets RulesPreset { get; }
 
     /// <summary>
     ///     Gets or sets the maximum amount of players for this lobby.
