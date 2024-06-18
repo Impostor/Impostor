@@ -1,5 +1,5 @@
 {
-  "dumpostorVersion": "1.0.0",
-  "gameVersion": "2024.3.5",
+  "dumpostorVersion": "1.0.0-dev",
+  "gameVersion": "2024.6.18",
   "platformType": "StandaloneItch"
 }
