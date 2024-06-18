@@ -6,5 +6,8 @@
   "GuardianAngel": 4,
   "Shapeshifter": 5,
   "CrewmateGhost": 6,
-  "ImpostorGhost": 7
+  "ImpostorGhost": 7,
+  "Noisemaker": 8,
+  "Phantom": 9,
+  "Tracker": 10
 }
