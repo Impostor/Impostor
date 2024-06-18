@@ -31,6 +31,9 @@ public class RoleOptionsCollection
                 RoleTypes.Engineer => EngineerRoleOptions.Deserialize(roleOptionsReader, Version),
                 RoleTypes.GuardianAngel => GuardianAngelRoleOptions.Deserialize(roleOptionsReader, Version),
                 RoleTypes.Shapeshifter => ShapeshifterRoleOptions.Deserialize(roleOptionsReader, Version),
+                RoleTypes.Noisemaker => NoisemakerRoleOptions.Deserialize(roleOptionsReader, Version),
+                RoleTypes.Phantom => PhantomRoleOptions.Deserialize(roleOptionsReader, Version),
+                RoleTypes.Tracker => TrackerRoleOptions.Deserialize(roleOptionsReader, Version),
                 _ => throw new ArgumentOutOfRangeException(nameof(roleType), roleType, null),
             };
 
