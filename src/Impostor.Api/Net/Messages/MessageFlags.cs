@@ -42,7 +42,14 @@ namespace Impostor.Api.Net.Messages
 
         public static string FlagToString(byte flag)
         {
-            return FlagCache[flag];
+            if (FlagCache.TryGetValue(flag, out var res))
+            {
+                return res;
+            }
+            else
+            {
+                return $"Unknown Flag {flag}";
+            }
         }
     }
 }
