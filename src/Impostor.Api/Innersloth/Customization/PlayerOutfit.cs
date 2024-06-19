@@ -14,7 +14,17 @@ namespace Impostor.Api.Innersloth.Customization
 
         public string NamePlateId { get; internal set; } = "missing";
 
-        public string PlayerName { get; internal set; } = "missing";
+        public string PlayerName { get; internal set; } = string.Empty;
+
+        public byte HatSequenceId { get; internal set; } = 0;
+
+        public byte PetSequenceId { get; internal set; } = 0;
+
+        public byte SkinSequenceId { get; internal set; } = 0;
+
+        public byte VisorSequenceId { get; internal set; } = 0;
+
+        public byte NamePlateSequenceId { get; internal set; } = 0;
 
         public bool IsIncomplete
         {
@@ -38,6 +48,11 @@ namespace Impostor.Api.Innersloth.Customization
             writer.Write(SkinId);
             writer.Write(VisorId);
             writer.Write(NamePlateId);
+            writer.Write(HatSequenceId);
+            writer.Write(PetSequenceId);
+            writer.Write(SkinSequenceId);
+            writer.Write(VisorSequenceId);
+            writer.Write(NamePlateSequenceId);
         }
 
         public void Deserialize(IMessageReader reader)
@@ -49,6 +64,11 @@ namespace Impostor.Api.Innersloth.Customization
             SkinId = reader.ReadString();
             VisorId = reader.ReadString();
             NamePlateId = reader.ReadString();
+            HatSequenceId = reader.ReadByte();
+            PetSequenceId = reader.ReadByte();
+            SkinSequenceId = reader.ReadByte();
+            VisorSequenceId = reader.ReadByte();
+            NamePlateSequenceId = reader.ReadByte();
         }
     }
 }
