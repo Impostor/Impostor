@@ -11,7 +11,7 @@ namespace Impostor.Server.Net.State
 
         public InnerLobbyBehaviour? LobbyBehaviour { get; internal set; }
 
-        public InnerGameData? GameData { get; internal set; }
+        public InnerGameData GameData { get; internal set; } = new();
 
         public InnerVoteBanSystem? VoteBan { get; internal set; }
 
