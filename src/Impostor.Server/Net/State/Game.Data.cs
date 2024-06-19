@@ -35,7 +35,6 @@ namespace Impostor.Server.Net.State
             [0] = typeof(InnerSkeldShipStatus),
             [1] = typeof(InnerMeetingHud),
             [2] = typeof(InnerLobbyBehaviour),
-            [3] = typeof(InnerGameData),
             [4] = typeof(InnerPlayerControl),
             [5] = typeof(InnerMiraShipStatus),
             [6] = typeof(InnerPolusShipStatus),
@@ -43,12 +42,16 @@ namespace Impostor.Server.Net.State
             [8] = typeof(InnerAirshipStatus),
             [9] = typeof(InnerHideAndSeekManager),
             [10] = typeof(InnerNormalGameManager),
+            [11] = typeof(InnerPlayerInfo),
+            [12] = typeof(InnerVoteBanSystem),
             [13] = typeof(InnerFungleShipStatus),
         };
 
         private readonly List<InnerNetObject> _allObjects = new List<InnerNetObject>();
 
         private readonly Dictionary<uint, InnerNetObject> _allObjectsFast = new Dictionary<uint, InnerNetObject>();
+
+        private uint _nextNetId = 1;
 
         public T? FindObjectByNetId<T>(uint netId)
             where T : IInnerNetObject
@@ -311,6 +314,8 @@ namespace Impostor.Server.Net.State
 
         private async ValueTask OnSpawnAsync(ClientPlayer sender, InnerNetObject netObj)
         {
+            _nextNetId = netObj.NetId + 1;
+
             switch (netObj)
             {
                 case InnerGameManager innerGameManager:
@@ -325,9 +330,9 @@ namespace Impostor.Server.Net.State
                     break;
                 }
 
-                case InnerGameData data:
+                case InnerPlayerInfo playerInfo:
                 {
-                    GameNet.GameData = data;
+                    GameNet.GameData.AddPlayer(playerInfo);
                     break;
                 }
 
@@ -357,7 +362,7 @@ namespace Impostor.Server.Net.State
                     }
 
                     // Hook up InnerPlayerControl <-> InnerPlayerControl.PlayerInfo.
-                    var playerInfo = GameNet.GameData!.GetPlayerById(control.PlayerId) ?? GameNet.GameData.AddPlayer(control);
+                    var playerInfo = GameNet.GameData.GetPlayerById(control.PlayerId);
 
                     if (playerInfo != null)
                     {
@@ -401,12 +406,6 @@ namespace Impostor.Server.Net.State
                     break;
                 }
 
-                case InnerGameData:
-                {
-                    GameNet.GameData = null;
-                    break;
-                }
-
                 case InnerVoteBanSystem:
                 {
                     GameNet.VoteBan = null;
@@ -419,13 +418,18 @@ namespace Impostor.Server.Net.State
                     break;
                 }
 
-                case InnerPlayerControl control:
+                case InnerPlayerInfo playerInfo:
                 {
                     if (GameState != GameStates.Started && GameState != GameStates.Starting)
                     {
-                        GameNet.GameData?.RemovePlayer(control);
+                        GameNet.GameData.RemovePlayer(playerInfo.PlayerId);
                     }
 
+                    break;
+                }
+
+                case InnerPlayerControl control:
+                {
                     // Remove InnerPlayerControl <-> IClientPlayer.
                     if (TryGetPlayer(control.OwnerId, out var player))
                     {
