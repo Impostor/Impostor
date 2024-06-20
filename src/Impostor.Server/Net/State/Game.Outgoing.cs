@@ -123,5 +123,15 @@ namespace Impostor.Server.Net.State
             message.EndMessage();
             message.EndMessage();
         }
+
+        private void WriteObjectDespawn(IMessageWriter message, InnerNetObject obj)
+        {
+            message.StartMessage(MessageFlags.GameData);
+            Code.Serialize(message);
+            message.StartMessage(GameDataTag.DespawnFlag);
+            message.WritePacked(obj.NetId);
+            message.EndMessage();
+            message.EndMessage();
+        }
     }
 }
