@@ -84,7 +84,7 @@ namespace Impostor.Server.Net.Inner.Objects
             writer.Write(PlayerId);
             writer.WritePacked(ClientId);
 
-            writer.Write(Outfits.Count);
+            writer.Write((byte)Outfits.Count);
             foreach (KeyValuePair<PlayerOutfitType, PlayerOutfit> outfit in Outfits)
             {
                 writer.Write((byte)outfit.Key);
