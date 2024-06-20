@@ -511,6 +511,18 @@ namespace Impostor.Server.Net.State
             await SendObjectSpawnAsync(playerInfo);
         }
 
+        private async ValueTask DespawnPlayerInfoAsync(InnerPlayerInfo playerInfo)
+        {
+            if (playerInfo.OwnerId == ServerOwned)
+            {
+                _logger.LogDebug("Despawning PlayerInfo {nid}", playerInfo.NetId);
+                GameNet.GameData.RemovePlayer(playerInfo.PlayerId);
+                RemoveNetObject(playerInfo);
+
+                await SendObjectDespawnAsync(playerInfo);
+            }
+        }
+
         private bool AddNetObject(InnerNetObject obj)
         {
             if (_allObjectsFast.ContainsKey(obj.NetId))

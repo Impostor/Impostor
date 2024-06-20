@@ -134,5 +134,14 @@ namespace Impostor.Server.Net.State
             writer.EndMessage();
             await FinishGameDataAsync(writer, targetClientId);
         }
+
+        private async ValueTask SendObjectDespawnAsync(InnerNetObject obj, int? targetClientId = null)
+        {
+            using var writer = StartGameData(targetClientId);
+            writer.StartMessage(GameDataTag.DespawnFlag);
+            writer.WritePacked(obj.NetId);
+            writer.EndMessage();
+            await FinishGameDataAsync(writer, targetClientId);
+        }
     }
 }
