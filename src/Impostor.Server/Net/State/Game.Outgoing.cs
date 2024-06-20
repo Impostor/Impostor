@@ -100,5 +100,26 @@ namespace Impostor.Server.Net.State
         {
             Message12WaitForHostS2C.Serialize(message, clear, Code, player.Client.Id);
         }
+
+        private void WriteObjectSpawn(IMessageWriter message, InnerNetObject obj)
+        {
+            message.StartMessage(MessageFlags.GameData);
+            Code.Serialize(message);
+            message.StartMessage(GameDataTag.SpawnFlag);
+            message.WritePacked(11u);        // TODO don't hardcode
+            message.WritePacked(obj.OwnerId);
+            message.Write((byte)obj.SpawnFlags);
+            var components = obj.GetComponentsInChildren<InnerNetObject>();
+            message.WritePacked(components.Count);
+            foreach (var comp in components) {
+                message.WritePacked(obj.NetId);
+                message.StartMessage(1);
+                comp.SerializeAsync(message, true);
+                message.EndMessage();
+            }
+
+            message.EndMessage();
+            message.EndMessage();
+        }
     }
 }

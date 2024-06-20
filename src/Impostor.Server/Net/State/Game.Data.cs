@@ -5,6 +5,7 @@ using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Unity;
+using Impostor.Hazel;
 using Impostor.Server.Events.Meeting;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner;
@@ -30,6 +31,8 @@ namespace Impostor.Server.Net.State
         /// </summary>
         private const int CurrentClient = -3;
 
+        private const int ServerOwned = -4;
+
         private static readonly Dictionary<uint, Type> SpawnableObjects = new()
         {
             [0] = typeof(InnerSkeldShipStatus),
@@ -51,7 +54,7 @@ namespace Impostor.Server.Net.State
 
         private readonly Dictionary<uint, InnerNetObject> _allObjectsFast = new Dictionary<uint, InnerNetObject>();
 
-        private uint _nextNetId = 1;
+        private uint _nextNetId = 100000;
 
         public T? FindObjectByNetId<T>(uint netId)
             where T : IInnerNetObject
@@ -257,6 +260,31 @@ namespace Impostor.Server.Net.State
                         sender.Scene = scene;
 
                         _logger.LogTrace("> Scene {0} to {1}", clientId, sender.Scene);
+
+                        // If the player is not authoritive, also spawn PlayerInfo
+                        // TODO check if this is the correct location
+                        if (!sender.Client.GameVersion.HasDisableServerAuthorityFlag)
+                        {
+                            var playerInfo = (InnerPlayerInfo)ActivatorUtilities.CreateInstance(_serviceProvider, typeof(InnerPlayerInfo), this);
+                            playerInfo.SpawnFlags = SpawnFlags.None; // TODO??
+                            playerInfo.NetId = _nextNetId++;
+                            playerInfo.OwnerId = -4;
+                            playerInfo.ClientId = clientId;
+                            playerInfo.PlayerId = 0; // TODO
+
+                            if (!AddNetObject(playerInfo))
+                            {
+                                _logger.LogTrace("Couldn't spawn PlayerInfo");
+                                playerInfo.NetId = uint.MaxValue;
+                                break;
+                            }
+                            _logger.LogTrace("Spawning PlayerInfo (netId {Netid})", playerInfo.NetId);
+                            await OnSpawnAsync(sender, playerInfo);
+                            var writer = MessageWriter.Get(MessageType.Reliable);
+                            WriteObjectSpawn(writer, playerInfo);
+                            await SendToAllAsync(writer);
+                        }
+
                         break;
                     }
 
@@ -314,8 +342,6 @@ namespace Impostor.Server.Net.State
 
         private async ValueTask OnSpawnAsync(ClientPlayer sender, InnerNetObject netObj)
         {
-            _nextNetId = netObj.NetId + 1;
-
             switch (netObj)
             {
                 case InnerGameManager innerGameManager:
