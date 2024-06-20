@@ -167,7 +167,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc06SetName.Deserialize(reader, out var name);
+                    Rpc06SetName.Deserialize(reader, out var _, out var name);
                     return await HandleSetName(sender, name);
                 }
 
@@ -191,7 +191,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc08SetColor.Deserialize(reader, out var color);
+                    Rpc08SetColor.Deserialize(reader, out var _, out var color);
                     return await HandleSetColor(sender, color);
                 }
 
