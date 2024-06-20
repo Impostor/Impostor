@@ -266,7 +266,7 @@ namespace Impostor.Server.Net.State
                         if (!sender.Client.GameVersion.HasDisableServerAuthorityFlag)
                         {
                             var playerInfo = (InnerPlayerInfo)ActivatorUtilities.CreateInstance(_serviceProvider, typeof(InnerPlayerInfo), this);
-                            playerInfo.SpawnFlags = SpawnFlags.None; // TODO??
+                            playerInfo.SpawnFlags = SpawnFlags.None;
                             playerInfo.NetId = _nextNetId++;
                             playerInfo.OwnerId = -4;
                             playerInfo.ClientId = clientId;

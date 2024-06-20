@@ -89,7 +89,7 @@ namespace Impostor.Server.Net.Inner.Objects
             writer.WritePacked(ClientId);
 
             writer.Write((byte)Outfits.Count);
-            foreach (KeyValuePair<PlayerOutfitType, PlayerOutfit> outfit in Outfits)
+            foreach (var outfit in Outfits)
             {
                 writer.Write((byte)outfit.Key);
                 outfit.Value.Serialize(writer);
@@ -102,10 +102,12 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 flag = (byte)(flag | 1u);
             }
+
             if (IsDead)
             {
                 flag = (byte)(flag | 4u);
             }
+
             writer.Write(flag);
 
             writer.Write((ushort)(RoleType ?? 0));
@@ -120,6 +122,7 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 Tasks[i].Serialize(writer);
             }
+
             writer.Write(string.Empty);
             writer.Write(string.Empty);
             return new ValueTask<bool>(true);

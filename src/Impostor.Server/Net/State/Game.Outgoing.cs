@@ -109,9 +109,11 @@ namespace Impostor.Server.Net.State
             message.WritePacked(11u);        // TODO don't hardcode
             message.WritePacked(obj.OwnerId);
             message.Write((byte)obj.SpawnFlags);
+
             var components = obj.GetComponentsInChildren<InnerNetObject>();
             message.WritePacked(components.Count);
-            foreach (var comp in components) {
+            foreach (var comp in components)
+            {
                 message.WritePacked(obj.NetId);
                 message.StartMessage(1);
                 comp.SerializeAsync(message, true);
