@@ -270,7 +270,7 @@ namespace Impostor.Server.Net.State
                             playerInfo.NetId = _nextNetId++;
                             playerInfo.OwnerId = -4;
                             playerInfo.ClientId = clientId;
-                            playerInfo.PlayerId = 0; // TODO
+                            playerInfo.PlayerId = GameNet.GameData.GetNextAvailablePlayerId();
 
                             if (!AddNetObject(playerInfo))
                             {
@@ -278,6 +278,7 @@ namespace Impostor.Server.Net.State
                                 playerInfo.NetId = uint.MaxValue;
                                 break;
                             }
+
                             _logger.LogTrace("Spawning PlayerInfo (netId {Netid})", playerInfo.NetId);
                             await OnSpawnAsync(sender, playerInfo);
                             var writer = MessageWriter.Get(MessageType.Reliable);

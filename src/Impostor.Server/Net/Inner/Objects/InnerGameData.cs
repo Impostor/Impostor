@@ -31,5 +31,18 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             _allPlayers.TryRemove(playerId, out _);
         }
+
+        internal byte GetNextAvailablePlayerId()
+        {
+            for (byte i = 0; i < 255; i++)
+            {
+                if (!Players.ContainsKey(i))
+                {
+                    return i;
+                }
+            }
+
+            return 255;
+        }
     }
 }
