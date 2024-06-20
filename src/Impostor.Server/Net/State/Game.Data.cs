@@ -261,30 +261,7 @@ namespace Impostor.Server.Net.State
 
                         _logger.LogTrace("> Scene {0} to {1}", clientId, sender.Scene);
 
-                        // If the player is not authoritive, also spawn PlayerInfo
-                        // TODO check if this is the correct location
-                        if (!sender.Client.GameVersion.HasDisableServerAuthorityFlag)
-                        {
-                            var playerInfo = (InnerPlayerInfo)ActivatorUtilities.CreateInstance(_serviceProvider, typeof(InnerPlayerInfo), this);
-                            playerInfo.SpawnFlags = SpawnFlags.None;
-                            playerInfo.NetId = _nextNetId++;
-                            playerInfo.OwnerId = -4;
-                            playerInfo.ClientId = clientId;
-                            playerInfo.PlayerId = GameNet.GameData.GetNextAvailablePlayerId();
-
-                            if (!AddNetObject(playerInfo))
-                            {
-                                _logger.LogTrace("Couldn't spawn PlayerInfo");
-                                playerInfo.NetId = uint.MaxValue;
-                                break;
-                            }
-
-                            _logger.LogTrace("Spawning PlayerInfo (netId {Netid})", playerInfo.NetId);
-                            await OnSpawnAsync(sender, playerInfo);
-                            var writer = MessageWriter.Get(MessageType.Reliable);
-                            WriteObjectSpawn(writer, playerInfo);
-                            await SendToAllAsync(writer);
-                        }
+                        await CheckPlayerInfos(sender);
 
                         break;
                     }
@@ -467,6 +444,46 @@ namespace Impostor.Server.Net.State
                     break;
                 }
             }
+        }
+
+        private async ValueTask CheckPlayerInfos(ClientPlayer sender)
+        {
+            // Sync all server-owned objects
+            foreach (var obj in _allObjectsFast.Values)
+            {
+                if (obj.OwnerId == -4) {
+                    _logger.LogTrace("Sharing {Type} {NetId}", obj.GetType(), obj.NetId);
+                    var writer = MessageWriter.Get(MessageType.Reliable);
+                    WriteObjectSpawn(writer, obj);
+                    await SendToAsync(writer, sender.Client.Id);
+                }
+            }
+
+            // If the host doesn't disable server authority, spawn a player info for it
+            if (!IsHostAuthoritive && sender.Character == null)
+            {
+                var playerInfo = (InnerPlayerInfo)ActivatorUtilities.CreateInstance(_serviceProvider, typeof(InnerPlayerInfo), this);
+                playerInfo.SpawnFlags = SpawnFlags.None;
+                playerInfo.NetId = _nextNetId++;
+                playerInfo.OwnerId = -4;
+                playerInfo.ClientId = sender.Client.Id;
+                playerInfo.PlayerId = GameNet.GameData.GetNextAvailablePlayerId();
+
+                if (!AddNetObject(playerInfo))
+                {
+                    _logger.LogTrace("Couldn't spawn PlayerInfo");
+                    playerInfo.NetId = uint.MaxValue;
+                    return;
+                }
+
+                _logger.LogTrace("Spawning PlayerInfo (netId {Netid})", playerInfo.NetId);
+                await OnSpawnAsync(sender, playerInfo);
+                var writer = MessageWriter.Get(MessageType.Reliable);
+                WriteObjectSpawn(writer, playerInfo);
+                await SendToAllAsync(writer);
+            }
+
+
         }
 
         private bool AddNetObject(InnerNetObject obj)
