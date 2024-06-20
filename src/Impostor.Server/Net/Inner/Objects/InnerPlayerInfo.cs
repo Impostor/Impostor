@@ -9,14 +9,18 @@ using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Utils;
 using Impostor.Server.Net.State;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
     internal partial class InnerPlayerInfo
     {
-        public InnerPlayerInfo(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game)
+        private readonly ILogger<InnerPlayerInfo> _logger;
+
+        public InnerPlayerInfo(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerPlayerInfo> logger) : base(customMessageManager, game)
         {
             Components.Add(this);
+            _logger = logger;
         }
 
         public InnerPlayerControl? Controller { get; internal set; }
@@ -93,7 +97,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             writer.WritePacked(PlayerLevel);
 
-            byte flag = 0;
+            var flag = 0;
             if (Disconnected)
             {
                 flag = (byte)(flag | 1u);
@@ -112,7 +116,7 @@ namespace Impostor.Server.Net.Inner.Objects
             }
 
             writer.Write((byte)Tasks.Count);
-            for (int i = 0; i < Tasks.Count; i++)
+            for (var i = 0; i < Tasks.Count; i++)
             {
                 Tasks[i].Serialize(writer);
             }

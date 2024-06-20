@@ -2,6 +2,8 @@ namespace Impostor.Api.Innersloth.Customization
 {
     public class PlayerOutfit
     {
+        public string PlayerName { get; internal set; } = string.Empty;
+
         public ColorType Color { get; internal set; } = (ColorType)(-1);
 
         public string HatId { get; internal set; } = "missing";
@@ -13,8 +15,6 @@ namespace Impostor.Api.Innersloth.Customization
         public string VisorId { get; internal set; } = "missing";
 
         public string NamePlateId { get; internal set; } = "missing";
-
-        public string PlayerName { get; internal set; } = string.Empty;
 
         public byte HatSequenceId { get; internal set; } = 0;
 
