@@ -555,6 +555,7 @@ namespace Impostor.Server.Net.Inner.Objects
             if (task != null)
             {
                 task.Complete = true;
+                PlayerInfo.IsDirty = true;
                 await _eventManager.CallAsync(new PlayerCompletedTaskEvent(Game, sender, this, task));
             }
             else
