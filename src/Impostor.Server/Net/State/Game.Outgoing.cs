@@ -143,5 +143,15 @@ namespace Impostor.Server.Net.State
             writer.EndMessage();
             return FinishGameDataAsync(writer, targetClientId);
         }
+
+        private async ValueTask SendObjectData(InnerNetObject obj, int? targetClientId = null)
+        {
+            using var writer = StartGameData(targetClientId);
+            writer.StartMessage(GameDataTag.DataFlag);
+            writer.WritePacked(obj.NetId);
+            await obj.SerializeAsync(writer, false);
+            writer.EndMessage();
+            await FinishGameDataAsync(writer, targetClientId);
+        }
     }
 }
