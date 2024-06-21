@@ -546,6 +546,7 @@ namespace Impostor.Server.Net.Inner.Objects
             if (task != null)
             {
                 task.Complete = true;
+                PlayerInfo.IsDirty = true;
                 await _eventManager.CallAsync(new PlayerCompletedTaskEvent(Game, sender, this, task));
             }
             else
@@ -753,14 +754,15 @@ namespace Impostor.Server.Net.Inner.Objects
                         }
                     }
 
-                    if (color != expected)
+                    // TODO fix
+                    /*if (color != expected)
                     {
                         if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent SetColor with incorrect color"))
                         {
                             await SetColorAsync(expected);
                             return false;
                         }
-                    }
+                    }*/
                 }
                 else
                 {
