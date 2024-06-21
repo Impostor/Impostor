@@ -315,6 +315,19 @@ namespace Impostor.Server.Net.State
                 }
             }
 
+            // Check for dirty netobjects
+            foreach (var netObject in _allObjectsFast.Values)
+            {
+                if (netObject.IsDirty && netObject.OwnerId == ServerOwned)
+                {
+                    _logger.LogInformation("Sending over {Type} {NetId}", netObject.GetType(), netObject.NetId);
+                    var writer = MessageWriter.Get(MessageType.Reliable);
+                    await WriteObjectData(writer, netObject);
+                    await SendToAllAsync(writer);
+                    netObject.IsDirty = false;
+                }
+            }
+
             return true;
         }
 
@@ -451,7 +464,8 @@ namespace Impostor.Server.Net.State
             // Sync all server-owned objects
             foreach (var obj in _allObjectsFast.Values)
             {
-                if (obj.OwnerId == -4) {
+                if (obj.OwnerId == -4)
+                {
                     _logger.LogTrace("Sharing {Type} {NetId}", obj.GetType(), obj.NetId);
                     var writer = MessageWriter.Get(MessageType.Reliable);
                     WriteObjectSpawn(writer, obj);
@@ -482,8 +496,6 @@ namespace Impostor.Server.Net.State
                 WriteObjectSpawn(writer, playerInfo);
                 await SendToAllAsync(writer);
             }
-
-
         }
 
         private bool AddNetObject(InnerNetObject obj)

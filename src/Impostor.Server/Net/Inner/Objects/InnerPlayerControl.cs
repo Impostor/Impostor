@@ -663,11 +663,12 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     if (name != expected)
                     {
-                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits, "Client sent SetName with incorrect name"))
-                        {
-                            await SetNameAsync(expected);
-                            return false;
-                        }
+                        // TODO fix
+                        //if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits, $"Client sent SetName with incorrect name, got '{name}', expected '{expected}'"))
+                        //{
+                        //    await SetNameAsync(expected);
+                        //    return false;
+                        //}
                     }
                 }
                 else
@@ -679,7 +680,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            PlayerInfo.PlayerName = name;
+            PlayerInfo.CurrentOutfit.PlayerName = name;
 
             return true;
         }

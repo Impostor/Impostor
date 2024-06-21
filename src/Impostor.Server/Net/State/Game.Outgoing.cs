@@ -133,5 +133,16 @@ namespace Impostor.Server.Net.State
             message.EndMessage();
             message.EndMessage();
         }
+
+        private async ValueTask WriteObjectData(IMessageWriter message, InnerNetObject obj)
+        {
+            message.StartMessage(MessageFlags.GameData);
+            Code.Serialize(message);
+            message.StartMessage(GameDataTag.DataFlag);
+            message.WritePacked(obj.NetId);
+            await obj.SerializeAsync(message, false);
+            message.EndMessage();
+            message.EndMessage();
+        }
     }
 }

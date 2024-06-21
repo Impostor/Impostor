@@ -103,7 +103,6 @@ namespace Impostor.Server.Net.State
 
                     break;
                 }
-
             }
 
             return true;

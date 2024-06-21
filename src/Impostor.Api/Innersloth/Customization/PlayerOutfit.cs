@@ -2,19 +2,57 @@ namespace Impostor.Api.Innersloth.Customization
 {
     public class PlayerOutfit
     {
-        public string PlayerName { get; internal set; } = string.Empty;
+        private string _playerName = string.Empty;
+        private ColorType _color = (ColorType)(-1);
+        private string _hatId = "missing";
+        private string _petId = "missing";
+        private string _skinId = "missing";
+        private string _visorId = "missing";
+        private string _namePlateId = "missing";
 
-        public ColorType Color { get; internal set; } = (ColorType)(-1);
+        public bool IsDirty { get; internal set; }
 
-        public string HatId { get; internal set; } = "missing";
+        public string PlayerName
+        {
+            get => _playerName;
+            set => SetField(ref _playerName, value);
+        }
 
-        public string PetId { get; internal set; } = "missing";
+        public ColorType Color
+        {
+            get => _color;
+            set => SetField(ref _color, value);
+        }
 
-        public string SkinId { get; internal set; } = "missing";
+        public string HatId
+        {
+            get => _hatId;
+            set => SetField(ref _hatId, value);
+        }
 
-        public string VisorId { get; internal set; } = "missing";
+        public string PetId
+        {
+            get => _petId;
+            set => SetField(ref _petId, value);
+        }
 
-        public string NamePlateId { get; internal set; } = "missing";
+        public string SkinId
+        {
+            get => _skinId;
+            set => SetField(ref _skinId, value);
+        }
+
+        public string VisorId
+        {
+            get => _visorId;
+            set => SetField(ref _visorId, value);
+        }
+
+        public string NamePlateId
+        {
+            get => _namePlateId;
+            set => SetField(ref _namePlateId, value);
+        }
 
         public byte HatSequenceId { get; internal set; } = 0;
 
@@ -69,6 +107,12 @@ namespace Impostor.Api.Innersloth.Customization
             SkinSequenceId = reader.ReadByte();
             VisorSequenceId = reader.ReadByte();
             NamePlateSequenceId = reader.ReadByte();
+        }
+
+        private void SetField<T>(ref T field, T value)
+        {
+            field = value;
+            IsDirty = true;
         }
     }
 }
