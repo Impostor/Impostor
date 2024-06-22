@@ -384,6 +384,12 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc44SetRole.Deserialize(reader, out var role, out var _);
+
+                    if (role == RoleTypes.ImpostorGhost || role == RoleTypes.CrewmateGhost)
+                    {
+                        PlayerInfo.RoleWhenAlive = PlayerInfo.RoleType;
+                    }
+
                     PlayerInfo.RoleType = role;
                     PlayerInfo.IsDirty = true;
 

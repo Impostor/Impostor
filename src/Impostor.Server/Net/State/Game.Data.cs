@@ -320,7 +320,7 @@ namespace Impostor.Server.Net.State
             {
                 if (netObject.IsDirty && netObject.OwnerId == ServerOwned)
                 {
-                    _logger.LogInformation("Sending over {Type} {NetId}", netObject.GetType(), netObject.NetId);
+                    _logger.LogInformation("Sending over {Type} {NetId}", netObject.GetType().Name, netObject.NetId);
                     var writer = MessageWriter.Get(MessageType.Reliable);
                     await WriteObjectData(writer, netObject);
                     await SendToAllAsync(writer);
@@ -385,6 +385,12 @@ namespace Impostor.Server.Net.State
                     {
                         playerInfo.Controller = control;
                         control.PlayerInfo = playerInfo;
+                        // Reset PlayerInfo
+                        playerInfo.RoleType = RoleTypes.Crewmate;
+                        playerInfo.RoleWhenAlive = null;
+                        playerInfo.Tasks.Clear();
+                        playerInfo.IsDead = false;
+                        playerInfo.IsDirty = true;
                     }
 
                     if (player != null)
