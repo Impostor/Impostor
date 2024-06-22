@@ -383,7 +383,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc44SetRole.Deserialize(reader, out var role);
+                    Rpc44SetRole.Deserialize(reader, out var role, out var _);
                     PlayerInfo.RoleType = role;
 
                     if (Game.GameState == GameStates.Starting && Game.Players.All(clientPlayer => clientPlayer.Character?.PlayerInfo.RoleType != null))
