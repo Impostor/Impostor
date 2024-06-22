@@ -120,7 +120,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 flag = (byte)(flag | 4u);
             }
 
-            writer.Write(flag);
+            writer.Write((byte)flag);
 
             writer.Write((ushort)(RoleType ?? 0));
             writer.Write(RoleWhenAlive.HasValue);
