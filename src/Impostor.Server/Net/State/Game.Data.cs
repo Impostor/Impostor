@@ -474,7 +474,7 @@ namespace Impostor.Server.Net.State
             }
 
             // If the host doesn't disable server authority, spawn a player info for it
-            if (!IsHostAuthoritive && sender.Character == null)
+            if (!IsHostAuthoritive && !GameNet.GameData.PlayersByClientId.ContainsKey(sender.Client.Id))
             {
                 var playerInfo = (InnerPlayerInfo)ActivatorUtilities.CreateInstance(_serviceProvider, typeof(InnerPlayerInfo), this);
                 playerInfo.SpawnFlags = SpawnFlags.None;
