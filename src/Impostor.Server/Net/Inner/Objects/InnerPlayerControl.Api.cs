@@ -148,5 +148,19 @@ namespace Impostor.Server.Net.Inner.Objects
             // Notify plugins.
             await _eventManager.CallAsync(new PlayerExileEvent(Game, Game.GetClientPlayer(OwnerId)!, this));
         }
+
+        public async ValueTask StartVanishAsync()
+        {
+            using var writer = Game.StartRpc(NetId, RpcCalls.StartVanish);
+            Rpc63StartVanish.Serialize(writer);
+            await Game.FinishRpcAsync(writer);
+        }
+
+        public async ValueTask StartAppearAsync(bool shouldAnimate)
+        {
+            using var writer = Game.StartRpc(NetId, RpcCalls.StartAppear);
+            Rpc65StartAppear.Serialize(writer, shouldAnimate);
+            await Game.FinishRpcAsync(writer);
+        }
     }
 }
