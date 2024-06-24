@@ -716,10 +716,10 @@ namespace Impostor.Server.Net.Inner.Objects
                     {
                         // TODO fix
                         // if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits, $"Client sent SetName with incorrect name, got '{name}', expected '{expected}'"))
-                        //{
+                        // {
                         //    await SetNameAsync(expected);
                         //    return false;
-                        //}
+                        // }
                     }
                 }
                 else

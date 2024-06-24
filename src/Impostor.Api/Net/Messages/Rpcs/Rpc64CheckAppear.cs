@@ -1,5 +1,3 @@
-using Impostor.Api.Games;
-
 namespace Impostor.Api.Net.Messages.Rpcs
 {
     public static class Rpc64CheckAppear
