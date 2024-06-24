@@ -385,6 +385,7 @@ namespace Impostor.Server.Net.State
                     {
                         playerInfo.Controller = control;
                         control.PlayerInfo = playerInfo;
+
                         // Reset PlayerInfo
                         playerInfo.RoleType = RoleTypes.Crewmate;
                         playerInfo.RoleWhenAlive = null;

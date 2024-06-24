@@ -200,6 +200,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 default:
                     return await base.HandleRpcAsync(sender, target, call, reader);
             }
+
             return true;
         }
 

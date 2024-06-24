@@ -511,7 +511,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc55CheckShapeshift.Deserialize(reader, Game, out var playerControl, out var shouldAnimate);
+                    Rpc55CheckShapeshift.Deserialize(reader, Game, out var playerControl, out _);
                     break;
                 }
 
@@ -525,6 +525,48 @@ namespace Impostor.Server.Net.Inner.Objects
                     Rpc56RejectShapeshift.Deserialize(reader);
                     break;
                 }
+
+                case RpcCalls.CheckVanish:
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateRole(call, sender, PlayerInfo, RoleTypes.Phantom) ||
+                        !await ValidateCmd(call, sender, target))
+                    {
+                        return false;
+                    }
+
+                    Rpc62CheckVanish.Deserialize(reader, out var maxDuration);
+                    break;
+
+                case RpcCalls.StartVanish:
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
+                    {
+                        return false;
+                    }
+
+                    Rpc63StartVanish.Deserialize(reader);
+                    break;
+
+                case RpcCalls.CheckAppear:
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateRole(call, sender, PlayerInfo, RoleTypes.Phantom) ||
+                        !await ValidateCmd(call, sender, target))
+                    {
+                        return false;
+                    }
+
+                    Rpc64CheckAppear.Deserialize(reader, out bool shouldAnimate);
+                    break;
+
+                case RpcCalls.StartAppear:
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
+                    {
+                        return false;
+                    }
+
+                    Rpc65StartAppear.Deserialize(reader, out _);
+                    break;
 
                 default:
                     return await base.HandleRpcAsync(sender, target, call, reader);
