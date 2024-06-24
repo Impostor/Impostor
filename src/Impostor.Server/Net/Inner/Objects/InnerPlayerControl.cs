@@ -529,7 +529,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc62CheckVanish.Deserialize(reader, out var maxDuration);
-                    break;
+                    return await HandleCheckVanish(sender, maxDuration);
                 }
 
                 case RpcCalls.StartVanish:
@@ -541,7 +541,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc63StartVanish.Deserialize(reader);
-                    break;
+                    return await HandleStartVanish(sender);
                 }
 
                 case RpcCalls.CheckAppear:
@@ -553,8 +553,8 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc64CheckAppear.Deserialize(reader, out bool shouldAnimate);
-                    break;
+                    Rpc64CheckAppear.Deserialize(reader, out var shouldAnimate);
+                    return await HandleCheckAppear(sender, shouldAnimate);
                 }
 
                 case RpcCalls.StartAppear:
@@ -565,8 +565,8 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc65StartAppear.Deserialize(reader, out _);
-                    break;
+                    Rpc65StartAppear.Deserialize(reader, out var shouldAnimate);
+                    return await HandleStartAppear(sender, shouldAnimate);
                 }
 
                 default:
@@ -1047,6 +1047,62 @@ namespace Impostor.Server.Net.Inner.Objects
             if (startCounter != -1)
             {
                 await _eventManager.CallAsync(new PlayerSetStartCounterEvent(Game, sender, this, (byte)startCounter));
+            }
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleCheckVanish(ClientPlayer sender, float maxDuration)
+        {
+            // TODO: Check if operation is taking place during lobby/meetings
+            // TODO: Check max duration
+            // If the game is host authoritive, the RPC is handled by the host, otherwise by the server
+            if (_game.IsHostAuthoritive)
+            {
+                return true;
+            }
+            else
+            {
+                await StartVanishAsync();
+                return false;
+            }
+        }
+
+        private async ValueTask<bool> HandleStartVanish(ClientPlayer sender)
+        {
+            if (!_game.IsHostAuthoritive)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.StartVanish, CheatCategory.GameFlow, "Client tried to send StartVanish directly"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleCheckAppear(ClientPlayer sender, bool shouldAnimate)
+        {
+            // If the game is host authoritive, the RPC is handled by the host, otherwise by the server
+            if (_game.IsHostAuthoritive)
+            {
+                return true;
+            }
+            else
+            {
+                await StartAppearAsync(shouldAnimate);
+                return false;
+            }
+        }
+
+        private async ValueTask<bool> HandleStartAppear(ClientPlayer sender, bool shouldAnimate)
+        {
+            if (!_game.IsHostAuthoritive)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.StartAppear, CheatCategory.GameFlow, "Client tried to send StartAppear directly"))
+                {
+                    return false;
+                }
             }
 
             return true;
