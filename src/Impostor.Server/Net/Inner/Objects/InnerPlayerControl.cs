@@ -527,6 +527,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
 
                 case RpcCalls.CheckVanish:
+                {
                     if (!await ValidateOwnership(call, sender) ||
                         !await ValidateRole(call, sender, PlayerInfo, RoleTypes.Phantom) ||
                         !await ValidateCmd(call, sender, target))
@@ -536,8 +537,10 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     Rpc62CheckVanish.Deserialize(reader, out var maxDuration);
                     return await HandleCheckVanish(sender, maxDuration);
+                }
 
                 case RpcCalls.StartVanish:
+                {
                     if (!await ValidateHost(call, sender) ||
                         !await ValidateBroadcast(call, sender, target))
                     {
@@ -546,8 +549,10 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     Rpc63StartVanish.Deserialize(reader);
                     return await HandleStartVanish(sender);
+                }
 
                 case RpcCalls.CheckAppear:
+                {
                     if (!await ValidateOwnership(call, sender) ||
                         !await ValidateRole(call, sender, PlayerInfo, RoleTypes.Phantom) ||
                         !await ValidateCmd(call, sender, target))
@@ -557,16 +562,19 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     Rpc64CheckAppear.Deserialize(reader, out var shouldAnimate);
                     return await HandleCheckAppear(sender, shouldAnimate);
+                }
 
                 case RpcCalls.StartAppear:
+                {
                     if (!await ValidateHost(call, sender) ||
                         !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
                     }
 
-                    Rpc65StartAppear.Deserialize(reader, out var shouldAnimate1);
-                    return await HandleStartAppear(sender, shouldAnimate1);
+                    Rpc65StartAppear.Deserialize(reader, out var shouldAnimate);
+                    return await HandleStartAppear(sender, shouldAnimate);
+                }
 
                 default:
                     return await base.HandleRpcAsync(sender, target, call, reader);
@@ -1062,41 +1070,30 @@ namespace Impostor.Server.Net.Inner.Objects
                 return false;
             }
 
+            // TODO: Check if operation is taking place during lobby/meetings
+            // TODO: Check max duration
+            // If the game is host authoritive, the RPC is handled by the host, otherwise by the server
             if (_game.IsHostAuthoritive)
             {
-                if (sender.IsHost)
-                {
-                    return false;
-                }
-
-                // Due to InnerSloth's bug, + 25 host will not do check vanish at its side
-                // And it will send cmd check vanish to server
-                // I tried sending it back to host but the charge loop still occurs even the host receive its own check vanish
-                // Leave this for innersloth to fix their trash
                 return true;
-
-                // pass rpc calls to authoritive host
             }
-
-            // There should be a maxDuration value check but I don't know how to read options from server
-            // Server should reject the calls during meeting or other actions,
-            // but since check murder doesnt have this check, I'm not doing it here
-            await StartVanishAsync();
-            return false;
+            else
+            {
+                await StartVanishAsync();
+                return false;
+            }
         }
 
         private async ValueTask<bool> HandleStartVanish(ClientPlayer sender)
         {
             if (!_game.IsHostAuthoritive)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.StartVanish, CheatCategory.GameFlow, "Client tried to send start vanish directly"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.StartVanish, CheatCategory.GameFlow, "Client tried to send StartVanish directly"))
                 {
                     return false;
                 }
             }
 
-            // InnerSloth is writing maxDuration in check vanish. Not sure whether they gonna add a server side timer in the future.
-            // Leave this method for future usage.
             return true;
         }
 
@@ -1107,30 +1104,28 @@ namespace Impostor.Server.Net.Inner.Objects
                 return false;
             }
 
+            // If the game is host authoritive, the RPC is handled by the host, otherwise by the server
             if (_game.IsHostAuthoritive)
             {
                 return true;
-
-                // pass rpc calls to authoritive host
             }
-
-            // Same as the above one
-            await StartAppearAsync(shouldAnimate);
-            return false;
+            else
+            {
+                await StartAppearAsync(shouldAnimate);
+                return false;
+            }
         }
 
         private async ValueTask<bool> HandleStartAppear(ClientPlayer sender, bool shouldAnimate)
         {
             if (!_game.IsHostAuthoritive)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.StartAppear, CheatCategory.GameFlow, "Client tried to send start appear directly"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.StartAppear, CheatCategory.GameFlow, "Client tried to send StartAppear directly"))
                 {
                     return false;
                 }
             }
 
-            // It makes sense to check should animate bool under certain game process.
-            // But since shapeshift not doing this, I gonna leave this method for future usage.
             return true;
         }
     }
