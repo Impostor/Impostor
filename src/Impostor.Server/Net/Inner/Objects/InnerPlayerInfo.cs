@@ -14,7 +14,6 @@ using Impostor.Api.Utils;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.Logging;
 
-
 namespace Impostor.Server.Net.Inner.Objects
 {
     internal partial class InnerPlayerInfo
@@ -143,7 +142,6 @@ namespace Impostor.Server.Net.Inner.Objects
         public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             // TODO ac
-
             PlayerId = reader.ReadByte();
             ClientId = reader.ReadPackedInt32();
 
@@ -200,6 +198,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 default:
                     return await base.HandleRpcAsync(sender, target, call, reader);
             }
+
             return true;
         }
 
