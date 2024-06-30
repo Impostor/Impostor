@@ -89,7 +89,7 @@ namespace Impostor.Server.Net.State
             {
                 using var reader = parent.ReadMessage();
 
-                switch (reader.Tag)
+                switch ((GameDataTag)reader.Tag)
                 {
                     case GameDataTag.DataFlag:
                     {

@@ -42,7 +42,7 @@ namespace Impostor.Server.Net.State
         {
             var writer = StartGameData(targetClientId, type);
 
-            writer.StartMessage(GameDataTag.RpcFlag);
+            writer.StartMessage((byte)GameDataTag.RpcFlag);
             writer.WritePacked(targetNetId);
             writer.Write((byte)callId);
 
@@ -124,7 +124,7 @@ namespace Impostor.Server.Net.State
         private ValueTask SendObjectSpawn(InnerNetObject obj, int? targetClientId = null)
         {
             var writer = StartGameData(targetClientId);
-            writer.StartMessage(GameDataTag.SpawnFlag);
+            writer.StartMessage((byte)GameDataTag.SpawnFlag);
             writer.WritePacked(11u);        // TODO don't hardcode
             writer.WritePacked(obj.OwnerId);
             writer.Write((byte)obj.SpawnFlags);
@@ -146,7 +146,7 @@ namespace Impostor.Server.Net.State
         private ValueTask SendObjectDespawn(InnerNetObject obj, int? targetClientId = null)
         {
             var writer = StartGameData(targetClientId);
-            writer.StartMessage(GameDataTag.DespawnFlag);
+            writer.StartMessage((byte)GameDataTag.DespawnFlag);
             writer.WritePacked(obj.NetId);
             writer.EndMessage();
             return FinishGameDataAsync(writer, targetClientId);
@@ -155,7 +155,7 @@ namespace Impostor.Server.Net.State
         private async ValueTask SendObjectData(InnerNetObject obj, int? targetClientId = null)
         {
             var writer = StartGameData(targetClientId);
-            writer.StartMessage(GameDataTag.DataFlag);
+            writer.StartMessage((byte)GameDataTag.DataFlag);
             writer.WritePacked(obj.NetId);
             await obj.SerializeAsync(writer, false);
             writer.EndMessage();
