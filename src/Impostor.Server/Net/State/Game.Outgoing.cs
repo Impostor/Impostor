@@ -121,48 +121,45 @@ namespace Impostor.Server.Net.State
             Message12WaitForHostS2C.Serialize(message, clear, Code, player.Client.Id);
         }
 
-        private void WriteObjectSpawn(IMessageWriter message, InnerNetObject obj)
+        private ValueTask SendObjectSpawn(InnerNetObject obj, int? targetClientId = null)
         {
-            message.StartMessage(MessageFlags.GameData);
-            Code.Serialize(message);
-            message.StartMessage(GameDataTag.SpawnFlag);
-            message.WritePacked(11u);        // TODO don't hardcode
-            message.WritePacked(obj.OwnerId);
-            message.Write((byte)obj.SpawnFlags);
+            var writer = StartGameData(targetClientId);
+            writer.StartMessage(GameDataTag.SpawnFlag);
+            writer.WritePacked(11u);        // TODO don't hardcode
+            writer.WritePacked(obj.OwnerId);
+            writer.Write((byte)obj.SpawnFlags);
 
             var components = obj.GetComponentsInChildren<InnerNetObject>();
-            message.WritePacked(components.Count);
+            writer.WritePacked(components.Count);
             foreach (var comp in components)
             {
-                message.WritePacked(obj.NetId);
-                message.StartMessage(1);
-                comp.SerializeAsync(message, true);
-                message.EndMessage();
+                writer.WritePacked(obj.NetId);
+                writer.StartMessage(1);
+                comp.SerializeAsync(writer, true);
+                writer.EndMessage();
             }
 
-            message.EndMessage();
-            message.EndMessage();
+            writer.EndMessage();
+            return FinishGameDataAsync(writer, targetClientId);
         }
 
-        private void WriteObjectDespawn(IMessageWriter message, InnerNetObject obj)
+        private ValueTask SendObjectDespawn(InnerNetObject obj, int? targetClientId = null)
         {
-            message.StartMessage(MessageFlags.GameData);
-            Code.Serialize(message);
-            message.StartMessage(GameDataTag.DespawnFlag);
-            message.WritePacked(obj.NetId);
-            message.EndMessage();
-            message.EndMessage();
+            var writer = StartGameData(targetClientId);
+            writer.StartMessage(GameDataTag.DespawnFlag);
+            writer.WritePacked(obj.NetId);
+            writer.EndMessage();
+            return FinishGameDataAsync(writer, targetClientId);
         }
 
-        private async ValueTask WriteObjectData(IMessageWriter message, InnerNetObject obj)
+        private async ValueTask SendObjectData(InnerNetObject obj, int? targetClientId = null)
         {
-            message.StartMessage(MessageFlags.GameData);
-            Code.Serialize(message);
-            message.StartMessage(GameDataTag.DataFlag);
-            message.WritePacked(obj.NetId);
-            await obj.SerializeAsync(message, false);
-            message.EndMessage();
-            message.EndMessage();
+            var writer = StartGameData(targetClientId);
+            writer.StartMessage(GameDataTag.DataFlag);
+            writer.WritePacked(obj.NetId);
+            await obj.SerializeAsync(writer, false);
+            writer.EndMessage();
+            await FinishGameDataAsync(writer, targetClientId);
         }
     }
 }

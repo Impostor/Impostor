@@ -96,9 +96,7 @@ namespace Impostor.Server.Net.State
                         GameNet.GameData.RemovePlayer(playerInfo.PlayerId);
                         RemoveNetObject(playerInfo);
 
-                        var writer = MessageWriter.Get(MessageType.Reliable);
-                        WriteObjectDespawn(writer, playerInfo);
-                        await SendToAllAsync(writer);
+                        await SendObjectDespawn(playerInfo);
                     }
 
                     break;

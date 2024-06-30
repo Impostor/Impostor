@@ -321,9 +321,7 @@ namespace Impostor.Server.Net.State
                 if (netObject.IsDirty && netObject.OwnerId == ServerOwned)
                 {
                     _logger.LogInformation("Sending over {Type} {NetId}", netObject.GetType().Name, netObject.NetId);
-                    var writer = MessageWriter.Get(MessageType.Reliable);
-                    await WriteObjectData(writer, netObject);
-                    await SendToAllAsync(writer);
+                    await SendObjectData(netObject);
                     netObject.IsDirty = false;
                 }
             }
@@ -474,9 +472,7 @@ namespace Impostor.Server.Net.State
                 if (obj.OwnerId == -4)
                 {
                     _logger.LogTrace("Sharing {Type} {NetId}", obj.GetType(), obj.NetId);
-                    var writer = MessageWriter.Get(MessageType.Reliable);
-                    WriteObjectSpawn(writer, obj);
-                    await SendToAsync(writer, sender.Client.Id);
+                    await SendObjectSpawn(obj, sender.Client.Id);
                 }
             }
 
@@ -500,8 +496,7 @@ namespace Impostor.Server.Net.State
                 _logger.LogTrace("Spawning PlayerInfo (netId {Netid})", playerInfo.NetId);
                 await OnSpawnAsync(sender, playerInfo);
                 var writer = MessageWriter.Get(MessageType.Reliable);
-                WriteObjectSpawn(writer, playerInfo);
-                await SendToAllAsync(writer);
+                await SendObjectSpawn(playerInfo);
             }
         }
 
