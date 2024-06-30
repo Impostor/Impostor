@@ -109,6 +109,13 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
+            _logger.LogTrace(
+                "Client {SenderId} called Rpc {Call} on {CallerId} and sent it to {Target}",
+                sender.Client.Id,
+                call,
+                PlayerInfo.ClientId,
+                target?.Client.Id.ToString() ?? "everyone");
+
             switch (call)
             {
                 case RpcCalls.PlayAnimation:

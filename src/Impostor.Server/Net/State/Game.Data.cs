@@ -89,6 +89,8 @@ namespace Impostor.Server.Net.State
             {
                 using var reader = parent.ReadMessage();
 
+                _logger.LogTrace("Client {SenderId} sent GameData {Tag}", sender.Client.Id, (GameDataTag)reader.Tag);
+
                 switch ((GameDataTag)reader.Tag)
                 {
                     case GameDataTag.DataFlag:
@@ -96,6 +98,7 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
+                            _logger.LogTrace("Received Data for {NetId}, which is of type {Type}", netId, obj.GetType().Name);
                             await obj.DeserializeAsync(sender, target, reader, false);
                         }
                         else
