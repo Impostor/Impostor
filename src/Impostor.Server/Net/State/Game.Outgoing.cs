@@ -40,6 +40,27 @@ namespace Impostor.Server.Net.State
 
         public IMessageWriter StartRpc(uint targetNetId, RpcCalls callId, int? targetClientId = null, MessageType type = MessageType.Reliable)
         {
+            var writer = StartGameData(targetClientId, type);
+
+            writer.StartMessage(GameDataTag.RpcFlag);
+            writer.WritePacked(targetNetId);
+            writer.Write((byte)callId);
+
+            return writer;
+        }
+
+        public ValueTask FinishRpcAsync(IMessageWriter writer, int? targetClientId = null)
+        {
+            writer.EndMessage();
+            return FinishGameDataAsync(writer, targetClientId);
+        }
+
+        /// <summary>Start a GameData(To) message.</summary>
+        /// <param name="targetClientId">The client to target if needed, `null` otherwise.</param>
+        /// <param name="type">The type of message to send, defaults to reliable.</param>
+        /// <returns>MessageWriter that should be handed back to <see cref="FinishGameDataAsync"/>.</returns>
+        private IMessageWriter StartGameData(int? targetClientId = null, MessageType type = MessageType.Reliable)
+        {
             var writer = MessageWriter.Get(type);
 
             if (targetClientId == null || targetClientId < 0)
@@ -54,16 +75,15 @@ namespace Impostor.Server.Net.State
                 writer.WritePacked(targetClientId.Value);
             }
 
-            writer.StartMessage(GameDataTag.RpcFlag);
-            writer.WritePacked(targetNetId);
-            writer.Write((byte)callId);
-
             return writer;
         }
 
-        public ValueTask FinishRpcAsync(IMessageWriter writer, int? targetClientId = null)
+        /// <summary>Finalize and send a GameData packet.</summary>
+        /// <param name="writer">MessageWriter received from <see cref="StartGameData"/>.</param>
+        /// <param name="targetClientId">Same target ClientId passed to StartGameData.</param>
+        /// <returns>Task that sends the packet.</returns>
+        private ValueTask FinishGameDataAsync(IMessageWriter writer, int? targetClientId = null)
         {
-            writer.EndMessage();
             writer.EndMessage();
 
             return targetClientId.HasValue
