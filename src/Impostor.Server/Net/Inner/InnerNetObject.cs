@@ -29,6 +29,8 @@ namespace Impostor.Server.Net.Inner
 
         public SpawnFlags SpawnFlags { get; internal set; }
 
+        public virtual bool IsDirty { get; internal set; }
+
         public bool IsOwnedBy(IClientPlayer player)
         {
             return OwnerId == player.Client.Id ||

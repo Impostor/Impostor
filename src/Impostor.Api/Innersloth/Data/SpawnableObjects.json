@@ -2,7 +2,6 @@
   "0": "SkeldShipStatus",
   "1": "MeetingHud",
   "2": "LobbyBehaviour",
-  "3": "GameData",
   "4": "PlayerControl",
   "5": "MiraShipStatus",
   "6": "PolusShipStatus",
@@ -10,5 +9,7 @@
   "8": "AirshipStatus",
   "9": "HideAndSeekManager",
   "10": "NormalGameManager",
+  "11": "NetworkedPlayerInfo",
+  "12": "VoteBanSystem",
   "13": "FungleShipStatus"
 }

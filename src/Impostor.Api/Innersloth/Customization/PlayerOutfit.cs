@@ -2,19 +2,67 @@ namespace Impostor.Api.Innersloth.Customization
 {
     public class PlayerOutfit
     {
-        public ColorType Color { get; internal set; } = (ColorType)(-1);
+        private string _playerName = string.Empty;
+        private ColorType _color = (ColorType)(-1);
+        private string _hatId = "missing";
+        private string _petId = "missing";
+        private string _skinId = "missing";
+        private string _visorId = "missing";
+        private string _namePlateId = "missing";
 
-        public string HatId { get; internal set; } = "missing";
+        public bool IsDirty { get; internal set; }
 
-        public string PetId { get; internal set; } = "missing";
+        public string PlayerName
+        {
+            get => _playerName;
+            set => SetField(ref _playerName, value);
+        }
 
-        public string SkinId { get; internal set; } = "missing";
+        public ColorType Color
+        {
+            get => _color;
+            set => SetField(ref _color, value);
+        }
 
-        public string VisorId { get; internal set; } = "missing";
+        public string HatId
+        {
+            get => _hatId;
+            set => SetField(ref _hatId, value);
+        }
 
-        public string NamePlateId { get; internal set; } = "missing";
+        public string PetId
+        {
+            get => _petId;
+            set => SetField(ref _petId, value);
+        }
 
-        public string PlayerName { get; internal set; } = "missing";
+        public string SkinId
+        {
+            get => _skinId;
+            set => SetField(ref _skinId, value);
+        }
+
+        public string VisorId
+        {
+            get => _visorId;
+            set => SetField(ref _visorId, value);
+        }
+
+        public string NamePlateId
+        {
+            get => _namePlateId;
+            set => SetField(ref _namePlateId, value);
+        }
+
+        public byte HatSequenceId { get; internal set; } = 0;
+
+        public byte PetSequenceId { get; internal set; } = 0;
+
+        public byte SkinSequenceId { get; internal set; } = 0;
+
+        public byte VisorSequenceId { get; internal set; } = 0;
+
+        public byte NamePlateSequenceId { get; internal set; } = 0;
 
         public bool IsIncomplete
         {
@@ -38,6 +86,11 @@ namespace Impostor.Api.Innersloth.Customization
             writer.Write(SkinId);
             writer.Write(VisorId);
             writer.Write(NamePlateId);
+            writer.Write(HatSequenceId);
+            writer.Write(PetSequenceId);
+            writer.Write(SkinSequenceId);
+            writer.Write(VisorSequenceId);
+            writer.Write(NamePlateSequenceId);
         }
 
         public void Deserialize(IMessageReader reader)
@@ -49,6 +102,17 @@ namespace Impostor.Api.Innersloth.Customization
             SkinId = reader.ReadString();
             VisorId = reader.ReadString();
             NamePlateId = reader.ReadString();
+            HatSequenceId = reader.ReadByte();
+            PetSequenceId = reader.ReadByte();
+            SkinSequenceId = reader.ReadByte();
+            VisorSequenceId = reader.ReadByte();
+            NamePlateSequenceId = reader.ReadByte();
+        }
+
+        private void SetField<T>(ref T field, T value)
+        {
+            field = value;
+            IsDirty = true;
         }
     }
 }

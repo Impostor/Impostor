@@ -12,7 +12,7 @@ namespace Impostor.Server.Net.State
 
         IInnerLobbyBehaviour? IGameNet.LobbyBehaviour => LobbyBehaviour;
 
-        IInnerGameData? IGameNet.GameData => GameData;
+        IInnerGameData IGameNet.GameData => GameData;
 
         IInnerVoteBanSystem? IGameNet.VoteBan => VoteBan;
 

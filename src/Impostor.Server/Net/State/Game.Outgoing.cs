@@ -40,6 +40,27 @@ namespace Impostor.Server.Net.State
 
         public IMessageWriter StartRpc(uint targetNetId, RpcCalls callId, int? targetClientId = null, MessageType type = MessageType.Reliable)
         {
+            var writer = StartGameData(targetClientId, type);
+
+            writer.StartMessage((byte)GameDataTag.RpcFlag);
+            writer.WritePacked(targetNetId);
+            writer.Write((byte)callId);
+
+            return writer;
+        }
+
+        public ValueTask FinishRpcAsync(IMessageWriter writer, int? targetClientId = null)
+        {
+            writer.EndMessage();
+            return FinishGameDataAsync(writer, targetClientId);
+        }
+
+        /// <summary>Start a GameData(To) message.</summary>
+        /// <param name="targetClientId">The client to target if needed, `null` otherwise.</param>
+        /// <param name="type">The type of message to send, defaults to reliable.</param>
+        /// <returns>MessageWriter that should be handed back to <see cref="FinishGameDataAsync"/>.</returns>
+        private IMessageWriter StartGameData(int? targetClientId = null, MessageType type = MessageType.Reliable)
+        {
             var writer = MessageWriter.Get(type);
 
             if (targetClientId == null || targetClientId < 0)
@@ -54,16 +75,15 @@ namespace Impostor.Server.Net.State
                 writer.WritePacked(targetClientId.Value);
             }
 
-            writer.StartMessage(GameDataTag.RpcFlag);
-            writer.WritePacked(targetNetId);
-            writer.Write((byte)callId);
-
             return writer;
         }
 
-        public ValueTask FinishRpcAsync(IMessageWriter writer, int? targetClientId = null)
+        /// <summary>Finalize and send a GameData packet.</summary>
+        /// <param name="writer">MessageWriter received from <see cref="StartGameData"/>.</param>
+        /// <param name="targetClientId">Same target ClientId passed to StartGameData.</param>
+        /// <returns>Task that sends the packet.</returns>
+        private ValueTask FinishGameDataAsync(IMessageWriter writer, int? targetClientId = null)
         {
-            writer.EndMessage();
             writer.EndMessage();
 
             return targetClientId.HasValue
@@ -99,6 +119,47 @@ namespace Impostor.Server.Net.State
         private void WriteWaitForHostMessage(IMessageWriter message, bool clear, IClientPlayer player)
         {
             Message12WaitForHostS2C.Serialize(message, clear, Code, player.Client.Id);
+        }
+
+        private ValueTask SendObjectSpawn(InnerNetObject obj, int? targetClientId = null)
+        {
+            var writer = StartGameData(targetClientId);
+            writer.StartMessage((byte)GameDataTag.SpawnFlag);
+            writer.WritePacked(11u);        // TODO don't hardcode
+            writer.WritePacked(obj.OwnerId);
+            writer.Write((byte)obj.SpawnFlags);
+
+            var components = obj.GetComponentsInChildren<InnerNetObject>();
+            writer.WritePacked(components.Count);
+            foreach (var comp in components)
+            {
+                writer.WritePacked(obj.NetId);
+                writer.StartMessage(1);
+                comp.SerializeAsync(writer, true);
+                writer.EndMessage();
+            }
+
+            writer.EndMessage();
+            return FinishGameDataAsync(writer, targetClientId);
+        }
+
+        private ValueTask SendObjectDespawn(InnerNetObject obj, int? targetClientId = null)
+        {
+            var writer = StartGameData(targetClientId);
+            writer.StartMessage((byte)GameDataTag.DespawnFlag);
+            writer.WritePacked(obj.NetId);
+            writer.EndMessage();
+            return FinishGameDataAsync(writer, targetClientId);
+        }
+
+        private async ValueTask SendObjectData(InnerNetObject obj, int? targetClientId = null)
+        {
+            var writer = StartGameData(targetClientId);
+            writer.StartMessage((byte)GameDataTag.DataFlag);
+            writer.WritePacked(obj.NetId);
+            await obj.SerializeAsync(writer, false);
+            writer.EndMessage();
+            await FinishGameDataAsync(writer, targetClientId);
         }
     }
 }

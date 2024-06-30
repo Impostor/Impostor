@@ -5,6 +5,7 @@ using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Unity;
+using Impostor.Hazel;
 using Impostor.Server.Events.Meeting;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner;
@@ -30,12 +31,13 @@ namespace Impostor.Server.Net.State
         /// </summary>
         private const int CurrentClient = -3;
 
+        private const int ServerOwned = -4;
+
         private static readonly Dictionary<uint, Type> SpawnableObjects = new()
         {
             [0] = typeof(InnerSkeldShipStatus),
             [1] = typeof(InnerMeetingHud),
             [2] = typeof(InnerLobbyBehaviour),
-            [3] = typeof(InnerGameData),
             [4] = typeof(InnerPlayerControl),
             [5] = typeof(InnerMiraShipStatus),
             [6] = typeof(InnerPolusShipStatus),
@@ -43,12 +45,16 @@ namespace Impostor.Server.Net.State
             [8] = typeof(InnerAirshipStatus),
             [9] = typeof(InnerHideAndSeekManager),
             [10] = typeof(InnerNormalGameManager),
+            [11] = typeof(InnerPlayerInfo),
+            [12] = typeof(InnerVoteBanSystem),
             [13] = typeof(InnerFungleShipStatus),
         };
 
         private readonly List<InnerNetObject> _allObjects = new List<InnerNetObject>();
 
         private readonly Dictionary<uint, InnerNetObject> _allObjectsFast = new Dictionary<uint, InnerNetObject>();
+
+        private uint _nextNetId = 100000;
 
         public T? FindObjectByNetId<T>(uint netId)
             where T : IInnerNetObject
@@ -83,13 +89,16 @@ namespace Impostor.Server.Net.State
             {
                 using var reader = parent.ReadMessage();
 
-                switch (reader.Tag)
+                _logger.LogTrace("Client {SenderId} sent GameData {Tag}", sender.Client.Id, (GameDataTag)reader.Tag);
+
+                switch ((GameDataTag)reader.Tag)
                 {
                     case GameDataTag.DataFlag:
                     {
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
+                            _logger.LogTrace("Received Data for {NetId}, which is of type {Type}", netId, obj.GetType().Name);
                             await obj.DeserializeAsync(sender, target, reader, false);
                         }
                         else
@@ -254,6 +263,9 @@ namespace Impostor.Server.Net.State
                         sender.Scene = scene;
 
                         _logger.LogTrace("> Scene {0} to {1}", clientId, sender.Scene);
+
+                        await CheckPlayerInfos(sender);
+
                         break;
                     }
 
@@ -306,6 +318,17 @@ namespace Impostor.Server.Net.State
                 }
             }
 
+            // Check for dirty netobjects
+            foreach (var netObject in _allObjectsFast.Values)
+            {
+                if (netObject.IsDirty && netObject.OwnerId == ServerOwned)
+                {
+                    _logger.LogInformation("Sending over {Type} {NetId}", netObject.GetType().Name, netObject.NetId);
+                    await SendObjectData(netObject);
+                    netObject.IsDirty = false;
+                }
+            }
+
             return true;
         }
 
@@ -325,9 +348,9 @@ namespace Impostor.Server.Net.State
                     break;
                 }
 
-                case InnerGameData data:
+                case InnerPlayerInfo playerInfo:
                 {
-                    GameNet.GameData = data;
+                    GameNet.GameData.AddPlayer(playerInfo);
                     break;
                 }
 
@@ -357,12 +380,19 @@ namespace Impostor.Server.Net.State
                     }
 
                     // Hook up InnerPlayerControl <-> InnerPlayerControl.PlayerInfo.
-                    var playerInfo = GameNet.GameData!.GetPlayerById(control.PlayerId) ?? GameNet.GameData.AddPlayer(control);
+                    var playerInfo = GameNet.GameData.GetPlayerById(control.PlayerId);
 
                     if (playerInfo != null)
                     {
                         playerInfo.Controller = control;
                         control.PlayerInfo = playerInfo;
+
+                        // Reset PlayerInfo
+                        playerInfo.RoleType = RoleTypes.Crewmate;
+                        playerInfo.RoleWhenAlive = null;
+                        playerInfo.Tasks.Clear();
+                        playerInfo.IsDead = false;
+                        playerInfo.IsDirty = true;
                     }
 
                     if (player != null)
@@ -401,12 +431,6 @@ namespace Impostor.Server.Net.State
                     break;
                 }
 
-                case InnerGameData:
-                {
-                    GameNet.GameData = null;
-                    break;
-                }
-
                 case InnerVoteBanSystem:
                 {
                     GameNet.VoteBan = null;
@@ -419,13 +443,18 @@ namespace Impostor.Server.Net.State
                     break;
                 }
 
-                case InnerPlayerControl control:
+                case InnerPlayerInfo playerInfo:
                 {
                     if (GameState != GameStates.Started && GameState != GameStates.Starting)
                     {
-                        GameNet.GameData?.RemovePlayer(control);
+                        GameNet.GameData.RemovePlayer(playerInfo.PlayerId);
                     }
 
+                    break;
+                }
+
+                case InnerPlayerControl control:
+                {
                     // Remove InnerPlayerControl <-> IClientPlayer.
                     if (TryGetPlayer(control.OwnerId, out var player))
                     {
@@ -435,6 +464,42 @@ namespace Impostor.Server.Net.State
 
                     break;
                 }
+            }
+        }
+
+        private async ValueTask CheckPlayerInfos(ClientPlayer sender)
+        {
+            // Sync all server-owned objects
+            foreach (var obj in _allObjectsFast.Values)
+            {
+                if (obj.OwnerId == -4)
+                {
+                    _logger.LogTrace("Sharing {Type} {NetId}", obj.GetType(), obj.NetId);
+                    await SendObjectSpawn(obj, sender.Client.Id);
+                }
+            }
+
+            // If the host doesn't disable server authority, spawn a player info for it
+            if (!IsHostAuthoritive && !GameNet.GameData.PlayersByClientId.ContainsKey(sender.Client.Id))
+            {
+                var playerInfo = (InnerPlayerInfo)ActivatorUtilities.CreateInstance(_serviceProvider, typeof(InnerPlayerInfo), this);
+                playerInfo.SpawnFlags = SpawnFlags.None;
+                playerInfo.NetId = _nextNetId++;
+                playerInfo.OwnerId = -4;
+                playerInfo.ClientId = sender.Client.Id;
+                playerInfo.PlayerId = GameNet.GameData.GetNextAvailablePlayerId();
+
+                if (!AddNetObject(playerInfo))
+                {
+                    _logger.LogTrace("Couldn't spawn PlayerInfo");
+                    playerInfo.NetId = uint.MaxValue;
+                    return;
+                }
+
+                _logger.LogTrace("Spawning PlayerInfo (netId {Netid})", playerInfo.NetId);
+                await OnSpawnAsync(sender, playerInfo);
+                var writer = MessageWriter.Get(MessageType.Reliable);
+                await SendObjectSpawn(playerInfo);
             }
         }
 

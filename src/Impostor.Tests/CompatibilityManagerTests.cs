@@ -48,11 +48,23 @@ public sealed class CompatibilityManagerTests
     public static IEnumerable<object[]> CanJoinGameData =>
         new List<object[]>
         {
+            // Same version -> can join
             new object[] { GameJoinError.None, new GameVersion(1, 0, 0), new GameVersion(1, 0, 0) },
-            new object[] { GameJoinError.InvalidClient, new GameVersion(1, 0, 0), new GameVersion(100, 0, 0) },
+
+            // Compatible versions -> can join
+            new object[] { GameJoinError.None, new GameVersion(2, 0, 0), new GameVersion(2, 1, 0) },
+
+            // Different incompatible versions -> show correct error
             new object[] { GameJoinError.ClientOutdated, new GameVersion(2, 0, 0), new GameVersion(1, 0, 0) },
             new object[] { GameJoinError.ClientTooNew, new GameVersion(1, 0, 0), new GameVersion(2, 0, 0) },
-            new object[] { GameJoinError.None, new GameVersion(2, 0, 0), new GameVersion(2, 1, 0) },
+
+            // Versions unknown to Impostor -> also show correct errors
+            new object[] { GameJoinError.ClientTooNew, new GameVersion(0, 0, 1), new GameVersion(1, 0, 0) },
+            new object[] { GameJoinError.ClientOutdated, new GameVersion(1, 0, 0), new GameVersion(0, 0, 1) },
+            new object[] { GameJoinError.ClientTooNew, new GameVersion(1, 0, 0), new GameVersion(100, 0, 0) },
+            new object[] { GameJoinError.ClientOutdated, new GameVersion(100, 0, 0), new GameVersion(1, 0, 0) },
+            new object[] { GameJoinError.ClientTooNew, new GameVersion(0, 0, 1), new GameVersion(100, 0, 0) },
+
         };
 
     [Theory]

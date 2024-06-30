@@ -52,7 +52,7 @@ namespace Impostor.Server.Net.State
             writer.StartMessage(MessageFlags.GameData);
             Code.Serialize(writer);
 
-            writer.StartMessage(GameDataTag.DataFlag);
+            writer.StartMessage((byte)GameDataTag.DataFlag);
             writer.WritePacked(GameNet.GameManager.NetId);
 
             writer.StartMessage((byte)gameOptionsTag);

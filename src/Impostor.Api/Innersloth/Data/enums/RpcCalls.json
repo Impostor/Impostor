@@ -55,5 +55,9 @@
   "CheckShapeshift": 55,
   "RejectShapeshift": 56,
   "LobbyTimeExpiring": 60,
-  "ExtendLobbyTimer": 61
+  "ExtendLobbyTimer": 61,
+  "CheckVanish": 62,
+  "StartVanish": 63,
+  "CheckAppear": 64,
+  "StartAppear": 65
 }
