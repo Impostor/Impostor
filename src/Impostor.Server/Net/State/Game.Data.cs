@@ -83,6 +83,8 @@ namespace Impostor.Server.Net.State
             {
                 using var reader = parent.ReadMessage();
 
+                _logger.LogTrace("Client {SenderId} sent GameData {Tag}", sender.Client.Id, reader.Tag);
+
                 switch (reader.Tag)
                 {
                     case GameDataTag.DataFlag:
@@ -90,6 +92,7 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
+                            _logger.LogTrace("Received Data for {NetId}, which is of type {Type}", netId, obj.GetType().Name);
                             await obj.DeserializeAsync(sender, target, reader, false);
                         }
                         else
@@ -105,7 +108,15 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
-                            if (!await obj.HandleRpcAsync(sender, target, (RpcCalls)reader.ReadByte(), reader))
+                            var call = (RpcCalls)reader.ReadByte();
+                            _logger.LogTrace(
+                                "Client {SenderId} called Rpc {Call} on NetId {CallerId} and sent it to {Target}",
+                                sender.Client.Id,
+                                call,
+                                obj.NetId,
+                                target?.Client.Id.ToString() ?? "everyone");
+
+                            if (!await obj.HandleRpcAsync(sender, target, call, reader))
                             {
                                 parent.RemoveMessage(reader);
                                 continue;
