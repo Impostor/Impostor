@@ -63,6 +63,8 @@ namespace Impostor.Server.Net.State
 
         public async ValueTask<bool> HandleGameDataAsync(IMessageReader parent, ClientPlayer sender, bool toPlayer)
         {
+            using var guard = await LockAsync();
+
             // Find target player.
             ClientPlayer? target = null;
 
