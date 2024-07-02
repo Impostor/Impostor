@@ -65,7 +65,13 @@ namespace Impostor.Server.Net
 
             var isCategoryEnabled = category switch
             {
-                CheatCategory.ProtocolExtension => _antiCheatConfig.ForbidProtocolExtensions,
+                CheatCategory.ProtocolExtension => _antiCheatConfig.AllowProtocolExtensions switch
+                {
+                    ProtocolExtensionsMode.Always => false,
+                    ProtocolExtensionsMode.IfRequested => !GameVersion.HasDisableServerAuthorityFlag,
+                    ProtocolExtensionsMode.Never => true,
+                    _ => true,
+                },
                 CheatCategory.GameFlow => _antiCheatConfig.EnableGameFlowChecks,
                 CheatCategory.MustBeHost => _antiCheatConfig.EnableMustBeHostChecks,
                 CheatCategory.ColorLimits => _antiCheatConfig.EnableColorLimitChecks,
