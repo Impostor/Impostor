@@ -1,4 +1,4 @@
-﻿namespace Impostor.Api.Config
+namespace Impostor.Api.Config
 {
     public class AntiCheatConfig
     {
@@ -24,6 +24,6 @@
 
         public bool EnableTargetChecks { get; set; } = true;
 
-        public bool ForbidProtocolExtensions { get; set; } = true;
+        public ProtocolExtensionsMode AllowProtocolExtensions { get; set; } = ProtocolExtensionsMode.Never;
     }
 }
