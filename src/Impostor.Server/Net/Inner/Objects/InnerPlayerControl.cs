@@ -395,6 +395,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     if (role == RoleTypes.ImpostorGhost || role == RoleTypes.CrewmateGhost)
                     {
                         PlayerInfo.RoleWhenAlive = PlayerInfo.RoleType;
+                        PlayerInfo.IsDead = true;
                     }
 
                     PlayerInfo.RoleType = role;
