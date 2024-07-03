@@ -498,7 +498,6 @@ namespace Impostor.Server.Net.State
 
                 _logger.LogTrace("Spawning PlayerInfo (netId {Netid})", playerInfo.NetId);
                 await OnSpawnAsync(sender, playerInfo);
-                var writer = MessageWriter.Get(MessageType.Reliable);
                 await SendObjectSpawn(playerInfo);
             }
         }

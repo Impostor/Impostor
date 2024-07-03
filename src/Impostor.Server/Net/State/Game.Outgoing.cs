@@ -123,7 +123,7 @@ namespace Impostor.Server.Net.State
 
         private ValueTask SendObjectSpawn(InnerNetObject obj, int? targetClientId = null)
         {
-            var writer = StartGameData(targetClientId);
+            using var writer = StartGameData(targetClientId);
             writer.StartMessage((byte)GameDataTag.SpawnFlag);
             writer.WritePacked(11u);        // TODO don't hardcode
             writer.WritePacked(obj.OwnerId);
@@ -145,7 +145,7 @@ namespace Impostor.Server.Net.State
 
         private ValueTask SendObjectDespawn(InnerNetObject obj, int? targetClientId = null)
         {
-            var writer = StartGameData(targetClientId);
+            using var writer = StartGameData(targetClientId);
             writer.StartMessage((byte)GameDataTag.DespawnFlag);
             writer.WritePacked(obj.NetId);
             writer.EndMessage();
@@ -154,7 +154,7 @@ namespace Impostor.Server.Net.State
 
         private async ValueTask SendObjectData(InnerNetObject obj, int? targetClientId = null)
         {
-            var writer = StartGameData(targetClientId);
+            using var writer = StartGameData(targetClientId);
             writer.StartMessage((byte)GameDataTag.DataFlag);
             writer.WritePacked(obj.NetId);
             await obj.SerializeAsync(writer, false);
