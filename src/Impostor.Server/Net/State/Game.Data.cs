@@ -323,7 +323,7 @@ namespace Impostor.Server.Net.State
             {
                 if (netObject.IsDirty && netObject.OwnerId == ServerOwned)
                 {
-                    _logger.LogInformation("Sending over {Type} {NetId}", netObject.GetType().Name, netObject.NetId);
+                    _logger.LogTrace("Sending over {Type} {NetId}", netObject.GetType().Name, netObject.NetId);
                     await SendObjectData(netObject);
                     netObject.IsDirty = false;
                 }
