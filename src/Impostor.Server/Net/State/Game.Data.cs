@@ -116,7 +116,15 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
-                            if (!await obj.HandleRpcAsync(sender, target, (RpcCalls)reader.ReadByte(), reader))
+                            var call = (RpcCalls)reader.ReadByte();
+                            _logger.LogTrace(
+                                "Client {SenderId} called Rpc {Call} on NetId {CallerId} and sent it to {Target}",
+                                sender.Client.Id,
+                                call,
+                                obj.NetId,
+                                target?.Client.Id.ToString() ?? "everyone");
+
+                            if (!await obj.HandleRpcAsync(sender, target, call, reader))
                             {
                                 parent.RemoveMessage(reader);
                                 continue;
