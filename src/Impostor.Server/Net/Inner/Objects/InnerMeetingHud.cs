@@ -289,7 +289,6 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (exiled != null)
             {
-                exiled.Die(DeathReason.Exile);
                 await _eventManager.CallAsync(new PlayerExileEvent(Game, Game.GetClientPlayer(exiled!.OwnerId)!, exiled));
             }
 
