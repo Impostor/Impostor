@@ -125,7 +125,7 @@ namespace Impostor.Server.Net.State
         {
             using var writer = StartGameData(targetClientId);
             writer.StartMessage((byte)GameDataTag.SpawnFlag);
-            writer.WritePacked(11u);        // TODO don't hardcode
+            writer.WritePacked(SpawnableObjectIds[obj.GetType()]);
             writer.WritePacked(obj.OwnerId);
             writer.Write((byte)obj.SpawnFlags);
 
