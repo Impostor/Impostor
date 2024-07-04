@@ -17,10 +17,10 @@ public class HideNSeekGameOptions : IGameOptions
     public GameModes GameMode => GameModes.HideNSeek;
 
     /// <inheritdoc />
-    public byte SpecialMode { get; set; } = 0;
+    public SpecialGameModes SpecialMode { get; set; } = SpecialGameModes.None;
 
     /// <inheritdoc />
-    public byte RulesPreset { get; set; } = 100;
+    public RulesPresets RulesPreset { get; set; } = RulesPresets.Custom;
 
     /// <inheritdoc />
     public byte MaxPlayers { get; set; } = 15;
@@ -104,8 +104,8 @@ public class HideNSeekGameOptions : IGameOptions
     {
         if (Version >= 8)
         {
-            SpecialMode = reader.ReadByte();
-            RulesPreset = reader.ReadByte();
+            SpecialMode = (SpecialGameModes)reader.ReadByte();
+            RulesPreset = (RulesPresets)reader.ReadByte();
         }
 
         MaxPlayers = reader.ReadByte();

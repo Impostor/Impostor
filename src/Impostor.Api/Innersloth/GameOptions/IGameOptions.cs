@@ -17,12 +17,12 @@ public interface IGameOptions
     /// <summary>
     ///    Gets if the AprilFools mode is enabled or not.
     /// </summary>
-    public byte SpecialMode { get; }
+    public SpecialGameModes SpecialMode { get; }
 
     /// <summary>
     ///    Gets the rule preset.
     /// </summary>
-    public byte RulesPreset { get; }
+    public RulesPresets RulesPreset { get; }
 
     /// <summary>
     ///     Gets or sets the maximum amount of players for this lobby.
