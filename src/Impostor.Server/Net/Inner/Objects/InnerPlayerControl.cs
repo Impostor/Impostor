@@ -700,6 +700,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 if (RequestedPlayerName.Any())
                 {
                     var expected = RequestedPlayerName.Dequeue();
+                    var requested = expected;
 
                     if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == expected))
                     {
@@ -720,7 +721,10 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     if (name != expected)
                     {
-                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits, "Client sent SetName with incorrect name"))
+                        if (await sender.Client.ReportCheatAsync(
+                            RpcCalls.SetName,
+                            CheatCategory.NameLimits,
+                            $"Client sent SetName with incorrect name, got '{name}', requested '{requested}', expected '{expected}'"))
                         {
                             await SetNameAsync(expected);
                             return false;
@@ -751,9 +755,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            if ((byte)color > ColorsCount)
+            if ((byte)color >= ColorsCount)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.ColorLimits, "Client sent invalid color"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.ProtocolExtension, "Client sent unknown color"))
                 {
                     return false;
                 }
@@ -774,9 +778,17 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
+            if ((byte)color >= ColorsCount)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ProtocolExtension, "Client sent unknown color"))
+                {
+                    return false;
+                }
+            }
+
             if (sender.IsOwner(this))
             {
-                if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == color))
+                if (Game.IsColorUsed(color, this))
                 {
                     if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent a color that is already used"))
                     {
@@ -788,33 +800,54 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 if (RequestedColorId.Any())
                 {
-                    var expected = RequestedColorId.Dequeue();
+                    var requested = RequestedColorId.Dequeue();
 
-                    for (var colorOffset = 0; colorOffset <= ColorsCount; colorOffset++)
+                    if (Game.IsColorUsed(color, this))
                     {
-                        var possibleColor = (ColorType)((byte)(expected + colorOffset) % ColorsCount);
-                        if (!Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == possibleColor))
+                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client selected a color that is already used"))
                         {
-                            expected = possibleColor;
-                            break;
-                        }
-
-                        if (colorOffset == ColorsCount)
-                        {
-                            if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent SetColor but all colors are already in use"))
-                            {
-                                await SetColorAsync(expected);
-                                return false;
-                            }
+                            return false;
                         }
                     }
 
-                    if (color != expected)
+                    var startFrom = requested;
+
+                    // Among Us wraps to the front if all colors between the requested and the final color are in use, check for this
+                    if (requested > color)
                     {
-                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent SetColor with incorrect color"))
+                        // Among Us wrapped, so check all colors between requested and the final color
+                        for (var c = requested; (byte)c < ColorsCount; c++)
                         {
-                            await SetColorAsync(expected);
-                            return false;
+                            if (!Game.IsColorUsed(c, this))
+                            {
+                                if (await sender.Client.ReportCheatAsync(
+                                    RpcCalls.SetColor,
+                                    CheatCategory.ColorLimits,
+                                    $"Client skipped color {c} that could be used, but wrapped instead. Player requested {requested} but was given {color}"))
+                                {
+                                    await SetColorAsync(c);
+                                    return false;
+                                }
+                            }
+                        }
+
+                        // Start checking from the first color, fallthrough to normal case
+                        startFrom = ColorType.Red;
+                    }
+
+                    // Check all colors between the requested color and the assigned color
+                    for (var c = startFrom; c < color; c++)
+                    {
+                        if (!Game.IsColorUsed(c, this))
+                        {
+                            if (await sender.Client.ReportCheatAsync(
+                                RpcCalls.SetColor,
+                                CheatCategory.ColorLimits,
+                                $"Client skipped color {c} that could be used. Player requested {requested} but was given {color}"))
+                            {
+                                await SetColorAsync(c);
+                                return false;
+                            }
                         }
                     }
                 }
@@ -1019,7 +1052,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (!await ValidateRole(RpcCalls.ProtectPlayer, sender, PlayerInfo, RoleTypes.GuardianAngel))
             {
-                    return false;
+                return false;
             }
 
             ((InnerPlayerControl)target).Protect(this);
