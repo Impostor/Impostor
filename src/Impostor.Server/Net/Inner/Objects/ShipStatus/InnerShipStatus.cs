@@ -83,7 +83,8 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
             {
                 case RpcCalls.CloseDoorsOfType:
                 {
-                    if (!await ValidateImpostor(call, sender, sender.Character!.PlayerInfo))
+                    if (!await ValidateImpostor(call, sender, sender.Character!.PlayerInfo)
+                        || !await ValidateCmd(call, sender, target))
                     {
                         return false;
                     }
