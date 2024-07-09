@@ -12,7 +12,16 @@
   },
   "AntiCheat": {
     "Enabled": true,
-    "BanIpFromGame": true
+    "BanIpFromGame": true,
+    "AllowCheatingHosts": "Never",
+    "EnableGameFlowChecks": true,
+    "EnableMustBeHostChecks": true,
+    "EnableColorLimitChecks": true,
+    "EnableNameLimitChecks": true,
+    "EnableOwnershipChecks": true,
+    "EnableRoleChecks": true,
+    "EnableTargetChecks": true,
+    "ForbidProtocolExtensions": true
   },
   "Timeout": {
     "SpawnTimeout": 2500,
