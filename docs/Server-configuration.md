@@ -1,6 +1,6 @@
 # Server configuration
 
-Some information about all the possible configurations. Click [here](https://github.com/Impostor/Impostor/blob/master/src/Impostor.Server/config-full.json) to see all the possible config options.
+Some information about all the possible configurations. Click [here](https://github.com/Impostor/Impostor/blob/master/src/Impostor.Server/full-config-example.json) to see all the possible config options.
 
 ## Options
 
@@ -100,7 +100,7 @@ Other Serilog sinks are also supported, but are out of scope for this documentat
 
 ### File
 
-The simplest option to configure is by using the `config.json` file next to the server executable. For all possible options see the [config-full.json](https://github.com/Impostor/Impostor/blob/dev/src/Impostor.Server/config-full.json) file.
+The simplest option to configure is by using the `config.json` file next to the server executable. For all possible options see the [full-config-example.json](https://github.com/Impostor/Impostor/blob/master/src/Impostor.Server/full-config-example.json) file.
 
 ### Environment variables
 

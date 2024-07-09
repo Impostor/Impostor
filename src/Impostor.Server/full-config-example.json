@@ -20,6 +20,7 @@
   },
   "Compatibility": {
     "AllowFutureGameVersions": false,
+    "AllowHostAuthority": false,
     "AllowVersionMixing": false
   },
   "Debug": {
