@@ -67,7 +67,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc61ExtendLobbyTimer.Deserialize(reader, out _, out _, out _);
-                    _logger.LogInformation("{0} - {1} sent Extend Lobby Timer",sender.Game.Code, sender.Client.Id);
+                    _logger.LogInformation("{0} - {1} sent Extend Lobby Timer", sender.Game.Code, sender.Client.Id);
                     break;
                 }
 
