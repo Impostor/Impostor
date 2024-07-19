@@ -160,7 +160,10 @@ namespace Impostor.Server.Net.Inner.Objects
             Disconnected = (flag & 1) != 0;
             IsDead = (flag & 4) != 0;
 
-            RoleType = (RoleTypes)reader.ReadUInt16(); // TODO ignore the RoleType here and only trust the SetRole rpc?
+            // Ignore the RoleType here and only trust the SetRole RPC, as
+            // RoleType is not nullable in vanilla, while Impostor checks game
+            // starts based on assigned roles.
+            _ = (RoleTypes)reader.ReadUInt16();
 
             if (reader.ReadBoolean())
             {
