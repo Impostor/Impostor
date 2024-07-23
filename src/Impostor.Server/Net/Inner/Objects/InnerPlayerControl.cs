@@ -392,6 +392,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     PlayerInfo.RoleType = role;
+                    PlayerInfo.IsDirty = true;
 
                     if (Game.GameState == GameStates.Starting && Game.Players.All(clientPlayer => clientPlayer.Character?.PlayerInfo.RoleType != null))
                     {
@@ -537,6 +538,7 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             PlayerInfo.IsDead = true;
             PlayerInfo.LastDeathReason = reason;
+            PlayerInfo.IsDirty = true;
         }
 
         internal void Protect(InnerPlayerControl guardianAngel)
