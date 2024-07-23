@@ -21,6 +21,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         {
             _logger = logger;
             _votes = new Dictionary<int, int[]>();
+            Components.Add(this);
         }
 
         public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
