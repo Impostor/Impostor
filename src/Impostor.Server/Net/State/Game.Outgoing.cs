@@ -55,11 +55,7 @@ namespace Impostor.Server.Net.State
             return FinishGameDataAsync(writer, targetClientId);
         }
 
-        /// <summary>Start a GameData(To) message.</summary>
-        /// <param name="targetClientId">The client to target if needed, `null` otherwise.</param>
-        /// <param name="type">The type of message to send, defaults to reliable.</param>
-        /// <returns>MessageWriter that should be handed back to <see cref="FinishGameDataAsync"/>.</returns>
-        private IMessageWriter StartGameData(int? targetClientId = null, MessageType type = MessageType.Reliable)
+        public IMessageWriter StartGameData(int? targetClientId = null, MessageType type = MessageType.Reliable)
         {
             var writer = MessageWriter.Get(type);
 
@@ -78,11 +74,7 @@ namespace Impostor.Server.Net.State
             return writer;
         }
 
-        /// <summary>Finalize and send a GameData packet.</summary>
-        /// <param name="writer">MessageWriter received from <see cref="StartGameData"/>.</param>
-        /// <param name="targetClientId">Same target ClientId passed to StartGameData.</param>
-        /// <returns>Task that sends the packet.</returns>
-        private ValueTask FinishGameDataAsync(IMessageWriter writer, int? targetClientId = null)
+        public ValueTask FinishGameDataAsync(IMessageWriter writer, int? targetClientId = null)
         {
             writer.EndMessage();
 
