@@ -2,8 +2,13 @@ namespace Impostor.Api.Innersloth.Customization
 {
     public class PlayerOutfit
     {
+        // Magic value that is assigned by default when the outfit is initially created. This is not
+        // `null` because existing API already exposed this magic value. It's also not 0 (which is
+        // the value exposed when serializing) because SetColor anticheat checks exist.
+        private const ColorType UnknownColor = (ColorType)(-1);
+
         private string _playerName = string.Empty;
-        private ColorType _color = (ColorType)(-1);
+        private ColorType _color = UnknownColor;
         private string _hatId = "missing";
         private string _petId = "missing";
         private string _skinId = "missing";
@@ -64,23 +69,25 @@ namespace Impostor.Api.Innersloth.Customization
 
         private byte NamePlateSequenceId { get; set; } = 0;
 
-        public bool IsIncomplete
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(PlayerName) && Color != (ColorType)(-1) && HatId != "missing" && PetId != "missing" && SkinId != "missing" && VisorId != "missing")
-                {
-                    return NamePlateId == "missing";
-                }
-
-                return true;
-            }
-        }
+        /// <summary>
+        /// Gets a value indicating whether a player outfit is complete or whether it needs to receive additional cosmetics.
+        /// </summary>
+        /// <returns>true if the outfit is incomplete, false if the outfit is complete.</returns>
+        public bool IsIncomplete => string.IsNullOrEmpty(PlayerName)
+                    || Color == UnknownColor
+                    || HatId == "missing"
+                    || PetId == "missing"
+                    || SkinId == "missing"
+                    || VisorId == "missing"
+                    || NamePlateId == "missing";
 
         public void Serialize(IMessageWriter writer)
         {
             writer.Write(PlayerName);
-            writer.WritePacked((int)Color);
+
+            // Follow officials by not sending a color value that is out of range. Sending -1 can cause exceptions on the client side.
+            writer.WritePacked(Color == UnknownColor ? 0 : (int)Color);
+
             writer.Write(HatId);
             writer.Write(PetId);
             writer.Write(SkinId);
