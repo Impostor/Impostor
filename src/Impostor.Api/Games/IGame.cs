@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Impostor.Api.Events;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
+using Impostor.Api.Utils;
 
 namespace Impostor.Api.Games
 {
@@ -51,6 +53,11 @@ namespace Impostor.Api.Games
 
         T? FindObjectByNetId<T>(uint netId)
             where T : IInnerNetObject;
+
+        /// <summary>Lock an <see cref="IGame"/> to prevent concurrent modification.</summary>
+        /// <returns>A <see cref="AsyncLock.Releaser" /> that should be disposed after modifying the game.</returns>
+        /// <remarks>This method should be called when modifying a game outside of an <see cref="IGameEvent" /> handler.</remarks>
+        ValueTask<AsyncLock.Releaser> LockAsync();
 
         /// <summary>
         ///     Adds an <see cref="IPAddress" /> to the ban list of this game.
