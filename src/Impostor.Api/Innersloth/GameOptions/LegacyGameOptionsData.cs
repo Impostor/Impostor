@@ -21,6 +21,12 @@ public class LegacyGameOptionsData : IGameOptions
 
     public GameModes GameMode => GameModes.Normal;
 
+    /// <inheritdoc />
+    public SpecialGameModes SpecialMode { get; } = SpecialGameModes.None;
+
+    /// <inheritdoc />
+    public RulesPresets RulesPreset { get; } = RulesPresets.Custom;
+
     /// <summary>
     ///     Gets or sets the maximum amount of players for this lobby.
     /// </summary>

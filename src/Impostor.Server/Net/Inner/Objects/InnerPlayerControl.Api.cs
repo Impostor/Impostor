@@ -32,7 +32,7 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerInfo.CurrentOutfit.Color = color;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetColor);
-            Rpc08SetColor.Serialize(writer, color);
+            Rpc08SetColor.Serialize(writer, PlayerInfo.NetId, color);
             await Game.FinishRpcAsync(writer);
         }
 

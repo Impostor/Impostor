@@ -1,23 +1,33 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Innersloth.GameOptions;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Custom;
 using Impostor.Api.Utils;
+using Impostor.Server.Net.State;
+using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Inner.Objects
 {
     internal partial class InnerPlayerInfo
     {
-        public InnerPlayerInfo(byte playerId)
+        private readonly ILogger<InnerPlayerInfo> _logger;
+
+        public InnerPlayerInfo(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerPlayerInfo> logger) : base(customMessageManager, game)
         {
-            PlayerId = playerId;
+            Components.Add(this);
+            _logger = logger;
         }
 
         public InnerPlayerControl? Controller { get; internal set; }
 
-        public byte PlayerId { get; }
+        public byte PlayerId { get; internal set; }
+
+        public int ClientId { get; internal set; }
 
         public string PlayerName { get; internal set; } = string.Empty;
 
@@ -31,6 +41,8 @@ namespace Impostor.Server.Net.Inner.Objects
         public PlayerOutfit CurrentOutfit => Outfits[CurrentOutfitType];
 
         public RoleTypes? RoleType { get; internal set; }
+
+        public RoleTypes? RoleWhenAlive { get; internal set; }
 
         public bool Disconnected { get; internal set; }
 
@@ -71,13 +83,56 @@ namespace Impostor.Server.Net.Inner.Objects
             }
         }
 
-        public void Serialize(IMessageWriter writer)
+        public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
         {
-            throw new NotImplementedException();
+            writer.Write(PlayerId);
+            writer.WritePacked(ClientId);
+
+            writer.Write((byte)Outfits.Count);
+            foreach (var outfit in Outfits)
+            {
+                writer.Write((byte)outfit.Key);
+                outfit.Value.Serialize(writer);
+            }
+
+            writer.WritePacked(PlayerLevel);
+
+            var flag = 0;
+            if (Disconnected)
+            {
+                flag = (byte)(flag | 1u);
+            }
+
+            if (IsDead)
+            {
+                flag = (byte)(flag | 4u);
+            }
+
+            writer.Write((byte)flag);
+
+            writer.Write((ushort)(RoleType ?? 0));
+            writer.Write(RoleWhenAlive.HasValue);
+            if (RoleWhenAlive.HasValue)
+            {
+                writer.Write((ushort)RoleWhenAlive.Value);
+            }
+
+            writer.Write((byte)Tasks.Count);
+            for (var i = 0; i < Tasks.Count; i++)
+            {
+                Tasks[i].Serialize(writer);
+            }
+
+            writer.Write(string.Empty); // FriendCode
+            writer.Write(string.Empty); // PUID
+            return new ValueTask<bool>(true);
         }
 
-        public void Deserialize(IMessageReader reader)
+        public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
+            PlayerId = reader.ReadByte();
+            ClientId = reader.ReadPackedInt32();
+
             Outfits.Clear();
             var b = reader.ReadByte();
             for (var i = 0; i < b; i++)
@@ -93,7 +148,15 @@ namespace Impostor.Server.Net.Inner.Objects
             Disconnected = (flag & 1) != 0;
             IsDead = (flag & 4) != 0;
 
-            _ = (RoleTypes)reader.ReadUInt16(); // ignore the RoleType here and only trust the SetRole rpc
+            // Ignore the RoleType here and only trust the SetRole RPC, as
+            // RoleType is not nullable in vanilla, while Impostor checks game
+            // starts based on assigned roles.
+            _ = (RoleTypes)reader.ReadUInt16();
+
+            if (reader.ReadBoolean())
+            {
+                RoleWhenAlive = (RoleTypes)reader.ReadUInt16();
+            }
 
             var taskCount = reader.ReadByte();
 
@@ -106,6 +169,12 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 Tasks[i].Deserialize(reader);
             }
+
+            // Impostor doesn't expose fields that aren't properly validated
+            reader.ReadString(); // FriendCode
+            reader.ReadString(); // PUID
+
+            return ValueTask.CompletedTask;
         }
     }
 }

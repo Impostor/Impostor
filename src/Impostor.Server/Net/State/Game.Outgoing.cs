@@ -112,5 +112,27 @@ namespace Impostor.Server.Net.State
         {
             Message12WaitForHostS2C.Serialize(message, clear, Code, player.Client.Id);
         }
+
+        private async ValueTask SendObjectSpawnAsync(InnerNetObject obj, int? targetClientId = null)
+        {
+            using var writer = StartGameData(targetClientId);
+            writer.StartMessage(GameDataTag.SpawnFlag);
+            writer.WritePacked(SpawnableObjectIds[obj.GetType()]);
+            writer.WritePacked(obj.OwnerId);
+            writer.Write((byte)obj.SpawnFlags);
+
+            var components = obj.GetComponentsInChildren<InnerNetObject>();
+            writer.WritePacked(components.Count);
+            foreach (var component in components)
+            {
+                writer.WritePacked(obj.NetId);
+                writer.StartMessage(1);
+                await component.SerializeAsync(writer, true);
+                writer.EndMessage();
+            }
+
+            writer.EndMessage();
+            await FinishGameDataAsync(writer, targetClientId);
+        }
     }
 }

@@ -4,7 +4,7 @@ namespace Impostor.Api.Innersloth.GameOptions;
 
 public class NormalGameOptions : IGameOptions
 {
-    public const int LatestVersion = 7;
+    public const int LatestVersion = 8;
 
     public NormalGameOptions(byte version = LatestVersion)
     {
@@ -18,6 +18,12 @@ public class NormalGameOptions : IGameOptions
 
     /// <inheritdoc />
     public GameModes GameMode => GameModes.Normal;
+
+    /// <inheritdoc />
+    public SpecialGameModes SpecialMode { get; set; } = SpecialGameModes.None;
+
+    /// <inheritdoc />
+    public RulesPresets RulesPreset { get; set; } = RulesPresets.Custom;
 
     /// <inheritdoc />
     public byte MaxPlayers { get; set; } = 10;
@@ -133,6 +139,12 @@ public class NormalGameOptions : IGameOptions
 
     public void Deserialize(IMessageReader reader)
     {
+        if (Version >= 8)
+        {
+            SpecialMode = (SpecialGameModes)reader.ReadByte();
+            RulesPreset = (RulesPresets)reader.ReadByte();
+        }
+
         MaxPlayers = reader.ReadByte();
         Keywords = (GameKeywords)reader.ReadUInt32();
         Map = (MapTypes)reader.ReadByte();
@@ -163,7 +175,7 @@ public class NormalGameOptions : IGameOptions
 
         RoleOptions.Deserialize(reader);
 
-        if (Version > 7)
+        if (Version > LatestVersion)
         {
             IGameOptions.ThrowUnknownVersion<NormalGameOptions>(Version);
         }
@@ -171,6 +183,12 @@ public class NormalGameOptions : IGameOptions
 
     public void Serialize(IMessageWriter writer)
     {
+        if (Version >= 8)
+        {
+            writer.Write((byte)SpecialMode);
+            writer.Write((byte)RulesPreset);
+        }
+
         writer.Write(MaxPlayers);
         writer.Write((uint)Keywords);
         writer.Write((byte)Map);
@@ -201,7 +219,7 @@ public class NormalGameOptions : IGameOptions
 
         RoleOptions.Serialize(writer);
 
-        if (Version > 7)
+        if (Version > LatestVersion)
         {
             IGameOptions.ThrowUnknownVersion<NormalGameOptions>(Version);
         }
