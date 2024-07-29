@@ -1,5 +1,5 @@
 {
-  "dumpostorVersion": "1.0.0",
+  "dumpostorVersion": "1.0.0-dev",
   "gameVersion": "2024.3.5",
-  "platformType": "StandaloneItch"
+  "platformType": "StandaloneSteamPC"
 }
