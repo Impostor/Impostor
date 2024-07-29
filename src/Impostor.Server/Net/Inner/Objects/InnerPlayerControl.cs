@@ -167,7 +167,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc06SetName.Deserialize(reader, out var name);
+                    Rpc06SetName.Deserialize(reader, out var _, out var name);
                     return await HandleSetName(sender, name);
                 }
 
@@ -191,7 +191,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc08SetColor.Deserialize(reader, out var color);
+                    Rpc08SetColor.Deserialize(reader, out var _, out var color);
                     return await HandleSetColor(sender, color);
                 }
 
@@ -383,8 +383,16 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc44SetRole.Deserialize(reader, out var role);
+                    Rpc44SetRole.Deserialize(reader, out var role, out var _);
+
+                    if (role is RoleTypes.ImpostorGhost or RoleTypes.CrewmateGhost or RoleTypes.GuardianAngel)
+                    {
+                        PlayerInfo.RoleWhenAlive = PlayerInfo.RoleType;
+                        PlayerInfo.IsDead = true;
+                    }
+
                     PlayerInfo.RoleType = role;
+                    PlayerInfo.IsDirty = true;
 
                     if (Game.GameState == GameStates.Starting && Game.Players.All(clientPlayer => clientPlayer.Character?.PlayerInfo.RoleType != null))
                     {
@@ -504,7 +512,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc55CheckShapeshift.Deserialize(reader, Game, out var playerControl, out var shouldAnimate);
+                    Rpc55CheckShapeshift.Deserialize(reader, Game, out var playerControl, out _);
                     break;
                 }
 
@@ -519,6 +527,56 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
                 }
 
+                case RpcCalls.CheckVanish:
+                {
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateRole(call, sender, PlayerInfo, RoleTypes.Phantom) ||
+                        !await ValidateCmd(call, sender, target))
+                    {
+                        return false;
+                    }
+
+                    Rpc62CheckVanish.Deserialize(reader, out var maxDuration);
+                    return await HandleCheckVanish(sender, maxDuration);
+                }
+
+                case RpcCalls.StartVanish:
+                {
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
+                    {
+                        return false;
+                    }
+
+                    Rpc63StartVanish.Deserialize(reader);
+                    return await HandleStartVanish(sender);
+                }
+
+                case RpcCalls.CheckAppear:
+                {
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateRole(call, sender, PlayerInfo, RoleTypes.Phantom) ||
+                        !await ValidateCmd(call, sender, target))
+                    {
+                        return false;
+                    }
+
+                    Rpc64CheckAppear.Deserialize(reader, out var shouldAnimate);
+                    return await HandleCheckAppear(sender, shouldAnimate);
+                }
+
+                case RpcCalls.StartAppear:
+                {
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateBroadcast(call, sender, target))
+                    {
+                        return false;
+                    }
+
+                    Rpc65StartAppear.Deserialize(reader, out var shouldAnimate);
+                    return await HandleStartAppear(sender, shouldAnimate);
+                }
+
                 default:
                     return await base.HandleRpcAsync(sender, target, call, reader);
             }
@@ -530,6 +588,7 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             PlayerInfo.IsDead = true;
             PlayerInfo.LastDeathReason = reason;
+            PlayerInfo.IsDirty = true;
         }
 
         internal void Protect(InnerPlayerControl guardianAngel)
@@ -546,6 +605,7 @@ namespace Impostor.Server.Net.Inner.Objects
             if (task != null)
             {
                 task.Complete = true;
+                PlayerInfo.IsDirty = true;
                 await _eventManager.CallAsync(new PlayerCompletedTaskEvent(Game, sender, this, task));
             }
             else
@@ -643,6 +703,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 if (RequestedPlayerName.Any())
                 {
                     var expected = RequestedPlayerName.Dequeue();
+                    var requested = expected;
 
                     if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == expected))
                     {
@@ -663,7 +724,10 @@ namespace Impostor.Server.Net.Inner.Objects
 
                     if (name != expected)
                     {
-                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits, "Client sent SetName with incorrect name"))
+                        if (await sender.Client.ReportCheatAsync(
+                            RpcCalls.SetName,
+                            CheatCategory.NameLimits,
+                            $"Client sent SetName with incorrect name, got '{name}', requested '{requested}', expected '{expected}'"))
                         {
                             await SetNameAsync(expected);
                             return false;
@@ -679,7 +743,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            PlayerInfo.PlayerName = name;
+            PlayerInfo.CurrentOutfit.PlayerName = name;
 
             return true;
         }
@@ -694,9 +758,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            if ((byte)color > ColorsCount)
+            if ((byte)color >= ColorsCount)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.ColorLimits, "Client sent invalid color"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.ProtocolExtension, "Client sent unknown color"))
                 {
                     return false;
                 }
@@ -717,9 +781,17 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
+            if ((byte)color >= ColorsCount)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.ProtocolExtension, "Client sent unknown color"))
+                {
+                    return false;
+                }
+            }
+
             if (sender.IsOwner(this))
             {
-                if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == color))
+                if (Game.IsColorUsed(color, this))
                 {
                     if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent a color that is already used"))
                     {
@@ -731,33 +803,54 @@ namespace Impostor.Server.Net.Inner.Objects
             {
                 if (RequestedColorId.Any())
                 {
-                    var expected = RequestedColorId.Dequeue();
+                    var requested = RequestedColorId.Dequeue();
 
-                    for (var colorOffset = 0; colorOffset <= ColorsCount; colorOffset++)
+                    if (Game.IsColorUsed(color, this))
                     {
-                        var possibleColor = (ColorType)((byte)(expected + colorOffset) % ColorsCount);
-                        if (!Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.CurrentOutfit.Color == possibleColor))
+                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client selected a color that is already used"))
                         {
-                            expected = possibleColor;
-                            break;
-                        }
-
-                        if (colorOffset == ColorsCount)
-                        {
-                            if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent SetColor but all colors are already in use"))
-                            {
-                                await SetColorAsync(expected);
-                                return false;
-                            }
+                            return false;
                         }
                     }
 
-                    if (color != expected)
+                    var startFrom = requested;
+
+                    // Among Us wraps to the front if all colors between the requested and the final color are in use, check for this
+                    if (requested > color)
                     {
-                        if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent SetColor with incorrect color"))
+                        // Among Us wrapped, so check all colors between requested and the final color
+                        for (var c = (ColorType)requested; c < (ColorType)ColorsCount; c++)
                         {
-                            await SetColorAsync(expected);
-                            return false;
+                            if (!Game.IsColorUsed(c, this))
+                            {
+                                if (await sender.Client.ReportCheatAsync(
+                                    RpcCalls.SetColor,
+                                    CheatCategory.ColorLimits,
+                                    $"Client skipped color {c} that could be used, but wrapped instead. Player requested {requested} but was given {color}"))
+                                {
+                                    await SetColorAsync(c);
+                                    return false;
+                                }
+                            }
+                        }
+
+                        // Start checking from the first color, fallthrough to normal case
+                        startFrom = ColorType.Red;
+                    }
+
+                    // Check all colors between the requested color and the assigned color
+                    for (var c = startFrom; c < color; c++)
+                    {
+                        if (!Game.IsColorUsed(c, this))
+                        {
+                            if (await sender.Client.ReportCheatAsync(
+                                RpcCalls.SetColor,
+                                CheatCategory.ColorLimits,
+                                $"Client skipped color {c} that could be used. Player requested {requested} but was given {color}"))
+                            {
+                                await SetColorAsync(c);
+                                return false;
+                            }
                         }
                     }
                 }
@@ -949,7 +1042,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (!await ValidateRole(RpcCalls.ProtectPlayer, sender, PlayerInfo, RoleTypes.GuardianAngel))
             {
-                    return false;
+                return false;
             }
 
             ((InnerPlayerControl)target).Protect(this);
@@ -997,6 +1090,62 @@ namespace Impostor.Server.Net.Inner.Objects
             if (startCounter != -1)
             {
                 await _eventManager.CallAsync(new PlayerSetStartCounterEvent(Game, sender, this, (byte)startCounter));
+            }
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleCheckVanish(ClientPlayer sender, float maxDuration)
+        {
+            // TODO: Check if operation is taking place during lobby/meetings
+            // TODO: Check max duration
+            // If the game is host authoritive, the RPC is handled by the host, otherwise by the server
+            if (_game.IsHostAuthoritive)
+            {
+                return true;
+            }
+            else
+            {
+                await StartVanishAsync();
+                return false;
+            }
+        }
+
+        private async ValueTask<bool> HandleStartVanish(ClientPlayer sender)
+        {
+            if (!_game.IsHostAuthoritive)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.StartVanish, CheatCategory.GameFlow, "Client tried to send StartVanish directly"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleCheckAppear(ClientPlayer sender, bool shouldAnimate)
+        {
+            // If the game is host authoritive, the RPC is handled by the host, otherwise by the server
+            if (_game.IsHostAuthoritive)
+            {
+                return true;
+            }
+            else
+            {
+                await StartAppearAsync(shouldAnimate);
+                return false;
+            }
+        }
+
+        private async ValueTask<bool> HandleStartAppear(ClientPlayer sender, bool shouldAnimate)
+        {
+            if (!_game.IsHostAuthoritive)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.StartAppear, CheatCategory.GameFlow, "Client tried to send StartAppear directly"))
+                {
+                    return false;
+                }
             }
 
             return true;
