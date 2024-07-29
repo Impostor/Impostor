@@ -29,7 +29,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public int ClientId { get; internal set; }
 
-        public string PlayerName { get; internal set; } = string.Empty;
+        public string PlayerName => CurrentOutfit.PlayerName;
 
         public Dictionary<PlayerOutfitType, PlayerOutfit> Outfits { get; } = new()
         {
@@ -59,6 +59,12 @@ namespace Impostor.Server.Net.Inner.Objects
         public DateTimeOffset LastMurder { get; set; }
 
         public uint PlayerLevel { get; internal set; }
+
+        public override bool IsDirty
+        {
+            get => CurrentOutfit.IsDirty;
+            internal set => CurrentOutfit.IsDirty = value;
+        }
 
         public bool CanMurder(IGame game, IDateTimeProvider dateTimeProvider)
         {

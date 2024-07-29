@@ -326,6 +326,17 @@ namespace Impostor.Server.Net.State
                 }
             }
 
+            // Check for dirty netobjects
+            foreach (var netObject in _allObjectsFast.Values)
+            {
+                if (netObject.IsDirty && netObject.OwnerId == ServerOwned)
+                {
+                    _logger.LogTrace("Sending over {Type} {NetId}", netObject.GetType().Name, netObject.NetId);
+                    await SendObjectData(netObject);
+                    netObject.IsDirty = false;
+                }
+            }
+
             return true;
         }
 

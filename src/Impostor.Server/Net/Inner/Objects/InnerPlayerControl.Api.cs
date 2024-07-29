@@ -20,8 +20,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetNameAsync(string name)
         {
-            PlayerInfo.PlayerName = name;
+            PlayerInfo.CurrentOutfit.PlayerName = name;
 
+            // TODO check playerinfo ownership
             using var writer = Game.StartRpc(NetId, RpcCalls.SetName);
             writer.Write(name);
             await Game.FinishRpcAsync(writer);
