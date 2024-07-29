@@ -9,8 +9,10 @@ using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Server.Events;
@@ -129,6 +131,15 @@ namespace Impostor.Server.Net.State
 
                 await _eventManager.CallAsync(new GameStartedEvent(this));
             }
+        }
+
+        /// <summary>Check if there are players using a color.</summary>
+        /// <param name="color">The color to check for.</param>
+        /// <param name="exceptBy">Exempt a player from being checked.</param>
+        /// <returns>True if there is player other than exceptBy that uses that color.</returns>
+        internal bool IsColorUsed(ColorType color, IInnerPlayerControl? exceptBy = null)
+        {
+            return Players.Any(p => p.Character != null && p.Character != exceptBy && p.Character.PlayerInfo.CurrentOutfit.Color == color);
         }
 
         private ValueTask BroadcastJoinMessage(IMessageWriter message, bool clear, ClientPlayer player)
