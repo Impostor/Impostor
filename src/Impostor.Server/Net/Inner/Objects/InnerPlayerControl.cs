@@ -251,7 +251,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc38SetLevel.Deserialize(reader, out var level);
-                    return true;
+                    return await HandleSetLevel(sender, level);
                 }
 
                 case RpcCalls.ReportDeadBody:
@@ -830,6 +830,19 @@ namespace Impostor.Server.Net.Inner.Objects
             }
 
             PlayerInfo.CurrentOutfit.NamePlateId = skin;
+
+            return true;
+        }
+
+        private async ValueTask<bool> HandleSetLevel(ClientPlayer sender, uint level)
+        {
+            if (Game.GameState == GameStates.Started &&
+                await sender.Client.ReportCheatAsync(RpcCalls.SetLevel, CheatCategory.GameFlow, "Client tried to set level while not in game"))
+            {
+                return false;
+            }
+
+            PlayerInfo.PlayerLevel = level;
 
             return true;
         }
