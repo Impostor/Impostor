@@ -390,6 +390,10 @@ namespace Impostor.Server.Net.Inner.Objects
                         PlayerInfo.RoleWhenAlive = PlayerInfo.RoleType;
                         PlayerInfo.IsDead = true;
                     }
+                    else
+                    {
+                        PlayerInfo.IsDead = false;
+                    }
 
                     PlayerInfo.RoleType = role;
                     PlayerInfo.IsDirty = true;
