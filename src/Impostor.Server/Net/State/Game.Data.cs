@@ -245,9 +245,10 @@ namespace Impostor.Server.Net.State
                         if (scene != "OnlineGame")
                         {
                             _logger.LogWarning(
-                                "Player {0} ({1}) tried to send SceneChangeFlag with disallowed scene.",
+                                "Player {PlayerName} ({ClientId}) tried to send SceneChangeFlag with disallowed scene \"{Scene}\".",
                                 sender.Client.Name,
-                                sender.Client.Id);
+                                sender.Client.Id,
+                                scene);
                             return false;
                         }
 
