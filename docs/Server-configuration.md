@@ -1,7 +1,5 @@
 # Server configuration
 
-Some information about all the possible configurations. Click [here](https://github.com/Impostor/Impostor/blob/master/src/Impostor.Server/full-config-example.json) to see all the possible config options.
-
 ## Options
 
 ### Required Server Configuration
@@ -99,11 +97,11 @@ Other Serilog sinks are also supported, but are out of scope for this documentat
 
 ### File
 
-The simplest option to configure is by using the `config.json` file next to the server executable. For all possible options see the [full-config-example.json](https://github.com/Impostor/Impostor/blob/master/src/Impostor.Server/full-config-example.json) file.
+The `config.json` file contains all the configurable options.
 
 ### Environment variables
 
-If you're unable to edit the config.json file, you can instead set Environment variables to configure Impostor. The general pattern for each variable is `IMPOSTOR_SectionName__VariableName`. For example, to disable the anticheat, you can set the environment variable `IMPOSTOR_AntiCheat__Enabled=false`. Here are some more examples:
+If you're unable to edit the `config.json` file, you can instead set Environment variables to configure Impostor. The general pattern for each variable is `IMPOSTOR_SectionName__VariableName`. For example, to disable the anticheat, you can set the environment variable `IMPOSTOR_AntiCheat__Enabled=false`. Here are some more examples:
 
 ```
 IMPOSTOR_Server__PublicIp=127.0.0.1
