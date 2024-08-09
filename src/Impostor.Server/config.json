@@ -1,4 +1,4 @@
-﻿{
+{
   "Server": {
     "PublicIp": "127.0.0.1",
     "PublicPort": 22023,
@@ -12,6 +12,28 @@
   },
   "AntiCheat": {
     "Enabled": true,
-    "BanIpFromGame": true
+    "BanIpFromGame": true,
+    "AllowCheatingHosts": "Never",
+    "EnableGameFlowChecks": true,
+    "EnableMustBeHostChecks": true,
+    "EnableColorLimitChecks": true,
+    "EnableNameLimitChecks": true,
+    "EnableOwnershipChecks": true,
+    "EnableRoleChecks": true,
+    "EnableTargetChecks": true,
+    "ForbidProtocolExtensions": true
+  },
+  "Timeout": {
+    "SpawnTimeout": 2500,
+    "ConnectionTimeout": 2500
+  },
+  "Compatibility": {
+    "AllowFutureGameVersions": false,
+    "AllowHostAuthority": false,
+    "AllowVersionMixing": false
+  },
+  "Debug": {
+    "GameRecorderEnabled": true,
+    "GameRecorderPath": ""
   }
 }
