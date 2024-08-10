@@ -33,7 +33,7 @@
     "AllowVersionMixing": false
   },
   "Debug": {
-    "GameRecorderEnabled": true,
+    "GameRecorderEnabled": false,
     "GameRecorderPath": ""
   }
 }
