@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Games;
@@ -41,6 +42,12 @@ namespace Impostor.Server.Net.State
             foreach (var player in _players)
             {
                 player.Value.Limbo = LimboStates.PreSpawn;
+            }
+
+            // Delete all PlayerInfo objects
+            foreach (var playerInfo in GameNet.GameData.Players.Values.ToList())
+            {
+                await DespawnPlayerInfoAsync(playerInfo);
             }
 
             await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));

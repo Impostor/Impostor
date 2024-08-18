@@ -99,6 +99,8 @@ namespace Impostor.Server.Net.State
             {
                 using var reader = parent.ReadMessage();
 
+                _logger.LogTrace("Client {SenderId} sent GameData {Tag}", sender.Client.Id, reader.Tag);
+
                 switch (reader.Tag)
                 {
                     case GameDataTag.DataFlag:
@@ -106,6 +108,7 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
+                            _logger.LogTrace("Received Data for {NetId}, which is of type {Type}", netId, obj.GetType().Name);
                             await obj.DeserializeAsync(sender, target, reader, false);
                         }
                         else
@@ -121,7 +124,15 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjectsFast.TryGetValue(netId, out var obj))
                         {
-                            if (!await obj.HandleRpcAsync(sender, target, (RpcCalls)reader.ReadByte(), reader))
+                            var call = (RpcCalls)reader.ReadByte();
+                            _logger.LogTrace(
+                                "Client {SenderId} called Rpc {Call} on NetId {CallerId} and sent it to {Target}",
+                                sender.Client.Id,
+                                call,
+                                obj.NetId,
+                                target?.Client.Id.ToString() ?? "everyone");
+
+                            if (!await obj.HandleRpcAsync(sender, target, call, reader))
                             {
                                 parent.RemoveMessage(reader);
                                 continue;
@@ -261,9 +272,10 @@ namespace Impostor.Server.Net.State
                         if (scene != "OnlineGame")
                         {
                             _logger.LogWarning(
-                                "Player {0} ({1}) tried to send SceneChangeFlag with disallowed scene.",
+                                "Player {PlayerName} ({ClientId}) tried to send SceneChangeFlag with disallowed scene \"{Scene}\".",
                                 sender.Client.Name,
-                                sender.Client.Id);
+                                sender.Client.Id,
+                                scene);
                             return false;
                         }
 
@@ -508,6 +520,18 @@ namespace Impostor.Server.Net.State
             _logger.LogTrace("Spawning PlayerInfo (netId {Netid})", playerInfo.NetId);
             await OnSpawnAsync(sender, playerInfo);
             await SendObjectSpawnAsync(playerInfo);
+        }
+
+        private async ValueTask DespawnPlayerInfoAsync(InnerPlayerInfo playerInfo)
+        {
+            if (playerInfo.OwnerId == ServerOwned)
+            {
+                _logger.LogDebug("Despawning PlayerInfo {nid}", playerInfo.NetId);
+                GameNet.GameData.RemovePlayer(playerInfo.PlayerId);
+                RemoveNetObject(playerInfo);
+
+                await SendObjectDespawnAsync(playerInfo);
+            }
         }
 
         private bool AddNetObject(InnerNetObject obj)
