@@ -29,7 +29,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public int ClientId { get; internal set; }
 
-        public string PlayerName { get; internal set; } = string.Empty;
+        public string PlayerName => CurrentOutfit.PlayerName;
 
         public Dictionary<PlayerOutfitType, PlayerOutfit> Outfits { get; } = new()
         {

@@ -20,7 +20,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetNameAsync(string name)
         {
-            PlayerInfo.PlayerName = name;
+            PlayerInfo.CurrentOutfit.PlayerName = name;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetName);
             writer.Write(name);
