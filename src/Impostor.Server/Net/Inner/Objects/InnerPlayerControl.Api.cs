@@ -20,7 +20,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetNameAsync(string name)
         {
-            PlayerInfo.PlayerName = name;
+            PlayerInfo.CurrentOutfit.PlayerName = name;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetName);
             writer.Write(name);
@@ -32,7 +32,7 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerInfo.CurrentOutfit.Color = color;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetColor);
-            Rpc08SetColor.Serialize(writer, color);
+            Rpc08SetColor.Serialize(writer, PlayerInfo.NetId, color);
             await Game.FinishRpcAsync(writer);
         }
 
@@ -147,6 +147,20 @@ namespace Impostor.Server.Net.Inner.Objects
 
             // Notify plugins.
             await _eventManager.CallAsync(new PlayerExileEvent(Game, Game.GetClientPlayer(OwnerId)!, this));
+        }
+
+        public async ValueTask StartVanishAsync()
+        {
+            using var writer = Game.StartRpc(NetId, RpcCalls.StartVanish);
+            Rpc63StartVanish.Serialize(writer);
+            await Game.FinishRpcAsync(writer);
+        }
+
+        public async ValueTask StartAppearAsync(bool shouldAnimate)
+        {
+            using var writer = Game.StartRpc(NetId, RpcCalls.StartAppear);
+            Rpc65StartAppear.Serialize(writer, shouldAnimate);
+            await Game.FinishRpcAsync(writer);
         }
     }
 }
