@@ -1,5 +1,3 @@
-using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
@@ -13,10 +11,9 @@ namespace Impostor.Server.Net.State
 {
     internal partial class Game
     {
-        private readonly SemaphoreSlim _clientAddLock = new SemaphoreSlim(1, 1);
-
         public async ValueTask HandleStartGame(IMessageReader message)
         {
+            using var guard = await LockAsync();
             GameState = GameStates.Starting;
 
             using var packet = MessageWriter.Get(MessageType.Reliable);
@@ -28,6 +25,7 @@ namespace Impostor.Server.Net.State
 
         public async ValueTask HandleEndGame(IMessageReader message, GameOverReason gameOverReason)
         {
+            using var guard = await LockAsync();
             GameState = GameStates.Ended;
 
             // Broadcast end of the game.
@@ -48,6 +46,7 @@ namespace Impostor.Server.Net.State
 
         public async ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic)
         {
+            using var guard = await LockAsync();
             IsPublic = isPublic;
 
             using var packet = MessageWriter.Get(MessageType.Reliable);
@@ -74,6 +73,7 @@ namespace Impostor.Server.Net.State
 
         public async ValueTask HandleKickPlayer(int playerId, bool isBan)
         {
+            using var guard = await LockAsync();
             _logger.LogInformation("{0} - Player {1} has left.", Code, playerId);
 
             using var message = MessageWriter.Get(MessageType.Reliable);
@@ -96,26 +96,8 @@ namespace Impostor.Server.Net.State
 
         public async ValueTask<GameJoinResult> AddClientAsync(ClientBase client)
         {
-            var hasLock = false;
-
-            try
-            {
-                hasLock = await _clientAddLock.WaitAsync(TimeSpan.FromMinutes(1));
-
-                if (hasLock)
-                {
-                    return await AddClientSafeAsync(client);
-                }
-            }
-            finally
-            {
-                if (hasLock)
-                {
-                    _clientAddLock.Release();
-                }
-            }
-
-            return GameJoinResult.FromError(GameJoinError.InvalidClient);
+            using var guard = await LockAsync();
+            return await AddClientSafeAsync(client);
         }
 
         private async ValueTask HandleJoinGameNew(ClientPlayer sender, bool isNew)

@@ -13,6 +13,7 @@ using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Net.Messages.S2C;
+using Impostor.Api.Utils;
 using Impostor.Server.Events;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
@@ -32,6 +33,7 @@ namespace Impostor.Server.Net.State
         private readonly ICompatibilityManager _compatibilityManager;
         private readonly CompatibilityConfig _compatibilityConfig;
         private readonly TimeoutConfig _timeoutConfig;
+        private readonly AsyncLock _lock = new();
 
         public Game(
             ILogger<Game> logger,
@@ -111,6 +113,11 @@ namespace Impostor.Server.Net.State
         public IClientPlayer? GetClientPlayer(int clientId)
         {
             return _players.TryGetValue(clientId, out var clientPlayer) ? clientPlayer : null;
+        }
+
+        public ValueTask<AsyncLock.Releaser> LockAsync()
+        {
+            return _lock.LockAsync();
         }
 
         internal async ValueTask StartedAsync()
