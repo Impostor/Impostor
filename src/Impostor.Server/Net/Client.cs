@@ -86,9 +86,14 @@ namespace Impostor.Server.Net
 
             _logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{SupportCode}] [{Context}-{Category}] {Message}", Name, Id, supportCode, context.Name, category, message);
 
-            if (_antiCheatConfig.BanIpFromGame)
+            if (Player is { } player)
             {
-                Player?.Game.BanIp(Connection.EndPoint.Address);
+                if (_antiCheatConfig.BanIpFromGame)
+                {
+                    player.Game.BanIp(Connection.EndPoint.Address);
+                }
+
+                await player.Game.HandleRemovePlayer(Id, DisconnectReason.Hacking);
             }
 
             var disconnectMessage =
