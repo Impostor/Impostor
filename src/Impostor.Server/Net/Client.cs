@@ -348,7 +348,9 @@ namespace Impostor.Server.Net
             {
                 if (Player != null)
                 {
-                    await Player.Game.HandleRemovePlayer(Id, DisconnectReason.ExitGame);
+                    // The client never sends over the real disconnect reason so we always assume ExitGame
+                    var isRemote = reason == "The remote sent a disconnect request";
+                    await Player.Game.HandleRemovePlayer(Id, isRemote ? DisconnectReason.ExitGame : DisconnectReason.Error);
                 }
             }
             catch (Exception ex)
