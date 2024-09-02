@@ -15,17 +15,26 @@ namespace Impostor.Api.Net.Messages.Rpcs
         public static void Deserialize(IMessageReader reader, out int extensionId, out bool isSuccess, out byte extensionFailureReasons)
         {
             extensionId = reader.ReadPackedInt32();
-            isSuccess = reader.ReadBoolean();
 
-            if (!isSuccess)
+            try
             {
-                extensionFailureReasons = reader.ReadByte();
+                isSuccess = reader.ReadBoolean();
 
-                // The game currently only logs the failure reason and dont act on it.
-                // ExtensionFailureReasons enum exists in code but is not used, not adding it here until InnerSloth put real use to it.
+                if (!isSuccess)
+                {
+                    extensionFailureReasons = reader.ReadByte();
+
+                    // The game currently only logs the failure reason and dont act on it.
+                    // ExtensionFailureReasons enum exists in code but is not used, not adding it here until InnerSloth put real use to it.
+                }
+                else
+                {
+                    extensionFailureReasons = 0;
+                }
             }
-            else
+            catch
             {
+                isSuccess = false;
                 extensionFailureReasons = 0;
             }
         }
