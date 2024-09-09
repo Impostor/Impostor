@@ -2,42 +2,102 @@ namespace Impostor.Api.Innersloth.Customization
 {
     public class PlayerOutfit
     {
-        public ColorType Color { get; internal set; } = (ColorType)(-1);
+        // Magic value that is assigned by default when the outfit is initially created. This is not
+        // `null` because existing API already exposed this magic value. It's also not 0 (which is
+        // the value exposed when serializing) because SetColor anticheat checks exist.
+        private const ColorType UnknownColor = (ColorType)(-1);
 
-        public string HatId { get; internal set; } = "missing";
+        private string _playerName = string.Empty;
+        private ColorType _color = UnknownColor;
+        private string _hatId = "missing";
+        private string _petId = "missing";
+        private string _skinId = "missing";
+        private string _visorId = "missing";
+        private string _namePlateId = "missing";
 
-        public string PetId { get; internal set; } = "missing";
+        public bool IsDirty { get; internal set; }
 
-        public string SkinId { get; internal set; } = "missing";
-
-        public string VisorId { get; internal set; } = "missing";
-
-        public string NamePlateId { get; internal set; } = "missing";
-
-        public string PlayerName { get; internal set; } = "missing";
-
-        public bool IsIncomplete
+        public string PlayerName
         {
-            get
-            {
-                if (!string.IsNullOrEmpty(PlayerName) && Color != (ColorType)(-1) && HatId != "missing" && PetId != "missing" && SkinId != "missing" && VisorId != "missing")
-                {
-                    return NamePlateId == "missing";
-                }
-
-                return true;
-            }
+            get => _playerName;
+            internal set => SetField(ref _playerName, value);
         }
+
+        public ColorType Color
+        {
+            get => _color;
+            internal set => SetField(ref _color, value);
+        }
+
+        public string HatId
+        {
+            get => _hatId;
+            internal set => SetField(ref _hatId, value);
+        }
+
+        public string PetId
+        {
+            get => _petId;
+            internal set => SetField(ref _petId, value);
+        }
+
+        public string SkinId
+        {
+            get => _skinId;
+            internal set => SetField(ref _skinId, value);
+        }
+
+        public string VisorId
+        {
+            get => _visorId;
+            internal set => SetField(ref _visorId, value);
+        }
+
+        public string NamePlateId
+        {
+            get => _namePlateId;
+            internal set => SetField(ref _namePlateId, value);
+        }
+
+        private byte HatSequenceId { get; set; } = 0;
+
+        private byte PetSequenceId { get; set; } = 0;
+
+        private byte SkinSequenceId { get; set; } = 0;
+
+        private byte VisorSequenceId { get; set; } = 0;
+
+        private byte NamePlateSequenceId { get; set; } = 0;
+
+        /// <summary>
+        /// Gets a value indicating whether a player outfit is complete or whether it needs to receive additional cosmetics.
+        /// </summary>
+        /// <returns>true if the outfit is incomplete, false if the outfit is complete.</returns>
+        public bool IsIncomplete => string.IsNullOrEmpty(PlayerName)
+                    || Color == UnknownColor
+                    || HatId == "missing"
+                    || PetId == "missing"
+                    || SkinId == "missing"
+                    || VisorId == "missing"
+                    || NamePlateId == "missing";
 
         public void Serialize(IMessageWriter writer)
         {
             writer.Write(PlayerName);
-            writer.WritePacked((int)Color);
+
+            // Follow officials by not sending a color value that is out of range. Sending -1 can cause exceptions on the client side.
+            writer.WritePacked(Color == UnknownColor ? 0 : (int)Color);
+
             writer.Write(HatId);
             writer.Write(PetId);
             writer.Write(SkinId);
             writer.Write(VisorId);
             writer.Write(NamePlateId);
+            writer.Write(HatSequenceId);
+            writer.Write(PetSequenceId);
+            writer.Write(SkinSequenceId);
+            writer.Write(VisorSequenceId);
+            writer.Write(NamePlateSequenceId);
         }
 
         public void Deserialize(IMessageReader reader)
@@ -49,6 +109,17 @@ namespace Impostor.Api.Innersloth.Customization
             SkinId = reader.ReadString();
             VisorId = reader.ReadString();
             NamePlateId = reader.ReadString();
+            HatSequenceId = reader.ReadByte();
+            PetSequenceId = reader.ReadByte();
+            SkinSequenceId = reader.ReadByte();
+            VisorSequenceId = reader.ReadByte();
+            NamePlateSequenceId = reader.ReadByte();
+        }
+
+        private void SetField<T>(ref T field, T value)
+        {
+            field = value;
+            IsDirty = true;
         }
     }
 }

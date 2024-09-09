@@ -34,6 +34,28 @@ namespace Impostor.Server.Net.Manager
             _clients = new ConcurrentDictionary<int, ClientBase>();
             _compatibilityManager = compatibilityManager;
             _compatibilityConfig = compatibilityConfig.Value;
+
+            if (_compatibilityConfig.AllowFutureGameVersions
+                || _compatibilityConfig.AllowHostAuthority
+                || _compatibilityConfig.AllowVersionMixing)
+            {
+                _logger.LogWarning("One or more compatibility options were enabled, please mention these when seeking support:");
+
+                if (_compatibilityConfig.AllowFutureGameVersions)
+                {
+                    _logger.LogWarning("AllowFutureGameVersions, which allows future Among Us versions to connect that were unknown at the time this Impostor was built");
+                }
+
+                if (_compatibilityConfig.AllowHostAuthority)
+                {
+                    _logger.LogWarning("AllowHostAuthority, which allows game hosts to control more game features, but it uses less well tested code on the client, which causes some bugs");
+                }
+
+                if (_compatibilityConfig.AllowVersionMixing)
+                {
+                    _logger.LogWarning("AllowVersionMixing, which allows players to join games created on different game versions that they may not be 100% compatible with");
+                }
+            }
         }
 
         public IEnumerable<ClientBase> Clients => _clients.Values;
@@ -77,6 +99,20 @@ namespace Impostor.Server.Net.Manager
 
                 await connection.CustomDisconnectAsync(DisconnectReason.Custom, message);
                 return;
+            }
+
+            // Warn when players connect using the +25 flag that disables server authority. The host authority version
+            // of 2024.6.18 contains various bugs that break the game, so print a message if this mode is in use
+            if (clientVersion.HasDisableServerAuthorityFlag)
+            {
+                if (!_compatibilityConfig.AllowHostAuthority)
+                {
+                    _logger.LogInformation("Player {Name} kicked because they requested host authority.", name);
+                    await connection.CustomDisconnectAsync(DisconnectReason.Custom, DisconnectMessages.HostAuthorityUnsupported);
+                    return;
+                }
+
+                _logger.LogWarning("Player {Name} connected with server authority disabled, this may cause issues as there are known bugs in this mode. Please mention that this mode is in use when asking for support.", name);
             }
 
             if (name.Length > 10)

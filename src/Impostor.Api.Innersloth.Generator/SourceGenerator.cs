@@ -79,6 +79,8 @@ public sealed class SourceGenerator : IIncrementalGenerator
             enumGenerator.Generate("GameOverReason", underlyingType: CSharpEnumUnderlyingType.Byte);
             enumGenerator.Generate("Platforms");
             enumGenerator.Generate("RoleTypes", underlyingType: CSharpEnumUnderlyingType.UnsignedShort);
+            enumGenerator.Generate("RulesPresets", underlyingType: CSharpEnumUnderlyingType.Byte);
+            enumGenerator.Generate("SpecialGameModes", underlyingType: CSharpEnumUnderlyingType.Byte);
             enumGenerator.Generate("StringNames");
             enumGenerator.Generate("SystemTypes", underlyingType: CSharpEnumUnderlyingType.Byte);
             enumGenerator.Generate("Language", sourceName: "SupportedLangs");

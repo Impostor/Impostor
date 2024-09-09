@@ -28,6 +28,7 @@ namespace Impostor.Api.Net.Messages
         public const byte SetActivePodType = 21;
         public const byte QueryPlatformIds = 22;
         public const byte QueryLobbyInfo = 23;
+        public const byte EndGameHostMigration = 24;
 
         private static readonly Dictionary<byte, string> FlagCache;
 
@@ -41,7 +42,7 @@ namespace Impostor.Api.Net.Messages
 
         public static string FlagToString(byte flag)
         {
-            return FlagCache[flag];
+            return FlagCache.TryGetValue(flag, out var res) ? res : $"Unknown Flag {flag}";
         }
     }
 }

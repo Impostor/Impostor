@@ -85,6 +85,15 @@ namespace Impostor.Server.Net.State
                 }
             });
 
+            // Clean up the PlayerInfo if we own it and we're still in the lobby
+            if (GameState == GameStates.NotStarted)
+            {
+                if (GameNet.GameData.PlayersByClientId.TryGetValue(playerId, out var playerInfo))
+                {
+                    await DespawnPlayerInfoAsync(playerInfo);
+                }
+            }
+
             return true;
         }
 

@@ -30,5 +30,7 @@
                                                         Sorry, UDP Matchmaking is no longer supported.
                                                         See <link={UpgradingDocsLink}#impostor-190>Impostor documentation</link> on how to migrate to HTTP Matchmaking
                                                         """;
+
+        public const string HostAuthorityUnsupported = "Your client is requesting host authority, which is not enabled on this Impostor server.";
     }
 }

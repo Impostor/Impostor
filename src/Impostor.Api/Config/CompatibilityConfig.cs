@@ -6,6 +6,8 @@ namespace Impostor.Api.Config
 
         public bool AllowFutureGameVersions { get; set; } = false;
 
+        public bool AllowHostAuthority { get; set; } = false;
+
         public bool AllowVersionMixing { get; set; } = false;
     }
 }

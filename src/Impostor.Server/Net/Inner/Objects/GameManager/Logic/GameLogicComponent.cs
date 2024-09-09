@@ -6,9 +6,9 @@ namespace Impostor.Server.Net.Inner.Objects.GameManager.Logic;
 
 internal abstract class GameLogicComponent
 {
-    public virtual ValueTask HandleRpcAsync(RpcCalls callId, IMessageReader reader)
+    public virtual ValueTask<bool> HandleRpcAsync(RpcCalls callId, IMessageReader reader)
     {
-        throw new NotImplementedException($"Unhandled RpcCall {callId}");
+        return ValueTask.FromResult(false);
     }
 
     public virtual ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)

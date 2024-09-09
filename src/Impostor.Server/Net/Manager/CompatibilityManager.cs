@@ -17,13 +17,9 @@ internal class CompatibilityManager : ICompatibilityManager
     {
         new[]
         {
-            new GameVersion(2023, 10, 1), // 2023.10.24
-            new GameVersion(2023, 11, 15), // 2023.11.28
-        },
-        new[]
-        {
-            new GameVersion(2024, 2, 1), // 2024.3.5
-            new GameVersion(2024, 2, 3), // 2024.6.4
+            new GameVersion(2024, 3, 1), // 2024.6.18
+            new GameVersion(2024, 4, 1), // 2024.8.13
+            new GameVersion(2024, 4, 2), // 2024.9.4
         },
     };
 
@@ -63,6 +59,12 @@ internal class CompatibilityManager : ICompatibilityManager
         return null;
     }
 
+    private CompatibilityGroup GetCompatibilityGroupOrDefault(GameVersion clientVersion)
+    {
+        // If the compatibility group is not defined, we assume it is not compatible with anything else than itself
+        return TryGetCompatibilityGroup(clientVersion) ?? new CompatibilityGroup(new[] { clientVersion.Normalize() });
+    }
+
     public VersionCompareResult CanConnectToServer(GameVersion clientVersion)
     {
         if (this.TryGetCompatibilityGroup(clientVersion) != null)
@@ -91,13 +93,8 @@ internal class CompatibilityManager : ICompatibilityManager
             return GameJoinError.None;
         }
 
-        var hostCompatGroup = this.TryGetCompatibilityGroup(hostVersion);
-        var playerCompatGroup = this.TryGetCompatibilityGroup(clientVersion);
-
-        if (hostCompatGroup == null || playerCompatGroup == null)
-        {
-            return GameJoinError.InvalidClient;
-        }
+        var hostCompatGroup = GetCompatibilityGroupOrDefault(hostVersion);
+        var playerCompatGroup = GetCompatibilityGroupOrDefault(clientVersion);
 
         if (hostCompatGroup != playerCompatGroup)
         {

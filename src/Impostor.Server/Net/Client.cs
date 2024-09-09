@@ -82,14 +82,27 @@ namespace Impostor.Server.Net
                 return false;
             }
 
-            _logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{Context}-{Category}] {Message}", Name, Id, context.Name, category, message);
+            var supportCode = Random.Shared.Next(0, 999_999).ToString("000-000");
 
-            if (_antiCheatConfig.BanIpFromGame)
+            _logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{SupportCode}] [{Context}-{Category}] {Message}", Name, Id, supportCode, context.Name, category, message);
+
+            if (Player is { } player)
             {
-                Player?.Game.BanIp(Connection.EndPoint.Address);
+                if (_antiCheatConfig.BanIpFromGame)
+                {
+                    player.Game.BanIp(Connection.EndPoint.Address);
+                }
+
+                await player.Game.HandleRemovePlayer(Id, DisconnectReason.Hacking);
             }
 
-            await DisconnectAsync(DisconnectReason.Hacking, context.Name + ": " + message);
+            var disconnectMessage =
+                $"""
+                 You have been caught cheating and were {(_antiCheatConfig.BanIpFromGame ? "banned" : "kicked")} from the lobby.
+                 For questions, contact your server admin and share the following code: {supportCode}.
+                 """;
+
+            await DisconnectAsync(DisconnectReason.Custom, disconnectMessage);
 
             return true;
         }
@@ -348,7 +361,9 @@ namespace Impostor.Server.Net
             {
                 if (Player != null)
                 {
-                    await Player.Game.HandleRemovePlayer(Id, DisconnectReason.ExitGame);
+                    // The client never sends over the real disconnect reason so we always assume ExitGame
+                    var isRemote = reason == "The remote sent a disconnect request";
+                    await Player.Game.HandleRemovePlayer(Id, isRemote ? DisconnectReason.ExitGame : DisconnectReason.Error);
                 }
             }
             catch (Exception ex)
