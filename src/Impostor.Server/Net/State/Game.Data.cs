@@ -348,9 +348,12 @@ namespace Impostor.Server.Net.State
 
                 case InnerPlayerInfo playerInfo:
                 {
-                    if (!IsHostAuthoritive && await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.ProtocolExtension, "Spawning NetworkedPlayerInfo as vanilla host"))
+                    if (!IsHostAuthoritive)
                     {
-                        return;
+                        if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.ProtocolExtension, "Spawning NetworkedPlayerInfo as vanilla host"))
+                        {
+                            return;
+                        }
                     }
 
                     if (!GameNet.GameData.AddPlayer(playerInfo))
