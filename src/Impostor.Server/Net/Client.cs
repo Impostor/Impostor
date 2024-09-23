@@ -290,7 +290,7 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    await Player!.Game.HandleAlterGame(Player, gameTag, value);
+                    await Player!.Game.HandleAlterGame(Player, value);
                     break;
                 }
 
