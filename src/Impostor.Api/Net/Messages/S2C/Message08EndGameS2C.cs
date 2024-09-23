@@ -8,7 +8,7 @@ namespace Impostor.Api.Net.Messages.S2C
     {
         public static void Serialize(IMessageWriter writer, GameCode gameCode, GameOverReason gameOverReason)
         {
-            writer.StartMessage(MessageFlags.StartGame);
+            writer.StartMessage(MessageFlags.EndGame);
             gameCode.Serialize(writer);
             writer.Write((byte)gameOverReason);
 
