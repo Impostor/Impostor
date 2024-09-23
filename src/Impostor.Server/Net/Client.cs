@@ -198,7 +198,7 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    await Player!.Game.HandleStartGame(reader);
+                    await Player!.Game.HandleStartGame();
                     break;
                 }
 
@@ -269,7 +269,7 @@ namespace Impostor.Server.Net
                         reader,
                         out var gameOverReason);
 
-                    await Player!.Game.HandleEndGame(reader, gameOverReason);
+                    await Player!.Game.HandleEndGame(gameOverReason);
                     break;
                 }
 
@@ -290,7 +290,7 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    await Player!.Game.HandleAlterGame(reader, Player, value);
+                    await Player!.Game.HandleAlterGame(Player, gameTag, value);
                     break;
                 }
 
