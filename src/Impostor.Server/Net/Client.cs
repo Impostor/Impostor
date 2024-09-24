@@ -198,7 +198,17 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    await Player!.Game.HandleStartGame();
+                    Message02StartGameC2S.Deserialize(reader);
+
+                    if (reader.BytesRemaining() > 0)
+                    {
+                        if (await ReportCheatAsync(new CheatContext(nameof(MessageFlags.StartGame)), CheatCategory.ProtocolExtension, "Sending StartGame with unexpected content."))
+                        {
+                            return;
+                        }
+                    }
+
+                    await Player!.Game.HandleStartGame(reader);
                     break;
                 }
 
@@ -269,7 +279,7 @@ namespace Impostor.Server.Net
                         reader,
                         out var gameOverReason);
 
-                    await Player!.Game.HandleEndGame(gameOverReason);
+                    await Player!.Game.HandleEndGame(reader, gameOverReason);
                     break;
                 }
 
@@ -290,7 +300,15 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    await Player!.Game.HandleAlterGame(Player, value);
+                    if (reader.BytesRemaining() > 0)
+                    {
+                        if (await ReportCheatAsync(new CheatContext(nameof(MessageFlags.AlterGame)), CheatCategory.ProtocolExtension, "Sending AlterGame with unexpected content."))
+                        {
+                            return;
+                        }
+                    }
+
+                    await Player!.Game.HandleAlterGame(reader, Player, value);
                     break;
                 }
 

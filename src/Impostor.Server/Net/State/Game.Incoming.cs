@@ -17,18 +17,18 @@ namespace Impostor.Server.Net.State
     {
         private readonly SemaphoreSlim _clientAddLock = new SemaphoreSlim(1, 1);
 
-        public async ValueTask HandleStartGame()
+        public async ValueTask HandleStartGame(IMessageReader packet)
         {
             GameState = GameStates.Starting;
 
             using var writer = MessageWriter.Get(MessageType.Reliable);
-            Message02StartGameS2C.Serialize(writer, Code);
+            packet.CopyTo(writer);
             await SendToAllAsync(writer);
 
             await _eventManager.CallAsync(new GameStartingEvent(this));
         }
 
-        public async ValueTask HandleEndGame(GameOverReason gameOverReason)
+        public async ValueTask HandleEndGame(IMessageReader packet, GameOverReason gameOverReason)
         {
             GameState = GameStates.Ended;
 
@@ -52,12 +52,12 @@ namespace Impostor.Server.Net.State
             await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));
         }
 
-        public async ValueTask HandleAlterGame(IClientPlayer sender, bool isPublic)
+        public async ValueTask HandleAlterGame(IMessageReader packet, IClientPlayer sender, bool isPublic)
         {
             IsPublic = isPublic;
 
             using var writer = MessageWriter.Get(MessageType.Reliable);
-            Message10AlterGameS2C.Serialize(writer, false, Code, isPublic);
+            packet.CopyTo(writer);
             await SendToAllExceptAsync(writer, sender.Client.Id);
 
             await _eventManager.CallAsync(new GameAlterEvent(this, isPublic));
