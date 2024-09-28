@@ -203,8 +203,8 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc39SetHatStr.Deserialize(reader, out var hat);
-                    return await HandleSetHat(sender, hat);
+                    Rpc39SetHatStr.Deserialize(reader, out var hat, out var nextRpcSequenceId);
+                    return await HandleSetHat(sender, hat, nextRpcSequenceId);
                 }
 
                 case RpcCalls.SetSkinStr:
@@ -215,8 +215,8 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc40SetSkinStr.Deserialize(reader, out var skin);
-                    return await HandleSetSkin(sender, skin);
+                    Rpc40SetSkinStr.Deserialize(reader, out var skin, out var nextRpcSequenceId);
+                    return await HandleSetSkin(sender, skin, nextRpcSequenceId);
                 }
 
                 case RpcCalls.SetVisorStr:
@@ -227,8 +227,8 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc42SetVisorStr.Deserialize(reader, out var visor);
-                    return await HandleSetVisor(sender, visor);
+                    Rpc42SetVisorStr.Deserialize(reader, out var visor, out var nextRpcSequenceId);
+                    return await HandleSetVisor(sender, visor, nextRpcSequenceId);
                 }
 
                 case RpcCalls.SetNamePlateStr:
@@ -238,8 +238,8 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc43SetNamePlateStr.Deserialize(reader, out var namePlate);
-                    return await HandleSetNamePlate(sender, namePlate);
+                    Rpc43SetNamePlateStr.Deserialize(reader, out var namePlate, out var nextRpcSequenceId);
+                    return await HandleSetNamePlate(sender, namePlate, nextRpcSequenceId);
                 }
 
                 case RpcCalls.SetLevel:
@@ -335,8 +335,8 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    Rpc41SetPetStr.Deserialize(reader, out var pet);
-                    return await HandleSetPet(sender, pet);
+                    Rpc41SetPetStr.Deserialize(reader, out var pet, out var nextRpcSequenceId);
+                    return await HandleSetPet(sender, pet, nextRpcSequenceId);
                 }
 
                 case RpcCalls.SetStartCounter:
@@ -865,54 +865,58 @@ namespace Impostor.Server.Net.Inner.Objects
             return true;
         }
 
-        private async ValueTask<bool> HandleSetHat(ClientPlayer sender, string hat)
+        private async ValueTask<bool> HandleSetHat(ClientPlayer sender, string hat, byte nextRpcSequenceId)
         {
             if (Game.GameState == GameStates.Started &&
-                await sender.Client.ReportCheatAsync(RpcCalls.SetHat, CheatCategory.GameFlow, "Client tried to change hat while not in lobby"))
+                await sender.Client.ReportCheatAsync(RpcCalls.SetHatStr, CheatCategory.GameFlow, "Client tried to change hat while not in lobby"))
             {
                 return false;
             }
 
             PlayerInfo.CurrentOutfit.HatId = hat;
+            PlayerInfo.CurrentOutfit.HatSequenceId = nextRpcSequenceId;
 
             return true;
         }
 
-        private async ValueTask<bool> HandleSetSkin(ClientPlayer sender, string skin)
+        private async ValueTask<bool> HandleSetSkin(ClientPlayer sender, string skin, byte nextRpcSequenceId)
         {
             if (Game.GameState == GameStates.Started &&
-                await sender.Client.ReportCheatAsync(RpcCalls.SetSkin, CheatCategory.GameFlow, "Client tried to change skin while not in lobby"))
+                await sender.Client.ReportCheatAsync(RpcCalls.SetSkinStr, CheatCategory.GameFlow, "Client tried to change skin while not in lobby"))
             {
                 return false;
             }
 
             PlayerInfo.CurrentOutfit.SkinId = skin;
+            PlayerInfo.CurrentOutfit.SkinSequenceId = nextRpcSequenceId;
 
             return true;
         }
 
-        private async ValueTask<bool> HandleSetVisor(ClientPlayer sender, string visor)
+        private async ValueTask<bool> HandleSetVisor(ClientPlayer sender, string visor, byte nextRpcSequenceId)
         {
             if (Game.GameState == GameStates.Started &&
-                await sender.Client.ReportCheatAsync(RpcCalls.SetVisor, CheatCategory.GameFlow, "Client tried to change visor while not in lobby"))
+                await sender.Client.ReportCheatAsync(RpcCalls.SetVisorStr, CheatCategory.GameFlow, "Client tried to change visor while not in lobby"))
             {
                 return false;
             }
 
             PlayerInfo.CurrentOutfit.VisorId = visor;
+            PlayerInfo.CurrentOutfit.VisorSequenceId = nextRpcSequenceId;
 
             return true;
         }
 
-        private async ValueTask<bool> HandleSetNamePlate(ClientPlayer sender, string skin)
+        private async ValueTask<bool> HandleSetNamePlate(ClientPlayer sender, string namePlate, byte nextRpcSequenceId)
         {
             if (Game.GameState == GameStates.Started &&
-                await sender.Client.ReportCheatAsync(RpcCalls.SetNamePlate, CheatCategory.GameFlow, "Client tried to change skin while not in lobby"))
+                await sender.Client.ReportCheatAsync(RpcCalls.SetNamePlateStr, CheatCategory.GameFlow, "Client tried to change skin while not in lobby"))
             {
                 return false;
             }
 
-            PlayerInfo.CurrentOutfit.NamePlateId = skin;
+            PlayerInfo.CurrentOutfit.NamePlateId = namePlate;
+            PlayerInfo.CurrentOutfit.NamePlateSequenceId = nextRpcSequenceId;
 
             return true;
         }
@@ -1074,15 +1078,16 @@ namespace Impostor.Server.Net.Inner.Objects
             await _eventManager.CallAsync(new PlayerStartMeetingEvent(Game, Game.GetClientPlayer(this.OwnerId)!, this, deadPlayer));
         }
 
-        private async ValueTask<bool> HandleSetPet(ClientPlayer sender, string pet)
+        private async ValueTask<bool> HandleSetPet(ClientPlayer sender, string pet, byte nextRpcSequenceId)
         {
             if (Game.GameState == GameStates.Started &&
-                await sender.Client.ReportCheatAsync(RpcCalls.SetPet, CheatCategory.GameFlow, "Client tried to change pet while not in lobby"))
+                await sender.Client.ReportCheatAsync(RpcCalls.SetPetStr, CheatCategory.GameFlow, "Client tried to change pet while not in lobby"))
             {
                 return false;
             }
 
             PlayerInfo.CurrentOutfit.PetId = pet;
+            PlayerInfo.CurrentOutfit.PetSequenceId = nextRpcSequenceId;
 
             return true;
         }
