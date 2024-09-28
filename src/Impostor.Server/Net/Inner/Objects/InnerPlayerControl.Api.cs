@@ -23,7 +23,7 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerInfo.CurrentOutfit.PlayerName = name;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetName);
-            writer.Write(name);
+            Rpc06SetName.Serialize(writer, PlayerInfo.NetId, name);
             await Game.FinishRpcAsync(writer);
         }
 
