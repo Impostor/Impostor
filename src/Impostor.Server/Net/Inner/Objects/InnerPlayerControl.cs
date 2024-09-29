@@ -611,23 +611,6 @@ namespace Impostor.Server.Net.Inner.Objects
             }
         }
 
-        private async ValueTask HandleSetInfected(ReadOnlyMemory<byte> infectedIds)
-        {
-            for (var i = 0; i < infectedIds.Length; i++)
-            {
-                var player = Game.GameNet.GameData!.GetPlayerById(infectedIds.Span[i]);
-                if (player != null)
-                {
-                    // player.IsImpostor = true;
-                }
-            }
-
-            if (Game.GameState == GameStates.Starting)
-            {
-                await Game.StartedAsync();
-            }
-        }
-
         private async ValueTask<bool> HandleCheckName(ClientPlayer sender, string name)
         {
             if (Game.GameState == GameStates.Started)
