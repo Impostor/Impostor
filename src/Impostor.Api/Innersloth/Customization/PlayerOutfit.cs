@@ -59,15 +59,15 @@ namespace Impostor.Api.Innersloth.Customization
             internal set => SetField(ref _namePlateId, value);
         }
 
-        public byte HatSequenceId { get; set; } = 0;
+        internal byte HatSequenceId { get; set; } = 0;
 
-        public byte PetSequenceId { get; set; } = 0;
+        internal byte PetSequenceId { get; set; } = 0;
 
-        public byte SkinSequenceId { get; set; } = 0;
+        internal byte SkinSequenceId { get; set; } = 0;
 
-        public byte VisorSequenceId { get; set; } = 0;
+        internal byte VisorSequenceId { get; set; } = 0;
 
-        public byte NamePlateSequenceId { get; set; } = 0;
+        internal byte NamePlateSequenceId { get; set; } = 0;
 
         /// <summary>
         /// Gets a value indicating whether a player outfit is complete or whether it needs to receive additional cosmetics.
