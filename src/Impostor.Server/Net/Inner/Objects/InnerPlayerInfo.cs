@@ -252,6 +252,7 @@ namespace Impostor.Server.Net.Inner.Objects
                         rpc);
                     break;
             }
+
             return nextRpcSequenceId;
         }
     }
