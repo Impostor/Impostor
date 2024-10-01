@@ -221,28 +221,29 @@ namespace Impostor.Server.Net.Inner.Objects
             var defaultOutfit = this.Outfits[PlayerOutfitType.Default];
 
             byte nextRpcSequenceId = 0;
+            const byte SequenceIdAddition = 5;
 
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (rpc)
             {
                 case RpcCalls.SetHatStr:
-                    ++defaultOutfit.HatSequenceId;
+                    defaultOutfit.HatSequenceId += SequenceIdAddition;
                     nextRpcSequenceId = defaultOutfit.HatSequenceId;
                     break;
                 case RpcCalls.SetSkinStr:
-                    ++defaultOutfit.SkinSequenceId;
+                    defaultOutfit.SkinSequenceId += SequenceIdAddition;
                     nextRpcSequenceId = defaultOutfit.SkinSequenceId;
                     break;
                 case RpcCalls.SetPetStr:
-                    ++defaultOutfit.PetSequenceId;
+                    defaultOutfit.PetSequenceId += SequenceIdAddition;
                     nextRpcSequenceId = defaultOutfit.PetSequenceId;
                     break;
                 case RpcCalls.SetVisorStr:
-                    ++defaultOutfit.VisorSequenceId;
+                    defaultOutfit.VisorSequenceId += SequenceIdAddition;
                     nextRpcSequenceId = defaultOutfit.VisorSequenceId;
                     break;
                 case RpcCalls.SetNamePlateStr:
-                    ++defaultOutfit.NamePlateSequenceId;
+                    defaultOutfit.NamePlateSequenceId += SequenceIdAddition;
                     nextRpcSequenceId = defaultOutfit.NamePlateSequenceId;
                     break;
                 default:
