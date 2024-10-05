@@ -40,8 +40,8 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             PlayerInfo.CurrentOutfit.HatId = hatId;
 
-            using var writer = Game.StartRpc(NetId, RpcCalls.SetHat);
-            Rpc39SetHatStr.Serialize(writer, hatId);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetHatStr);
+            Rpc39SetHatStr.Serialize(writer, hatId, PlayerInfo.GetNextRpcSequenceId(RpcCalls.SetHatStr));
             await Game.FinishRpcAsync(writer);
         }
 
@@ -49,8 +49,8 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             PlayerInfo.CurrentOutfit.PetId = petId;
 
-            using var writer = Game.StartRpc(NetId, RpcCalls.SetPet);
-            Rpc41SetPetStr.Serialize(writer, petId);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetPetStr);
+            Rpc41SetPetStr.Serialize(writer, petId, PlayerInfo.GetNextRpcSequenceId(RpcCalls.SetPetStr));
             await Game.FinishRpcAsync(writer);
         }
 
@@ -58,8 +58,26 @@ namespace Impostor.Server.Net.Inner.Objects
         {
             PlayerInfo.CurrentOutfit.SkinId = skinId;
 
-            using var writer = Game.StartRpc(NetId, RpcCalls.SetSkin);
-            Rpc40SetSkinStr.Serialize(writer, skinId);
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetSkinStr);
+            Rpc40SetSkinStr.Serialize(writer, skinId, PlayerInfo.GetNextRpcSequenceId(RpcCalls.SetSkinStr));
+            await Game.FinishRpcAsync(writer);
+        }
+
+        public async ValueTask SetVisorAsync(string visorId)
+        {
+            PlayerInfo.CurrentOutfit.VisorId = visorId;
+
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetVisorStr);
+            Rpc42SetVisorStr.Serialize(writer, visorId, PlayerInfo.GetNextRpcSequenceId(RpcCalls.SetVisorStr));
+            await Game.FinishRpcAsync(writer);
+        }
+
+        public async ValueTask SetNamePlateAsync(string nameplateId)
+        {
+            PlayerInfo.CurrentOutfit.NamePlateId = nameplateId;
+
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetNamePlateStr);
+            Rpc43SetNamePlateStr.Serialize(writer, nameplateId, PlayerInfo.GetNextRpcSequenceId(RpcCalls.SetNamePlateStr));
             await Game.FinishRpcAsync(writer);
         }
 

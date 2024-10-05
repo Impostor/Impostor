@@ -215,5 +215,46 @@ namespace Impostor.Server.Net.Inner.Objects
                 Tasks.Add(new TaskInfo(this, _eventManager, taskId++, taskType));
             }
         }
+
+        public byte GetNextRpcSequenceId(RpcCalls rpc)
+        {
+            var defaultOutfit = this.Outfits[PlayerOutfitType.Default];
+
+            byte nextRpcSequenceId = 0;
+            const byte SequenceIdAddition = 5;
+
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            switch (rpc)
+            {
+                case RpcCalls.SetHatStr:
+                    defaultOutfit.HatSequenceId += SequenceIdAddition;
+                    nextRpcSequenceId = defaultOutfit.HatSequenceId;
+                    break;
+                case RpcCalls.SetSkinStr:
+                    defaultOutfit.SkinSequenceId += SequenceIdAddition;
+                    nextRpcSequenceId = defaultOutfit.SkinSequenceId;
+                    break;
+                case RpcCalls.SetPetStr:
+                    defaultOutfit.PetSequenceId += SequenceIdAddition;
+                    nextRpcSequenceId = defaultOutfit.PetSequenceId;
+                    break;
+                case RpcCalls.SetVisorStr:
+                    defaultOutfit.VisorSequenceId += SequenceIdAddition;
+                    nextRpcSequenceId = defaultOutfit.VisorSequenceId;
+                    break;
+                case RpcCalls.SetNamePlateStr:
+                    defaultOutfit.NamePlateSequenceId += SequenceIdAddition;
+                    nextRpcSequenceId = defaultOutfit.NamePlateSequenceId;
+                    break;
+                default:
+                    _logger.LogError(
+                        "{NextRpcSequenceIdName} was called for an RPC it doesn\'t know how to handle: {Rpc}",
+                        nameof(GetNextRpcSequenceId),
+                        rpc);
+                    break;
+            }
+
+            return nextRpcSequenceId;
+        }
     }
 }
