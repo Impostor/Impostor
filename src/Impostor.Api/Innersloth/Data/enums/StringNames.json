@@ -1439,6 +1439,9 @@
   "CookFish": 3431,
   "PrepVegetables": 3432,
   "MushroomMixupName": 3433,
+  "EosAccountSilentMergeFail": 3434,
+  "AskForEosAccount": 3435,
+  "KwsCreateFail": 3436,
   "GameType": 3500,
   "GameTypeError": 3501,
   "GameTypeClassic": 3502,
@@ -1479,5 +1482,15 @@
   "QCLobbyRolePhantoms": 3537,
   "QCSelfWasTracking": 3538,
   "QCSelfGoingToNoisemaker": 3539,
-  "QCSelfSawRoleInLocation": 3540
+  "QCSelfSawRoleInLocation": 3540,
+  "QCCoreSettings": 3541,
+  "QCRolesGalore": 3542,
+  "QCPitchDark": 3543,
+  "QCFlashlight": 3544,
+  "QCPleaseWait": 3545,
+  "QCWaitMinute": 3546,
+  "QCLobbyClosing": 3547,
+  "QCChangeCosmetics": 3548,
+  "QCWaitingPlayers": 3549,
+  "QCLetsWaitPlayers": 3550
 }
