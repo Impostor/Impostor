@@ -6,6 +6,7 @@ using Impostor.Api.Net.Messages;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -18,8 +19,8 @@ namespace Impostor.Server.Recorder
         private bool _createdGame;
         private bool _recordAfter;
 
-        public ClientRecorder(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, GameManager gameManager, string name, GameVersion gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, HazelConnection connection, PacketRecorder recorder)
-            : base(logger, antiCheatOptions, clientManager, gameManager, customMessageManager, name, gameVersion, language, chatMode, platformSpecificData, connection)
+        public ClientRecorder(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, GameManager gameManager, string name, GameVersion gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, HazelConnection connection, PacketRecorder recorder, IStringLocalizer<Resources.Language> localizer)
+            : base(logger, antiCheatOptions, clientManager, gameManager, customMessageManager, name, gameVersion, language, chatMode, platformSpecificData, connection, localizer)
         {
             _recorder = recorder;
             _isFirst = true;

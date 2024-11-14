@@ -98,20 +98,12 @@ namespace Impostor.Server
                         .GetSection(DebugConfig.Section)
                         .Get<DebugConfig>() ?? new DebugConfig();
 
-                    services.AddSingleton<ServerEnvironment>();
-                    services.AddSingleton<IServerEnvironment>(p => p.GetRequiredService<ServerEnvironment>());
-                    services.AddSingleton<IDateTimeProvider, RealDateTimeProvider>();
-
                     services.Configure<DebugConfig>(host.Configuration.GetSection(DebugConfig.Section));
                     services.Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section));
                     services.Configure<CompatibilityConfig>(host.Configuration.GetSection(CompatibilityConfig.Section));
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                     services.Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section));
                     services.Configure<HttpServerConfig>(host.Configuration.GetSection(HttpServerConfig.Section));
-
-                    services.AddSingleton<ICompatibilityManager, CompatibilityManager>();
-                    services.AddSingleton<ClientManager>();
-                    services.AddSingleton<IClientManager>(p => p.GetRequiredService<ClientManager>());
 
                     if (debug.GameRecorderEnabled)
                     {
@@ -125,6 +117,7 @@ namespace Impostor.Server
 
                         services.AddSingleton<PacketRecorder>();
                         services.AddHostedService(sp => sp.GetRequiredService<PacketRecorder>());
+
                         services.AddSingleton<IClientFactory, ClientFactory<ClientRecorder>>();
                     }
                     else
@@ -132,18 +125,31 @@ namespace Impostor.Server
                         services.AddSingleton<IClientFactory, ClientFactory<Client>>();
                     }
 
-                    services.AddSingleton<GameManager>();
-                    services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
                     services.AddSingleton<ListingManager>();
+                    services.AddSingleton<Matchmaker>();
 
-                    services.AddEventPools();
-                    services.AddHazel();
-                    services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
-                    services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
+                    services.AddSingleton<IDateTimeProvider, RealDateTimeProvider>();
+                    services.AddSingleton<ICompatibilityManager, CompatibilityManager>();
                     services.AddSingleton<IMessageWriterProvider, MessageWriterProvider>();
                     services.AddSingleton<IGameCodeFactory, GameCodeFactory>();
                     services.AddSingleton<IEventManager, EventManager>();
-                    services.AddSingleton<Matchmaker>();
+                    services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
+                    services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
+
+                    services.AddSingleton<ClientManager>();
+                    services.AddSingleton<IClientManager>(p => p.GetRequiredService<ClientManager>());
+
+                    services.AddSingleton<ServerEnvironment>();
+                    services.AddSingleton<IServerEnvironment>(p => p.GetRequiredService<ServerEnvironment>());
+
+                    services.AddSingleton<GameManager>();
+                    services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
+
+                    services.AddEventPools();
+                    services.AddHazel();
+
+                    services.AddLocalization();
+
                     services.AddHostedService<MatchmakerService>();
                 })
                 .UseSerilog((context, loggerConfiguration) =>

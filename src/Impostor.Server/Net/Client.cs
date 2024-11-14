@@ -12,6 +12,7 @@ using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
 using Impostor.Server.Net.Manager;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -24,8 +25,9 @@ namespace Impostor.Server.Net
         private readonly ClientManager _clientManager;
         private readonly GameManager _gameManager;
         private readonly ICustomMessageManager<ICustomRootMessage> _customMessageManager;
+        private readonly IStringLocalizer<Resources.Language> _localizer;
 
-        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, string name, GameVersion gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, IHazelConnection connection)
+        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, string name, GameVersion gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, IHazelConnection connection, IStringLocalizer<Resources.Language> localizer)
             : base(name, gameVersion, language, chatMode, platformSpecificData, connection)
         {
             _logger = logger;
@@ -33,6 +35,7 @@ namespace Impostor.Server.Net
             _clientManager = clientManager;
             _gameManager = gameManager;
             _customMessageManager = customMessageManager;
+            _localizer = localizer;
         }
 
         public override async ValueTask<bool> ReportCheatAsync(CheatContext context, CheatCategory category, string message)
@@ -172,13 +175,13 @@ namespace Impostor.Server.Net
                             await DisconnectAsync(DisconnectReason.GameStarted);
                             break;
                         case GameJoinError.GameDestroyed:
-                            await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.Destroyed);
+                            await DisconnectAsync(DisconnectReason.Custom, _localizer["DisconnectMessages.Destroyed"]);
                             break;
                         case GameJoinError.ClientOutdated:
-                            await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.ClientOutdated);
+                            await DisconnectAsync(DisconnectReason.Custom, _localizer["DisconnectMessages.ClientOutdated"]);
                             break;
                         case GameJoinError.ClientTooNew:
-                            await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.ClientTooNew);
+                            await DisconnectAsync(DisconnectReason.Custom, _localizer["DisconnectMessages.ClientTooNew"]);
                             break;
                         case GameJoinError.Custom:
                             await DisconnectAsync(DisconnectReason.Custom, result.Message);
@@ -312,7 +315,7 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.GetGameListV2:
                 {
-                    await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.UdpMatchmakingUnsupported);
+                    await DisconnectAsync(DisconnectReason.Custom, _localizer["DisconnectMessages.UdpMatchmakingUnsupported"]);
                     return;
                 }
 
