@@ -18,6 +18,8 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Impostor/Impostor</RepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!--Resolve a vulnerability warning because Microsoft.AspNetCore.Http.Abstraction uses System.Text.Encoding.CodePages 4.5.1-->
+    <NoWarn>NU1904</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,8 +28,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
     <PackageReference Include="Impostor.Hazel.Abstractions" Version="1.0.0" />
 
