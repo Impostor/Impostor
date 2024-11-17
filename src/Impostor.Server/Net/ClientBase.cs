@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net;
 using Impostor.Server.Net.State;
 
@@ -38,6 +39,8 @@ namespace Impostor.Server.Net
         public IDictionary<object, object> Items { get; }
 
         public ClientPlayer? Player { get; set; }
+
+        public ColorType? PreviousColor { get; set; } = null;
 
         IClientPlayer? IClient.Player => Player;
 
