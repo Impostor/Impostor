@@ -373,6 +373,7 @@ namespace Impostor.Server.Net
 
             _logger.LogInformation("Client {0} disconnecting, reason: {1}", Id, reason);
             _clientManager.Remove(this);
+            await _gameManager.OnClientDisconnectAsync(this);
         }
 
         private bool IsPacketAllowed(IMessageReader message, bool hostOnly)
