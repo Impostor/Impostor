@@ -69,6 +69,11 @@ namespace Impostor.Server.Net.Hazel
                 {
                     await Client.HandleMessageAsync(message, e.Type);
                 }
+
+                if (!IsConnected)
+                {
+                    break;
+                }
             }
         }
     }
