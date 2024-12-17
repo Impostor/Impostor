@@ -59,5 +59,20 @@ namespace Impostor.Server.Net
         {
             await Connection.CustomDisconnectAsync(reason, message);
         }
+
+        public bool Equals(IClient? other)
+        {
+            return other != null && Id == other.Id;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as ClientBase);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id;
+        }
     }
 }
