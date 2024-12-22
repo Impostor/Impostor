@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
 using Impostor.Server.Events;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,27 +17,25 @@ namespace Impostor.Server.Net.State
     {
         private readonly SemaphoreSlim _clientAddLock = new SemaphoreSlim(1, 1);
 
-        public async ValueTask HandleStartGame(IMessageReader message)
+        public async ValueTask HandleStartGame(IMessageReader packet)
         {
             GameState = GameStates.Starting;
 
-            using var packet = MessageWriter.Get(MessageType.Reliable);
-            message.CopyTo(packet);
-            await SendToAllAsync(packet);
+            using var writer = MessageWriter.Get(MessageType.Reliable);
+            packet.CopyTo(writer);
+            await SendToAllAsync(writer);
 
             await _eventManager.CallAsync(new GameStartingEvent(this));
         }
 
-        public async ValueTask HandleEndGame(IMessageReader message, GameOverReason gameOverReason)
+        public async ValueTask HandleEndGame(IMessageReader packet, GameOverReason gameOverReason)
         {
             GameState = GameStates.Ended;
 
             // Broadcast end of the game.
-            using (var packet = MessageWriter.Get(MessageType.Reliable))
-            {
-                message.CopyTo(packet);
-                await SendToAllAsync(packet);
-            }
+            using var writer = MessageWriter.Get(MessageType.Reliable);
+            Message08EndGameS2C.Serialize(writer, Code, gameOverReason);
+            await SendToAllAsync(writer);
 
             // Put all players in the correct limbo state.
             foreach (var player in _players)
@@ -53,13 +52,13 @@ namespace Impostor.Server.Net.State
             await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));
         }
 
-        public async ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic)
+        public async ValueTask HandleAlterGame(IMessageReader packet, IClientPlayer sender, bool isPublic)
         {
             IsPublic = isPublic;
 
-            using var packet = MessageWriter.Get(MessageType.Reliable);
-            message.CopyTo(packet);
-            await SendToAllExceptAsync(packet, sender.Client.Id);
+            using var writer = MessageWriter.Get(MessageType.Reliable);
+            packet.CopyTo(writer);
+            await SendToAllExceptAsync(writer, sender.Client.Id);
 
             await _eventManager.CallAsync(new GameAlterEvent(this, isPublic));
         }
