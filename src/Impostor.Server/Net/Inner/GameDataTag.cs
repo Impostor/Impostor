@@ -1,4 +1,4 @@
-﻿namespace Impostor.Server.Net.Inner
+namespace Impostor.Server.Net.Inner
 {
     public static class GameDataTag
     {
@@ -11,5 +11,6 @@
         public const byte ChangeSettingsFlag = 8;
         public const byte ConsoleDeclareClientPlatformFlag = 205;
         public const byte PS4RoomRequest = 206;
+        public const byte XboxDeclareXuid = 207;
     }
 }
