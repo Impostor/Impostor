@@ -315,7 +315,7 @@ namespace Impostor.Server.Net.State
 
                     default:
                     {
-                        if (Enum.IsDefined(typeof(GameDataTag), reader.Tag))
+                        if (GameDataTag.ValidTags.Contains(reader.Tag))
                         {
                             _logger.LogDebug("Get vanilla GameData tag {0} that isn't handled.", reader.Tag);
                             break;
