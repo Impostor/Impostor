@@ -74,16 +74,12 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (!await ValidateCmd(call, sender, target))
-            {
-                return false;
-            }
-
             switch (call)
             {
                 case RpcCalls.CloseDoorsOfType:
                 {
-                    if (!await ValidateImpostor(call, sender, sender.Character!.PlayerInfo))
+                    if (!await ValidateCmd(call, sender, target) ||
+                        !await ValidateImpostor(call, sender, sender.Character!.PlayerInfo))
                     {
                         return false;
                     }
@@ -94,6 +90,11 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 
                 case RpcCalls.UpdateSystem:
                 {
+                    if (!await ValidateCmd(call, sender, target))
+                    {
+                        return false;
+                    }
+
                     // TODO: properly deserialize this RPC
                     // Rpc35UpdateSystem.Deserialize(reader, Game, out var systemType, out var playerControl, out var sequenceId, out var state, out var ventId);
                     break;
