@@ -846,7 +846,7 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerInfo.CurrentOutfit.Color = color;
 
             // Record the color so it can be restored on the next game
-            if (!Game.IsHostAuthoritive && Game.TryGetPlayer(OwnerId, out var clientPlayer))
+            if (Game.TryGetPlayer(OwnerId, out var clientPlayer))
             {
                 clientPlayer.Client.PreviousColor = color;
             }
