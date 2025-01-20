@@ -71,6 +71,22 @@ namespace Impostor.Api.Net.Inner.Objects
         ValueTask SetSkinAsync(string skinId);
 
         /// <summary>
+        ///     Sets the visor of the current <see cref="IInnerPlayerControl" />.
+        ///     Visible to all players.
+        /// </summary>
+        /// <param name="visorId">A visor for the player.</param>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask SetVisorAsync(string visorId);
+
+        /// <summary>
+        ///     Sets the nameplate of the current <see cref="IInnerPlayerControl" />.
+        ///     Visible to all players.
+        /// </summary>
+        /// <param name="nameplateId">A nameplate for the player.</param>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask SetNamePlateAsync(string nameplateId);
+
+        /// <summary>
         ///     Send a chat message as the current <see cref="IInnerPlayerControl" />.
         ///     Visible to all players.
         /// </summary>
