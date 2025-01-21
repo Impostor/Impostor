@@ -1,9 +1,8 @@
 ﻿using Impostor.Api.Net.Inner.Objects;
 
-namespace Impostor.Api.Events.Player
+namespace Impostor.Api.Events.Player;
+
+public interface IPlayerCompletedTaskEvent : IPlayerEvent
 {
-    public interface IPlayerCompletedTaskEvent : IPlayerEvent
-    {
-        ITaskInfo Task { get; }
-    }
+    ITaskInfo Task { get; }
 }

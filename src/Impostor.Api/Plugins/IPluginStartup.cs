@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Impostor.Api.Plugins
-{
-    public interface IPluginStartup
-    {
-        void ConfigureHost(IHostBuilder host);
+namespace Impostor.Api.Plugins;
 
-        void ConfigureServices(IServiceCollection services);
-    }
+public interface IPluginStartup
+{
+    void ConfigureHost(IHostBuilder host);
+
+    void ConfigureServices(IServiceCollection services);
 }

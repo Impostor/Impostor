@@ -2,29 +2,28 @@
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 
-namespace Impostor.Server.Events.Register
+namespace Impostor.Server.Events.Register;
+
+internal class ManualRegisteredEventListener : IRegisteredEventListener
 {
-    internal class ManualRegisteredEventListener : IRegisteredEventListener
+    private readonly IManualEventListener _manualEventListener;
+
+    public ManualRegisteredEventListener(IManualEventListener manualEventListener)
     {
-        private readonly IManualEventListener _manualEventListener;
+        _manualEventListener = manualEventListener;
+    }
 
-        public ManualRegisteredEventListener(IManualEventListener manualEventListener)
+    public Type EventType { get; } = typeof(object);
+
+    public EventPriority Priority => _manualEventListener.Priority;
+
+    public ValueTask InvokeAsync(object? eventHandler, object @event, IServiceProvider provider)
+    {
+        if (@event is IEvent typedEvent)
         {
-            _manualEventListener = manualEventListener;
+            return _manualEventListener.Execute(typedEvent);
         }
 
-        public Type EventType { get; } = typeof(object);
-
-        public EventPriority Priority => _manualEventListener.Priority;
-
-        public ValueTask InvokeAsync(object? eventHandler, object @event, IServiceProvider provider)
-        {
-            if (@event is IEvent typedEvent)
-            {
-                return _manualEventListener.Execute(typedEvent);
-            }
-
-            return ValueTask.CompletedTask;
-        }
+        return ValueTask.CompletedTask;
     }
 }

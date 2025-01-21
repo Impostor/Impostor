@@ -1,30 +1,29 @@
-namespace Impostor.Server.Net.Inner.Objects
+namespace Impostor.Server.Net.Inner.Objects;
+
+internal partial class InnerMeetingHud
 {
-    internal partial class InnerMeetingHud
+    public class VoterState
     {
-        public class VoterState
+        public VoterState(byte voterId, byte votedForId)
         {
-            public VoterState(byte voterId, byte votedForId)
-            {
-                VoterId = voterId;
-                VotedForId = votedForId;
-            }
+            VoterId = voterId;
+            VotedForId = votedForId;
+        }
 
-            public byte VoterId { get; }
+        public byte VoterId { get; }
 
-            public byte VotedForId { get; }
+        public byte VotedForId { get; }
 
-            public static VoterState Deserialize(IMessageReader reader)
-            {
-                return new VoterState(reader.Tag, reader.ReadByte());
-            }
+        public static VoterState Deserialize(IMessageReader reader)
+        {
+            return new VoterState(reader.Tag, reader.ReadByte());
+        }
 
-            public void Serialize(IMessageWriter writer)
-            {
-                writer.StartMessage(this.VoterId);
-                writer.Write(this.VotedForId);
-                writer.EndMessage();
-            }
+        public void Serialize(IMessageWriter writer)
+        {
+            writer.StartMessage(this.VoterId);
+            writer.Write(this.VotedForId);
+            writer.EndMessage();
         }
     }
 }

@@ -1,20 +1,19 @@
 using System.Numerics;
 using System.Threading.Tasks;
 
-namespace Impostor.Api.Net.Inner.Objects.Components
-{
-    public interface IInnerCustomNetworkTransform : IInnerNetObject
-    {
-        /// <summary>
-        ///     Gets position where the object thinks it is (not interpolated).
-        /// </summary>
-        Vector2 Position { get; }
+namespace Impostor.Api.Net.Inner.Objects.Components;
 
-        /// <summary>
-        ///     Snaps the current to the given position <see cref="IInnerPlayerControl" />.
-        /// </summary>
-        /// <param name="position">The target position.</param>
-        /// <returns>Task that must be awaited.</returns>
-        ValueTask SnapToAsync(Vector2 position);
-    }
+public interface IInnerCustomNetworkTransform : IInnerNetObject
+{
+    /// <summary>
+    ///     Gets position where the object thinks it is (not interpolated).
+    /// </summary>
+    Vector2 Position { get; }
+
+    /// <summary>
+    ///     Snaps the current to the given position <see cref="IInnerPlayerControl" />.
+    /// </summary>
+    /// <param name="position">The target position.</param>
+    /// <returns>Task that must be awaited.</returns>
+    ValueTask SnapToAsync(Vector2 position);
 }

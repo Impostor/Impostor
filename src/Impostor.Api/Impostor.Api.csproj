@@ -25,14 +25,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.1" />
+    <PackageReference Include="NextFast.Hazel.Abstractions" Version="1.0.1-dev" />
+    <PackageReference Include="Serilog" Version="4.2.1-dev-02337" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
-    <PackageReference Include="Impostor.Hazel.Abstractions" Version="1.0.0" />
 
     <ProjectReference Include="..\Impostor.Api.Innersloth.Generator\Impostor.Api.Innersloth.Generator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <AdditionalFiles Include="Innersloth/Data/**/*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Config\DebugConfig.cs" />
   </ItemGroup>
 
 </Project>

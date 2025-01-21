@@ -216,23 +216,23 @@ public class LegacyGameOptionsData : IGameOptions
     /// <param name="writer">The stream to write the message to.</param>
     public void Serialize(IMessageWriter writer)
     {
-        writer.Write((byte)Version);
-        writer.Write((byte)MaxPlayers);
+        writer.Write(Version);
+        writer.Write(MaxPlayers);
         writer.Write((uint)Keywords);
         writer.Write((byte)Map);
-        writer.Write((float)PlayerSpeedMod);
-        writer.Write((float)CrewLightMod);
-        writer.Write((float)ImpostorLightMod);
-        writer.Write((float)KillCooldown);
+        writer.Write(PlayerSpeedMod);
+        writer.Write(CrewLightMod);
+        writer.Write(ImpostorLightMod);
+        writer.Write(KillCooldown);
         writer.Write((byte)NumCommonTasks);
         writer.Write((byte)NumLongTasks);
         writer.Write((byte)NumShortTasks);
-        writer.Write((int)NumEmergencyMeetings);
+        writer.Write(NumEmergencyMeetings);
         writer.Write((byte)NumImpostors);
         writer.Write((byte)KillDistance);
         writer.Write((uint)DiscussionTime);
         writer.Write((uint)VotingTime);
-        writer.Write((bool)IsDefaults);
+        writer.Write(IsDefaults);
 
         if (Version >= 2)
         {
@@ -241,13 +241,13 @@ public class LegacyGameOptionsData : IGameOptions
 
         if (Version >= 3)
         {
-            writer.Write((bool)ConfirmImpostor);
-            writer.Write((bool)VisualTasks);
+            writer.Write(ConfirmImpostor);
+            writer.Write(VisualTasks);
         }
 
         if (Version >= 4)
         {
-            writer.Write((bool)AnonymousVotes);
+            writer.Write(AnonymousVotes);
             writer.Write((byte)TaskBarUpdate);
         }
 

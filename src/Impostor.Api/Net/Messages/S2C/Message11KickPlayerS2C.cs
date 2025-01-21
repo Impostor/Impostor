@@ -1,26 +1,25 @@
 ﻿using System;
 
-namespace Impostor.Api.Net.Messages.S2C
+namespace Impostor.Api.Net.Messages.S2C;
+
+public class Message11KickPlayerS2C
 {
-    public class Message11KickPlayerS2C
+    public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, bool isBan)
     {
-        public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, bool isBan)
+        if (clear)
         {
-            if (clear)
-            {
-                writer.Clear(MessageType.Reliable);
-            }
-
-            writer.StartMessage(MessageFlags.KickPlayer);
-            writer.Write(gameCode);
-            writer.WritePacked(playerId);
-            writer.Write(isBan);
-            writer.EndMessage();
+            writer.Clear(MessageType.Reliable);
         }
 
-        public static void Deserialize(IMessageReader reader)
-        {
-            throw new NotImplementedException();
-        }
+        writer.StartMessage(MessageFlags.KickPlayer);
+        writer.Write(gameCode);
+        writer.WritePacked(playerId);
+        writer.Write(isBan);
+        writer.EndMessage();
+    }
+
+    public static void Deserialize(IMessageReader reader)
+    {
+        throw new NotImplementedException();
     }
 }

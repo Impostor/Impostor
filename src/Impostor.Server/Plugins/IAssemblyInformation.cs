@@ -1,14 +1,13 @@
 ﻿using System.Reflection;
 using System.Runtime.Loader;
 
-namespace Impostor.Server.Plugins
+namespace Impostor.Server.Plugins;
+
+public interface IAssemblyInformation
 {
-    public interface IAssemblyInformation
-    {
-        AssemblyName AssemblyName { get; }
+    AssemblyName AssemblyName { get; }
 
-        bool IsPlugin { get; }
+    bool IsPlugin { get; }
 
-        Assembly Load(AssemblyLoadContext context);
-    }
+    Assembly Load(AssemblyLoadContext context);
 }

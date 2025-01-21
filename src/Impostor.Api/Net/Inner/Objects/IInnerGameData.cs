@@ -1,6 +1,5 @@
-﻿namespace Impostor.Api.Net.Inner.Objects
+﻿namespace Impostor.Api.Net.Inner.Objects;
+
+public interface IInnerGameData
 {
-    public interface IInnerGameData
-    {
-    }
 }

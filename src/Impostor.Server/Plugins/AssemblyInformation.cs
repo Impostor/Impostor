@@ -2,37 +2,36 @@
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace Impostor.Server.Plugins
+namespace Impostor.Server.Plugins;
+
+public class AssemblyInformation : IAssemblyInformation
 {
-    public class AssemblyInformation : IAssemblyInformation
+    private Assembly? _assembly;
+
+    public AssemblyInformation(AssemblyName assemblyName, string path, bool isPlugin)
     {
-        private Assembly? _assembly;
+        AssemblyName = assemblyName;
+        Path = path;
+        IsPlugin = isPlugin;
+    }
 
-        public AssemblyInformation(AssemblyName assemblyName, string path, bool isPlugin)
+    public string Path { get; }
+
+    public bool IsPlugin { get; }
+
+    public AssemblyName AssemblyName { get; }
+
+    public Assembly Load(AssemblyLoadContext context)
+    {
+        if (_assembly != null)
         {
-            AssemblyName = assemblyName;
-            Path = path;
-            IsPlugin = isPlugin;
-        }
-
-        public string Path { get; }
-
-        public bool IsPlugin { get; }
-
-        public AssemblyName AssemblyName { get; }
-
-        public Assembly Load(AssemblyLoadContext context)
-        {
-            if (_assembly != null)
-            {
-                return _assembly;
-            }
-
-            using var stream = File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-            _assembly = context.LoadFromStream(stream);
-
             return _assembly;
         }
+
+        using var stream = File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+        _assembly = context.LoadFromStream(stream);
+
+        return _assembly;
     }
 }

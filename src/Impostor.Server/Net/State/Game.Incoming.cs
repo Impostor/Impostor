@@ -5,261 +5,259 @@ using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
-using Impostor.Hazel;
 using Impostor.Server.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Impostor.Server.Net.State
+namespace Impostor.Server.Net.State;
+
+internal partial class Game
 {
-    internal partial class Game
+    private readonly SemaphoreSlim _clientAddLock = new SemaphoreSlim(1, 1);
+
+    public async ValueTask HandleStartGame(IMessageReader message)
     {
-        private readonly SemaphoreSlim _clientAddLock = new SemaphoreSlim(1, 1);
+        GameState = GameStates.Starting;
 
-        public async ValueTask HandleStartGame(IMessageReader message)
+        using var packet = MessageWriter.Get(MessageType.Reliable);
+        message.CopyTo(packet);
+        await SendToAllAsync(packet);
+
+        await _eventManager.CallAsync(new GameStartingEvent(this));
+    }
+
+    public async ValueTask HandleEndGame(IMessageReader message, GameOverReason gameOverReason)
+    {
+        GameState = GameStates.Ended;
+
+        // Broadcast end of the game.
+        using (var packet = MessageWriter.Get(MessageType.Reliable))
         {
-            GameState = GameStates.Starting;
-
-            using var packet = MessageWriter.Get(MessageType.Reliable);
             message.CopyTo(packet);
             await SendToAllAsync(packet);
-
-            await _eventManager.CallAsync(new GameStartingEvent(this));
         }
 
-        public async ValueTask HandleEndGame(IMessageReader message, GameOverReason gameOverReason)
+        // Put all players in the correct limbo state.
+        foreach (var player in _players)
         {
-            GameState = GameStates.Ended;
-
-            // Broadcast end of the game.
-            using (var packet = MessageWriter.Get(MessageType.Reliable))
-            {
-                message.CopyTo(packet);
-                await SendToAllAsync(packet);
-            }
-
-            // Put all players in the correct limbo state.
-            foreach (var player in _players)
-            {
-                player.Value.Limbo = LimboStates.PreSpawn;
-            }
-
-            // Delete all PlayerInfo objects
-            foreach (var playerInfo in GameNet.GameData.Players.Values.ToArray())
-            {
-                await DespawnPlayerInfoAsync(playerInfo);
-            }
-
-            await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));
+            player.Value.Limbo = LimboStates.PreSpawn;
         }
 
-        public async ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic)
+        // Delete all PlayerInfo objects
+        foreach (var playerInfo in GameNet.GameData.Players.Values.ToArray())
         {
-            IsPublic = isPublic;
-
-            using var packet = MessageWriter.Get(MessageType.Reliable);
-            message.CopyTo(packet);
-            await SendToAllExceptAsync(packet, sender.Client.Id);
-
-            await _eventManager.CallAsync(new GameAlterEvent(this, isPublic));
+            await DespawnPlayerInfoAsync(playerInfo);
         }
 
-        public async ValueTask HandleRemovePlayer(int playerId, DisconnectReason reason)
+        await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));
+    }
+
+    public async ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic)
+    {
+        IsPublic = isPublic;
+
+        using var packet = MessageWriter.Get(MessageType.Reliable);
+        message.CopyTo(packet);
+        await SendToAllExceptAsync(packet, sender.Client.Id);
+
+        await _eventManager.CallAsync(new GameAlterEvent(this, isPublic));
+    }
+
+    public async ValueTask HandleRemovePlayer(int playerId, DisconnectReason reason)
+    {
+        await PlayerRemove(playerId);
+
+        // It's possible that the last player was removed, so check if the game is still around.
+        if (GameState == GameStates.Destroyed)
         {
-            await PlayerRemove(playerId);
-
-            // It's possible that the last player was removed, so check if the game is still around.
-            if (GameState == GameStates.Destroyed)
-            {
-                return;
-            }
-
-            using var packet = MessageWriter.Get(MessageType.Reliable);
-            WriteRemovePlayerMessage(packet, false, playerId, reason);
-            await SendToAllExceptAsync(packet, playerId);
+            return;
         }
 
-        public async ValueTask HandleKickPlayer(int playerId, bool isBan)
+        using var packet = MessageWriter.Get(MessageType.Reliable);
+        WriteRemovePlayerMessage(packet, false, playerId, reason);
+        await SendToAllExceptAsync(packet, playerId);
+    }
+
+    public async ValueTask HandleKickPlayer(int playerId, bool isBan)
+    {
+        _logger.LogInformation("{0} - Player {1} has left.", Code, playerId);
+
+        using var message = MessageWriter.Get(MessageType.Reliable);
+
+        // Send message to everyone that this player was kicked.
+        WriteKickPlayerMessage(message, false, playerId, isBan);
+
+        await SendToAllAsync(message);
+        await PlayerRemove(playerId, isBan);
+
+        // Remove the player from everyone's game.
+        WriteRemovePlayerMessage(
+            message,
+            true,
+            playerId,
+            isBan ? DisconnectReason.Banned : DisconnectReason.Kicked);
+
+        await SendToAllExceptAsync(message, playerId);
+    }
+
+    public async ValueTask<GameJoinResult> AddClientAsync(ClientBase client)
+    {
+        var hasLock = false;
+
+        try
         {
-            _logger.LogInformation("{0} - Player {1} has left.", Code, playerId);
+            hasLock = await _clientAddLock.WaitAsync(TimeSpan.FromMinutes(1));
 
-            using var message = MessageWriter.Get(MessageType.Reliable);
-
-            // Send message to everyone that this player was kicked.
-            WriteKickPlayerMessage(message, false, playerId, isBan);
-
-            await SendToAllAsync(message);
-            await PlayerRemove(playerId, isBan);
-
-            // Remove the player from everyone's game.
-            WriteRemovePlayerMessage(
-                message,
-                true,
-                playerId,
-                isBan ? DisconnectReason.Banned : DisconnectReason.Kicked);
-
-            await SendToAllExceptAsync(message, playerId);
+            if (hasLock)
+            {
+                return await AddClientSafeAsync(client);
+            }
         }
-
-        public async ValueTask<GameJoinResult> AddClientAsync(ClientBase client)
+        finally
         {
-            var hasLock = false;
-
-            try
+            if (hasLock)
             {
-                hasLock = await _clientAddLock.WaitAsync(TimeSpan.FromMinutes(1));
-
-                if (hasLock)
-                {
-                    return await AddClientSafeAsync(client);
-                }
-            }
-            finally
-            {
-                if (hasLock)
-                {
-                    _clientAddLock.Release();
-                }
-            }
-
-            return GameJoinResult.FromError(GameJoinError.InvalidClient);
-        }
-
-        private async ValueTask HandleJoinGameNew(ClientPlayer sender, bool isNew)
-        {
-            _logger.LogInformation("{0} - Player {1} ({2}) is joining.", Code, sender.Client.Name, sender.Client.Id);
-
-            // Add player to the game.
-            if (isNew)
-            {
-                await PlayerAdd(sender);
-            }
-
-            sender.InitializeSpawnTimeout();
-
-            using (var message = MessageWriter.Get(MessageType.Reliable))
-            {
-                WriteJoinedGameMessage(message, false, sender);
-                WriteAlterGameMessage(message, false, IsPublic);
-
-                sender.Limbo = LimboStates.NotLimbo;
-
-                await SendToAsync(message, sender.Client.Id);
-                await BroadcastJoinMessage(message, true, sender);
+                _clientAddLock.Release();
             }
         }
 
-        private async ValueTask<GameJoinResult> AddClientSafeAsync(ClientBase client)
+        return GameJoinResult.FromError(GameJoinError.InvalidClient);
+    }
+
+    private async ValueTask HandleJoinGameNew(ClientPlayer sender, bool isNew)
+    {
+        _logger.LogInformation("{0} - Player {1} ({2}) is joining.", Code, sender.Client.Name, sender.Client.Id);
+
+        // Add player to the game.
+        if (isNew)
         {
-            // Check if the IP of the player is banned.
-            if (_bannedIps.Contains(client.Connection.EndPoint.Address))
+            await PlayerAdd(sender);
+        }
+
+        sender.InitializeSpawnTimeout();
+
+        using (var message = MessageWriter.Get(MessageType.Reliable))
+        {
+            WriteJoinedGameMessage(message, false, sender);
+            WriteAlterGameMessage(message, false, IsPublic);
+
+            sender.Limbo = LimboStates.NotLimbo;
+
+            await SendToAsync(message, sender.Client.Id);
+            await BroadcastJoinMessage(message, true, sender);
+        }
+    }
+
+    private async ValueTask<GameJoinResult> AddClientSafeAsync(ClientBase client)
+    {
+        // Check if the IP of the player is banned.
+        if (_bannedIps.Contains(client.Connection.EndPoint.Address))
+        {
+            return GameJoinResult.FromError(GameJoinError.Banned);
+        }
+
+        var player = client.Player;
+
+        // Check if the player is running the same version as the host
+        if (_compatibilityConfig.AllowVersionMixing == false &&
+            this.Host != null && client.GameVersion != this.Host.Client.GameVersion)
+        {
+            var versionCheckResult = _compatibilityManager.CanJoinGame(Host.Client.GameVersion, client.GameVersion);
+            if (versionCheckResult != GameJoinError.None)
             {
-                return GameJoinResult.FromError(GameJoinError.Banned);
+                return GameJoinResult.FromError(versionCheckResult);
+            }
+        }
+
+        if (GameState == GameStates.Starting || GameState == GameStates.Started)
+        {
+            return GameJoinResult.FromError(GameJoinError.GameStarted);
+        }
+
+        if (GameState == GameStates.Destroyed)
+        {
+            return GameJoinResult.FromError(GameJoinError.GameDestroyed);
+        }
+
+        // Check if;
+        // - The player is already in this game.
+        // - The game is full.
+        if (player?.Game != this && _players.Count >= Options.MaxPlayers)
+        {
+            return GameJoinResult.FromError(GameJoinError.GameFull);
+        }
+
+        var isNew = false;
+
+        if (player == null || player.Game != this)
+        {
+            var clientPlayer = new ClientPlayer(_serviceProvider.GetRequiredService<ILogger<ClientPlayer>>(), client, this, _timeoutConfig.SpawnTimeout);
+
+            if (!_clientManager.Validate(client))
+            {
+                return GameJoinResult.FromError(GameJoinError.InvalidClient);
             }
 
-            var player = client.Player;
+            isNew = true;
+            player = clientPlayer;
+            client.Player = clientPlayer;
+        }
 
-            // Check if the player is running the same version as the host
-            if (_compatibilityConfig.AllowVersionMixing == false &&
-                this.Host != null && client.GameVersion != this.Host.Client.GameVersion)
-            {
-                var versionCheckResult = _compatibilityManager.CanJoinGame(Host.Client.GameVersion, client.GameVersion);
-                if (versionCheckResult != GameJoinError.None)
-                {
-                    return GameJoinResult.FromError(versionCheckResult);
-                }
-            }
+        // Check current player state.
+        if (player.Limbo == LimboStates.NotLimbo)
+        {
+            return GameJoinResult.FromError(GameJoinError.InvalidLimbo);
+        }
 
-            if (GameState == GameStates.Starting || GameState == GameStates.Started)
-            {
-                return GameJoinResult.FromError(GameJoinError.GameStarted);
-            }
-
-            if (GameState == GameStates.Destroyed)
-            {
-                return GameJoinResult.FromError(GameJoinError.GameDestroyed);
-            }
-
-            // Check if;
-            // - The player is already in this game.
-            // - The game is full.
-            if (player?.Game != this && _players.Count >= Options.MaxPlayers)
-            {
-                return GameJoinResult.FromError(GameJoinError.GameFull);
-            }
-
-            var isNew = false;
-
-            if (player == null || player.Game != this)
-            {
-                var clientPlayer = new ClientPlayer(_serviceProvider.GetRequiredService<ILogger<ClientPlayer>>(), client, this, _timeoutConfig.SpawnTimeout);
-
-                if (!_clientManager.Validate(client))
-                {
-                    return GameJoinResult.FromError(GameJoinError.InvalidClient);
-                }
-
-                isNew = true;
-                player = clientPlayer;
-                client.Player = clientPlayer;
-            }
-
-            // Check current player state.
-            if (player.Limbo == LimboStates.NotLimbo)
-            {
-                return GameJoinResult.FromError(GameJoinError.InvalidLimbo);
-            }
-
-            if (GameState == GameStates.Ended)
-            {
-                await HandleJoinGameNext(player, isNew);
-                return GameJoinResult.CreateSuccess(player);
-            }
-
-            var @event = new GamePlayerJoiningEvent(this, player);
-            await _eventManager.CallAsync(@event);
-
-            if (@event.JoinResult != null && !@event.JoinResult.Value.IsSuccess)
-            {
-                return @event.JoinResult.Value;
-            }
-
-            await HandleJoinGameNew(player, isNew);
+        if (GameState == GameStates.Ended)
+        {
+            await HandleJoinGameNext(player, isNew);
             return GameJoinResult.CreateSuccess(player);
         }
 
-        private async ValueTask HandleJoinGameNext(ClientPlayer sender, bool isNew)
+        var @event = new GamePlayerJoiningEvent(this, player);
+        await _eventManager.CallAsync(@event);
+
+        if (@event.JoinResult != null && !@event.JoinResult.Value.IsSuccess)
         {
-            _logger.LogInformation("{0} - Player {1} ({2}) is rejoining.", Code, sender.Client.Name, sender.Client.Id);
+            return @event.JoinResult.Value;
+        }
 
-            // Add player to the game.
-            if (isNew)
-            {
-                await PlayerAdd(sender);
-            }
+        await HandleJoinGameNew(player, isNew);
+        return GameJoinResult.CreateSuccess(player);
+    }
 
-            // Check if the host joined and let everyone join.
-            if (sender.Client.Id == HostId)
-            {
-                GameState = GameStates.NotStarted;
+    private async ValueTask HandleJoinGameNext(ClientPlayer sender, bool isNew)
+    {
+        _logger.LogInformation("{0} - Player {1} ({2}) is rejoining.", Code, sender.Client.Name, sender.Client.Id);
 
-                // Spawn the host.
-                await HandleJoinGameNew(sender, false);
+        // Add player to the game.
+        if (isNew)
+        {
+            await PlayerAdd(sender);
+        }
 
-                // Pull players out of limbo.
-                await CheckLimboPlayers();
-                return;
-            }
+        // Check if the host joined and let everyone join.
+        if (sender.Client.Id == HostId)
+        {
+            GameState = GameStates.NotStarted;
 
-            sender.Limbo = LimboStates.WaitingForHost;
+            // Spawn the host.
+            await HandleJoinGameNew(sender, false);
 
-            using (var packet = MessageWriter.Get(MessageType.Reliable))
-            {
-                WriteWaitForHostMessage(packet, false, sender);
+            // Pull players out of limbo.
+            await CheckLimboPlayers();
+            return;
+        }
 
-                await SendToAsync(packet, sender.Client.Id);
-                await BroadcastJoinMessage(packet, true, sender);
-            }
+        sender.Limbo = LimboStates.WaitingForHost;
+
+        using (var packet = MessageWriter.Get(MessageType.Reliable))
+        {
+            WriteWaitForHostMessage(packet, false, sender);
+
+            await SendToAsync(packet, sender.Client.Id);
+            await BroadcastJoinMessage(packet, true, sender);
         }
     }
 }

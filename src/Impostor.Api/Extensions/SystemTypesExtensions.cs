@@ -1,12 +1,11 @@
 ﻿using Impostor.Api.Innersloth;
 
-namespace Impostor.Api
+namespace Impostor.Api;
+
+public static class SystemTypesExtensions
 {
-    public static class SystemTypesExtensions
+    public static string GetFriendlyName(this SystemTypes type)
     {
-        public static string GetFriendlyName(this SystemTypes type)
-        {
-            return SystemTypeHelpers.Names[(int)type];
-        }
+        return SystemTypeHelpers.Names[(int)type];
     }
 }

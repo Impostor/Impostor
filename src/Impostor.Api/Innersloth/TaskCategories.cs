@@ -1,9 +1,8 @@
-namespace Impostor.Api.Innersloth
+namespace Impostor.Api.Innersloth;
+
+public enum TaskCategories : byte
 {
-    public enum TaskCategories : byte
-    {
-        CommonTask,
-        LongTask,
-        ShortTask,
-    }
+    CommonTask,
+    LongTask,
+    ShortTask,
 }

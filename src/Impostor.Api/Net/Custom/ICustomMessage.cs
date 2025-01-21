@@ -1,7 +1,6 @@
-namespace Impostor.Api.Net.Custom
+namespace Impostor.Api.Net.Custom;
+
+public interface ICustomMessage
 {
-    public interface ICustomMessage
-    {
-        byte Id { get; }
-    }
+    byte Id { get; }
 }

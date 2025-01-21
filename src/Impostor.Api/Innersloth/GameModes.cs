@@ -1,11 +1,10 @@
-namespace Impostor.Api.Innersloth
+namespace Impostor.Api.Innersloth;
+
+public enum GameModes : byte
 {
-    public enum GameModes : byte
-    {
-        None,
-        Normal,
-        HideNSeek,
-        NormalFools,
-        SeekFools,
-    }
+    None,
+    Normal,
+    HideNSeek,
+    NormalFools,
+    SeekFools,
 }

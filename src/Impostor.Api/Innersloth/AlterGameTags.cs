@@ -1,7 +1,6 @@
-﻿namespace Impostor.Api.Innersloth
+﻿namespace Impostor.Api.Innersloth;
+
+public enum AlterGameTags : byte
 {
-    public enum AlterGameTags : byte
-    {
-        ChangePrivacy = 1,
-    }
+    ChangePrivacy = 1,
 }

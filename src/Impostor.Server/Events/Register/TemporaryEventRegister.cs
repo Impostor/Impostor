@@ -5,55 +5,54 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-namespace Impostor.Server.Events.Register
+namespace Impostor.Server.Events.Register;
+
+internal class TemporaryEventRegister
 {
-    internal class TemporaryEventRegister
+    private readonly ConcurrentDictionary<int, IRegisteredEventListener> _callbacks;
+    private int _idLast;
+
+    public TemporaryEventRegister()
     {
-        private readonly ConcurrentDictionary<int, IRegisteredEventListener> _callbacks;
-        private int _idLast;
+        _callbacks = new ConcurrentDictionary<int, IRegisteredEventListener>();
+    }
 
-        public TemporaryEventRegister()
+    public IEnumerable<IRegisteredEventListener> GetEventListeners()
+    {
+        return _callbacks.Select(i => i.Value);
+    }
+
+    public IDisposable Add(IRegisteredEventListener callback)
+    {
+        var id = Interlocked.Increment(ref _idLast);
+
+        if (!_callbacks.TryAdd(id, callback))
         {
-            _callbacks = new ConcurrentDictionary<int, IRegisteredEventListener>();
+            Debug.Fail("Failed to register the event listener");
         }
 
-        public IEnumerable<IRegisteredEventListener> GetEventListeners()
+        return new UnregisterEvent(this, id);
+    }
+
+    private void Remove(int id)
+    {
+        _callbacks.TryRemove(id, out _);
+    }
+
+    private class UnregisterEvent : IDisposable
+    {
+        private readonly TemporaryEventRegister _register;
+        private readonly int _id;
+
+        public UnregisterEvent(TemporaryEventRegister register, int id)
         {
-            return _callbacks.Select(i => i.Value);
+            _register = register;
+            _id = id;
         }
 
-        public IDisposable Add(IRegisteredEventListener callback)
+        public void Dispose()
         {
-            var id = Interlocked.Increment(ref _idLast);
-
-            if (!_callbacks.TryAdd(id, callback))
-            {
-                Debug.Fail("Failed to register the event listener");
-            }
-
-            return new UnregisterEvent(this, id);
-        }
-
-        private void Remove(int id)
-        {
-            _callbacks.TryRemove(id, out _);
-        }
-
-        private class UnregisterEvent : IDisposable
-        {
-            private readonly TemporaryEventRegister _register;
-            private readonly int _id;
-
-            public UnregisterEvent(TemporaryEventRegister register, int id)
-            {
-                _register = register;
-                _id = id;
-            }
-
-            public void Dispose()
-            {
-                _register.Remove(_id);
-            }
+            _register.Remove(_id);
         }
     }
 }

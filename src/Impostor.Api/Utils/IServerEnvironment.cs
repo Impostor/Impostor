@@ -1,7 +1,6 @@
-namespace Impostor.Api.Utils
+namespace Impostor.Api.Utils;
+
+public interface IServerEnvironment
 {
-    public interface IServerEnvironment
-    {
-        string Version { get; }
-    }
+    string Version { get; }
 }

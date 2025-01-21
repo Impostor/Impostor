@@ -1,12 +1,9 @@
-﻿using Impostor.Hazel;
+﻿namespace Impostor.Server.Net.Messages;
 
-namespace Impostor.Server.Net.Messages
+public class MessageWriterProvider : IMessageWriterProvider
 {
-    public class MessageWriterProvider : IMessageWriterProvider
+    public IMessageWriter Get(MessageType sendOption = MessageType.Unreliable)
     {
-        public IMessageWriter Get(MessageType sendOption = MessageType.Unreliable)
-        {
-            return MessageWriter.Get(sendOption);
-        }
+        return MessageWriter.Get(sendOption);
     }
 }

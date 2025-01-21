@@ -1,79 +1,77 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
-using Impostor.Hazel;
 using Microsoft.Extensions.Logging;
 
-namespace Impostor.Server.Net.Hazel
+namespace Impostor.Server.Net.Hazel;
+
+internal class HazelConnection : IHazelConnection
 {
-    internal class HazelConnection : IHazelConnection
+    private readonly ILogger<HazelConnection> _logger;
+
+    public HazelConnection(Connection innerConnection, ILogger<HazelConnection> logger)
     {
-        private readonly ILogger<HazelConnection> _logger;
+        _logger = logger;
+        InnerConnection = innerConnection;
+        innerConnection.DataReceived = ConnectionOnDataReceived;
+        innerConnection.Disconnected = ConnectionOnDisconnected;
+    }
 
-        public HazelConnection(Connection innerConnection, ILogger<HazelConnection> logger)
+    public Connection InnerConnection { get; }
+
+    public IPEndPoint EndPoint => InnerConnection.EndPoint;
+
+    public bool IsConnected => InnerConnection.State == ConnectionState.Connected;
+
+    public IClient? Client { get; set; }
+
+    public float AveragePing => InnerConnection is NetworkConnection networkConnection ? networkConnection.AveragePingMs : 0;
+
+    public ValueTask SendAsync(IMessageWriter writer)
+    {
+        return InnerConnection.SendAsync(writer);
+    }
+
+    public ValueTask DisconnectAsync(string? reason, IMessageWriter? writer = null)
+    {
+        return InnerConnection.Disconnect(reason, writer as MessageWriter);
+    }
+
+    public void DisposeInnerConnection()
+    {
+        InnerConnection.Dispose();
+    }
+
+    private async ValueTask ConnectionOnDisconnected(DisconnectedEventArgs e)
+    {
+        if (Client != null)
         {
-            _logger = logger;
-            InnerConnection = innerConnection;
-            innerConnection.DataReceived = ConnectionOnDataReceived;
-            innerConnection.Disconnected = ConnectionOnDisconnected;
+            await Client.HandleDisconnectAsync(e.Reason);
+        }
+    }
+
+    private async ValueTask ConnectionOnDataReceived(DataReceivedEventArgs e)
+    {
+        if (Client == null)
+        {
+            return;
         }
 
-        public Connection InnerConnection { get; }
-
-        public IPEndPoint EndPoint => InnerConnection.EndPoint;
-
-        public bool IsConnected => InnerConnection.State == ConnectionState.Connected;
-
-        public IClient? Client { get; set; }
-
-        public float AveragePing => InnerConnection is NetworkConnection networkConnection ? networkConnection.AveragePingMs : 0;
-
-        public ValueTask SendAsync(IMessageWriter writer)
+        while (true)
         {
-            return InnerConnection.SendAsync(writer);
-        }
-
-        public ValueTask DisconnectAsync(string? reason, IMessageWriter? writer = null)
-        {
-            return InnerConnection.Disconnect(reason, writer as MessageWriter);
-        }
-
-        public void DisposeInnerConnection()
-        {
-            InnerConnection.Dispose();
-        }
-
-        private async ValueTask ConnectionOnDisconnected(DisconnectedEventArgs e)
-        {
-            if (Client != null)
+            if (e.Message.Position >= e.Message.Length)
             {
-                await Client.HandleDisconnectAsync(e.Reason);
+                break;
             }
-        }
 
-        private async ValueTask ConnectionOnDataReceived(DataReceivedEventArgs e)
-        {
-            if (Client == null)
+            using (var message = e.Message.ReadMessage())
             {
-                return;
+                await Client.HandleMessageAsync(message, e.Type);
             }
 
-            while (true)
+            if (!IsConnected)
             {
-                if (e.Message.Position >= e.Message.Length)
-                {
-                    break;
-                }
-
-                using (var message = e.Message.ReadMessage())
-                {
-                    await Client.HandleMessageAsync(message, e.Type);
-                }
-
-                if (!IsConnected)
-                {
-                    break;
-                }
+                break;
             }
         }
     }

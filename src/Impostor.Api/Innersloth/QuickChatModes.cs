@@ -1,8 +1,7 @@
-namespace Impostor.Api.Innersloth
+namespace Impostor.Api.Innersloth;
+
+public enum QuickChatModes
 {
-    public enum QuickChatModes
-    {
-        FreeChatOrQuickChat = 1,
-        QuickChatOnly = 2,
-    }
+    FreeChatOrQuickChat = 1,
+    QuickChatOnly = 2,
 }

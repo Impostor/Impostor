@@ -1,1 +1,1 @@
-global using Impostor.Hazel.Abstractions;
+global using Next.Hazel.Abstractions;

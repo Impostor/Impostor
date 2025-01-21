@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Api", "Impostor.Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Api.Innersloth.Generator", "Impostor.Api.Innersloth.Generator\Impostor.Api.Innersloth.Generator.csproj", "{8B6C3AC5-E2B2-49F8-854D-22DFB4AB3D31}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Api.Extension", "Impostor.Api.Extension\Impostor.Api.Extension.csproj", "{5457D76E-2EF7-441F-88CF-5E5A2FBE94FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,14 @@ Global
 		{8B6C3AC5-E2B2-49F8-854D-22DFB4AB3D31}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8B6C3AC5-E2B2-49F8-854D-22DFB4AB3D31}.Release|x86.ActiveCfg = Release|Any CPU
 		{8B6C3AC5-E2B2-49F8-854D-22DFB4AB3D31}.Release|x86.Build.0 = Release|Any CPU
+		{5457D76E-2EF7-441F-88CF-5E5A2FBE94FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5457D76E-2EF7-441F-88CF-5E5A2FBE94FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5457D76E-2EF7-441F-88CF-5E5A2FBE94FC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5457D76E-2EF7-441F-88CF-5E5A2FBE94FC}.Debug|x86.Build.0 = Debug|Any CPU
+		{5457D76E-2EF7-441F-88CF-5E5A2FBE94FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5457D76E-2EF7-441F-88CF-5E5A2FBE94FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5457D76E-2EF7-441F-88CF-5E5A2FBE94FC}.Release|x86.ActiveCfg = Release|Any CPU
+		{5457D76E-2EF7-441F-88CF-5E5A2FBE94FC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,17 +2,16 @@
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 
-namespace Impostor.Server.Net.State
+namespace Impostor.Server.Net.State;
+
+internal partial class ClientPlayer
 {
-    internal partial class ClientPlayer
-    {
-        /// <inheritdoc />
-        IClient IClientPlayer.Client => Client;
+    /// <inheritdoc />
+    IClient IClientPlayer.Client => Client;
 
-        /// <inheritdoc />
-        IGame IClientPlayer.Game => Game;
+    /// <inheritdoc />
+    IGame IClientPlayer.Game => Game;
 
-        /// <inheritdoc />
-        IInnerPlayerControl? IClientPlayer.Character => Character;
-    }
+    /// <inheritdoc />
+    IInnerPlayerControl? IClientPlayer.Character => Character;
 }

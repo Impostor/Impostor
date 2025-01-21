@@ -1,6 +1,5 @@
-namespace Impostor.Api.Net.Inner.Objects.ShipStatus
+namespace Impostor.Api.Net.Inner.Objects.ShipStatus;
+
+public interface IInnerPolusShipStatus : IInnerShipStatus
 {
-    public interface IInnerPolusShipStatus : IInnerShipStatus
-    {
-    }
 }

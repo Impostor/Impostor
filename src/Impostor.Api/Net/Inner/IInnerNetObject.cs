@@ -1,13 +1,12 @@
 ﻿using Impostor.Api.Games;
 
-namespace Impostor.Api.Net.Inner
+namespace Impostor.Api.Net.Inner;
+
+public interface IInnerNetObject
 {
-    public interface IInnerNetObject
-    {
-        public uint NetId { get; }
+    public uint NetId { get; }
 
-        public int OwnerId { get; }
+    public int OwnerId { get; }
 
-        public IGame Game { get; }
-    }
+    public IGame Game { get; }
 }

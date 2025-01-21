@@ -3,21 +3,20 @@ using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 
-namespace Impostor.Server.Events.Player
+namespace Impostor.Server.Events.Player;
+
+public class PlayerExileEvent : IPlayerExileEvent
 {
-    public class PlayerExileEvent : IPlayerExileEvent
+    public PlayerExileEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl)
     {
-        public PlayerExileEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl)
-        {
-            Game = game;
-            ClientPlayer = clientPlayer;
-            PlayerControl = playerControl;
-        }
-
-        public IGame Game { get; }
-
-        public IClientPlayer ClientPlayer { get; }
-
-        public IInnerPlayerControl PlayerControl { get; }
+        Game = game;
+        ClientPlayer = clientPlayer;
+        PlayerControl = playerControl;
     }
+
+    public IGame Game { get; }
+
+    public IClientPlayer ClientPlayer { get; }
+
+    public IInnerPlayerControl PlayerControl { get; }
 }

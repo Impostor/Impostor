@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
@@ -71,7 +72,7 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
 
     public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)

@@ -2,18 +2,17 @@
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 
-namespace Impostor.Server.Events
+namespace Impostor.Server.Events;
+
+public class GameEndedEvent : IGameEndedEvent
 {
-    public class GameEndedEvent : IGameEndedEvent
+    public GameEndedEvent(IGame game, GameOverReason gameOverReason)
     {
-        public GameEndedEvent(IGame game, GameOverReason gameOverReason)
-        {
-            Game = game;
-            GameOverReason = gameOverReason;
-        }
-
-        public IGame Game { get; }
-
-        public GameOverReason GameOverReason { get; }
+        Game = game;
+        GameOverReason = gameOverReason;
     }
+
+    public IGame Game { get; }
+
+    public GameOverReason GameOverReason { get; }
 }

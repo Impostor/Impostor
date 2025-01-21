@@ -1,30 +1,36 @@
-﻿using Impostor.Api.Utils;
+﻿namespace Impostor.Api.Config;
 
-namespace Impostor.Api.Config
+using Serilog.Events;
+
+public class ServerConfig
 {
-    public class ServerConfig
-    {
-        public const string Section = "Server";
+    public const string Section = "Server";
 
-        private string? _resolvedPublicIp;
-        private string? _resolvedListenIp;
+    public LinsterConfig[] Listeners { get; set; } = [];
 
-        public string PublicIp { get; set; } = "127.0.0.1";
+    public LogEventLevel LogLevel { get; set; } = LogEventLevel.Information;
 
-        public ushort PublicPort { get; set; } = 22023;
+    public string? Env { get; set; }
+}
 
-        public string ListenIp { get; set; } = "0.0.0.0";
+public class LinsterConfig
+{
+    // No Set Use First PublicIp or ListenIp
+    public string? PublicIp { get; set; }
 
-        public ushort ListenPort { get; set; } = 22023;
+    // No Set Use ListenPort
+    public ushort? PublicPort { get; set; }
 
-        public string ResolvePublicIp()
-        {
-            return _resolvedPublicIp ??= IpUtils.ResolveIp(PublicIp);
-        }
+    public string ListenIp { get; set; } = "0.0.0.0";
 
-        public string ResolveListenIp()
-        {
-            return _resolvedListenIp ??= IpUtils.ResolveIp(ListenIp);
-        }
-    }
+    public ushort ListenPort { get; set; } = 22023;
+
+    // PrivateKeyPath must be set
+    public bool IsDtl { get; set; } = false;
+
+    // Dtl Use
+    public string PrivateKeyPath { get; set; } = string.Empty;
+
+    // Port is +2, if is dtl no use, auth use dtl so private key must be set
+    public bool HasAuth { get; set; } = false;
 }
