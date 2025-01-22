@@ -2,6 +2,15 @@
   "version": 1,
   "dependencies": {
     "net9.0": {
+      "Microsoft.AspNetCore.SpaServices.Extensions": {
+        "type": "Direct",
+        "requested": "[9.0.1, )",
+        "resolved": "9.0.1",
+        "contentHash": "mQoIRCHcAjw0DHF2sTgRB1+o9nUyC01AKXGfmVWl7WPfSqGdjAHgN6D1IxYB1i0X3WoNuKXNpTLdiomVQXZMYg==",
+        "dependencies": {
+          "Microsoft.Extensions.FileProviders.Physical": "9.0.1"
+        }
+      },
       "Microsoft.Extensions.FileSystemGlobbing": {
         "type": "Direct",
         "requested": "[9.0.1, )",

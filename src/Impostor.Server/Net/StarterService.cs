@@ -1,19 +1,23 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-
 namespace Impostor.Server.Net;
 
-public class StarterService : IHostedService
+using System.Threading;
+using System.Threading.Tasks;
+using Api.Config;
+using Manager;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+
+public class StarterService(NetListenerManager listenerManager, IOptions<ServerConfig> serverConfigOption) : IHostedService
 {
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var serverConfig = serverConfigOption.Value;
+
+        await listenerManager.StartAllAsync();
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await listenerManager.StopAllAsync();
     }
 }

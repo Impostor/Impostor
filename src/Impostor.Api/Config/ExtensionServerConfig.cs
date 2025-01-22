@@ -14,8 +14,6 @@ public class ExtensionServerConfig
 
     public string SpaDirectory { get; set; } = "/Web";
 
-    public bool EnabledSignalR { get; set; } = false;
-
     public bool EnabledSignalRWeb { get; set; } = false;
 
     public bool EnabledSignalRMatchmaker { get; set; } = false;

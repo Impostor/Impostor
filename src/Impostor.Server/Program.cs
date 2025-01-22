@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Runtime.Loader;
 using Impostor.Api.Config;
@@ -10,6 +11,7 @@ using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Utils;
 using Impostor.Server.Events;
+using Impostor.Server.Hubs;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Custom;
 using Impostor.Server.Net.Factories;
@@ -17,8 +19,11 @@ using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Server.Plugins;
 using Impostor.Server.Utils;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Next.Hazel.Extensions;
 using Serilog;
@@ -70,10 +75,12 @@ internal static class Program
     {
         var configuration = CreateConfiguration(args)
             .GetConfig<ServerConfig>(ServerConfig.Section, out var serverConfig)
+            .GetConfig<ExtensionServerConfig>(ExtensionServerConfig.Section, out var extensionConfig)
             .GetConfig<PluginConfig>(PluginConfig.Section, out var pluginConfig);
 
         var hostBuilder = Host.CreateDefaultBuilder(args)
             .ConfigureServer(configuration)
+            .ConfigureExtension(extensionConfig)
             .ConfigureLog(serverConfig.LogLevel)
             .UseContentRoot(Directory.GetCurrentDirectory())
             .UseEnvironment(serverConfig.Env ?? DotnetUtils.Environment)
@@ -157,9 +164,61 @@ internal static class Program
         }
     }
 
-    private static IHostBuilder ConfigureExtension(this IHostBuilder builder)
+    private static IHostBuilder ConfigureExtension(this IHostBuilder builder, ExtensionServerConfig config)
     {
-        return builder;
+        if (!config.Enable)
+        {
+            return builder;
+        }
+
+        return builder.ConfigureWebHostDefaults(hostBuilder =>
+        {
+            hostBuilder.ConfigureKestrel(options =>
+            {
+                options.Listen(IPAddress.Parse(config.ListenIp.ResolveIp()), config.ListenPort);
+            });
+
+            hostBuilder.ConfigureServices(collection =>
+            {
+                if (config.EnabledSignalRWeb || config.EnabledSignalRMatchmaker)
+                {
+                    collection.AddSignalR();
+                }
+            });
+
+            hostBuilder.Configure(applicationBuilder =>
+            {
+                if (config.EnabledSpa)
+                {
+                    applicationBuilder.Map("/web", webBuilder =>
+                    {
+                        var fileOption = new StaticFileOptions
+                        {
+                            FileProvider = new PhysicalFileProvider(config.SpaDirectory),
+                        };
+                        webBuilder.UseSpaStaticFiles(fileOption);
+
+                        webBuilder.UseSpa(spa =>
+                        {
+                            spa.Options.DefaultPageStaticFileOptions = fileOption;
+                        });
+                    });
+                }
+
+                applicationBuilder.UseEndpoints(endpoint =>
+                {
+                    if (config.EnabledSignalRWeb)
+                    {
+                        endpoint.MapHub<WebHub>("/signalr/web");
+                    }
+
+                    if (config.EnabledSignalRMatchmaker)
+                    {
+                        endpoint.MapHub<MatchmakerHub>("/signalr/matchmaker");
+                    }
+                });
+            });
+        });
     }
 
     private static IConfiguration GetConfig<T>(this IConfiguration configuration, string section, out T result) where T : class, new()
