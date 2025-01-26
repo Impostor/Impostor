@@ -499,6 +499,14 @@ namespace Impostor.Server.Net.State
             playerInfo.ClientId = sender.Client.Id;
             playerInfo.PlayerId = GameNet.GameData.GetNextAvailablePlayerId();
 
+            // If player played a previous game, restore their color
+            var prevColor = sender.Client.PreviousColor;
+            if (prevColor.HasValue)
+            {
+                _logger.LogTrace("Color restored to {Color}", prevColor.Value);
+                playerInfo.CurrentOutfit.Color = prevColor.Value;
+            }
+
             if (!AddNetObject(playerInfo))
             {
                 _logger.LogError("Couldn't spawn PlayerInfo for {Name} ({ClientId})", sender.Client.Name, sender.Client.Id);
