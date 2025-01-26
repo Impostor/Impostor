@@ -26,7 +26,11 @@ public sealed class HelloController : ControllerBase
             _logger.LogInformation("Impostor's Http server is reachable (this message is only printed once per start)");
         }
 
-        return Ok(@"Impostor is running, please configure your Among Us to connect to a game
-To generate a region file, go to https://impostor.github.io/Impostor");
+        return Ok(
+            """
+            Impostor is running, please configure your Among Us to connect to a game
+            To generate a region file, go to https://impostor.github.io/Impostor
+            """
+        );
     }
 }
