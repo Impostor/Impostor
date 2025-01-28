@@ -315,7 +315,18 @@ namespace Impostor.Server.Net.State
 
                     default:
                     {
-                        _logger.LogWarning("Bad GameData tag {0}", reader.Tag);
+                        if (GameDataTag.ValidTags.Contains(reader.Tag))
+                        {
+                            _logger.LogDebug("Get vanilla GameData tag {0} that isn't handled.", reader.Tag);
+                            break;
+                        }
+
+                        if (await sender.Client.ReportCheatAsync(new CheatContext("GameDataTag.Unknown"), CheatCategory.ProtocolExtension, $"Client sent unknown GameData tag {reader.Tag}"))
+                        {
+                            return false;
+                        }
+
+                        _logger.LogWarning("Get Unknown GameData tag {0}", reader.Tag);
                         break;
                     }
                 }
