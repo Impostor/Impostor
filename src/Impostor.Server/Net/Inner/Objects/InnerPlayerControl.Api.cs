@@ -180,5 +180,20 @@ namespace Impostor.Server.Net.Inner.Objects
             Rpc65StartAppear.Serialize(writer, shouldAnimate);
             await Game.FinishRpcAsync(writer);
         }
+
+        public async ValueTask SetRoleAsync(RoleTypes role, bool canOverrideRole)
+        {
+            if (role is RoleTypes.ImpostorGhost or RoleTypes.CrewmateGhost or RoleTypes.GuardianAngel)
+            {
+                PlayerInfo.RoleWhenAlive = PlayerInfo.RoleType;
+                PlayerInfo.IsDead = true;
+            }
+
+            PlayerInfo.RoleType = role;
+
+            using var writer = Game.StartRpc(NetId, RpcCalls.SetRole);
+            Rpc44SetRole.Serialize(writer, role, canOverrideRole);
+            await Game.FinishRpcAsync(writer);
+        }
     }
 }
