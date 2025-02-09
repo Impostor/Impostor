@@ -141,5 +141,29 @@ namespace Impostor.Api.Net.Inner.Objects
         /// </summary>
         /// <returns>Task that must be awaited.</returns>
         ValueTask ExileAsync();
+
+        /// <summary>
+        ///     Vanishes the current player.
+        ///     Visible to all players.
+        /// </summary>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask StartVanishAsync();
+
+        /// <summary>
+        ///     Unvanishes the current player.
+        ///     Visible to all players.
+        /// </summary>
+        /// <param name="shouldAnimate">Whether or not an animation should be played.</param>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask StartAppearAsync(bool shouldAnimate);
+
+        /// <summary>
+        ///     Sets the role of the current player. This will kill or revive the player, depending on the role.
+        ///     Visible to all players.
+        /// </summary>
+        /// <param name="role">The role that the player will be assigned.</param>
+        /// <param name="canOverrideRole">Whether or not the role can be overridden.</param>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask SetRoleAsync(RoleTypes role, bool canOverrideRole = true);
     }
 }
