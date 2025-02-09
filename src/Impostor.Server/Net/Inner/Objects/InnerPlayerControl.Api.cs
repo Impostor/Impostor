@@ -183,11 +183,12 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetRoleAsync(RoleTypes role, bool canOverrideRole)
         {
-            if (role is RoleTypes.ImpostorGhost or RoleTypes.CrewmateGhost or RoleTypes.GuardianAngel)
+            if (!(PlayerInfo.RoleType is RoleTypes.ImpostorGhost or RoleTypes.CrewmateGhost or RoleTypes.GuardianAngel))
             {
                 PlayerInfo.RoleWhenAlive = PlayerInfo.RoleType;
-                PlayerInfo.IsDead = true;
             }
+
+            PlayerInfo.IsDead = role is RoleTypes.ImpostorGhost or RoleTypes.CrewmateGhost or RoleTypes.GuardianAngel;
 
             PlayerInfo.RoleType = role;
 
