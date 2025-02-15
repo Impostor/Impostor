@@ -7,7 +7,6 @@ using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Maps;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects.ShipStatus;
 using Impostor.Api.Net.Messages.Rpcs;
@@ -21,8 +20,8 @@ internal abstract class InnerShipStatus : InnerNetObject, IInnerShipStatus
 {
     private readonly Dictionary<SystemTypes, ISystemType> _systems = new();
 
-    protected InnerShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, MapTypes mapType) :
-        base(customMessageManager, game)
+    protected InnerShipStatus(Game game, MapTypes mapType) :
+        base(game)
     {
         Components.Add(this);
 

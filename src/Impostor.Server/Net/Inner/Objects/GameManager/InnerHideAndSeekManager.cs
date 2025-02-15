@@ -1,5 +1,4 @@
 using Impostor.Api.Events.Managers;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner.Objects.GameManager;
 using Impostor.Server.Net.Inner.Objects.GameManager.Logic.HideAndSeek;
 using Impostor.Server.Net.State;
@@ -9,8 +8,8 @@ namespace Impostor.Server.Net.Inner.Objects.GameManager;
 
 internal partial class InnerHideAndSeekManager : InnerGameManager, IInnerHideAndSeekManager
 {
-    public InnerHideAndSeekManager(ICustomMessageManager<ICustomRpc> customMessageManager, Game game,
-        ILogger<InnerGameManager> logger, IEventManager eventManager) : base(customMessageManager, game, logger)
+    public InnerHideAndSeekManager(Game game,
+        ILogger<InnerGameManager> logger, IEventManager eventManager) : base(game, logger)
     {
         LogicMusic = AddGameLogic(new LogicHnSMusic());
         LogicMinigame = AddGameLogic(new LogicMinigameHnS());

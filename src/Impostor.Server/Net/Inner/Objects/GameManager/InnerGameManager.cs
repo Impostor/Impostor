@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects.GameManager;
 using Impostor.Server.Net.Inner.Objects.GameManager.Logic;
@@ -16,8 +15,8 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
     private readonly ILogger<InnerGameManager> _logger;
     private readonly List<GameLogicComponent> _logicComponents = new();
 
-    public InnerGameManager(ICustomMessageManager<ICustomRpc> customMessageManager, Game game,
-        ILogger<InnerGameManager> logger) : base(customMessageManager, game)
+    public InnerGameManager(Game game,
+        ILogger<InnerGameManager> logger) : base(game)
     {
         _logger = logger;
 

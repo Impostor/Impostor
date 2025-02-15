@@ -3,17 +3,11 @@ using Impostor.Server.Events.Register;
 
 namespace Impostor.Server.Events;
 
-internal readonly struct EventHandler
+internal readonly struct EventHandler(IEventListener? o, IRegisteredEventListener listener)
 {
-    public EventHandler(IEventListener? o, IRegisteredEventListener listener)
-    {
-        Object = o;
-        Listener = listener;
-    }
+    public IEventListener? Object { get; } = o;
 
-    public IEventListener? Object { get; }
-
-    public IRegisteredEventListener Listener { get; }
+    public IRegisteredEventListener Listener { get; } = listener;
 
     public void Deconstruct(out IEventListener? o, out IRegisteredEventListener listener)
     {

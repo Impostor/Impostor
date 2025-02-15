@@ -80,7 +80,7 @@ internal partial class Game
 
     public async ValueTask HandleKickPlayer(int playerId, bool isBan)
     {
-        _logger.LogInformation("{0} - Player {1} has left.", Code, playerId);
+        logger.LogInformation("{0} - Player {1} has left.", Code, playerId);
 
         using var message = MessageWriter.Get(MessageType.Reliable);
 
@@ -126,7 +126,7 @@ internal partial class Game
 
     private async ValueTask HandleJoinGameNew(ClientPlayer sender, bool isNew)
     {
-        _logger.LogInformation("{0} - Player {1} ({2}) is joining.", Code, sender.Client.Name, sender.Client.Id);
+        logger.LogInformation("{0} - Player {1} ({2}) is joining.", Code, sender.Client.Name, sender.Client.Id);
 
         // Add player to the game.
         if (isNew)
@@ -162,7 +162,7 @@ internal partial class Game
         if (_compatibilityConfig.AllowVersionMixing == false &&
             Host != null && client.GameVersion != Host.Client.GameVersion)
         {
-            var versionCheckResult = _compatibilityManager.CanJoinGame(Host.Client.GameVersion, client.GameVersion);
+            var versionCheckResult = compatibilityManager.CanJoinGame(Host.Client.GameVersion, client.GameVersion);
             if (versionCheckResult != GameJoinError.None)
             {
                 return GameJoinResult.FromError(versionCheckResult);
@@ -191,10 +191,10 @@ internal partial class Game
 
         if (player == null || player.Game != this)
         {
-            var clientPlayer = new ClientPlayer(_serviceProvider.GetRequiredService<ILogger<ClientPlayer>>(), client,
+            var clientPlayer = new ClientPlayer(serviceProvider.GetRequiredService<ILogger<ClientPlayer>>(), client,
                 this, _timeoutConfig.SpawnTimeout);
 
-            if (!_clientManager.Validate(client))
+            if (!clientManager.Validate(client))
             {
                 return GameJoinResult.FromError(GameJoinError.InvalidClient);
             }
@@ -230,7 +230,7 @@ internal partial class Game
 
     private async ValueTask HandleJoinGameNext(ClientPlayer sender, bool isNew)
     {
-        _logger.LogInformation("{0} - Player {1} ({2}) is rejoining.", Code, sender.Client.Name, sender.Client.Id);
+        logger.LogInformation("{0} - Player {1} ({2}) is rejoining.", Code, sender.Client.Name, sender.Client.Id);
 
         // Add player to the game.
         if (isNew)

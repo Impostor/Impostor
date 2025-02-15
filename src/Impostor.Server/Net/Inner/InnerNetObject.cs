@@ -1,25 +1,17 @@
 ﻿using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
+using Impostor.Server.Events;
 using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner;
 
-internal abstract partial class InnerNetObject : GameObject, IInnerNetObject
+internal abstract partial class InnerNetObject(Game game) : GameObject, IInnerNetObject
 {
     private const int HostInheritId = -2;
 
-    private readonly ICustomMessageManager<ICustomRpc> _customMessageManager;
-
-    protected InnerNetObject(ICustomMessageManager<ICustomRpc> customMessageManager, Game game)
-    {
-        _customMessageManager = customMessageManager;
-        Game = game;
-    }
-
-    public Game Game { get; }
+    public Game Game { get; } = game;
 
     public SpawnFlags SpawnFlags { get; internal set; }
 
@@ -46,20 +38,9 @@ internal abstract partial class InnerNetObject : GameObject, IInnerNetObject
     public virtual async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
         IMessageReader reader)
     {
-        return await HandleCustomRpcAsync(sender, target, call, reader) ?? await UnregisteredCall(call, sender);
+        return await UnregisteredCallAsync(call, sender);
     }
-
-    protected async ValueTask<bool?> HandleCustomRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
-        IMessageReader reader)
-    {
-        if (_customMessageManager.TryGet((byte)call, out var customRpc))
-        {
-            return await customRpc.HandleRpcAsync(this, sender, target, reader);
-        }
-
-        return null;
-    }
-
+    
     internal virtual ValueTask OnSpawnAsync()
     {
         return default;

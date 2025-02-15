@@ -3,15 +3,9 @@ using Impostor.Api.Games;
 
 namespace Impostor.Server.Events;
 
-public class GameAlterEvent : IGameAlterEvent
+public class GameAlterEvent(IGame game, bool isPublic) : IGameAlterEvent
 {
-    public GameAlterEvent(IGame game, bool isPublic)
-    {
-        Game = game;
-        IsPublic = isPublic;
-    }
+    public IGame Game { get; } = game;
 
-    public IGame Game { get; }
-
-    public bool IsPublic { get; }
+    public bool IsPublic { get; } = isPublic;
 }

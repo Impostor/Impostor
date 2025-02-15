@@ -22,74 +22,48 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.State;
 
-internal partial class Game
+internal partial class Game(
+    ILogger<Game> logger,
+    IServiceProvider serviceProvider,
+    GameManager gameManager,
+    GameCode code,
+    IGameOptions options,
+    GameFilterOptions filterOptions,
+    ClientManager clientManager,
+    IEventManager eventManager,
+    ICompatibilityManager compatibilityManager,
+    IOptions<CompatibilityConfig> compatibilityConfig,
+    IOptions<TimeoutConfig> timeoutConfig
+    )
 {
-    private readonly HashSet<IPAddress> _bannedIps;
-    private readonly ClientManager _clientManager;
-    private readonly CompatibilityConfig _compatibilityConfig;
-    private readonly ICompatibilityManager _compatibilityManager;
-    private readonly IEventManager _eventManager;
-    private readonly GameManager _gameManager;
-    private readonly ILogger<Game> _logger;
-    private readonly ConcurrentDictionary<int, ClientPlayer> _players;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly TimeoutConfig _timeoutConfig;
-
-    public Game(
-        ILogger<Game> logger,
-        IServiceProvider serviceProvider,
-        GameManager gameManager,
-        GameCode code,
-        IGameOptions options,
-        GameFilterOptions filterOptions,
-        ClientManager clientManager,
-        IEventManager eventManager,
-        ICompatibilityManager compatibilityManager,
-        IOptions<CompatibilityConfig> compatibilityConfig,
-        IOptions<TimeoutConfig> timeoutConfig)
-    {
-        _logger = logger;
-        _serviceProvider = serviceProvider;
-        _gameManager = gameManager;
-        _players = new ConcurrentDictionary<int, ClientPlayer>();
-        _bannedIps = new HashSet<IPAddress>();
-
-        Code = code;
-        HostId = -1;
-        GameState = GameStates.NotStarted;
-        GameNet = new GameNet();
-        Options = options;
-        FilterOptions = filterOptions;
-        _clientManager = clientManager;
-        _eventManager = eventManager;
-        _compatibilityManager = compatibilityManager;
-        _compatibilityConfig = compatibilityConfig.Value;
-        _timeoutConfig = timeoutConfig.Value;
-        Items = new ConcurrentDictionary<object, object>();
-    }
+    private readonly HashSet<IPAddress> _bannedIps = new();
+    private readonly CompatibilityConfig _compatibilityConfig = compatibilityConfig.Value;
+    private readonly IEventManager _eventManager = eventManager;
+    private readonly ConcurrentDictionary<int, ClientPlayer> _players = new();
+    private readonly TimeoutConfig _timeoutConfig = timeoutConfig.Value;
 
     public ClientPlayer? Host
     {
         get => _players.GetValueOrDefault(HostId);
     }
 
-    internal GameNet GameNet { get; }
+    internal GameNet GameNet { get; } = new();
 
-    public GameCode Code { get; }
+    public GameCode Code { get; } = code;
 
     public bool IsPublic { get; private set; }
 
     public string? DisplayName { get; set; }
 
-    public int HostId { get; private set; }
+    public int HostId { get; private set; } = -1;
 
-    public GameStates GameState { get; private set; }
+    public GameStates GameState { get; private set; } = GameStates.NotStarted;
 
-    public IGameOptions Options { get; }
+    public IGameOptions Options { get; } = options;
 
-    public GameFilterOptions FilterOptions { get; }
+    public GameFilterOptions FilterOptions { get; } = filterOptions;
 
-    public IDictionary<object, object> Items { get; }
+    public IDictionary<object, object> Items { get; } = new ConcurrentDictionary<object, object>();
 
     public int PlayerCount
     {

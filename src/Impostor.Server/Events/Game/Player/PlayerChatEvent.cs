@@ -5,23 +5,16 @@ using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Events.Player;
 
-public class PlayerChatEvent : IPlayerChatEvent
+public class PlayerChatEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, string message)
+    : IPlayerChatEvent
 {
-    public PlayerChatEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, string message)
-    {
-        Game = game;
-        ClientPlayer = clientPlayer;
-        PlayerControl = playerControl;
-        Message = message;
-    }
+    public IGame Game { get; } = game;
 
-    public IGame Game { get; }
+    public IClientPlayer ClientPlayer { get; } = clientPlayer;
 
-    public IClientPlayer ClientPlayer { get; }
+    public IInnerPlayerControl PlayerControl { get; } = playerControl;
 
-    public IInnerPlayerControl PlayerControl { get; }
-
-    public string Message { get; }
+    public string Message { get; } = message;
 
     public bool IsCancelled { get; set; }
 }

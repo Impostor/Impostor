@@ -9,14 +9,13 @@ using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
-using Impostor.Api.Net.Custom;
+
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Utils;
 using Impostor.Server.Commands;
 using Impostor.Server.Events;
 using Impostor.Server.Hubs;
 using Impostor.Server.Net;
-using Impostor.Server.Net.Custom;
 using Impostor.Server.Net.Factories;
 using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
@@ -108,33 +107,28 @@ internal static class Program
             })
             .ConfigureServices((host, services) =>
             {
-                services.AddSingleton<ServerEnvironment>();
-                services.AddSingleton<IServerEnvironment>(p => p.GetRequiredService<ServerEnvironment>());
-                services.AddSingleton<IDateTimeProvider, RealDateTimeProvider>();
-
-                services.Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section));
-                services.Configure<CompatibilityConfig>(host.Configuration.GetSection(CompatibilityConfig.Section));
-                services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
-                services.Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section));
-
-                services.AddSingleton<ICompatibilityManager, CompatibilityManager>();
-                services.AddSingleton<ClientManager>();
-                services.AddSingleton<IClientManager>(p => p.GetRequiredService<ClientManager>());
-
-                services.AddSingleton<IClientFactory, ClientFactory<Client>>();
-                services.AddSingleton<GameManager>();
-                services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
-
                 services.AddEventPools();
                 services.AddHazel();
-                /*services
-                    .AddSingleton<ICustomMessageManager<ICustomRootMessage>,
-                        CustomMessageManager<ICustomRootMessage>>();
-                services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();*/
-                services.AddSingleton<IMessageWriterProvider, MessageWriterProvider>();
-                services.AddSingleton<IGameCodeFactory, GameCodeFactory>();
-                services.AddSingleton<IEventManager, EventManager>();
-                services.AddSingleton<INetListenerManager, NetListenerManager>();
+                
+                services
+                    .Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section))
+                    .Configure<CompatibilityConfig>(host.Configuration.GetSection(CompatibilityConfig.Section))
+                    .Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section))
+                    .Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section));
+                
+                services
+                    .AddSingleton<IMessageWriterProvider, MessageWriterProvider>()
+                    .AddSingleton<IGameCodeFactory, GameCodeFactory>()
+                    .AddSingleton<IEventManager, EventManager>()
+                    .AddSingleton<INetListenerManager, NetListenerManager>()
+                    .AddSingleton<IDateTimeProvider, RealDateTimeProvider>()
+                    .AddSingleton<ICompatibilityManager, CompatibilityManager>()
+                    .AddSingleton<IClientFactory, ClientFactory<Client>>();
+
+                services
+                    .AddRequiredSingleton<IServerEnvironment, ServerEnvironment>()
+                    .AddRequiredSingleton<IClientManager, ClientManager>()
+                    .AddRequiredSingleton<IGameManager, GameManager>();
 
                 if (config.EnableCommands)
                     services.AddHostedService<ConsoleCommandService>();

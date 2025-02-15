@@ -7,7 +7,6 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Api.Utils;
@@ -21,8 +20,8 @@ internal partial class InnerPlayerInfo
     private readonly IEventManager _eventManager;
     private readonly ILogger<InnerPlayerInfo> _logger;
 
-    public InnerPlayerInfo(ICustomMessageManager<ICustomRpc> customMessageManager, IEventManager eventManager,
-        Game game, ILogger<InnerPlayerInfo> logger) : base(customMessageManager, game)
+    public InnerPlayerInfo(IEventManager eventManager,
+        Game game, ILogger<InnerPlayerInfo> logger) : base(game)
     {
         Components.Add(this);
         _eventManager = eventManager;

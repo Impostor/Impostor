@@ -116,14 +116,9 @@ internal abstract partial class InnerNetObject
         return true;
     }
 
-    protected async ValueTask<bool> UnregisteredCall(CheatContext context, IClientPlayer sender)
+    private static async ValueTask<bool> UnregisteredCallAsync(CheatContext context, IClientPlayer sender)
     {
-        if (await sender.Client.ReportCheatAsync(context, CheatCategory.ProtocolExtension,
-                "Client sent unregistered call"))
-        {
-            return false;
-        }
-
-        return true;
+        return !await sender.Client.ReportCheatAsync(context, CheatCategory.ProtocolExtension,
+            "Client sent unregistered call");
     }
 }

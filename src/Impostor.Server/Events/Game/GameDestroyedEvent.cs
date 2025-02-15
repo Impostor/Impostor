@@ -3,12 +3,7 @@ using Impostor.Api.Games;
 
 namespace Impostor.Server.Events;
 
-public class GameDestroyedEvent : IGameDestroyedEvent
+public class GameDestroyedEvent(IGame game) : IGameDestroyedEvent
 {
-    public GameDestroyedEvent(IGame game)
-    {
-        Game = game;
-    }
-
-    public IGame Game { get; }
+    public IGame Game { get; } = game;
 }

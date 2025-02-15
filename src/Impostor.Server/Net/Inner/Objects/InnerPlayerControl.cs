@@ -10,7 +10,6 @@ using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Innersloth.GameOptions.RoleOptions;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Messages.Rpcs;
@@ -32,9 +31,9 @@ internal partial class InnerPlayerControl : InnerNetObject
     private readonly Game _game;
     private readonly ILogger<InnerPlayerControl> _logger;
 
-    public InnerPlayerControl(ICustomMessageManager<ICustomRpc> customMessageManager, Game game,
+    public InnerPlayerControl(Game game,
         ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager,
-        IDateTimeProvider dateTimeProvider) : base(customMessageManager, game)
+        IDateTimeProvider dateTimeProvider) : base(game)
     {
         _game = game;
         _logger = logger;

@@ -3,13 +3,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Config;
+using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
+using Impostor.Server.Events;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,7 +22,7 @@ internal class Client(
     IOptions<AntiCheatConfig> antiCheatOptions,
     ClientManager clientManager,
     GameManager gameManager,
-    ICustomMessageManager<ICustomRootMessage> customMessageManager,
+    IEventManager eventManager,
     string name,
     GameVersion gameVersion,
     Language language,
@@ -112,6 +113,11 @@ internal class Client(
 
         logger.LogTrace("[{0}] Server got {1}.", Id, MessageFlags.FlagToString(flag));
 
+        var messageEvent = new GameMessageEvent(false, flag, reader);
+        await eventManager.CallAsync(messageEvent);
+        if (messageEvent.HasBreak)
+            return;
+
         switch (flag)
         {
             case MessageFlags.HostGame:
@@ -129,11 +135,9 @@ internal class Client(
                 }
 
                 // Code in the packet below will be used in JoinGame.
-                using (var writer = MessageWriter.Get(MessageType.Reliable))
-                {
-                    Message00HostGameS2C.Serialize(writer, game.Code);
-                    await Connection.SendAsync(writer);
-                }
+                using var writer = MessageWriter.Get(MessageType.Reliable);
+                Message00HostGameS2C.Serialize(writer, game.Code);
+                await Connection.SendAsync(writer);
 
                 break;
             }
@@ -329,29 +333,9 @@ internal class Client(
             }
 
             default:
-                if (customMessageManager.TryGet(flag, out var customRootMessage))
-                {
-                    await customRootMessage.HandleMessageAsync(this, reader, messageType);
-                    break;
-                }
-
                 logger.LogWarning("Server received unknown flag {0}.", flag);
                 break;
         }
-
-#if DEBUG
-        if (flag != MessageFlags.GameData &&
-            flag != MessageFlags.GameDataTo &&
-            flag != MessageFlags.EndGame &&
-            reader.Position < reader.Length)
-        {
-            logger.LogWarning(
-                "Server did not consume all bytes from {0} ({1} < {2}).",
-                flag,
-                reader.Position,
-                reader.Length);
-        }
-#endif
     }
 
     public override async ValueTask HandleDisconnectAsync(string reason)

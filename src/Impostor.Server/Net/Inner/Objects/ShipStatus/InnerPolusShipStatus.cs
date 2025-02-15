@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Impostor.Api.Innersloth;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner.Objects.ShipStatus;
 using Impostor.Server.Net.Inner.Objects.Systems;
 using Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
@@ -9,13 +8,8 @@ using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner.Objects.ShipStatus;
 
-internal class InnerPolusShipStatus : InnerShipStatus, IInnerPolusShipStatus
+internal class InnerPolusShipStatus(Game game) : InnerShipStatus(game, MapTypes.Polus), IInnerPolusShipStatus
 {
-    public InnerPolusShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(
-        customMessageManager, game, MapTypes.Polus)
-    {
-    }
-
     public override Vector2 GetSpawnLocation(InnerPlayerControl player, int numPlayers, bool initialSpawn)
     {
         if (initialSpawn)

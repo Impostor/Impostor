@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner.Objects;
 using Impostor.Server.Net.State;
 
@@ -9,8 +8,7 @@ namespace Impostor.Server.Net.Inner.Objects;
 
 internal class InnerLobbyBehaviour : InnerNetObject, IInnerLobbyBehaviour
 {
-    public InnerLobbyBehaviour(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(
-        customMessageManager, game)
+    public InnerLobbyBehaviour(Game game) : base(game)
     {
         Components.Add(this);
     }

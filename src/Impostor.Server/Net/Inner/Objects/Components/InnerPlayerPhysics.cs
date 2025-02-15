@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Player;
@@ -12,20 +11,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.Inner.Objects.Components;
 
-internal partial class InnerPlayerPhysics : InnerNetObject
+internal partial class InnerPlayerPhysics(
+    Game game,
+    ILogger<InnerPlayerPhysics> logger,
+    InnerPlayerControl playerControl,
+    IEventManager eventManager)
+    : InnerNetObject(game)
 {
-    private readonly IEventManager _eventManager;
-    private readonly ILogger<InnerPlayerPhysics> _logger;
-    private readonly InnerPlayerControl _playerControl;
-
-    public InnerPlayerPhysics(ICustomMessageManager<ICustomRpc> customMessageManager, Game game,
-        ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl, IEventManager eventManager) : base(
-        customMessageManager, game)
-    {
-        _logger = logger;
-        _playerControl = playerControl;
-        _eventManager = eventManager;
-    }
+    private readonly ILogger<InnerPlayerPhysics> _logger = logger;
 
     public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
     {
@@ -51,7 +44,7 @@ internal partial class InnerPlayerPhysics : InnerNetObject
             case RpcCalls.EnterVent:
             case RpcCalls.ExitVent:
             {
-                if (!await ValidateCanVent(call, sender, _playerControl.PlayerInfo))
+                if (!await ValidateCanVent(call, sender, playerControl.PlayerInfo))
                 {
                     return false;
                 }
@@ -95,10 +88,10 @@ internal partial class InnerPlayerPhysics : InnerNetObject
                 switch (call)
                 {
                     case RpcCalls.EnterVent:
-                        await _eventManager.CallAsync(new PlayerEnterVentEvent(Game, sender, _playerControl, vent));
+                        await eventManager.CallAsync(new PlayerEnterVentEvent(Game, sender, playerControl, vent));
                         break;
                     case RpcCalls.ExitVent:
-                        await _eventManager.CallAsync(new PlayerExitVentEvent(Game, sender, _playerControl, vent));
+                        await eventManager.CallAsync(new PlayerExitVentEvent(Game, sender, playerControl, vent));
                         break;
                 }
 

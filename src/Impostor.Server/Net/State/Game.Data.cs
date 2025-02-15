@@ -6,6 +6,7 @@ using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Unity;
+using Impostor.Server.Events;
 using Impostor.Server.Events.Meeting;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.Inner;
@@ -88,12 +89,12 @@ internal partial class Game
             var targetId = parent.ReadPackedInt32();
             if (!TryGetPlayer(targetId, out target))
             {
-                _logger.LogWarning("Player {0} tried to send GameData to unknown player {1}.", sender.Client.Id,
+                logger.LogWarning("Player {0} tried to send GameData to unknown player {1}.", sender.Client.Id,
                     targetId);
                 return false;
             }
 
-            _logger.LogTrace("Received GameData for target {0}.", targetId);
+            logger.LogTrace("Received GameData for target {0}.", targetId);
         }
 
         // Parse GameData messages.
@@ -112,7 +113,7 @@ internal partial class Game
                     }
                     else
                     {
-                        _logger.LogWarning("Received DataFlag for unregistered NetId {0}.", netId);
+                        logger.LogWarning("Received DataFlag for unregistered NetId {0}.", netId);
                     }
 
                     break;
@@ -121,9 +122,21 @@ internal partial class Game
                 case GameDataTag.RpcFlag:
                 {
                     var netId = reader.ReadPackedUInt32();
+                    var rpc = reader.ReadByte();
                     if (_allObjectsFast.TryGetValue(netId, out var obj))
                     {
-                        if (!await obj.HandleRpcAsync(sender, target, (RpcCalls)reader.ReadByte(), reader))
+                        var messageEvent = new GameMessageEvent(obj, rpc, reader);
+                        await eventManager.CallAsync(messageEvent);
+                        if (messageEvent.HasBreak)
+                            break;
+
+                        if (messageEvent.HandleRpc != null && messageEvent.HandleRpc.Invoke(sender, target))
+                        {
+                            parent.RemoveMessage(reader);
+                            continue;
+                        }
+                        
+                        if (!await obj.HandleRpcAsync(sender, target, (RpcCalls)rpc, reader))
                         {
                             parent.RemoveMessage(reader);
                             continue;
@@ -131,7 +144,7 @@ internal partial class Game
                     }
                     else
                     {
-                        _logger.LogWarning("Received RpcFlag for unregistered NetId {0}.", netId);
+                        logger.LogWarning("Received RpcFlag for unregistered NetId {0}.", netId);
                     }
 
                     break;
@@ -153,7 +166,7 @@ internal partial class Game
                     if (SpawnableObjects.TryGetValue(objectId, out var spawnableObjectType))
                     {
                         var innerNetObject =
-                            (InnerNetObject)ActivatorUtilities.CreateInstance(_serviceProvider, spawnableObjectType,
+                            (InnerNetObject)ActivatorUtilities.CreateInstance(serviceProvider, spawnableObjectType,
                                 this);
                         var ownerClientId = reader.ReadPackedInt32();
 
@@ -164,7 +177,7 @@ internal partial class Game
 
                         if (componentsCount != components.Count)
                         {
-                            _logger.LogError(
+                            logger.LogError(
                                 "Children didn't match for spawnable {0}, name {1} ({2} != {3})",
                                 objectId,
                                 innerNetObject.GetType().Name,
@@ -173,7 +186,7 @@ internal partial class Game
                             continue;
                         }
 
-                        _logger.LogDebug(
+                        logger.LogDebug(
                             "Spawning {0} components, SpawnFlags {1}",
                             innerNetObject.GetType().Name,
                             innerNetObject.SpawnFlags);
@@ -185,7 +198,7 @@ internal partial class Game
                             obj.NetId = reader.ReadPackedUInt32();
                             obj.OwnerId = ownerClientId;
 
-                            _logger.LogDebug(
+                            logger.LogDebug(
                                 "- {0}, NetId {1}, OwnerId {2}",
                                 obj.GetType().Name,
                                 obj.NetId,
@@ -193,7 +206,7 @@ internal partial class Game
 
                             if (!AddNetObject(obj))
                             {
-                                _logger.LogTrace("Failed to AddNetObject, it already exists.");
+                                logger.LogTrace("Failed to AddNetObject, it already exists.");
 
                                 obj.NetId = uint.MaxValue;
                                 break;
@@ -211,7 +224,7 @@ internal partial class Game
                         continue;
                     }
 
-                    _logger.LogWarning("Couldn't find spawnable object {0}.", objectId);
+                    logger.LogWarning("Couldn't find spawnable object {0}.", objectId);
                     break;
                 }
 
@@ -223,7 +236,7 @@ internal partial class Game
                     {
                         if (sender.Client.Id != obj.OwnerId && !sender.IsHost)
                         {
-                            _logger.LogWarning(
+                            logger.LogWarning(
                                 "Player {0} ({1}) tried to send DespawnFlag for {2} but was denied.",
                                 sender.Client.Name,
                                 sender.Client.Id,
@@ -233,12 +246,12 @@ internal partial class Game
 
                         RemoveNetObject(obj);
                         await OnDestroyAsync(obj);
-                        _logger.LogDebug("Destroyed InnerNetObject {0} ({1}), OwnerId {2}", obj.GetType().Name, netId,
+                        logger.LogDebug("Destroyed InnerNetObject {0} ({1}), OwnerId {2}", obj.GetType().Name, netId,
                             obj.OwnerId);
                     }
                     else
                     {
-                        _logger.LogDebug(
+                        logger.LogDebug(
                             "Player {0} ({1}) sent DespawnFlag for unregistered NetId {2}.",
                             sender.Client.Name,
                             sender.Client.Id,
@@ -256,7 +269,7 @@ internal partial class Game
 
                     if (clientId != sender.Client.Id)
                     {
-                        _logger.LogWarning(
+                        logger.LogWarning(
                             "Player {0} ({1}) tried to send SceneChangeFlag for another player.",
                             sender.Client.Name,
                             sender.Client.Id);
@@ -266,7 +279,7 @@ internal partial class Game
                     // According to game assembly, sender is only allowed to send OnlineGame.
                     if (scene != "OnlineGame")
                     {
-                        _logger.LogWarning(
+                        logger.LogWarning(
                             "Player {PlayerName} ({ClientId}) tried to send SceneChangeFlag with disallowed scene \"{Scene}\".",
                             sender.Client.Name,
                             sender.Client.Id,
@@ -276,7 +289,7 @@ internal partial class Game
 
                     sender.Scene = scene;
 
-                    _logger.LogTrace("> Scene {0} to {1}", clientId, sender.Scene);
+                    logger.LogTrace("> Scene {0} to {1}", clientId, sender.Scene);
 
                     await SyncServerObjectsAsync(sender);
                     await SpawnPlayerInfoAsync(sender);
@@ -290,14 +303,14 @@ internal partial class Game
 
                     if (clientId != sender.Client.Id)
                     {
-                        _logger.LogWarning(
+                        logger.LogWarning(
                             "Player {0} ({1}) tried to send ReadyFlag for another player.",
                             sender.Client.Name,
                             sender.Client.Id);
                         return false;
                     }
 
-                    _logger.LogTrace("> IsReady {0}", clientId);
+                    logger.LogTrace("> IsReady {0}", clientId);
                     break;
                 }
 
@@ -323,7 +336,7 @@ internal partial class Game
 
                 default:
                 {
-                    _logger.LogWarning("Bad GameData tag {0}", reader.Tag);
+                    logger.LogWarning("Bad GameData tag {0}", reader.Tag);
                     break;
                 }
             }
@@ -358,7 +371,7 @@ internal partial class Game
             {
                 if (!GameNet.GameData.AddPlayer(playerInfo))
                 {
-                    _logger.LogWarning(
+                    logger.LogWarning(
                         "Could not add PlayerInfo for playerId {PlayerId} with NetId {newId}, already have NetId {oldNetId}",
                         playerInfo.PlayerId,
                         playerInfo.NetId,
@@ -482,7 +495,7 @@ internal partial class Game
         {
             if (obj.OwnerId == ServerOwned)
             {
-                _logger.LogTrace("Syncing {Type} {NetId}", obj.GetType(), obj.NetId);
+                logger.LogTrace("Syncing {Type} {NetId}", obj.GetType(), obj.NetId);
                 await SendObjectSpawnAsync(obj, sender.Client.Id);
             }
         }
@@ -503,7 +516,7 @@ internal partial class Game
         }
 
         var playerInfo =
-            (InnerPlayerInfo)ActivatorUtilities.CreateInstance(_serviceProvider, typeof(InnerPlayerInfo), this);
+            (InnerPlayerInfo)ActivatorUtilities.CreateInstance(serviceProvider, typeof(InnerPlayerInfo), this);
         playerInfo.SpawnFlags = SpawnFlags.None;
         playerInfo.NetId = _nextNetId++;
         playerInfo.OwnerId = ServerOwned;
@@ -512,12 +525,12 @@ internal partial class Game
 
         if (!AddNetObject(playerInfo))
         {
-            _logger.LogError("Couldn't spawn PlayerInfo for {Name} ({ClientId})", sender.Client.Name, sender.Client.Id);
+            logger.LogError("Couldn't spawn PlayerInfo for {Name} ({ClientId})", sender.Client.Name, sender.Client.Id);
             playerInfo.NetId = uint.MaxValue;
             return;
         }
 
-        _logger.LogTrace("Spawning PlayerInfo (netId {Netid})", playerInfo.NetId);
+        logger.LogTrace("Spawning PlayerInfo (netId {Netid})", playerInfo.NetId);
         await OnSpawnAsync(sender, playerInfo);
         await SendObjectSpawnAsync(playerInfo);
     }
@@ -526,7 +539,7 @@ internal partial class Game
     {
         if (playerInfo.OwnerId == ServerOwned)
         {
-            _logger.LogDebug("Despawning PlayerInfo {nid}", playerInfo.NetId);
+            logger.LogDebug("Despawning PlayerInfo {nid}", playerInfo.NetId);
             GameNet.GameData.RemovePlayer(playerInfo.PlayerId);
             RemoveNetObject(playerInfo);
 

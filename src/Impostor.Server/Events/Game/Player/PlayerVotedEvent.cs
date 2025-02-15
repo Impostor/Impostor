@@ -5,25 +5,21 @@ using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Events.Player;
 
-public class PlayerVotedEvent : IPlayerVotedEvent
+public class PlayerVotedEvent(
+    IGame game,
+    IClientPlayer clientPlayer,
+    IInnerPlayerControl playerControl,
+    VoteType voteType,
+    IInnerPlayerControl? votedFor)
+    : IPlayerVotedEvent
 {
-    public PlayerVotedEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl,
-        VoteType voteType, IInnerPlayerControl? votedFor)
-    {
-        Game = game;
-        ClientPlayer = clientPlayer;
-        PlayerControl = playerControl;
-        VoteType = voteType;
-        VotedFor = votedFor;
-    }
+    public IGame Game { get; } = game;
 
-    public IGame Game { get; }
+    public IClientPlayer ClientPlayer { get; } = clientPlayer;
 
-    public IClientPlayer ClientPlayer { get; }
+    public IInnerPlayerControl PlayerControl { get; } = playerControl;
 
-    public IInnerPlayerControl PlayerControl { get; }
+    public IInnerPlayerControl? VotedFor { get; } = votedFor;
 
-    public IInnerPlayerControl? VotedFor { get; }
-
-    public VoteType VoteType { get; }
+    public VoteType VoteType { get; } = voteType;
 }

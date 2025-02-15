@@ -4,15 +4,9 @@ using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Events.Meeting;
 
-public class MeetingStartedEvent : IMeetingStartedEvent
+public class MeetingStartedEvent(IGame game, IInnerMeetingHud meetingHud) : IMeetingStartedEvent
 {
-    public MeetingStartedEvent(IGame game, IInnerMeetingHud meetingHud)
-    {
-        Game = game;
-        MeetingHud = meetingHud;
-    }
+    public IGame Game { get; } = game;
 
-    public IGame Game { get; }
-
-    public IInnerMeetingHud MeetingHud { get; }
+    public IInnerMeetingHud MeetingHud { get; } = meetingHud;
 }

@@ -11,20 +11,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Events;
 
-internal class EventManager : IEventManager
+internal class EventManager(ILogger<EventManager> logger, IServiceProvider serviceProvider)
+    : IEventManager
 {
-    private readonly ConcurrentDictionary<Type, List<EventHandler>> _cachedEventHandlers;
-    private readonly ILogger<EventManager> _logger;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ConcurrentDictionary<Type, TemporaryEventRegister> _temporaryEventListeners;
-
-    public EventManager(ILogger<EventManager> logger, IServiceProvider serviceProvider)
-    {
-        _logger = logger;
-        _serviceProvider = serviceProvider;
-        _temporaryEventListeners = new ConcurrentDictionary<Type, TemporaryEventRegister>();
-        _cachedEventHandlers = new ConcurrentDictionary<Type, List<EventHandler>>();
-    }
+    private readonly ConcurrentDictionary<Type, List<EventHandler>> _cachedEventHandlers = new();
+    private readonly ConcurrentDictionary<Type, TemporaryEventRegister> _temporaryEventListeners = new();
 
     /// <inheritdoc />
     public IDisposable RegisterListener<TListener>(TListener listener, Func<Func<Task>, Task>? invoker = null)
@@ -87,12 +78,12 @@ internal class EventManager : IEventManager
 
             foreach (var (handler, eventListener) in handlers)
             {
-                await eventListener.InvokeAsync(handler, @event, _serviceProvider);
+                await eventListener.InvokeAsync(handler, @event, serviceProvider);
             }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Invocation of event {0} threw an exception.", @event.GetType().Name);
+            logger.LogError(e, "Invocation of event {0} threw an exception.", @event.GetType().Name);
         }
     }
 
@@ -129,7 +120,7 @@ internal class EventManager : IEventManager
             }
         }
 
-        foreach (var handler in _serviceProvider.GetServices<IEventListener>())
+        foreach (var handler in serviceProvider.GetServices<IEventListener>())
         {
             if (handler is IManualEventListener manualEventListener && manualEventListener.CanExecute<TEvent>())
             {

@@ -6,18 +6,11 @@ using Impostor.Api.Net;
 
 namespace Impostor.Server.Events;
 
-public class GameCreationEvent : IGameCreationEvent
+public class GameCreationEvent(IGameManager gameManager, IClient? client) : IGameCreationEvent
 {
-    private readonly IGameManager _gameManager;
     private GameCode? _gameCode;
 
-    public GameCreationEvent(IGameManager gameManager, IClient? client)
-    {
-        _gameManager = gameManager;
-        Client = client;
-    }
-
-    public IClient? Client { get; }
+    public IClient? Client { get; } = client;
 
     public GameCode? GameCode
     {
@@ -31,7 +24,7 @@ public class GameCreationEvent : IGameCreationEvent
                     throw new ImpostorException("GameCode is invalid.");
                 }
 
-                if (_gameManager.Find(value.Value) != null)
+                if (gameManager.Find(value.Value) != null)
                 {
                     throw new ImpostorException($"GameCode [{value.Value.Code}] is already used.");
                 }

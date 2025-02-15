@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Player;
@@ -14,26 +13,19 @@ using Microsoft.Extensions.ObjectPool;
 
 namespace Impostor.Server.Net.Inner.Objects.Components;
 
-internal partial class InnerCustomNetworkTransform : InnerNetObject
+internal partial class InnerCustomNetworkTransform(
+    Game game,
+    ILogger<InnerCustomNetworkTransform> logger,
+    InnerPlayerControl playerControl,
+    IEventManager eventManager,
+    ObjectPool<PlayerMovementEvent> pool)
+    : InnerNetObject(game)
 {
     private static readonly Vector2 ColliderOffset = new(0f, -0.4f);
-    private readonly IEventManager _eventManager;
 
-    private readonly ILogger<InnerCustomNetworkTransform> _logger;
-    private readonly InnerPlayerControl _playerControl;
-    private readonly ObjectPool<PlayerMovementEvent> _pool;
+    private readonly ILogger<InnerCustomNetworkTransform> _logger = logger;
 
     private ushort _lastSequenceId;
-
-    public InnerCustomNetworkTransform(ICustomMessageManager<ICustomRpc> customMessageManager, Game game,
-        ILogger<InnerCustomNetworkTransform> logger, InnerPlayerControl playerControl, IEventManager eventManager,
-        ObjectPool<PlayerMovementEvent> pool) : base(customMessageManager, game)
-    {
-        _logger = logger;
-        _playerControl = playerControl;
-        _eventManager = eventManager;
-        _pool = pool;
-    }
 
     public Vector2 Position { get; private set; }
 
@@ -107,12 +99,12 @@ internal partial class InnerCustomNetworkTransform : InnerNetObject
 
                 if (vent != null)
                 {
-                    if (!await ValidateCanVent(call, sender, _playerControl.PlayerInfo))
+                    if (!await ValidateCanVent(call, sender, playerControl.PlayerInfo))
                     {
                         return false;
                     }
 
-                    await _eventManager.CallAsync(new PlayerVentEvent(Game, sender, _playerControl, vent));
+                    await eventManager.CallAsync(new PlayerVentEvent(Game, sender, playerControl, vent));
                 }
             }
 
@@ -127,10 +119,10 @@ internal partial class InnerCustomNetworkTransform : InnerNetObject
     {
         Position = position;
 
-        var playerMovementEvent = _pool.Get();
-        playerMovementEvent.Reset(Game, sender, _playerControl);
-        await _eventManager.CallAsync(playerMovementEvent);
-        _pool.Return(playerMovementEvent);
+        var playerMovementEvent = pool.Get();
+        playerMovementEvent.Reset(Game, sender, playerControl);
+        await eventManager.CallAsync(playerMovementEvent);
+        pool.Return(playerMovementEvent);
     }
 
     private static bool SidGreaterThan(ushort newSid, ushort prevSid)

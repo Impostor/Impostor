@@ -10,7 +10,6 @@ public class ServerConfig
 
     public bool EnableCommands { get; set; }
     public bool EnableNextApi { get; set; }
-    public bool EnableCustom { get; set; }
     
     public bool WriteConsole { get; set; } = true;
     public bool WriteFile { get; set; } = true;

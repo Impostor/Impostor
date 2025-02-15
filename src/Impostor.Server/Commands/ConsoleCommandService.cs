@@ -3,13 +3,12 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Impostor.Api.Commands;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Commands;
 
-public class ConsoleCommandService(ILogger<ConsoleCommandService> logger, ICommandsManager commandsManager) : BackgroundService
+public class ConsoleCommandService(ILogger<ConsoleCommandService> logger, CommandsManager commandsManager) : BackgroundService
 {
     private TextReader Reader { get; } = Console.In;
     

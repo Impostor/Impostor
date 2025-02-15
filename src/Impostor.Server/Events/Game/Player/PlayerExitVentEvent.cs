@@ -6,21 +6,18 @@ using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Events.Player;
 
-public class PlayerExitVentEvent : IPlayerExitVentEvent
+public class PlayerExitVentEvent(
+    IGame game,
+    IClientPlayer sender,
+    IInnerPlayerControl innerPlayerPhysics,
+    VentData vent)
+    : IPlayerExitVentEvent
 {
-    public PlayerExitVentEvent(IGame game, IClientPlayer sender, IInnerPlayerControl innerPlayerPhysics, VentData vent)
-    {
-        Game = game;
-        ClientPlayer = sender;
-        PlayerControl = innerPlayerPhysics;
-        Vent = vent;
-    }
+    public IGame Game { get; } = game;
 
-    public IGame Game { get; }
+    public IClientPlayer ClientPlayer { get; } = sender;
 
-    public IClientPlayer ClientPlayer { get; }
+    public IInnerPlayerControl PlayerControl { get; } = innerPlayerPhysics;
 
-    public IInnerPlayerControl PlayerControl { get; }
-
-    public VentData Vent { get; }
+    public VentData Vent { get; } = vent;
 }

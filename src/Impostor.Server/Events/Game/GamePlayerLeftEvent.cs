@@ -4,18 +4,11 @@ using Impostor.Api.Net;
 
 namespace Impostor.Server.Events;
 
-public class GamePlayerLeftEvent : IGamePlayerLeftEvent
+public class GamePlayerLeftEvent(IGame game, IClientPlayer player, bool isBan) : IGamePlayerLeftEvent
 {
-    public GamePlayerLeftEvent(IGame game, IClientPlayer player, bool isBan)
-    {
-        Game = game;
-        Player = player;
-        IsBan = isBan;
-    }
+    public IGame Game { get; } = game;
 
-    public IGame Game { get; }
+    public IClientPlayer Player { get; } = player;
 
-    public IClientPlayer Player { get; }
-
-    public bool IsBan { get; }
+    public bool IsBan { get; } = isBan;
 }

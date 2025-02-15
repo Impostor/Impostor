@@ -3,15 +3,9 @@ using Impostor.Api.Net;
 
 namespace Impostor.Server.Events.Client;
 
-public class ClientConnectionEvent : IClientConnectionEvent
+public class ClientConnectionEvent(IHazelConnection connection, IMessageReader handshakeData) : IClientConnectionEvent
 {
-    public ClientConnectionEvent(IHazelConnection connection, IMessageReader handshakeData)
-    {
-        Connection = connection;
-        HandshakeData = handshakeData;
-    }
+    public IHazelConnection Connection { get; } = connection;
 
-    public IHazelConnection Connection { get; }
-
-    public IMessageReader HandshakeData { get; }
+    public IMessageReader HandshakeData { get; } = handshakeData;
 }

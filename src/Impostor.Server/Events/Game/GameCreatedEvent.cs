@@ -4,15 +4,9 @@ using Impostor.Api.Net;
 
 namespace Impostor.Server.Events;
 
-public class GameCreatedEvent : IGameCreatedEvent
+public class GameCreatedEvent(IGame game, IClient? host) : IGameCreatedEvent
 {
-    public GameCreatedEvent(IGame game, IClient? host)
-    {
-        Game = game;
-        Host = host;
-    }
+    public IGame Game { get; } = game;
 
-    public IGame Game { get; }
-
-    public IClient? Host { get; }
+    public IClient? Host { get; } = host;
 }

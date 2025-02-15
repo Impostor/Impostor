@@ -35,7 +35,7 @@ internal partial class Game
             return false;
         }
 
-        _logger.LogInformation("{0} - Player {1} ({2}) has left.", Code, player.Client.Name, playerId);
+        logger.LogInformation("{0} - Player {1} ({2}) has left.", Code, player.Client.Name, playerId);
 
         if (GameState == GameStates.Starting || GameState == GameStates.Started || GameState == GameStates.NotStarted)
         {
@@ -61,7 +61,7 @@ internal partial class Game
             GameState = GameStates.Destroyed;
 
             // Remove instance reference.
-            await _gameManager.RemoveAsync(Code);
+            await gameManager.RemoveAsync(Code);
             return true;
         }
 
@@ -79,7 +79,7 @@ internal partial class Game
 
             if (player.Client.Connection.IsConnected && player.Client.Connection is HazelConnection hazel)
             {
-                _logger.LogInformation("{0} - Player {1} ({2}) kept connection open after leaving, disposing.", Code,
+                logger.LogInformation("{0} - Player {1} ({2}) kept connection open after leaving, disposing.", Code,
                     player.Client.Name, playerId);
                 await player.Client.DisconnectAsync(isBan ? DisconnectReason.Banned : DisconnectReason.Kicked);
             }
@@ -116,7 +116,7 @@ internal partial class Game
         }
 
         HostId = host.Client.Id;
-        _logger.LogInformation("{0} - Assigned {1} ({2}) as new host.", Code, host.Client.Name, host.Client.Id);
+        logger.LogInformation("{0} - Assigned {1} ({2}) as new host.", Code, host.Client.Name, host.Client.Id);
 
         // Check our current game state.
         if (GameState == GameStates.Ended && host.Limbo == LimboStates.WaitingForHost)

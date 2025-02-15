@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Impostor.Api.Innersloth;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner.Objects.ShipStatus;
 using Impostor.Server.Net.Inner.Objects.Systems;
 using Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
@@ -8,13 +7,8 @@ using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner.Objects.ShipStatus;
 
-internal class InnerDleksShipStatus : InnerShipStatus, IInnerDleksShipStatus
+internal class InnerDleksShipStatus(Game game) : InnerShipStatus(game, MapTypes.Dleks), IInnerDleksShipStatus
 {
-    public InnerDleksShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(
-        customMessageManager, game, MapTypes.Dleks)
-    {
-    }
-
     protected override void AddSystems(Dictionary<SystemTypes, ISystemType> systems)
     {
         base.AddSystems(systems);

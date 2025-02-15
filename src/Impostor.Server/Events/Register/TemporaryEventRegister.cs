@@ -9,13 +9,8 @@ namespace Impostor.Server.Events.Register;
 
 internal class TemporaryEventRegister
 {
-    private readonly ConcurrentDictionary<int, IRegisteredEventListener> _callbacks;
+    private readonly ConcurrentDictionary<int, IRegisteredEventListener> _callbacks = new();
     private int _idLast;
-
-    public TemporaryEventRegister()
-    {
-        _callbacks = new ConcurrentDictionary<int, IRegisteredEventListener>();
-    }
 
     public IEnumerable<IRegisteredEventListener> GetEventListeners()
     {
@@ -39,20 +34,11 @@ internal class TemporaryEventRegister
         _callbacks.TryRemove(id, out _);
     }
 
-    private class UnregisterEvent : IDisposable
+    private class UnregisterEvent(TemporaryEventRegister register, int id) : IDisposable
     {
-        private readonly int _id;
-        private readonly TemporaryEventRegister _register;
-
-        public UnregisterEvent(TemporaryEventRegister register, int id)
-        {
-            _register = register;
-            _id = id;
-        }
-
         public void Dispose()
         {
-            _register.Remove(_id);
+            register.Remove(id);
         }
     }
 }

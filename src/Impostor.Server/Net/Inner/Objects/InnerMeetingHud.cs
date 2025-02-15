@@ -10,7 +10,6 @@ using Impostor.Api.Events.Player;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
-using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Meeting;
@@ -29,8 +28,8 @@ internal partial class InnerMeetingHud : InnerNetObject
 
     [AllowNull] private PlayerVoteArea[] _playerStates;
 
-    public InnerMeetingHud(ICustomMessageManager<ICustomRpc> customMessageManager, Game game,
-        ILogger<InnerMeetingHud> logger, IEventManager eventManager) : base(customMessageManager, game)
+    public InnerMeetingHud(Game game,
+        ILogger<InnerMeetingHud> logger, IEventManager eventManager) : base( game)
     {
         _logger = logger;
         _eventManager = eventManager;

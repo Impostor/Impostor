@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj"/>
+    <ProjectReference Include="..\Impostor.Api.Extension\Impostor.Api.Extension.csproj"/>
   </ItemGroup>
 
   <ItemGroup>

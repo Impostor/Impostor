@@ -4,15 +4,9 @@ using static Impostor.Api.Events.IGameOptionsChangedEvent;
 
 namespace Impostor.Server.Events;
 
-public class GameOptionsChangedEvent : IGameOptionsChangedEvent
+public class GameOptionsChangedEvent(IGame game, ChangeReason changedBy) : IGameOptionsChangedEvent
 {
-    public GameOptionsChangedEvent(IGame game, ChangeReason changedBy)
-    {
-        Game = game;
-        ChangedBy = changedBy;
-    }
+    public ChangeReason ChangedBy { get; } = changedBy;
 
-    public ChangeReason ChangedBy { get; }
-
-    public IGame Game { get; }
+    public IGame Game { get; } = game;
 }

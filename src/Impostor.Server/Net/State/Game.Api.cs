@@ -73,7 +73,7 @@ internal partial class Game : IGame
         // Prevent bad plugins from causing a server crash by recursing into this function
         if (_alreadyCallingOptionsChangedEvent)
         {
-            _logger.LogError(
+            logger.LogError(
                 "Plugin called SyncSettingsAsync while processing a GameOptionsChangedEvent, aborting to prevent recursion");
         }
         else

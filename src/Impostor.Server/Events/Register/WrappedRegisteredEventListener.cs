@@ -4,29 +4,20 @@ using Impostor.Api.Events;
 
 namespace Impostor.Server.Events.Register;
 
-internal class WrappedRegisteredEventListener : IRegisteredEventListener
+internal class WrappedRegisteredEventListener(IRegisteredEventListener innerObject, object o) : IRegisteredEventListener
 {
-    private readonly IRegisteredEventListener _innerObject;
-    private readonly object _object;
-
-    public WrappedRegisteredEventListener(IRegisteredEventListener innerObject, object o)
-    {
-        _innerObject = innerObject;
-        _object = o;
-    }
-
     public Type EventType
     {
-        get => _innerObject.EventType;
+        get => innerObject.EventType;
     }
 
     public EventPriority Priority
     {
-        get => _innerObject.Priority;
+        get => innerObject.Priority;
     }
 
     public ValueTask InvokeAsync(object? eventHandler, object @event, IServiceProvider provider)
     {
-        return _innerObject.InvokeAsync(_object, @event, provider);
+        return innerObject.InvokeAsync(o, @event, provider);
     }
 }

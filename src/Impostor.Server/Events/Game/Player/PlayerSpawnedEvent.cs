@@ -5,18 +5,12 @@ using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Events.Player;
 
-public class PlayerSpawnedEvent : IPlayerSpawnedEvent
+public class PlayerSpawnedEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl)
+    : IPlayerSpawnedEvent
 {
-    public PlayerSpawnedEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl)
-    {
-        Game = game;
-        ClientPlayer = clientPlayer;
-        PlayerControl = playerControl;
-    }
+    public IGame Game { get; } = game;
 
-    public IGame Game { get; }
+    public IClientPlayer ClientPlayer { get; } = clientPlayer;
 
-    public IClientPlayer ClientPlayer { get; }
-
-    public IInnerPlayerControl PlayerControl { get; }
+    public IInnerPlayerControl PlayerControl { get; } = playerControl;
 }

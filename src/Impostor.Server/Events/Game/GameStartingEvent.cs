@@ -3,12 +3,7 @@ using Impostor.Api.Games;
 
 namespace Impostor.Server.Events;
 
-public class GameStartingEvent : IGameStartingEvent
+public class GameStartingEvent(IGame game) : IGameStartingEvent
 {
-    public GameStartingEvent(IGame game)
-    {
-        Game = game;
-    }
-
-    public IGame Game { get; }
+    public IGame Game { get; } = game;
 }

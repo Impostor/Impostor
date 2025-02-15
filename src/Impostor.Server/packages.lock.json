@@ -388,6 +388,12 @@
           "NextFast.Hazel.Abstractions": "[1.0.1-dev, )",
           "Serilog": "[4.2.1-dev-02340, )"
         }
+      },
+      "impostor.api.extension": {
+        "type": "Project",
+        "dependencies": {
+          "Impostor.Api": "[1.10.2-dev, )"
+        }
       }
     },
     "net9.0/linux-arm": {
