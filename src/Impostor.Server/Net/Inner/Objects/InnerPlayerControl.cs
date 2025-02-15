@@ -26,13 +26,15 @@ namespace Impostor.Server.Net.Inner.Objects;
 internal partial class InnerPlayerControl : InnerNetObject
 {
     private static readonly byte ColorsCount = (byte)Enum.GetValues<ColorType>().Length;
+    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IEventManager _eventManager;
 
     private readonly Game _game;
     private readonly ILogger<InnerPlayerControl> _logger;
-    private readonly IEventManager _eventManager;
-    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public InnerPlayerControl(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager, IDateTimeProvider dateTimeProvider) : base(customMessageManager, game)
+    public InnerPlayerControl(ICustomMessageManager<ICustomRpc> customMessageManager, Game game,
+        ILogger<InnerPlayerControl> logger, IServiceProvider serviceProvider, IEventManager eventManager,
+        IDateTimeProvider dateTimeProvider) : base(customMessageManager, game)
     {
         _game = game;
         _logger = logger;
@@ -51,18 +53,15 @@ internal partial class InnerPlayerControl : InnerNetObject
 
     public bool IsNew { get; private set; }
 
-    public byte PlayerId { get; private set; }
-
     public InnerPlayerPhysics Physics { get; }
 
     public InnerCustomNetworkTransform NetworkTransform { get; }
 
-    [AllowNull]
-    public InnerPlayerInfo PlayerInfo { get; internal set; }
+    [AllowNull] public InnerPlayerInfo PlayerInfo { get; internal set; }
 
-    internal Queue<string> RequestedPlayerName { get; } = new Queue<string>();
+    internal Queue<string> RequestedPlayerName { get; } = new();
 
-    internal Queue<ColorType> RequestedColorId { get; } = new Queue<ColorType>();
+    internal Queue<ColorType> RequestedColorId { get; } = new();
 
     /// <summary> Gets or sets target that was set by the last CheckMurder RPC. </summary>
     internal IInnerPlayerControl? IsMurdering { get; set; }
@@ -78,7 +77,8 @@ internal partial class InnerPlayerControl : InnerNetObject
             // HnS doesn't have guardian angels
             if (Game.Options is NormalGameOptions normalGameOptions && ProtectedOn != null)
             {
-                var guardianAngelOptions = (GuardianAngelRoleOptions)normalGameOptions.RoleOptions.Roles[RoleTypes.GuardianAngel].RoleOptions;
+                var guardianAngelOptions =
+                    (GuardianAngelRoleOptions)normalGameOptions.RoleOptions.Roles[RoleTypes.GuardianAngel].RoleOptions;
                 var protectionExpiresAt = ProtectedOn.Value.AddSeconds(guardianAngelOptions.ProtectionDurationSeconds);
                 return protectionExpiresAt >= _dateTimeProvider.UtcNow;
             }
@@ -87,12 +87,15 @@ internal partial class InnerPlayerControl : InnerNetObject
         }
     }
 
+    public byte PlayerId { get; private set; }
+
     public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
     {
         throw new NotImplementedException();
     }
 
-    public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+    public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader,
+        bool initialState)
     {
         if (!await ValidateHost(CheatContext.Deserialize, sender))
         {
@@ -107,7 +110,8 @@ internal partial class InnerPlayerControl : InnerNetObject
         PlayerId = reader.ReadByte();
     }
 
-    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
+        IMessageReader reader)
     {
         switch (call)
         {
@@ -167,7 +171,7 @@ internal partial class InnerPlayerControl : InnerNetObject
                     return false;
                 }
 
-                Rpc06SetName.Deserialize(reader, out var _, out var name);
+                Rpc06SetName.Deserialize(reader, out _, out var name);
                 return await HandleSetName(sender, name);
             }
 
@@ -191,7 +195,7 @@ internal partial class InnerPlayerControl : InnerNetObject
                     return false;
                 }
 
-                Rpc08SetColor.Deserialize(reader, out var _, out var color);
+                Rpc08SetColor.Deserialize(reader, out _, out var color);
                 return await HandleSetColor(sender, color);
             }
 
@@ -383,7 +387,7 @@ internal partial class InnerPlayerControl : InnerNetObject
                     return false;
                 }
 
-                Rpc44SetRole.Deserialize(reader, out var role, out var _);
+                Rpc44SetRole.Deserialize(reader, out var role, out _);
 
                 if (role is RoleTypes.ImpostorGhost or RoleTypes.CrewmateGhost or RoleTypes.GuardianAngel)
                 {
@@ -393,7 +397,8 @@ internal partial class InnerPlayerControl : InnerNetObject
 
                 PlayerInfo.RoleType = role;
 
-                if (Game.GameState == GameStates.Starting && Game.Players.All(clientPlayer => clientPlayer.Character?.PlayerInfo.RoleType != null))
+                if (Game.GameState == GameStates.Starting && Game.Players.All(clientPlayer =>
+                        clientPlayer.Character?.PlayerInfo.RoleType != null))
                 {
                     await Game.StartedAsync();
                 }
@@ -607,7 +612,8 @@ internal partial class InnerPlayerControl : InnerNetObject
         }
         else
         {
-            _logger.LogWarning($"Client sent {nameof(RpcCalls.CompleteTask)} with a taskIndex that is not in their {nameof(InnerPlayerInfo)}");
+            _logger.LogWarning(
+                $"Client sent {nameof(RpcCalls.CompleteTask)} with a taskIndex that is not in their {nameof(InnerPlayerInfo)}");
         }
     }
 
@@ -615,7 +621,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     {
         if (Game.GameState == GameStates.Started)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.GameFlow, "Client tried to set a name midgame"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.GameFlow,
+                    "Client tried to set a name midgame"))
             {
                 return false;
             }
@@ -623,7 +630,8 @@ internal partial class InnerPlayerControl : InnerNetObject
 
         if (name.Length > 10)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.NameLimits, "Client sent name exceeding 10 characters"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.NameLimits,
+                    "Client sent name exceeding 10 characters"))
             {
                 return false;
             }
@@ -631,7 +639,8 @@ internal partial class InnerPlayerControl : InnerNetObject
 
         if (string.IsNullOrWhiteSpace(name) || !name.All(TextBox.IsCharAllowed))
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.NameLimits, "Client sent name containing illegal characters"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.NameLimits,
+                    "Client sent name containing illegal characters"))
             {
                 return false;
             }
@@ -639,7 +648,8 @@ internal partial class InnerPlayerControl : InnerNetObject
 
         if (sender.Client.Name != name)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.NameLimits, "Client sent name not matching his name from handshake"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckName, CheatCategory.NameLimits,
+                    "Client sent name not matching his name from handshake"))
             {
                 return false;
             }
@@ -654,7 +664,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     {
         if (Game.GameState == GameStates.Started)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.GameFlow, "Client tried to set a name midgame"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.GameFlow,
+                    "Client tried to set a name midgame"))
             {
                 return false;
             }
@@ -662,9 +673,11 @@ internal partial class InnerPlayerControl : InnerNetObject
 
         if (sender.IsOwner(this))
         {
-            if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == name))
+            if (Game.Players.Any(x =>
+                    x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == name))
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits, "Client sent name that is already used"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits,
+                        "Client sent name that is already used"))
                 {
                     return false;
                 }
@@ -672,7 +685,8 @@ internal partial class InnerPlayerControl : InnerNetObject
 
             if (sender.Client.Name != name)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits, "Client sent name not matching his name from handshake"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits,
+                        "Client sent name not matching his name from handshake"))
                 {
                     return false;
                 }
@@ -685,14 +699,17 @@ internal partial class InnerPlayerControl : InnerNetObject
                 var expected = RequestedPlayerName.Dequeue();
                 var requested = expected;
 
-                if (Game.Players.Any(x => x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == expected))
+                if (Game.Players.Any(x =>
+                        x.Character != null && x.Character != this && x.Character.PlayerInfo.PlayerName == expected))
                 {
                     var i = 1;
                     while (true)
                     {
                         var text = expected + " " + i;
 
-                        if (Game.Players.All(x => x.Character == null || x.Character == this || x.Character.PlayerInfo.PlayerName != text))
+                        if (Game.Players.All(x =>
+                                x.Character == null || x.Character == this ||
+                                x.Character.PlayerInfo.PlayerName != text))
                         {
                             expected = text;
                             break;
@@ -716,7 +733,8 @@ internal partial class InnerPlayerControl : InnerNetObject
             }
             else
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits, $"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.SetName, CheatCategory.NameLimits,
+                        $"Client sent {nameof(RpcCalls.SetName)} for a player that didn't request it"))
                 {
                     return false;
                 }
@@ -732,7 +750,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     {
         if (Game.GameState == GameStates.Started)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.GameFlow, "Client tried to ask for a color midgame"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.GameFlow,
+                    "Client tried to ask for a color midgame"))
             {
                 return false;
             }
@@ -740,7 +759,8 @@ internal partial class InnerPlayerControl : InnerNetObject
 
         if ((byte)color >= ColorsCount)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.ProtocolExtension, "Client sent unknown color"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckColor, CheatCategory.ProtocolExtension,
+                    "Client sent unknown color"))
             {
                 return false;
             }
@@ -755,7 +775,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     {
         if (Game.GameState == GameStates.Started)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client tried to set a color midgame"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow,
+                    "Client tried to set a color midgame"))
             {
                 return false;
             }
@@ -763,7 +784,8 @@ internal partial class InnerPlayerControl : InnerNetObject
 
         if ((byte)color >= ColorsCount)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ProtocolExtension, "Client sent unknown color"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ProtocolExtension,
+                    "Client sent unknown color"))
             {
                 return false;
             }
@@ -773,7 +795,8 @@ internal partial class InnerPlayerControl : InnerNetObject
         {
             if (Game.IsColorUsed(color, this))
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client sent a color that is already used"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits,
+                        "Client sent a color that is already used"))
                 {
                     return false;
                 }
@@ -787,7 +810,8 @@ internal partial class InnerPlayerControl : InnerNetObject
 
                 if (Game.IsColorUsed(color, this))
                 {
-                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits, "Client selected a color that is already used"))
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.ColorLimits,
+                            "Client selected a color that is already used"))
                     {
                         return false;
                     }
@@ -836,7 +860,8 @@ internal partial class InnerPlayerControl : InnerNetObject
             }
             else
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow, "Client sent SetColor for a player that didn't request it"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.SetColor, CheatCategory.GameFlow,
+                        "Client sent SetColor for a player that didn't request it"))
                 {
                     return false;
                 }
@@ -851,7 +876,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     private async ValueTask<bool> HandleSetHat(ClientPlayer sender, string hat, byte nextRpcSequenceId)
     {
         if (Game.GameState == GameStates.Started &&
-            await sender.Client.ReportCheatAsync(RpcCalls.SetHatStr, CheatCategory.GameFlow, "Client tried to change hat while not in lobby"))
+            await sender.Client.ReportCheatAsync(RpcCalls.SetHatStr, CheatCategory.GameFlow,
+                "Client tried to change hat while not in lobby"))
         {
             return false;
         }
@@ -865,7 +891,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     private async ValueTask<bool> HandleSetSkin(ClientPlayer sender, string skin, byte nextRpcSequenceId)
     {
         if (Game.GameState == GameStates.Started &&
-            await sender.Client.ReportCheatAsync(RpcCalls.SetSkinStr, CheatCategory.GameFlow, "Client tried to change skin while not in lobby"))
+            await sender.Client.ReportCheatAsync(RpcCalls.SetSkinStr, CheatCategory.GameFlow,
+                "Client tried to change skin while not in lobby"))
         {
             return false;
         }
@@ -879,7 +906,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     private async ValueTask<bool> HandleSetVisor(ClientPlayer sender, string visor, byte nextRpcSequenceId)
     {
         if (Game.GameState == GameStates.Started &&
-            await sender.Client.ReportCheatAsync(RpcCalls.SetVisorStr, CheatCategory.GameFlow, "Client tried to change visor while not in lobby"))
+            await sender.Client.ReportCheatAsync(RpcCalls.SetVisorStr, CheatCategory.GameFlow,
+                "Client tried to change visor while not in lobby"))
         {
             return false;
         }
@@ -893,7 +921,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     private async ValueTask<bool> HandleSetNamePlate(ClientPlayer sender, string namePlate, byte nextRpcSequenceId)
     {
         if (Game.GameState == GameStates.Started &&
-            await sender.Client.ReportCheatAsync(RpcCalls.SetNamePlateStr, CheatCategory.GameFlow, "Client tried to change skin while not in lobby"))
+            await sender.Client.ReportCheatAsync(RpcCalls.SetNamePlateStr, CheatCategory.GameFlow,
+                "Client tried to change skin while not in lobby"))
         {
             return false;
         }
@@ -907,7 +936,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     private async ValueTask<bool> HandleSetLevel(ClientPlayer sender, uint level)
     {
         if (Game.GameState == GameStates.Started &&
-            await sender.Client.ReportCheatAsync(RpcCalls.SetLevel, CheatCategory.GameFlow, "Client tried to set level while not in game"))
+            await sender.Client.ReportCheatAsync(RpcCalls.SetLevel, CheatCategory.GameFlow,
+                "Client tried to set level while not in game"))
         {
             return false;
         }
@@ -930,7 +960,8 @@ internal partial class InnerPlayerControl : InnerNetObject
             if (!_game.IsHostAuthoritive)
             {
                 // Host-only mods may desync the kill timeout between players
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow, "Client tried to murder too fast"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow,
+                        "Client tried to murder too fast"))
                 {
                     return false;
                 }
@@ -941,13 +972,15 @@ internal partial class InnerPlayerControl : InnerNetObject
         // killing role (like an sheriff). So this needs to be allowed if the host requested authority.
         if (target == null || (target.PlayerInfo.IsImpostor && !_game.IsHostAuthoritive))
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow, "Client tried to murder invalid target"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow,
+                    "Client tried to murder invalid target"))
             {
                 return false;
             }
         }
 
-        PlayerInfo.LastMurder = _dateTimeProvider.UtcNow - TimeSpan.FromMilliseconds(sender.Client.Connection.AveragePing);
+        PlayerInfo.LastMurder =
+            _dateTimeProvider.UtcNow - TimeSpan.FromMilliseconds(sender.Client.Connection.AveragePing);
         IsMurdering = target;
 
         // Check if host authority mode is on
@@ -974,11 +1007,13 @@ internal partial class InnerPlayerControl : InnerNetObject
         return false;
     }
 
-    private async ValueTask<bool> HandleMurderPlayer(ClientPlayer sender, InnerPlayerControl? target, MurderResultFlags result)
+    private async ValueTask<bool> HandleMurderPlayer(ClientPlayer sender, InnerPlayerControl? target,
+        MurderResultFlags result)
     {
         if (!_game.IsHostAuthoritive)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, CheatCategory.GameFlow, "Client tried to murder directly"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, CheatCategory.GameFlow,
+                    "Client tried to murder directly"))
             {
                 return false;
             }
@@ -986,7 +1021,8 @@ internal partial class InnerPlayerControl : InnerNetObject
 
         if (target == null)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, CheatCategory.GameFlow, "Client tried to murder invalid target"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, CheatCategory.GameFlow,
+                    "Client tried to murder invalid target"))
             {
                 return false;
             }
@@ -995,7 +1031,8 @@ internal partial class InnerPlayerControl : InnerNetObject
         // If the host is also the impostor that committed the murder, CheckMurder is actually sent *after* the MurderPlayer RPC
         if (sender.Character != this && target != IsMurdering)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, CheatCategory.GameFlow, "Host tried to murder incorrect target"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.MurderPlayer, CheatCategory.GameFlow,
+                    "Host tried to murder incorrect target"))
             {
                 return false;
             }
@@ -1030,7 +1067,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     {
         if (target == null)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckProtect, CheatCategory.Target, "Client tried to protect invalid target"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.CheckProtect, CheatCategory.Target,
+                    "Client tried to protect invalid target"))
             {
                 return false;
             }
@@ -1059,13 +1097,15 @@ internal partial class InnerPlayerControl : InnerNetObject
     private async ValueTask HandleStartMeeting(byte targetId)
     {
         var deadPlayer = Game.GameNet.GameData!.GetPlayerById(targetId)?.Controller;
-        await _eventManager.CallAsync(new PlayerStartMeetingEvent(Game, Game.GetClientPlayer(this.OwnerId)!, this, deadPlayer));
+        await _eventManager.CallAsync(new PlayerStartMeetingEvent(Game, Game.GetClientPlayer(OwnerId)!, this,
+            deadPlayer));
     }
 
     private async ValueTask<bool> HandleSetPet(ClientPlayer sender, string pet, byte nextRpcSequenceId)
     {
         if (Game.GameState == GameStates.Started &&
-            await sender.Client.ReportCheatAsync(RpcCalls.SetPetStr, CheatCategory.GameFlow, "Client tried to change pet while not in lobby"))
+            await sender.Client.ReportCheatAsync(RpcCalls.SetPetStr, CheatCategory.GameFlow,
+                "Client tried to change pet while not in lobby"))
         {
             return false;
         }
@@ -1080,7 +1120,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     {
         if (!sender.IsHost && startCounter != -1)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.SetStartCounter, CheatCategory.MustBeHost, "Client tried to set start counter as a non-host"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.SetStartCounter, CheatCategory.MustBeHost,
+                    "Client tried to set start counter as a non-host"))
             {
                 return false;
             }
@@ -1112,7 +1153,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     {
         if (!_game.IsHostAuthoritive)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.StartVanish, CheatCategory.GameFlow, "Client tried to send StartVanish directly"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.StartVanish, CheatCategory.GameFlow,
+                    "Client tried to send StartVanish directly"))
             {
                 return false;
             }
@@ -1137,7 +1179,8 @@ internal partial class InnerPlayerControl : InnerNetObject
     {
         if (!_game.IsHostAuthoritive)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.StartAppear, CheatCategory.GameFlow, "Client tried to send StartAppear directly"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.StartAppear, CheatCategory.GameFlow,
+                    "Client tried to send StartAppear directly"))
             {
                 return false;
             }

@@ -41,8 +41,8 @@ internal class TemporaryEventRegister
 
     private class UnregisterEvent : IDisposable
     {
-        private readonly TemporaryEventRegister _register;
         private readonly int _id;
+        private readonly TemporaryEventRegister _register;
 
         public UnregisterEvent(TemporaryEventRegister register, int id)
         {

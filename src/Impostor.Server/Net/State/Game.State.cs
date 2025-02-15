@@ -79,7 +79,8 @@ internal partial class Game
 
             if (player.Client.Connection.IsConnected && player.Client.Connection is HazelConnection hazel)
             {
-                _logger.LogInformation("{0} - Player {1} ({2}) kept connection open after leaving, disposing.", Code, player.Client.Name, playerId);
+                _logger.LogInformation("{0} - Player {1} ({2}) kept connection open after leaving, disposing.", Code,
+                    player.Client.Name, playerId);
                 await player.Client.DisconnectAsync(isBan ? DisconnectReason.Banned : DisconnectReason.Kicked);
             }
         });

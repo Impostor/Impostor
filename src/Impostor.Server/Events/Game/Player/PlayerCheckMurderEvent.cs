@@ -8,7 +8,8 @@ namespace Impostor.Server.Events.Player;
 
 public class PlayerCheckMurderEvent : IPlayerCheckMurderEvent
 {
-    public PlayerCheckMurderEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, IInnerPlayerControl victim, MurderResultFlags result)
+    public PlayerCheckMurderEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl,
+        IInnerPlayerControl victim, MurderResultFlags result)
     {
         Game = game;
         ClientPlayer = clientPlayer;

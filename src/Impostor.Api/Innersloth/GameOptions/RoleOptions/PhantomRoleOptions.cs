@@ -9,11 +9,20 @@ public class PhantomRoleOptions : IRoleOptions
 
     public byte Version { get; }
 
-    public RoleTypes Type => RoleTypes.Phantom;
-
     public byte Cooldown { get; set; } = 15;
 
     public byte Duration { get; set; } = 30;
+
+    public RoleTypes Type
+    {
+        get => RoleTypes.Phantom;
+    }
+
+    public void Serialize(IMessageWriter writer)
+    {
+        writer.Write(Cooldown);
+        writer.Write(Duration);
+    }
 
     public static PhantomRoleOptions Deserialize(IMessageReader reader, byte version)
     {
@@ -23,11 +32,5 @@ public class PhantomRoleOptions : IRoleOptions
         options.Duration = reader.ReadByte();
 
         return options;
-    }
-
-    public void Serialize(IMessageWriter writer)
-    {
-        writer.Write(Cooldown);
-        writer.Write(Duration);
     }
 }

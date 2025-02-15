@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <CodeAnalysisRuleSet>../ProjectRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
     <IncludeSymbols>true</IncludeSymbols>
@@ -17,26 +16,24 @@
     <PackageProjectUrl>https://github.com/Impostor/Impostor</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Impostor/Impostor</RepositoryUrl>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../../docs/images/logo_64.png" Pack="true" PackagePath="\" />
+    <None Include="../../docs/images/logo_64.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.1" />
-    <PackageReference Include="NextFast.Hazel.Abstractions" Version="1.0.1-dev" />
-    <PackageReference Include="Serilog" Version="4.2.1-dev-02337" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.2"/>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.2"/>
+    <PackageReference Include="NextFast.Hazel.Abstractions" Version="1.0.1-dev"/>
+    <PackageReference Include="Serilog" Version="4.2.1-dev-02340"/>
 
-    <ProjectReference Include="..\Impostor.Api.Innersloth.Generator\Impostor.Api.Innersloth.Generator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
-    <AdditionalFiles Include="Innersloth/Data/**/*.json" />
+    <ProjectReference Include="..\Impostor.Api.Innersloth.Generator\Impostor.Api.Innersloth.Generator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer"/>
+    <AdditionalFiles Include="Innersloth/Data/**/*.json"/>
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Config\DebugConfig.cs" />
+    <Compile Remove="Config\DebugConfig.cs"/>
   </ItemGroup>
 
 </Project>

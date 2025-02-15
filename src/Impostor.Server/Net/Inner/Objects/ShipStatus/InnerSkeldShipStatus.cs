@@ -10,7 +10,8 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus;
 
 internal class InnerSkeldShipStatus : InnerShipStatus, IInnerSkeldShipStatus
 {
-    public InnerSkeldShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game, MapTypes.Skeld)
+    public InnerSkeldShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(
+        customMessageManager, game, MapTypes.Skeld)
     {
     }
 

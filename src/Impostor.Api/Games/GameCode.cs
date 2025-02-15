@@ -21,15 +21,30 @@ public readonly struct GameCode : IEquatable<GameCode>
 
     public int Value { get; }
 
-    public bool IsInvalid => Value == -1;
+    public bool IsInvalid
+    {
+        get => Value == -1;
+    }
 
-    public static implicit operator string(GameCode code) => code.Code;
+    public static implicit operator string(GameCode code)
+    {
+        return code.Code;
+    }
 
-    public static implicit operator int(GameCode code) => code.Value;
+    public static implicit operator int(GameCode code)
+    {
+        return code.Value;
+    }
 
-    public static implicit operator GameCode(string code) => From(code);
+    public static implicit operator GameCode(string code)
+    {
+        return From(code);
+    }
 
-    public static implicit operator GameCode(int value) => From(value);
+    public static implicit operator GameCode(int value)
+    {
+        return From(value);
+    }
 
     public static bool operator ==(GameCode left, GameCode right)
     {
@@ -46,9 +61,15 @@ public readonly struct GameCode : IEquatable<GameCode>
         return new GameCode(GameCodeParser.GenerateCode(6));
     }
 
-    public static GameCode From(int value) => new GameCode(value);
+    public static GameCode From(int value)
+    {
+        return new GameCode(value);
+    }
 
-    public static GameCode From(string value) => new GameCode(value);
+    public static GameCode From(string value)
+    {
+        return new GameCode(value);
+    }
 
     /// <inheritdoc />
     public bool Equals(GameCode other)

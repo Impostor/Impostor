@@ -3,7 +3,8 @@ using System.Numerics;
 
 namespace Impostor.Api.Innersloth;
 
-public readonly struct GameVersion : IEquatable<GameVersion>, IComparable<GameVersion>, IComparisonOperators<GameVersion, GameVersion, bool>
+public readonly struct GameVersion : IEquatable<GameVersion>, IComparable<GameVersion>,
+    IComparisonOperators<GameVersion, GameVersion, bool>
 {
     private const int YearMask = 25000;
     private const int MonthMask = 1800;
@@ -18,41 +19,68 @@ public readonly struct GameVersion : IEquatable<GameVersion>, IComparable<GameVe
 
     public GameVersion(int year, int month, int day, int revision = 0)
     {
-        Value = (year * YearMask) + (month * MonthMask) + (day * DayMask) + revision;
+        Value = year * YearMask + month * MonthMask + day * DayMask + revision;
     }
 
     public int Value { get; }
 
-    public int Year => Value / YearMask;
+    public int Year
+    {
+        get => Value / YearMask;
+    }
 
-    public int Month => (Value % YearMask) / MonthMask;
+    public int Month
+    {
+        get => Value % YearMask / MonthMask;
+    }
 
-    public int Day => ((Value % YearMask) % MonthMask) / DayMask;
+    public int Day
+    {
+        get => Value % YearMask % MonthMask / DayMask;
+    }
 
-    public int Revision => Value % DayMask;
+    public int Revision
+    {
+        get => Value % DayMask;
+    }
 
     /// <summary>
-    /// Gets a value indicating whether the DisableServerAuthority flag is present.
+    ///     Gets a value indicating whether the DisableServerAuthority flag is present.
     /// </summary>
     public bool HasDisableServerAuthorityFlag
     {
-        get
-        {
-            return Revision >= DisableServerAuthorityFlag;
-        }
+        get => Revision >= DisableServerAuthorityFlag;
     }
 
-    public static bool operator ==(GameVersion left, GameVersion right) => left.Value == right.Value;
+    public static bool operator ==(GameVersion left, GameVersion right)
+    {
+        return left.Value == right.Value;
+    }
 
-    public static bool operator !=(GameVersion left, GameVersion right) => left.Value != right.Value;
+    public static bool operator !=(GameVersion left, GameVersion right)
+    {
+        return left.Value != right.Value;
+    }
 
-    public static bool operator >(GameVersion left, GameVersion right) => left.Value > right.Value;
+    public static bool operator >(GameVersion left, GameVersion right)
+    {
+        return left.Value > right.Value;
+    }
 
-    public static bool operator >=(GameVersion left, GameVersion right) => left.Value >= right.Value;
+    public static bool operator >=(GameVersion left, GameVersion right)
+    {
+        return left.Value >= right.Value;
+    }
 
-    public static bool operator <(GameVersion left, GameVersion right) => left.Value < right.Value;
+    public static bool operator <(GameVersion left, GameVersion right)
+    {
+        return left.Value < right.Value;
+    }
 
-    public static bool operator <=(GameVersion left, GameVersion right) => left.Value <= right.Value;
+    public static bool operator <=(GameVersion left, GameVersion right)
+    {
+        return left.Value <= right.Value;
+    }
 
     public void GetComponents(out int year, out int month, out int day, out int revision)
     {
@@ -66,7 +94,7 @@ public readonly struct GameVersion : IEquatable<GameVersion>, IComparable<GameVe
     }
 
     /// <summary>
-    /// Normalizes this game version by removing all the special flags.
+    ///     Normalizes this game version by removing all the special flags.
     /// </summary>
     /// <returns>This GameVersion but stripped of special flags.</returns>
     public GameVersion Normalize()

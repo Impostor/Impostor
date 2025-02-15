@@ -24,15 +24,15 @@ namespace Impostor.Server.Net.State;
 
 internal partial class Game
 {
-    private readonly ILogger<Game> _logger;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly GameManager _gameManager;
-    private readonly ClientManager _clientManager;
-    private readonly ConcurrentDictionary<int, ClientPlayer> _players;
     private readonly HashSet<IPAddress> _bannedIps;
-    private readonly IEventManager _eventManager;
-    private readonly ICompatibilityManager _compatibilityManager;
+    private readonly ClientManager _clientManager;
     private readonly CompatibilityConfig _compatibilityConfig;
+    private readonly ICompatibilityManager _compatibilityManager;
+    private readonly IEventManager _eventManager;
+    private readonly GameManager _gameManager;
+    private readonly ILogger<Game> _logger;
+    private readonly ConcurrentDictionary<int, ClientPlayer> _players;
+    private readonly IServiceProvider _serviceProvider;
     private readonly TimeoutConfig _timeoutConfig;
 
     public Game(
@@ -68,6 +68,13 @@ internal partial class Game
         Items = new ConcurrentDictionary<object, object>();
     }
 
+    public ClientPlayer? Host
+    {
+        get => _players.GetValueOrDefault(HostId);
+    }
+
+    internal GameNet GameNet { get; }
+
     public GameCode Code { get; }
 
     public bool IsPublic { get; private set; }
@@ -84,15 +91,25 @@ internal partial class Game
 
     public IDictionary<object, object> Items { get; }
 
-    public int PlayerCount => _players.Count;
+    public int PlayerCount
+    {
+        get => _players.Count;
+    }
 
-    public ClientPlayer? Host => _players.GetValueOrDefault(HostId);
+    public IEnumerable<IClientPlayer> Players
+    {
+        get => _players.Select(p => p.Value);
+    }
 
-    public IEnumerable<IClientPlayer> Players => _players.Select(p => p.Value);
+    public bool IsHostAuthoritive
+    {
+        get => Host != null && Host.Client.GameVersion.HasDisableServerAuthorityFlag;
+    }
 
-    public bool IsHostAuthoritive => Host != null && Host.Client.GameVersion.HasDisableServerAuthorityFlag;
-
-    internal GameNet GameNet { get; }
+    public IClientPlayer? GetClientPlayer(int clientId)
+    {
+        return _players.TryGetValue(clientId, out var clientPlayer) ? clientPlayer : null;
+    }
 
     public bool TryGetPlayer(int id, [MaybeNullWhen(false)] out ClientPlayer player)
     {
@@ -106,11 +123,6 @@ internal partial class Game
         return false;
     }
 
-    public IClientPlayer? GetClientPlayer(int clientId)
-    {
-        return _players.TryGetValue(clientId, out var clientPlayer) ? clientPlayer : null;
-    }
-
     internal async ValueTask StartedAsync()
     {
         if (GameState == GameStates.Starting)
@@ -119,7 +131,8 @@ internal partial class Game
             {
                 if (GameNet.ShipStatus != null)
                 {
-                    await player.Character!.NetworkTransform.SetPositionAsync(player, GameNet.ShipStatus.GetSpawnLocation(player.Character, PlayerCount, true));
+                    await player.Character!.NetworkTransform.SetPositionAsync(player,
+                        GameNet.ShipStatus.GetSpawnLocation(player.Character, PlayerCount, true));
                 }
             }
 
@@ -135,7 +148,8 @@ internal partial class Game
     /// <returns>True if there is player other than exceptBy that uses that color.</returns>
     internal bool IsColorUsed(ColorType color, IInnerPlayerControl? exceptBy = null)
     {
-        return Players.Any(p => p.Character != null && p.Character != exceptBy && p.Character.PlayerInfo.CurrentOutfit.Color == color);
+        return Players.Any(p =>
+            p.Character != null && p.Character != exceptBy && p.Character.PlayerInfo.CurrentOutfit.Color == color);
     }
 
     private ValueTask BroadcastJoinMessage(IMessageWriter message, bool clear, ClientPlayer player)

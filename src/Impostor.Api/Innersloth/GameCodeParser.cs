@@ -91,9 +91,9 @@ public static class GameCodeParser
             V2[a % 26],
             V2[a / 26],
             V2[b % 26],
-            V2[(b / 26) % 26],
-            V2[(b / (26 * 26)) % 26],
-            V2[(b / (26 * 26 * 26)) % 26],
+            V2[b / 26 % 26],
+            V2[b / (26 * 26) % 26],
+            V2[b / (26 * 26 * 26) % 26],
         });
     }
 
@@ -106,8 +106,8 @@ public static class GameCodeParser
         var e = V2Map[code[4] - 65];
         var f = V2Map[code[5] - 65];
 
-        var one = (a + (26 * b)) & 0x3FF;
-        var two = c + (26 * (d + (26 * (e + (26 * f)))));
+        var one = (a + 26 * b) & 0x3FF;
+        var two = c + 26 * (d + 26 * (e + 26 * f));
 
         return (int)(one | ((two << 10) & 0x3FFFFC00) | 0x80000000);
     }

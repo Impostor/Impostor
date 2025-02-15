@@ -25,6 +25,7 @@ internal static class Extensions
 
     public static string ToCSharpString(this Vector2 value)
     {
-        return $"new Vector2({value.X.ToString(CultureInfo.InvariantCulture)}f, {value.Y.ToString(CultureInfo.InvariantCulture)}f)";
+        return
+            $"new Vector2({value.X.ToString(CultureInfo.InvariantCulture)}f, {value.Y.ToString(CultureInfo.InvariantCulture)}f)";
     }
 }

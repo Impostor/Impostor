@@ -19,7 +19,8 @@ internal partial class Game
         }
     }
 
-    public async ValueTask SendToAllExceptAsync(IMessageWriter writer, int senderId, LimboStates states = LimboStates.NotLimbo)
+    public async ValueTask SendToAllExceptAsync(IMessageWriter writer, int senderId,
+        LimboStates states = LimboStates.NotLimbo)
     {
         foreach (var connection in GetConnections(x =>
                      x.Limbo.HasFlag(states) &&
@@ -37,7 +38,8 @@ internal partial class Game
         }
     }
 
-    public IMessageWriter StartRpc(uint targetNetId, RpcCalls callId, int? targetClientId = null, MessageType type = MessageType.Reliable)
+    public IMessageWriter StartRpc(uint targetNetId, RpcCalls callId, int? targetClientId = null,
+        MessageType type = MessageType.Reliable)
     {
         var writer = StartGameData(targetClientId, type);
 

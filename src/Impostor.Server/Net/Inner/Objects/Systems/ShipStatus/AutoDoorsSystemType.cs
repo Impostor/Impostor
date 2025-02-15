@@ -32,7 +32,7 @@ public class AutoDoorsSystemType : ISystemType
 
             for (var i = 0; i < _doors.Count; i++)
             {
-                if ((num & 1 << i) != 0)
+                if ((num & (1 << i)) != 0)
                 {
                     _doors[i] = reader.ReadBoolean();
                 }

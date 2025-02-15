@@ -4,7 +4,8 @@ namespace Impostor.Api.Net.Messages.S2C;
 
 public static class Message07JoinedGameS2C
 {
-    public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId, IClientPlayer[] otherPlayers)
+    public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId,
+        IClientPlayer[] otherPlayers)
     {
         if (clear)
         {

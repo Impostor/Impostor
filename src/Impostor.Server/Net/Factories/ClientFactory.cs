@@ -15,9 +15,11 @@ internal class ClientFactory<TClient> : IClientFactory
         _serviceProvider = serviceProvider;
     }
 
-    public ClientBase Create(IHazelConnection connection, string name, GameVersion clientVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData)
+    public ClientBase Create(IHazelConnection connection, string name, GameVersion clientVersion, Language language,
+        QuickChatModes chatMode, PlatformSpecificData platformSpecificData)
     {
-        var client = ActivatorUtilities.CreateInstance<TClient>(_serviceProvider, name, clientVersion, language, chatMode, platformSpecificData, connection);
+        var client = ActivatorUtilities.CreateInstance<TClient>(_serviceProvider, name, clientVersion, language,
+            chatMode, platformSpecificData, connection);
         connection.Client = client;
         return client;
     }

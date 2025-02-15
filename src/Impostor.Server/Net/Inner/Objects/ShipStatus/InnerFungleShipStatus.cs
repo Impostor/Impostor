@@ -9,7 +9,8 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus;
 
 internal class InnerFungleShipStatus : InnerShipStatus
 {
-    public InnerFungleShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game, MapTypes.Fungle)
+    public InnerFungleShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(
+        customMessageManager, game, MapTypes.Fungle)
     {
     }
 

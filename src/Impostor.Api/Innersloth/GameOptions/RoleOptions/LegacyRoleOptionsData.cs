@@ -24,7 +24,7 @@ public class LegacyRoleOptionsData
 
     public byte EngineerInVentMaxTime { get; set; } = 15;
 
-    public Dictionary<RoleTypes, RoleRate> RoleRates { get; } = new Dictionary<RoleTypes, RoleRate>();
+    public Dictionary<RoleTypes, RoleRate> RoleRates { get; } = new();
 
     public static LegacyRoleOptionsData Deserialize(IMessageReader reader)
     {

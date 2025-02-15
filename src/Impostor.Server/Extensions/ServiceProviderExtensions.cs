@@ -14,7 +14,8 @@ public static class ServiceProviderExtensions
         services.AddSingleton(serviceProvider =>
         {
             var provider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
-            var policy = ActivatorUtilities.CreateInstance<PlayerMovementEvent.PlayerMovementEventObjectPolicy>(serviceProvider);
+            var policy =
+                ActivatorUtilities.CreateInstance<PlayerMovementEvent.PlayerMovementEventObjectPolicy>(serviceProvider);
             return provider.Create(policy);
         });
     }

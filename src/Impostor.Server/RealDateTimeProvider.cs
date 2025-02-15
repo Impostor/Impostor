@@ -5,5 +5,8 @@ namespace Impostor.Server;
 
 public class RealDateTimeProvider : IDateTimeProvider
 {
-    public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
+    public DateTimeOffset UtcNow
+    {
+        get => DateTimeOffset.UtcNow;
+    }
 }

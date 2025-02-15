@@ -22,14 +22,14 @@ namespace Impostor.Server.Net.Manager;
 
 internal class GameManager : IGameManager
 {
-    private readonly ILogger<GameManager> _logger;
-    private readonly ConcurrentDictionary<int, Game> _games;
     private readonly CompatibilityConfig _compatibilityConfig;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly ICompatibilityManager _compatibilityManager;
     private readonly IEventManager _eventManager;
     private readonly IGameCodeFactory _gameCodeFactory;
-    private readonly ICompatibilityManager _compatibilityManager;
+    private readonly ConcurrentDictionary<int, Game> _games;
     private readonly ConcurrentDictionary<IClient, Game?> _gamesCreatedBy;
+    private readonly ILogger<GameManager> _logger;
+    private readonly IServiceProvider _serviceProvider;
 
     public GameManager(
         ILogger<GameManager> logger,
@@ -50,9 +50,20 @@ internal class GameManager : IGameManager
         _gamesCreatedBy = new ConcurrentDictionary<IClient, Game?>();
     }
 
-    IEnumerable<IGame> IGameManager.Games => _games.Select(kv => kv.Value);
+    IEnumerable<IGame> IGameManager.Games
+    {
+        get => _games.Select(kv => kv.Value);
+    }
 
-    IGame? IGameManager.Find(GameCode code) => Find(code);
+    IGame? IGameManager.Find(GameCode code)
+    {
+        return Find(code);
+    }
+
+    public ValueTask<IGame?> CreateAsync(IGameOptions options, GameFilterOptions filterOptions)
+    {
+        return CreateAsync(null, options, filterOptions);
+    }
 
     public Game? Find(GameCode code)
     {
@@ -86,7 +97,8 @@ internal class GameManager : IGameManager
     {
         if (owner != null && !_gamesCreatedBy.TryAdd(owner, null))
         {
-            _logger.LogWarning("Connection {Name}({ClientId}) has tried to create a second game, blocked", owner.Name, owner.Id);
+            _logger.LogWarning("Connection {Name}({ClientId}) has tried to create a second game, blocked", owner.Name,
+                owner.Id);
             return null;
         }
 
@@ -118,12 +130,8 @@ internal class GameManager : IGameManager
         return game;
     }
 
-    public ValueTask<IGame?> CreateAsync(IGameOptions options, GameFilterOptions filterOptions)
-    {
-        return CreateAsync(null, options, filterOptions);
-    }
-
-    private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(IGameOptions options, GameFilterOptions filterOptions, IClient? owner, GameCode? desiredGameCode = null)
+    private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(IGameOptions options,
+        GameFilterOptions filterOptions, IClient? owner, GameCode? desiredGameCode = null)
     {
         var gameCode = desiredGameCode ?? _gameCodeFactory.Create();
         var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, gameCode, options, filterOptions);
@@ -142,9 +150,11 @@ internal class GameManager : IGameManager
 
     internal async ValueTask OnClientDisconnectAsync(IClient client)
     {
-        if (_gamesCreatedBy.TryRemove(client, out var game) && game is { PlayerCount: 0, GameState: not GameStates.Destroyed })
+        if (_gamesCreatedBy.TryRemove(client, out var game) &&
+            game is { PlayerCount: 0, GameState: not GameStates.Destroyed })
         {
-            _logger.LogWarning("Client {Name}({ClientId}) left empty game open when disconnecting", client.Name, client.Id);
+            _logger.LogWarning("Client {Name}({ClientId}) left empty game open when disconnecting", client.Name,
+                client.Id);
             await RemoveAsync(game.Code);
         }
     }

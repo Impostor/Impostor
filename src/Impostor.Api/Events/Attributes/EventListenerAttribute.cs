@@ -27,7 +27,8 @@ public class EventListenerAttribute : Attribute
     public Type? Event { get; set; }
 
     /// <summary>
-    ///     Gets or sets a value indicating whether the listener will be called regardless of the <see cref="IEventCancelable.IsCancelled" />.
+    ///     Gets or sets a value indicating whether the listener will be called regardless of the
+    ///     <see cref="IEventCancelable.IsCancelled" />.
     /// </summary>
     public bool IgnoreCancelled { get; set; }
 }

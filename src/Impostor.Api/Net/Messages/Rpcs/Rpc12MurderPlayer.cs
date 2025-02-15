@@ -12,7 +12,8 @@ public static class Rpc12MurderPlayer
         writer.Write((int)result);
     }
 
-    public static void Deserialize(IMessageReader reader, IGame game, out IInnerPlayerControl? target, out MurderResultFlags result)
+    public static void Deserialize(IMessageReader reader, IGame game, out IInnerPlayerControl? target,
+        out MurderResultFlags result)
     {
         target = reader.ReadNetObject<IInnerPlayerControl>(game);
         result = (MurderResultFlags)reader.ReadInt32();

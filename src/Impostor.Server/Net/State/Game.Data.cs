@@ -58,11 +58,12 @@ internal partial class Game
         [13] = typeof(InnerFungleShipStatus),
     };
 
-    private static readonly Dictionary<Type, uint> SpawnableObjectIds = SpawnableObjects.ToDictionary(i => i.Value, i => i.Key);
+    private static readonly Dictionary<Type, uint> SpawnableObjectIds =
+        SpawnableObjects.ToDictionary(i => i.Value, i => i.Key);
 
-    private readonly List<InnerNetObject> _allObjects = new List<InnerNetObject>();
+    private readonly List<InnerNetObject> _allObjects = new();
 
-    private readonly Dictionary<uint, InnerNetObject> _allObjectsFast = new Dictionary<uint, InnerNetObject>();
+    private readonly Dictionary<uint, InnerNetObject> _allObjectsFast = new();
 
     private uint _nextNetId = MinServerNetId;
 
@@ -87,7 +88,8 @@ internal partial class Game
             var targetId = parent.ReadPackedInt32();
             if (!TryGetPlayer(targetId, out target))
             {
-                _logger.LogWarning("Player {0} tried to send GameData to unknown player {1}.", sender.Client.Id, targetId);
+                _logger.LogWarning("Player {0} tried to send GameData to unknown player {1}.", sender.Client.Id,
+                    targetId);
                 return false;
             }
 
@@ -140,7 +142,8 @@ internal partial class Game
                     // Only the host is allowed to spawn objects.
                     if (!sender.IsHost)
                     {
-                        if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.MustBeHost, "Tried to send SpawnFlag as non-host."))
+                        if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)),
+                                CheatCategory.MustBeHost, "Tried to send SpawnFlag as non-host."))
                         {
                             return false;
                         }
@@ -149,7 +152,9 @@ internal partial class Game
                     var objectId = reader.ReadPackedUInt32();
                     if (SpawnableObjects.TryGetValue(objectId, out var spawnableObjectType))
                     {
-                        var innerNetObject = (InnerNetObject)ActivatorUtilities.CreateInstance(_serviceProvider, spawnableObjectType, this);
+                        var innerNetObject =
+                            (InnerNetObject)ActivatorUtilities.CreateInstance(_serviceProvider, spawnableObjectType,
+                                this);
                         var ownerClientId = reader.ReadPackedInt32();
 
                         innerNetObject.SpawnFlags = (SpawnFlags)reader.ReadByte();
@@ -228,7 +233,8 @@ internal partial class Game
 
                         RemoveNetObject(obj);
                         await OnDestroyAsync(obj);
-                        _logger.LogDebug("Destroyed InnerNetObject {0} ({1}), OwnerId {2}", obj.GetType().Name, netId, obj.OwnerId);
+                        _logger.LogDebug("Destroyed InnerNetObject {0} ({1}), OwnerId {2}", obj.GetType().Name, netId,
+                            obj.OwnerId);
                     }
                     else
                     {
@@ -302,7 +308,9 @@ internal partial class Game
 
                     if (clientId != sender.Client.Id)
                     {
-                        if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.ConsoleDeclareClientPlatformFlag)), CheatCategory.Ownership, "Client sent info with wrong client id"))
+                        if (await sender.Client.ReportCheatAsync(
+                                new CheatContext(nameof(GameDataTag.ConsoleDeclareClientPlatformFlag)),
+                                CheatCategory.Ownership, "Client sent info with wrong client id"))
                         {
                             return false;
                         }
@@ -382,7 +390,8 @@ internal partial class Game
                 }
                 else
                 {
-                    await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.GameFlow, "Failed to find player that spawned the InnerPlayerControl");
+                    await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)),
+                        CheatCategory.GameFlow, "Failed to find player that spawned the InnerPlayerControl");
                 }
 
                 // Hook up InnerPlayerControl <-> InnerPlayerControl.PlayerInfo.
@@ -408,7 +417,8 @@ internal partial class Game
                 {
                     if (GameNet.ShipStatus != null)
                     {
-                        await player.Character!.NetworkTransform.SetPositionAsync(player, GameNet.ShipStatus.GetSpawnLocation(player.Character, PlayerCount, false));
+                        await player.Character!.NetworkTransform.SetPositionAsync(player,
+                            GameNet.ShipStatus.GetSpawnLocation(player.Character, PlayerCount, false));
                     }
                 }
 
@@ -492,7 +502,8 @@ internal partial class Game
             return;
         }
 
-        var playerInfo = (InnerPlayerInfo)ActivatorUtilities.CreateInstance(_serviceProvider, typeof(InnerPlayerInfo), this);
+        var playerInfo =
+            (InnerPlayerInfo)ActivatorUtilities.CreateInstance(_serviceProvider, typeof(InnerPlayerInfo), this);
         playerInfo.SpawnFlags = SpawnFlags.None;
         playerInfo.NetId = _nextNetId++;
         playerInfo.OwnerId = ServerOwned;

@@ -8,13 +8,17 @@ namespace Impostor.Server;
 public static class IHazelConnectionExtensions
 {
     /// <summary>
-    /// Disconnect a connection using a custom message.
+    ///     Disconnect a connection using a custom message.
     /// </summary>
     /// <param name="connection">The connection to disconnect.</param>
     /// <param name="reason">The reason to disconnect with.</param>
-    /// <param name="message">The custom message to disconnect with if <paramref name="reason"/> is <see cref="DisconnectReason.Custom"/>.</param>
+    /// <param name="message">
+    ///     The custom message to disconnect with if <paramref name="reason" /> is
+    ///     <see cref="DisconnectReason.Custom" />.
+    /// </param>
     /// <returns>Task that should be awaited to ensure disconnection.</returns>
-    public static async ValueTask CustomDisconnectAsync(this IHazelConnection connection, DisconnectReason reason, string? message = null)
+    public static async ValueTask CustomDisconnectAsync(this IHazelConnection connection, DisconnectReason reason,
+        string? message = null)
     {
         if (!connection.IsConnected)
         {

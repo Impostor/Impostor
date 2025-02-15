@@ -9,13 +9,23 @@ public class TrackerRoleOptions : IRoleOptions
 
     public byte Version { get; }
 
-    public RoleTypes Type => RoleTypes.Tracker;
-
     public byte Cooldown { get; set; } = 15;
 
     public byte Duration { get; set; } = 30;
 
     public byte Delay { get; set; } = 1;
+
+    public RoleTypes Type
+    {
+        get => RoleTypes.Tracker;
+    }
+
+    public void Serialize(IMessageWriter writer)
+    {
+        writer.Write(Cooldown);
+        writer.Write(Duration);
+        writer.Write(Delay);
+    }
 
     public static TrackerRoleOptions Deserialize(IMessageReader reader, byte version)
     {
@@ -26,12 +36,5 @@ public class TrackerRoleOptions : IRoleOptions
         options.Delay = reader.ReadByte();
 
         return options;
-    }
-
-    public void Serialize(IMessageWriter writer)
-    {
-        writer.Write(Cooldown);
-        writer.Write(Duration);
-        writer.Write(Delay);
     }
 }

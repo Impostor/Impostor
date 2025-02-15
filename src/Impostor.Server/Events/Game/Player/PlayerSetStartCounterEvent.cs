@@ -7,7 +7,8 @@ namespace Impostor.Server.Events.Player;
 
 public class PlayerSetStartCounterEvent : IPlayerSetStartCounterEvent
 {
-    public PlayerSetStartCounterEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, byte secondsLeft)
+    public PlayerSetStartCounterEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl,
+        byte secondsLeft)
     {
         Game = game;
         ClientPlayer = clientPlayer;

@@ -6,6 +6,16 @@ namespace Impostor.Api.Net.Inner.Objects;
 
 public interface IInnerMeetingHud : IInnerNetObject
 {
+    /// <summary>
+    ///     Gets states of players taking part in this meeting.
+    /// </summary>
+    IReadOnlyCollection<IPlayerVoteArea> PlayerStates { get; }
+
+    /// <summary>
+    ///     Gets the player that started the meeting.
+    /// </summary>
+    IInnerPlayerInfo? Reporter { get; }
+
     public interface IPlayerVoteArea
     {
         /// <summary>
@@ -41,18 +51,8 @@ public interface IInnerMeetingHud : IInnerNetObject
         ///     Gets the player voted for.
         /// </summary>
         /// <remarks>
-        ///     Null when <see cref="VoteType" /> isn't <see cref="F:Impostor.Api.Events.Player.VoteType.Player"/>.
+        ///     Null when <see cref="VoteType" /> isn't <see cref="F:Impostor.Api.Events.Player.VoteType.Player" />.
         /// </remarks>
         public IInnerPlayerControl? VotedFor { get; }
     }
-
-    /// <summary>
-    ///     Gets states of players taking part in this meeting.
-    /// </summary>
-    IReadOnlyCollection<IPlayerVoteArea> PlayerStates { get; }
-
-    /// <summary>
-    ///     Gets the player that started the meeting.
-    /// </summary>
-    IInnerPlayerInfo? Reporter { get; }
 }

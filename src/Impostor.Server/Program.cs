@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -10,6 +12,7 @@ using Impostor.Api.Games.Managers;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Utils;
+using Impostor.Server.Commands;
 using Impostor.Server.Events;
 using Impostor.Server.Hubs;
 using Impostor.Server.Net;
@@ -29,7 +32,6 @@ using Next.Hazel.Extensions;
 using Serilog;
 using Serilog.Events;
 using Serilog.Settings.Configuration;
-using PluginConfig = Impostor.Api.Config.PluginConfig;
 
 namespace Impostor.Server;
 
@@ -58,14 +60,22 @@ internal static class Program
         }
     }
 
+    private static string? GetArg(this string[] args, string name)
+    {
+        if (!args.Contains(name))
+            return null;
+        
+        var index = Array.IndexOf(args, name);
+        return index + 1 < args.Length ? args[index + 1] : null;
+    }
+
     private static IConfiguration CreateConfiguration(string[] args)
     {
         var configurationBuilder = new ConfigurationBuilder();
-
-        configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
-        configurationBuilder.AddJsonFile("config.json", true);
-        configurationBuilder.AddJsonFile("config.Development.json", true);
-        configurationBuilder.AddEnvironmentVariables(prefix: "IMPOSTOR_");
+        
+        configurationBuilder.SetBasePath(args.GetArg("--base") ?? Directory.GetCurrentDirectory());
+        configurationBuilder.AddJsonFile(args.GetArg("--config") ?? "config.json", true);
+        configurationBuilder.AddEnvironmentVariables(args.GetArg("--prefix") ?? "IMPOSTOR_");
         configurationBuilder.AddCommandLine(args);
 
         return configurationBuilder.Build();
@@ -79,18 +89,18 @@ internal static class Program
             .GetConfig<PluginConfig>(PluginConfig.Section, out var pluginConfig);
 
         var hostBuilder = Host.CreateDefaultBuilder(args)
-            .ConfigureServer(configuration)
+            .ConfigureServer(configuration, serverConfig)
             .ConfigureExtension(extensionConfig)
-            .ConfigureLog(serverConfig.LogLevel)
-            .UseContentRoot(Directory.GetCurrentDirectory())
+            .ConfigureLog(serverConfig)
+            .UseContentRoot(serverConfig.RootPath ?? Directory.GetCurrentDirectory())
             .UseEnvironment(serverConfig.Env ?? DotnetUtils.Environment)
-            .UseConsoleLifetime()
-            .UsePluginLoader(pluginConfig);
+            .UsePluginLoader(pluginConfig)
+            .UseConsoleLifetime();
 
         return hostBuilder;
     }
 
-    private static IHostBuilder ConfigureServer(this IHostBuilder builder, IConfiguration configuration)
+    private static IHostBuilder ConfigureServer(this IHostBuilder builder, IConfiguration configuration, ServerConfig config)
     {
         builder.ConfigureAppConfiguration(configurationBuilder =>
             {
@@ -117,30 +127,38 @@ internal static class Program
 
                 services.AddEventPools();
                 services.AddHazel();
-                services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
-                services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
+                /*services
+                    .AddSingleton<ICustomMessageManager<ICustomRootMessage>,
+                        CustomMessageManager<ICustomRootMessage>>();
+                services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();*/
                 services.AddSingleton<IMessageWriterProvider, MessageWriterProvider>();
                 services.AddSingleton<IGameCodeFactory, GameCodeFactory>();
                 services.AddSingleton<IEventManager, EventManager>();
-                services.AddSingleton<NetListenerManager>();
-                services.AddHostedService<NetApiService>();
+                services.AddSingleton<INetListenerManager, NetListenerManager>();
+
+                if (config.EnableCommands)
+                    services.AddHostedService<ConsoleCommandService>();
+                if (config.EnableNextApi) 
+                    services.AddHostedService<NetApiService>();
+                
                 services.AddHostedService<StarterService>();
             });
         return builder;
     }
 
-    private static IHostBuilder ConfigureLog(this IHostBuilder hostBuilder, LogEventLevel minimumLevel)
+    private static IHostBuilder ConfigureLog(this IHostBuilder hostBuilder, ServerConfig serverConfig)
     {
         hostBuilder.UseSerilog((context, loggerConfiguration) =>
         {
             AssemblyLoadContext.Default.Resolving += LoadSerilogAssembly;
-
+            
             loggerConfiguration
-                .MinimumLevel.Is(minimumLevel)
+                .MinimumLevel.Is(serverConfig.LogLevel)
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .ReadFrom.Configuration(context.Configuration, new ConfigurationReaderOptions(ConfigurationAssemblySource.AlwaysScanDllFiles));
+                .LoggerSet(serverConfig)
+                .ReadFrom.Configuration(context.Configuration,
+                    new ConfigurationReaderOptions(ConfigurationAssemblySource.AlwaysScanDllFiles));
 
             AssemblyLoadContext.Default.Resolving -= LoadSerilogAssembly;
         });
@@ -162,6 +180,17 @@ internal static class Program
 
             return null;
         }
+    }
+
+    private static LoggerConfiguration LoggerSet(this LoggerConfiguration config, ServerConfig serverConfig)
+    {
+        return serverConfig switch
+        {
+            { WriteConsole: true, WriteFile: true } => config.WriteTo.Console().WriteTo.File(serverConfig.LogFilePath),
+            { WriteConsole: false, WriteFile: true } => config.WriteTo.File(serverConfig.LogFilePath),
+            { WriteConsole: true, WriteFile: false } => config.WriteTo.Console(),
+            _ => config,
+        };
     }
 
     private static IHostBuilder ConfigureExtension(this IHostBuilder builder, ExtensionServerConfig config)
@@ -192,12 +221,24 @@ internal static class Program
                 {
                     applicationBuilder.Map("/web", webBuilder =>
                     {
+                        if (DotnetUtils.IsDev)
+                        {
+                            webBuilder.UseSpa(spa =>
+                            {
+                                spa.UseProxyToSpaDevelopmentServer("http://localhost:2500");
+                            });
+                        }
+
+                        if (DotnetUtils.IsDev || !Directory.Exists(config.SpaDirectory))
+                        {
+                            return;
+                        }
+                        
                         var fileOption = new StaticFileOptions
                         {
                             FileProvider = new PhysicalFileProvider(config.SpaDirectory),
                         };
                         webBuilder.UseSpaStaticFiles(fileOption);
-
                         webBuilder.UseSpa(spa =>
                         {
                             spa.Options.DefaultPageStaticFileOptions = fileOption;
@@ -221,7 +262,8 @@ internal static class Program
         });
     }
 
-    private static IConfiguration GetConfig<T>(this IConfiguration configuration, string section, out T result) where T : class, new()
+    private static IConfiguration GetConfig<T>(this IConfiguration configuration, string section, out T result)
+        where T : class, new()
     {
         result = configuration.GetSection(section)
             .Get<T>() ?? new T();

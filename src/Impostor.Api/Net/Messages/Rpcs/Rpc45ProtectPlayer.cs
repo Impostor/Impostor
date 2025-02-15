@@ -12,7 +12,8 @@ public static class Rpc45ProtectPlayer
         writer.Write((byte)color);
     }
 
-    public static void Deserialize(IMessageReader reader, IGame game, out IInnerPlayerControl? playerControl, out ColorType color)
+    public static void Deserialize(IMessageReader reader, IGame game, out IInnerPlayerControl? playerControl,
+        out ColorType color)
     {
         playerControl = reader.ReadNetObject<IInnerPlayerControl>(game);
         color = (ColorType)reader.ReadByte();

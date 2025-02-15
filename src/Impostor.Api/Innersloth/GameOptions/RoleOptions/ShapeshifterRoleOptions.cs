@@ -9,13 +9,23 @@ public class ShapeshifterRoleOptions : IRoleOptions
 
     public byte Version { get; }
 
-    public RoleTypes Type => RoleTypes.Shapeshifter;
-
     public bool LeaveSkin { get; set; }
 
     public byte Cooldown { get; set; } = 10;
 
     public byte Duration { get; set; } = 30;
+
+    public RoleTypes Type
+    {
+        get => RoleTypes.Shapeshifter;
+    }
+
+    public void Serialize(IMessageWriter writer)
+    {
+        writer.Write(LeaveSkin);
+        writer.Write(Cooldown);
+        writer.Write(Duration);
+    }
 
     public static ShapeshifterRoleOptions Deserialize(IMessageReader reader, byte version)
     {
@@ -26,12 +36,5 @@ public class ShapeshifterRoleOptions : IRoleOptions
         options.Duration = reader.ReadByte();
 
         return options;
-    }
-
-    public void Serialize(IMessageWriter writer)
-    {
-        writer.Write(LeaveSkin);
-        writer.Write(Cooldown);
-        writer.Write(Duration);
     }
 }

@@ -136,10 +136,10 @@ dotnet_naming_symbols.any_async_methods.applicable_kinds = method
 dotnet_naming_symbols.any_async_methods.applicable_accessibilities = *
 dotnet_naming_symbols.any_async_methods.required_modifiers = async
 
-dotnet_naming_style.end_in_async.required_prefix = 
+dotnet_naming_style.end_in_async.required_prefix =
 dotnet_naming_style.end_in_async.required_suffix = Async
 dotnet_naming_style.end_in_async.capitalization = pascal_case
-dotnet_naming_style.end_in_async.word_separator = 
+dotnet_naming_style.end_in_async.word_separator =
 
 # error RS2008: Enable analyzer release tracking for the analyzer project containing rule '{0}'
 dotnet_diagnostic.RS2008.severity = none

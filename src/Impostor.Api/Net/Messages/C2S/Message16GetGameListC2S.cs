@@ -11,7 +11,8 @@ public class Message16GetGameListC2S
         throw new NotImplementedException();
     }
 
-    public static void Deserialize(IMessageReader reader, out IGameOptions options, out QuickChatModes chatMode, out CrossplayFlags crossplayFlags, out GameFilterOptions gameFilterOptions)
+    public static void Deserialize(IMessageReader reader, out IGameOptions options, out QuickChatModes chatMode,
+        out CrossplayFlags crossplayFlags, out GameFilterOptions gameFilterOptions)
     {
         var version = reader.ReadPackedInt32();
         if (version != 2)

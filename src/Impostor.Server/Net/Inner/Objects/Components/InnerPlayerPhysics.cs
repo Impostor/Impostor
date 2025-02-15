@@ -14,11 +14,13 @@ namespace Impostor.Server.Net.Inner.Objects.Components;
 
 internal partial class InnerPlayerPhysics : InnerNetObject
 {
+    private readonly IEventManager _eventManager;
     private readonly ILogger<InnerPlayerPhysics> _logger;
     private readonly InnerPlayerControl _playerControl;
-    private readonly IEventManager _eventManager;
 
-    public InnerPlayerPhysics(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl, IEventManager eventManager) : base(customMessageManager, game)
+    public InnerPlayerPhysics(ICustomMessageManager<ICustomRpc> customMessageManager, Game game,
+        ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl, IEventManager eventManager) : base(
+        customMessageManager, game)
     {
         _logger = logger;
         _playerControl = playerControl;
@@ -30,12 +32,14 @@ internal partial class InnerPlayerPhysics : InnerNetObject
         throw new NotImplementedException();
     }
 
-    public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+    public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader,
+        bool initialState)
     {
         throw new NotImplementedException();
     }
 
-    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
+        IMessageReader reader)
     {
         if (call != RpcCalls.BootFromVent && !await ValidateOwnership(call, sender))
         {
@@ -68,7 +72,8 @@ internal partial class InnerPlayerPhysics : InnerNetObject
 
                 if (Game.GameNet.ShipStatus == null)
                 {
-                    if (await sender.Client.ReportCheatAsync(call, CheatCategory.ProtocolExtension, "Client interacted with vent on unknown map"))
+                    if (await sender.Client.ReportCheatAsync(call, CheatCategory.ProtocolExtension,
+                            "Client interacted with vent on unknown map"))
                     {
                         return false;
                     }
@@ -78,7 +83,8 @@ internal partial class InnerPlayerPhysics : InnerNetObject
 
                 if (!Game.GameNet.ShipStatus.Data.Vents.TryGetValue(ventId, out var vent))
                 {
-                    if (await sender.Client.ReportCheatAsync(call, CheatCategory.ProtocolExtension, "Client interacted with nonexistent vent"))
+                    if (await sender.Client.ReportCheatAsync(call, CheatCategory.ProtocolExtension,
+                            "Client interacted with nonexistent vent"))
                     {
                         return false;
                     }

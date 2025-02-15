@@ -12,7 +12,8 @@ internal abstract partial class InnerNetObject
     {
         if (!sender.IsOwner(this))
         {
-            if (await sender.Client.ReportCheatAsync(context, CheatCategory.Ownership, $"Failed ownership check on {GetType().Name}"))
+            if (await sender.Client.ReportCheatAsync(context, CheatCategory.Ownership,
+                    $"Failed ownership check on {GetType().Name}"))
             {
                 return false;
             }
@@ -73,7 +74,8 @@ internal abstract partial class InnerNetObject
         return true;
     }
 
-    protected async ValueTask<bool> ValidateImpostor(CheatContext context, IClientPlayer sender, InnerPlayerInfo playerInfo, bool value = true)
+    protected async ValueTask<bool> ValidateImpostor(CheatContext context, IClientPlayer sender,
+        InnerPlayerInfo playerInfo, bool value = true)
     {
         if (playerInfo.IsImpostor != value)
         {
@@ -86,7 +88,8 @@ internal abstract partial class InnerNetObject
         return true;
     }
 
-    protected async ValueTask<bool> ValidateCanVent(CheatContext context, IClientPlayer sender, InnerPlayerInfo playerInfo, bool value = true)
+    protected async ValueTask<bool> ValidateCanVent(CheatContext context, IClientPlayer sender,
+        InnerPlayerInfo playerInfo, bool value = true)
     {
         if (playerInfo.CanVent != value)
         {
@@ -99,7 +102,8 @@ internal abstract partial class InnerNetObject
         return true;
     }
 
-    protected async ValueTask<bool> ValidateRole(CheatContext context, IClientPlayer sender, InnerPlayerInfo playerInfo, RoleTypes role)
+    protected async ValueTask<bool> ValidateRole(CheatContext context, IClientPlayer sender, InnerPlayerInfo playerInfo,
+        RoleTypes role)
     {
         if (playerInfo.RoleType != role)
         {
@@ -114,7 +118,8 @@ internal abstract partial class InnerNetObject
 
     protected async ValueTask<bool> UnregisteredCall(CheatContext context, IClientPlayer sender)
     {
-        if (await sender.Client.ReportCheatAsync(context, CheatCategory.ProtocolExtension, "Client sent unregistered call"))
+        if (await sender.Client.ReportCheatAsync(context, CheatCategory.ProtocolExtension,
+                "Client sent unregistered call"))
         {
             return false;
         }

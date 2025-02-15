@@ -5,7 +5,8 @@ namespace Impostor.Api.Net.Messages.S2C;
 
 public class Message04RemovePlayerS2C
 {
-    public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId, DisconnectReason reason)
+    public static void Serialize(IMessageWriter writer, bool clear, int gameCode, int playerId, int hostId,
+        DisconnectReason reason)
     {
         // Only a subset of DisconnectReason shows an unique message.
         // ExitGame, Banned and Kicked.

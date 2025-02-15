@@ -6,5 +6,8 @@ namespace Impostor.Server.Net.Manager;
 
 internal partial class ClientManager : IClientManager
 {
-    IEnumerable<IClient> IClientManager.Clients => _clients.Values;
+    IEnumerable<IClient> IClientManager.Clients
+    {
+        get => _clients.Values;
+    }
 }

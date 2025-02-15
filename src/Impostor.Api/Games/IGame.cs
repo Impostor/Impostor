@@ -38,10 +38,10 @@ public interface IGame
     int HostId { get; }
 
     /// <summary>
-    /// Gets a value indicating whether the Host of the game has requested host authority.
+    ///     Gets a value indicating whether the Host of the game has requested host authority.
     /// </summary>
     /// <remarks>
-    /// Vanilla Among Us does not request this, but certain client-side mods will.
+    ///     Vanilla Among Us does not request this, but certain client-side mods will.
     /// </remarks>
     bool IsHostAuthoritive { get; }
 
@@ -105,14 +105,14 @@ public interface IGame
     /// <remarks>Use with caution, recommended only for advanced developers.</remarks>
     /// <param name="targetClientId">The client to target if needed, `null` if the message should be sent to all players.</param>
     /// <param name="type">Message type of the message.</param>
-    /// <returns>A <see cref="IMessageWriter" /> that you can fill and send using <see cref="FinishGameDataAsync"/>.</returns>
+    /// <returns>A <see cref="IMessageWriter" /> that you can fill and send using <see cref="FinishGameDataAsync" />.</returns>
     IMessageWriter StartGameData(int? targetClientId = null, MessageType type = MessageType.Reliable);
 
     /// <summary>
     ///     Finishes GameData message and sends it to either the target or all players.
     /// </summary>
     /// <remarks>Use with caution, recommended only for advanced developers.</remarks>
-    /// <param name="writer">MessageWriter received from <see cref="StartGameData"/>.</param>
+    /// <param name="writer">MessageWriter received from <see cref="StartGameData" />.</param>
     /// <param name="targetClientId">Same target ClientId passed to StartGameData.</param>
     /// <returns>Task that sends the packet.</returns>
     ValueTask FinishGameDataAsync(IMessageWriter writer, int? targetClientId = null);
@@ -125,15 +125,16 @@ public interface IGame
     /// <param name="callId">Rpc id of the message.</param>
     /// <param name="targetClientId">The client to target if needed, `null` if the message should be sent to all players.</param>
     /// <param name="type">Message type of the message.</param>
-    /// <returns>A <see cref="IMessageWriter" /> that you can fill with rpc data and send using <see cref="FinishRpcAsync"/>.</returns>
-    IMessageWriter StartRpc(uint targetNetId, RpcCalls callId, int? targetClientId = null, MessageType type = MessageType.Reliable);
+    /// <returns>A <see cref="IMessageWriter" /> that you can fill with rpc data and send using <see cref="FinishRpcAsync" />.</returns>
+    IMessageWriter StartRpc(uint targetNetId, RpcCalls callId, int? targetClientId = null,
+        MessageType type = MessageType.Reliable);
 
     /// <summary>
-    /// Finishes rpc message and sends it to either the target or all players.
+    ///     Finishes rpc message and sends it to either the target or all players.
     /// </summary>
     /// <remarks>Use with caution, recommended only for advanced developers.</remarks>
     /// <param name="writer">Message writer of the rpc.</param>
-    /// <param name="targetClientId">Same target client id passed to <see cref="StartRpc"/>.</param>
+    /// <param name="targetClientId">Same target client id passed to <see cref="StartRpc" />.</param>
     /// <returns>A <see cref="ValueTask" /> representing the asynchronous operation.</returns>
     ValueTask FinishRpcAsync(IMessageWriter writer, int? targetClientId = null);
 }

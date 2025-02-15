@@ -15,7 +15,10 @@ public class ReactorSystemType : ISystemType, IActivatable
 
     public HashSet<Tuple<byte, byte>> UserConsolePairs { get; }
 
-    public bool IsActive => Countdown < 10000.0;
+    public bool IsActive
+    {
+        get => Countdown < 10000.0;
+    }
 
     public void Serialize(IMessageWriter writer, bool initialState)
     {

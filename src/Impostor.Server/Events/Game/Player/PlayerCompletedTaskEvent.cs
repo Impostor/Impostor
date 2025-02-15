@@ -7,7 +7,8 @@ namespace Impostor.Server.Events.Player;
 
 public class PlayerCompletedTaskEvent : IPlayerCompletedTaskEvent
 {
-    public PlayerCompletedTaskEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl, ITaskInfo task)
+    public PlayerCompletedTaskEvent(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl,
+        ITaskInfo task)
     {
         Game = game;
         ClientPlayer = clientPlayer;

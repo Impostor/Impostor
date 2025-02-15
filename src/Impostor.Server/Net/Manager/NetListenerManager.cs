@@ -1,30 +1,31 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+using Impostor.Api.Config;
+using Impostor.Api.Net.Manager;
 using Impostor.Api.Utils;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
+using Next.Hazel.Dtls;
 using Next.Hazel.Udp;
 
 namespace Impostor.Server.Net.Manager;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using Api.Config;
-using Microsoft.Extensions.Logging;
-using Next.Hazel.Dtls;
-
-public class NetListenerManager(ILogger<NetListenerManager> logger, ObjectPool<MessageReader> readerPool)
+public class NetListenerManager(ILogger<NetListenerManager> logger, ObjectPool<MessageReader> readerPool) : INetListenerManager
 {
-    public List<ListenerInfo> Listeners { get; private set; } = [];
+    public List<ListenerInfo> Listeners { get; } = [];
 
     public Dictionary<string, X509Certificate> CachedCertificates { get; private set; } = new();
 
-    public void Create(ListenerConfig config)
+    public void Create(ListenerConfig config, int index = 0)
     {
         if (!CheckConfig(config))
         {
+            logger.LogWarning("config is invalid, config: {config}", index);
             return;
         }
 
@@ -107,7 +108,8 @@ public class NetListenerManager(ILogger<NetListenerManager> logger, ObjectPool<M
             return false;
         }
 
-        if ((config.PrivateKeyPath == string.Empty || config.CertificatePath == string.Empty) && (config.HasAuth || config.IsDtl))
+        if ((config.PrivateKeyPath == string.Empty || config.CertificatePath == string.Empty) &&
+            (config.HasAuth || config.IsDtl))
         {
             logger.LogWarning("private key or certificate path is empty not supported dtl and auth");
             return false;
@@ -182,15 +184,16 @@ public class NetListenerManager(ILogger<NetListenerManager> logger, ObjectPool<M
         }
     }
 
-    public record ListenerInfo(ListenerConfig Config, NetworkConnectionListener? Listener, DtlsConnectionListener? AuthListener);
-
     private async ValueTask OnAuthConnectionAsync(NewConnectionEventArgs connection)
     {
-
     }
 
     private async ValueTask OnConnectionAsync(NewConnectionEventArgs connection)
     {
-
     }
+    
+    public record ListenerInfo(
+        ListenerConfig Config,
+        NetworkConnectionListener? Listener,
+        DtlsConnectionListener? AuthListener);
 }

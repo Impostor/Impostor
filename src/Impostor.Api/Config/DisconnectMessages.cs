@@ -22,7 +22,8 @@ public static class DisconnectMessages
 
     public const string VersionServerTooOld = "Your client is too new, please update your Impostor server to play.";
 
-    public const string VersionUnsupported = "Your client version is unsupported, please update your Game and/or Impostor server.";
+    public const string VersionUnsupported =
+        "Your client version is unsupported, please update your Game and/or Impostor server.";
 
     private const string UpgradingDocsLink = "https://github.com/Impostor/Impostor/blob/master/docs/Upgrading.md";
 
@@ -31,5 +32,6 @@ public static class DisconnectMessages
                                                      See <link={UpgradingDocsLink}#impostor-190>Impostor documentation</link> on how to migrate to HTTP Matchmaking
                                                      """;
 
-    public const string HostAuthorityUnsupported = "Your client is requesting host authority, which is not enabled on this Impostor server.";
+    public const string HostAuthorityUnsupported =
+        "Your client is requesting host authority, which is not enabled on this Impostor server.";
 }

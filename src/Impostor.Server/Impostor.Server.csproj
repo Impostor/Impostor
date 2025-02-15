@@ -5,10 +5,9 @@
     <RuntimeIdentifiers>win-x64;linux-x64;linux-arm;linux-arm64;osx-x64</RuntimeIdentifiers>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <ApplicationIcon>icon.ico</ApplicationIcon>
-    <CodeAnalysisRuleSet>../ProjectRules.ruleset</CodeAnalysisRuleSet>
     <Nullable>enable</Nullable>
     <SelfContained>false</SelfContained>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <OutDir>E:\Next\ServerTest\</OutDir>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -19,23 +18,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj" />
+    <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="9.0.1" />
-    <PackageReference Include="NextFast.Hazel" Version="1.0.1-dev" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.1-dev-02317" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageReference Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="9.0.2"/>
+    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.0.2"/>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2"/>
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="9.0.2"/>
+    <PackageReference Include="NextFast.Hazel" Version="1.0.1-dev"/>
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0"/>
+    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.1-dev-02317"/>
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
   </ItemGroup>
 
 </Project>

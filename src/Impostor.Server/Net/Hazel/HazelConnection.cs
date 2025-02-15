@@ -19,13 +19,22 @@ internal class HazelConnection : IHazelConnection
 
     public Connection InnerConnection { get; }
 
-    public IPEndPoint EndPoint => InnerConnection.EndPoint;
+    public IPEndPoint EndPoint
+    {
+        get => InnerConnection.EndPoint;
+    }
 
-    public bool IsConnected => InnerConnection.State == ConnectionState.Connected;
+    public bool IsConnected
+    {
+        get => InnerConnection.State == ConnectionState.Connected;
+    }
 
     public IClient? Client { get; set; }
 
-    public float AveragePing => InnerConnection is NetworkConnection networkConnection ? networkConnection.AveragePingMs : 0;
+    public float AveragePing
+    {
+        get => InnerConnection is NetworkConnection networkConnection ? networkConnection.AveragePingMs : 0;
+    }
 
     public ValueTask SendAsync(IMessageWriter writer)
     {

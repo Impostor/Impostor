@@ -1,8 +1,8 @@
-namespace Impostor.Server.Net;
-
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+
+namespace Impostor.Server.Net;
 
 public class NetApiService : BackgroundService
 {

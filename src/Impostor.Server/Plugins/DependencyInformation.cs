@@ -11,7 +11,13 @@ public class DependencyInformation
         _attribute = attribute;
     }
 
-    public string Id => _attribute.Id;
+    public string Id
+    {
+        get => _attribute.Id;
+    }
 
-    public DependencyType DependencyType => _attribute.DependencyType;
+    public DependencyType DependencyType
+    {
+        get => _attribute.DependencyType;
+    }
 }

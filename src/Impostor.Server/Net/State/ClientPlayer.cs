@@ -30,25 +30,18 @@ internal partial class ClientPlayer : IClientPlayer
 
     public Game Game { get; }
 
-    /// <inheritdoc />
-    public LimboStates Limbo { get; set; }
-
     public InnerPlayerControl? Character { get; internal set; }
-
-    public bool IsHost => Game?.Host == this;
 
     public string? Scene { get; internal set; }
 
     public RuntimePlatform? Platform { get; internal set; }
 
-    public void InitializeSpawnTimeout()
-    {
-        _spawnTimeout.Change(_spawnTimeoutTime, -1);
-    }
+    /// <inheritdoc />
+    public LimboStates Limbo { get; set; }
 
-    public void DisableSpawnTimeout()
+    public bool IsHost
     {
-        _spawnTimeout.Change(-1, -1);
+        get => Game?.Host == this;
     }
 
     /// <inheritdoc />
@@ -67,6 +60,16 @@ internal partial class ClientPlayer : IClientPlayer
     public ValueTask BanAsync()
     {
         return Game.HandleKickPlayer(Client.Id, true);
+    }
+
+    public void InitializeSpawnTimeout()
+    {
+        _spawnTimeout.Change(_spawnTimeoutTime, -1);
+    }
+
+    public void DisableSpawnTimeout()
+    {
+        _spawnTimeout.Change(-1, -1);
     }
 
     private async void RunSpawnTimeout(object state)

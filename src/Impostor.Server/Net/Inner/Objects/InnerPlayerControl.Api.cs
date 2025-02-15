@@ -12,11 +12,20 @@ namespace Impostor.Server.Net.Inner.Objects;
 
 internal partial class InnerPlayerControl : IInnerPlayerControl
 {
-    IInnerPlayerPhysics IInnerPlayerControl.Physics => Physics;
+    IInnerPlayerPhysics IInnerPlayerControl.Physics
+    {
+        get => Physics;
+    }
 
-    IInnerCustomNetworkTransform IInnerPlayerControl.NetworkTransform => NetworkTransform;
+    IInnerCustomNetworkTransform IInnerPlayerControl.NetworkTransform
+    {
+        get => NetworkTransform;
+    }
 
-    IInnerPlayerInfo IInnerPlayerControl.PlayerInfo => PlayerInfo;
+    IInnerPlayerInfo IInnerPlayerControl.PlayerInfo
+    {
+        get => PlayerInfo;
+    }
 
     public async ValueTask SetNameAsync(string name)
     {
@@ -60,24 +69,6 @@ internal partial class InnerPlayerControl : IInnerPlayerControl
 
         using var writer = Game.StartRpc(NetId, RpcCalls.SetSkinStr);
         Rpc40SetSkinStr.Serialize(writer, skinId, PlayerInfo.GetNextRpcSequenceId(RpcCalls.SetSkinStr));
-        await Game.FinishRpcAsync(writer);
-    }
-
-    public async ValueTask SetVisorAsync(string visorId)
-    {
-        PlayerInfo.CurrentOutfit.VisorId = visorId;
-
-        using var writer = Game.StartRpc(NetId, RpcCalls.SetVisorStr);
-        Rpc42SetVisorStr.Serialize(writer, visorId, PlayerInfo.GetNextRpcSequenceId(RpcCalls.SetVisorStr));
-        await Game.FinishRpcAsync(writer);
-    }
-
-    public async ValueTask SetNamePlateAsync(string nameplateId)
-    {
-        PlayerInfo.CurrentOutfit.NamePlateId = nameplateId;
-
-        using var writer = Game.StartRpc(NetId, RpcCalls.SetNamePlateStr);
-        Rpc43SetNamePlateStr.Serialize(writer, nameplateId, PlayerInfo.GetNextRpcSequenceId(RpcCalls.SetNamePlateStr));
         await Game.FinishRpcAsync(writer);
     }
 
@@ -126,7 +117,8 @@ internal partial class InnerPlayerControl : IInnerPlayerControl
         Rpc12MurderPlayer.Serialize(writer, target, result);
         await Game.FinishRpcAsync(writer);
 
-        await _eventManager.CallAsync(new PlayerMurderEvent(Game, Game.GetClientPlayer(OwnerId)!, this, target, result));
+        await _eventManager.CallAsync(new PlayerMurderEvent(Game, Game.GetClientPlayer(OwnerId)!, this, target,
+            result));
     }
 
     public async ValueTask MurderPlayerAsync(IInnerPlayerControl target)
@@ -165,6 +157,24 @@ internal partial class InnerPlayerControl : IInnerPlayerControl
 
         // Notify plugins.
         await _eventManager.CallAsync(new PlayerExileEvent(Game, Game.GetClientPlayer(OwnerId)!, this));
+    }
+
+    public async ValueTask SetVisorAsync(string visorId)
+    {
+        PlayerInfo.CurrentOutfit.VisorId = visorId;
+
+        using var writer = Game.StartRpc(NetId, RpcCalls.SetVisorStr);
+        Rpc42SetVisorStr.Serialize(writer, visorId, PlayerInfo.GetNextRpcSequenceId(RpcCalls.SetVisorStr));
+        await Game.FinishRpcAsync(writer);
+    }
+
+    public async ValueTask SetNamePlateAsync(string nameplateId)
+    {
+        PlayerInfo.CurrentOutfit.NamePlateId = nameplateId;
+
+        using var writer = Game.StartRpc(NetId, RpcCalls.SetNamePlateStr);
+        Rpc43SetNamePlateStr.Serialize(writer, nameplateId, PlayerInfo.GetNextRpcSequenceId(RpcCalls.SetNamePlateStr));
+        await Game.FinishRpcAsync(writer);
     }
 
     public async ValueTask StartVanishAsync()

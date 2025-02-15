@@ -8,14 +8,6 @@ namespace Impostor.Server.Events.Player;
 
 public class PlayerMovementEvent : IPlayerMovementEvent
 {
-#pragma warning disable 8766
-    public IGame? Game { get; private set; }
-
-    public IClientPlayer? ClientPlayer { get; private set; }
-
-    public IInnerPlayerControl? PlayerControl { get; private set; }
-#pragma warning restore 8766
-
     public void Reset(IGame game, IClientPlayer clientPlayer, IInnerPlayerControl playerControl)
     {
         Game = game;
@@ -43,4 +35,11 @@ public class PlayerMovementEvent : IPlayerMovementEvent
             return true;
         }
     }
+#pragma warning disable 8766
+    public IGame? Game { get; private set; }
+
+    public IClientPlayer? ClientPlayer { get; private set; }
+
+    public IInnerPlayerControl? PlayerControl { get; private set; }
+#pragma warning restore 8766
 }

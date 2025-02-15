@@ -41,7 +41,8 @@ internal class Client(
 
         if (Player != null && Player.IsHost)
         {
-            var isHostCheatingAllowed = _antiCheatConfig.AllowCheatingHosts switch {
+            var isHostCheatingAllowed = _antiCheatConfig.AllowCheatingHosts switch
+            {
                 CheatingHostMode.Always => true,
                 CheatingHostMode.IfRequested => GameVersion.HasDisableServerAuthorityFlag,
                 CheatingHostMode.Never => false,
@@ -81,7 +82,8 @@ internal class Client(
 
         var supportCode = Random.Shared.Next(0, 999_999).ToString("000-000");
 
-        logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{SupportCode}] [{Context}-{Category}] {Message}", Name, Id, supportCode, context.Name, category, message);
+        logger.LogWarning("Client {Name} ({Id}) was caught cheating: [{SupportCode}] [{Context}-{Category}] {Message}",
+            Name, Id, supportCode, context.Name, category, message);
 
         if (Player is { } player)
         {
@@ -413,7 +415,8 @@ internal class Client(
     {
         using var message = MessageWriter.Get(MessageType.Reliable);
 
-        var playerSpecificData = gameManager.Find(code)?.Players.Select(p => p.Client.PlatformSpecificData) ?? Enumerable.Empty<PlatformSpecificData>();
+        var playerSpecificData = gameManager.Find(code)?.Players.Select(p => p.Client.PlatformSpecificData) ??
+                                 Enumerable.Empty<PlatformSpecificData>();
 
         Message22QueryPlatformIdsS2C.Serialize(message, code, playerSpecificData);
 

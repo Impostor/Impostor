@@ -9,7 +9,8 @@ namespace Impostor.Server.Net.Inner.Objects;
 
 internal class InnerLobbyBehaviour : InnerNetObject, IInnerLobbyBehaviour
 {
-    public InnerLobbyBehaviour(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game)
+    public InnerLobbyBehaviour(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(
+        customMessageManager, game)
     {
         Components.Add(this);
     }
@@ -19,7 +20,8 @@ internal class InnerLobbyBehaviour : InnerNetObject, IInnerLobbyBehaviour
         throw new NotImplementedException();
     }
 
-    public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+    public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader,
+        bool initialState)
     {
         throw new NotImplementedException();
     }

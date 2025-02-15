@@ -27,7 +27,8 @@ public class Message01JoinGameS2C
     }
 
     [Obsolete("JoinGame errors are no longer used by 2021.11.9 and up, disconnect clients instead.")]
-    public static void SerializeError(IMessageWriter writer, bool clear, DisconnectReason reason, string? message = null)
+    public static void SerializeError(IMessageWriter writer, bool clear, DisconnectReason reason,
+        string? message = null)
     {
         if (clear)
         {

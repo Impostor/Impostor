@@ -11,8 +11,8 @@ namespace Impostor.Server.Net.Inner.Objects;
 
 internal class TaskInfo : ITaskInfo
 {
-    private readonly InnerPlayerInfo _playerInfo;
     private readonly IEventManager _eventManager;
+    private readonly InnerPlayerInfo _playerInfo;
 
     public TaskInfo(InnerPlayerInfo playerInfo, IEventManager eventManager, uint id, TaskData? task)
     {
@@ -27,18 +27,6 @@ internal class TaskInfo : ITaskInfo
     public TaskData? Task { get; internal set; }
 
     public bool Complete { get; internal set; }
-
-    public void Serialize(IMessageWriter writer)
-    {
-        writer.WritePacked(Id);
-        writer.Write(Complete);
-    }
-
-    public void Deserialize(IMessageReader reader)
-    {
-        Id = reader.ReadPackedUInt32();
-        Complete = reader.ReadBoolean();
-    }
 
     public async ValueTask CompleteAsync()
     {
@@ -62,6 +50,19 @@ internal class TaskInfo : ITaskInfo
         await player.Game.FinishRpcAsync(writer);
 
         // Notify plugins.
-        await _eventManager.CallAsync(new PlayerCompletedTaskEvent(player.Game, player.Game.GetClientPlayer(player.OwnerId)!, player, this));
+        await _eventManager.CallAsync(new PlayerCompletedTaskEvent(player.Game,
+            player.Game.GetClientPlayer(player.OwnerId)!, player, this));
+    }
+
+    public void Serialize(IMessageWriter writer)
+    {
+        writer.WritePacked(Id);
+        writer.Write(Complete);
+    }
+
+    public void Deserialize(IMessageReader reader)
+    {
+        Id = reader.ReadPackedUInt32();
+        Complete = reader.ReadBoolean();
     }
 }

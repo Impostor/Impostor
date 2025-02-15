@@ -5,5 +5,8 @@ namespace Impostor.Server.Net.Inner.Objects.GameManager;
 
 internal partial class InnerHideAndSeekManager
 {
-    ILogicGameFlowHnS IInnerHideAndSeekManager.LogicFlowHnS => LogicFlowHnS;
+    ILogicGameFlowHnS IInnerHideAndSeekManager.LogicFlowHnS
+    {
+        get => LogicFlowHnS;
+    }
 }

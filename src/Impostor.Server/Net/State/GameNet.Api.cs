@@ -8,13 +8,28 @@ namespace Impostor.Server.Net.State;
 /// <inheritdoc />
 internal partial class GameNet : IGameNet
 {
-    IInnerGameManager? IGameNet.GameManager => GameManager;
+    IInnerGameManager? IGameNet.GameManager
+    {
+        get => GameManager;
+    }
 
-    IInnerLobbyBehaviour? IGameNet.LobbyBehaviour => LobbyBehaviour;
+    IInnerLobbyBehaviour? IGameNet.LobbyBehaviour
+    {
+        get => LobbyBehaviour;
+    }
 
-    IInnerGameData IGameNet.GameData => GameData;
+    IInnerGameData IGameNet.GameData
+    {
+        get => GameData;
+    }
 
-    IInnerVoteBanSystem? IGameNet.VoteBan => VoteBan;
+    IInnerVoteBanSystem? IGameNet.VoteBan
+    {
+        get => VoteBan;
+    }
 
-    IInnerShipStatus? IGameNet.ShipStatus => ShipStatus;
+    IInnerShipStatus? IGameNet.ShipStatus
+    {
+        get => ShipStatus;
+    }
 }

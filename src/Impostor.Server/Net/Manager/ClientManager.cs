@@ -17,15 +17,16 @@ namespace Impostor.Server.Net.Manager;
 
 internal partial class ClientManager
 {
-    private readonly ILogger<ClientManager> _logger;
-    private readonly IEventManager _eventManager;
-    private readonly ConcurrentDictionary<int, ClientBase> _clients;
-    private readonly ICompatibilityManager _compatibilityManager;
-    private readonly CompatibilityConfig _compatibilityConfig;
     private readonly IClientFactory _clientFactory;
+    private readonly ConcurrentDictionary<int, ClientBase> _clients;
+    private readonly CompatibilityConfig _compatibilityConfig;
+    private readonly ICompatibilityManager _compatibilityManager;
+    private readonly IEventManager _eventManager;
+    private readonly ILogger<ClientManager> _logger;
     private int _idLast;
 
-    public ClientManager(ILogger<ClientManager> logger, IEventManager eventManager, IClientFactory clientFactory, ICompatibilityManager compatibilityManager, IOptions<CompatibilityConfig> compatibilityConfig)
+    public ClientManager(ILogger<ClientManager> logger, IEventManager eventManager, IClientFactory clientFactory,
+        ICompatibilityManager compatibilityManager, IOptions<CompatibilityConfig> compatibilityConfig)
     {
         _logger = logger;
         _eventManager = eventManager;
@@ -38,26 +39,33 @@ internal partial class ClientManager
             || _compatibilityConfig.AllowHostAuthority
             || _compatibilityConfig.AllowVersionMixing)
         {
-            _logger.LogWarning("One or more compatibility options were enabled, please mention these when seeking support:");
+            _logger.LogWarning(
+                "One or more compatibility options were enabled, please mention these when seeking support:");
 
             if (_compatibilityConfig.AllowFutureGameVersions)
             {
-                _logger.LogWarning("AllowFutureGameVersions, which allows future Among Us versions to connect that were unknown at the time this Impostor was built");
+                _logger.LogWarning(
+                    "AllowFutureGameVersions, which allows future Among Us versions to connect that were unknown at the time this Impostor was built");
             }
 
             if (_compatibilityConfig.AllowHostAuthority)
             {
-                _logger.LogWarning("AllowHostAuthority, which allows game hosts to control more game features, but it uses less well tested code on the client, which causes some bugs");
+                _logger.LogWarning(
+                    "AllowHostAuthority, which allows game hosts to control more game features, but it uses less well tested code on the client, which causes some bugs");
             }
 
             if (_compatibilityConfig.AllowVersionMixing)
             {
-                _logger.LogWarning("AllowVersionMixing, which allows players to join games created on different game versions that they may not be 100% compatible with");
+                _logger.LogWarning(
+                    "AllowVersionMixing, which allows players to join games created on different game versions that they may not be 100% compatible with");
             }
         }
     }
 
-    public IEnumerable<ClientBase> Clients => _clients.Values;
+    public IEnumerable<ClientBase> Clients
+    {
+        get => _clients.Values;
+    }
 
     public int NextId()
     {
@@ -75,16 +83,22 @@ internal partial class ClientManager
         return clientId;
     }
 
-    public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, GameVersion clientVersion, Language language, QuickChatModes chatMode, PlatformSpecificData? platformSpecificData)
+    public async ValueTask RegisterConnectionAsync(IHazelConnection connection, string name, GameVersion clientVersion,
+        Language language, QuickChatModes chatMode, PlatformSpecificData? platformSpecificData)
     {
         var versionCompare = _compatibilityManager.CanConnectToServer(clientVersion);
-        if (versionCompare == ICompatibilityManager.VersionCompareResult.ServerTooOld && _compatibilityConfig.AllowFutureGameVersions && platformSpecificData != null)
+        if (versionCompare == ICompatibilityManager.VersionCompareResult.ServerTooOld &&
+            _compatibilityConfig.AllowFutureGameVersions && platformSpecificData != null)
         {
-            _logger.LogWarning("Client connected using future version: {clientVersion} ({version}). Unsupported, continue at your own risk.", clientVersion.Value, clientVersion.ToString());
+            _logger.LogWarning(
+                "Client connected using future version: {clientVersion} ({version}). Unsupported, continue at your own risk.",
+                clientVersion.Value, clientVersion.ToString());
         }
-        else if (versionCompare != ICompatibilityManager.VersionCompareResult.Compatible || platformSpecificData == null)
+        else if (versionCompare != ICompatibilityManager.VersionCompareResult.Compatible ||
+                 platformSpecificData == null)
         {
-            _logger.LogInformation("Client connected using unsupported version: {clientVersion} ({version})", clientVersion.Value, clientVersion.ToString());
+            _logger.LogInformation("Client connected using unsupported version: {clientVersion} ({version})",
+                clientVersion.Value, clientVersion.ToString());
 
             using var packet = MessageWriter.Get(MessageType.Reliable);
 
@@ -107,11 +121,14 @@ internal partial class ClientManager
             if (!_compatibilityConfig.AllowHostAuthority)
             {
                 _logger.LogInformation("Player {Name} kicked because they requested host authority.", name);
-                await connection.CustomDisconnectAsync(DisconnectReason.Custom, DisconnectMessages.HostAuthorityUnsupported);
+                await connection.CustomDisconnectAsync(DisconnectReason.Custom,
+                    DisconnectMessages.HostAuthorityUnsupported);
                 return;
             }
 
-            _logger.LogWarning("Player {Name} connected with server authority disabled, this may cause issues as there are known bugs in this mode. Please mention that this mode is in use when asking for support.", name);
+            _logger.LogWarning(
+                "Player {Name} connected with server authority disabled, this may cause issues as there are known bugs in this mode. Please mention that this mode is in use when asking for support.",
+                name);
         }
 
         if (name.Length > 10)
@@ -122,7 +139,8 @@ internal partial class ClientManager
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            await connection.CustomDisconnectAsync(DisconnectReason.Custom, DisconnectMessages.UsernameIllegalCharacters);
+            await connection.CustomDisconnectAsync(DisconnectReason.Custom,
+                DisconnectMessages.UsernameIllegalCharacters);
             return;
         }
 

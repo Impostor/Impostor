@@ -10,7 +10,8 @@ namespace Impostor.Server.Net;
 
 internal abstract class ClientBase : IClient
 {
-    protected ClientBase(string name, GameVersion gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, IHazelConnection connection)
+    protected ClientBase(string name, GameVersion gameVersion, Language language, QuickChatModes chatMode,
+        PlatformSpecificData platformSpecificData, IHazelConnection connection)
     {
         Name = name;
         GameVersion = gameVersion;
@@ -20,6 +21,8 @@ internal abstract class ClientBase : IClient
         Connection = connection;
         Items = new ConcurrentDictionary<object, object>();
     }
+
+    public ClientPlayer? Player { get; set; }
 
     public int Id { get; set; }
 
@@ -37,9 +40,10 @@ internal abstract class ClientBase : IClient
 
     public IDictionary<object, object> Items { get; }
 
-    public ClientPlayer? Player { get; set; }
-
-    IClientPlayer? IClient.Player => Player;
+    IClientPlayer? IClient.Player
+    {
+        get => Player;
+    }
 
     public virtual ValueTask<bool> ReportCheatAsync(CheatContext context, CheatCategory category, string message)
     {

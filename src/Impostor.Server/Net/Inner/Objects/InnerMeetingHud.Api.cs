@@ -6,7 +6,13 @@ namespace Impostor.Server.Net.Inner.Objects;
 
 internal partial class InnerMeetingHud : IInnerMeetingHud
 {
-    IReadOnlyCollection<IInnerMeetingHud.IPlayerVoteArea> IInnerMeetingHud.PlayerStates => Array.AsReadOnly(_playerStates);
+    IReadOnlyCollection<IInnerMeetingHud.IPlayerVoteArea> IInnerMeetingHud.PlayerStates
+    {
+        get => Array.AsReadOnly(_playerStates);
+    }
 
-    IInnerPlayerInfo? IInnerMeetingHud.Reporter => Reporter;
+    IInnerPlayerInfo? IInnerMeetingHud.Reporter
+    {
+        get => Reporter;
+    }
 }

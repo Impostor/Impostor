@@ -11,7 +11,7 @@ public interface ICustomMessageManager<T>
     /// <summary>
     ///     Register a custom message.
     /// </summary>
-    /// <param name="message"><typeparamref name="T"/> message.</param>
+    /// <param name="message"><typeparamref name="T" /> message.</param>
     /// <returns>Disposable that unregisters the message.</returns>
     IDisposable Register(T message);
 }

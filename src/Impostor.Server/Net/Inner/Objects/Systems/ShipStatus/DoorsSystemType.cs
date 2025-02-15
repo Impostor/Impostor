@@ -6,8 +6,8 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 
 public class DoorsSystemType : ISystemType
 {
-    private readonly Dictionary<SystemTypes, float> _timers = new Dictionary<SystemTypes, float>();
     private readonly Dictionary<int, bool> _doors;
+    private readonly Dictionary<SystemTypes, float> _timers = new();
 
     public DoorsSystemType(Dictionary<int, bool> doors)
     {

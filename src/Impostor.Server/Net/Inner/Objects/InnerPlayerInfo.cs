@@ -21,7 +21,8 @@ internal partial class InnerPlayerInfo
     private readonly IEventManager _eventManager;
     private readonly ILogger<InnerPlayerInfo> _logger;
 
-    public InnerPlayerInfo(ICustomMessageManager<ICustomRpc> customMessageManager, IEventManager eventManager, Game game, ILogger<InnerPlayerInfo> logger) : base(customMessageManager, game)
+    public InnerPlayerInfo(ICustomMessageManager<ICustomRpc> customMessageManager, IEventManager eventManager,
+        Game game, ILogger<InnerPlayerInfo> logger) : base(customMessageManager, game)
     {
         Components.Add(this);
         _eventManager = eventManager;
@@ -34,7 +35,21 @@ internal partial class InnerPlayerInfo
 
     public int ClientId { get; internal set; }
 
-    public string PlayerName => CurrentOutfit.PlayerName;
+    public RoleTypes? RoleWhenAlive { get; internal set; }
+
+    public bool Disconnected { get; internal set; }
+
+    public bool CanVent
+    {
+        get => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Engineer;
+    }
+
+    public List<TaskInfo> Tasks { get; internal set; } = new(0);
+
+    public string PlayerName
+    {
+        get => CurrentOutfit.PlayerName;
+    }
 
     public Dictionary<PlayerOutfitType, PlayerOutfit> Outfits { get; } = new()
     {
@@ -43,23 +58,21 @@ internal partial class InnerPlayerInfo
 
     public PlayerOutfitType CurrentOutfitType { get; set; } = PlayerOutfitType.Default;
 
-    public PlayerOutfit CurrentOutfit => Outfits[CurrentOutfitType];
+    public PlayerOutfit CurrentOutfit
+    {
+        get => Outfits[CurrentOutfitType];
+    }
 
     public RoleTypes? RoleType { get; internal set; }
 
-    public RoleTypes? RoleWhenAlive { get; internal set; }
-
-    public bool Disconnected { get; internal set; }
-
-    public bool IsImpostor => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.ImpostorGhost or RoleTypes.Phantom;
-
-    public bool CanVent => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Engineer;
+    public bool IsImpostor
+    {
+        get => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.ImpostorGhost or RoleTypes.Phantom;
+    }
 
     public bool IsDead { get; internal set; }
 
     public DeathReason LastDeathReason { get; internal set; }
-
-    public List<TaskInfo> Tasks { get; internal set; } = new List<TaskInfo>(0);
 
     public DateTimeOffset LastMurder { get; set; }
 
@@ -131,7 +144,8 @@ internal partial class InnerPlayerInfo
         return new ValueTask<bool>(true);
     }
 
-    public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+    public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader,
+        bool initialState)
     {
         PlayerId = reader.ReadByte();
         ClientId = reader.ReadPackedInt32();
@@ -180,7 +194,8 @@ internal partial class InnerPlayerInfo
         return ValueTask.CompletedTask;
     }
 
-    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
+        IMessageReader reader)
     {
         switch (call)
         {
@@ -209,14 +224,14 @@ internal partial class InnerPlayerInfo
         foreach (var taskTypeId in taskTypeIds.Span)
         {
             var mapTasks = Game.GameNet!.ShipStatus?.Data.Tasks;
-            var taskType = (mapTasks != null && mapTasks.ContainsKey(taskTypeId)) ? mapTasks[taskTypeId] : null;
+            var taskType = mapTasks != null && mapTasks.ContainsKey(taskTypeId) ? mapTasks[taskTypeId] : null;
             Tasks.Add(new TaskInfo(this, _eventManager, taskId++, taskType));
         }
     }
 
     public byte GetNextRpcSequenceId(RpcCalls rpc)
     {
-        var defaultOutfit = this.Outfits[PlayerOutfitType.Default];
+        var defaultOutfit = Outfits[PlayerOutfitType.Default];
 
         byte nextRpcSequenceId = 0;
         const byte SequenceIdAddition = 5;

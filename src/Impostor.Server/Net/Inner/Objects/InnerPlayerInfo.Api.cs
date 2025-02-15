@@ -5,5 +5,8 @@ namespace Impostor.Server.Net.Inner.Objects;
 
 internal partial class InnerPlayerInfo : InnerNetObject, IInnerPlayerInfo
 {
-    IEnumerable<ITaskInfo> IInnerPlayerInfo.Tasks => Tasks;
+    IEnumerable<ITaskInfo> IInnerPlayerInfo.Tasks
+    {
+        get => Tasks;
+    }
 }

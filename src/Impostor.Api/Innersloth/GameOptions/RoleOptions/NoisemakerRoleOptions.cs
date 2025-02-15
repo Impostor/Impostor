@@ -9,11 +9,20 @@ public class NoisemakerRoleOptions : IRoleOptions
 
     public byte Version { get; }
 
-    public RoleTypes Type => RoleTypes.Noisemaker;
-
     public bool ImpostorAlert { get; set; } = true;
 
     public byte AlertDuration { get; set; } = 10;
+
+    public RoleTypes Type
+    {
+        get => RoleTypes.Noisemaker;
+    }
+
+    public void Serialize(IMessageWriter writer)
+    {
+        writer.Write(AlertDuration);
+        writer.Write(ImpostorAlert);
+    }
 
     public static NoisemakerRoleOptions Deserialize(IMessageReader reader, byte version)
     {
@@ -23,11 +32,5 @@ public class NoisemakerRoleOptions : IRoleOptions
         options.ImpostorAlert = reader.ReadBoolean();
 
         return options;
-    }
-
-    public void Serialize(IMessageWriter writer)
-    {
-        writer.Write(AlertDuration);
-        writer.Write(ImpostorAlert);
     }
 }

@@ -15,12 +15,12 @@ public interface IGameOptions
     public GameModes GameMode { get; }
 
     /// <summary>
-    ///    Gets the currently active special gamemode. This is currently used for the AprilFools gamemode.
+    ///     Gets the currently active special gamemode. This is currently used for the AprilFools gamemode.
     /// </summary>
     public SpecialGameModes SpecialMode { get; }
 
     /// <summary>
-    ///    Gets the rule preset.
+    ///     Gets the rule preset.
     /// </summary>
     public RulesPresets RulesPreset { get; }
 
@@ -55,7 +55,8 @@ public interface IGameOptions
     {
         if (version < GameOptionsFactory.ModularOptionsDataVersion)
         {
-            throw new ImpostorException($"{typeof(TCaller).Name} didn't exist before version 7, did you mean {nameof(LegacyGameOptionsData)}?");
+            throw new ImpostorException(
+                $"{typeof(TCaller).Name} didn't exist before version 7, did you mean {nameof(LegacyGameOptionsData)}?");
         }
     }
 

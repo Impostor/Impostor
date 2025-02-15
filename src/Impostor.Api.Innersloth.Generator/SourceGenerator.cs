@@ -11,29 +11,13 @@ public sealed class SourceGenerator : IIncrementalGenerator
 {
     private const string DataPath = "Innersloth/Data/";
 
-    private readonly record struct Options(string ProjectDirectory)
-    {
-        public bool TryGetRelativePath(string path, [NotNullWhen(true)] out string? relativePath)
-        {
-            if (
-                path.NormalizePath().TryTrimStart(ProjectDirectory, out relativePath) &&
-                relativePath.TryTrimStart(DataPath, out relativePath)
-            )
-            {
-                return true;
-            }
-
-            relativePath = null;
-            return false;
-        }
-    }
-
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var optionsProvider = context.AnalyzerConfigOptionsProvider
             .Select((analyzerConfigOptions, _) =>
             {
-                if (!analyzerConfigOptions.GlobalOptions.TryGetValue("build_property.projectdir", out var projectDirectory))
+                if (!analyzerConfigOptions.GlobalOptions.TryGetValue("build_property.projectdir",
+                        out var projectDirectory))
                 {
                     throw new Exception("Couldn't get project directory");
                 }
@@ -96,5 +80,22 @@ public sealed class SourceGenerator : IIncrementalGenerator
                 mapDataGenerator.Generate(mapName);
             }
         });
+    }
+
+    private readonly record struct Options(string ProjectDirectory)
+    {
+        public bool TryGetRelativePath(string path, [NotNullWhen(true)] out string? relativePath)
+        {
+            if (
+                path.NormalizePath().TryTrimStart(ProjectDirectory, out relativePath) &&
+                relativePath.TryTrimStart(DataPath, out relativePath)
+            )
+            {
+                return true;
+            }
+
+            relativePath = null;
+            return false;
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace Impostor.Server.Net.State;
 
 internal partial class Game
 {
-    private readonly SemaphoreSlim _clientAddLock = new SemaphoreSlim(1, 1);
+    private readonly SemaphoreSlim _clientAddLock = new(1, 1);
 
     public async ValueTask HandleStartGame(IMessageReader message)
     {
@@ -160,7 +160,7 @@ internal partial class Game
 
         // Check if the player is running the same version as the host
         if (_compatibilityConfig.AllowVersionMixing == false &&
-            this.Host != null && client.GameVersion != this.Host.Client.GameVersion)
+            Host != null && client.GameVersion != Host.Client.GameVersion)
         {
             var versionCheckResult = _compatibilityManager.CanJoinGame(Host.Client.GameVersion, client.GameVersion);
             if (versionCheckResult != GameJoinError.None)
@@ -191,7 +191,8 @@ internal partial class Game
 
         if (player == null || player.Game != this)
         {
-            var clientPlayer = new ClientPlayer(_serviceProvider.GetRequiredService<ILogger<ClientPlayer>>(), client, this, _timeoutConfig.SpawnTimeout);
+            var clientPlayer = new ClientPlayer(_serviceProvider.GetRequiredService<ILogger<ClientPlayer>>(), client,
+                this, _timeoutConfig.SpawnTimeout);
 
             if (!_clientManager.Validate(client))
             {

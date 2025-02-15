@@ -25,16 +25,17 @@ internal class CompatibilityManager : ICompatibilityManager
     };
 
     private readonly List<CompatibilityGroup> _compatibilityGroups = new();
-    private readonly Dictionary<GameVersion, CompatibilityGroup> _supportMap = new();
     private readonly ILogger<CompatibilityManager> _logger;
-    private GameVersion _lowestVersionSupported = new(int.MaxValue);
+    private readonly Dictionary<GameVersion, CompatibilityGroup> _supportMap = new();
     private GameVersion _highestVersionSupported = new(0);
+    private GameVersion _lowestVersionSupported = new(int.MaxValue);
 
     public CompatibilityManager(ILogger<CompatibilityManager> logger) : this(logger, DefaultSupportedVersions)
     {
     }
 
-    internal CompatibilityManager(ILogger<CompatibilityManager> logger, IEnumerable<CompatibilityGroup> defaultSupportedVersions)
+    internal CompatibilityManager(ILogger<CompatibilityManager> logger,
+        IEnumerable<CompatibilityGroup> defaultSupportedVersions)
     {
         _logger = logger;
 
@@ -44,31 +45,14 @@ internal class CompatibilityManager : ICompatibilityManager
         }
     }
 
-    public IEnumerable<CompatibilityGroup> CompatibilityGroups => _compatibilityGroups;
-
-    private CompatibilityGroup? TryGetCompatibilityGroup(GameVersion clientVersion)
+    public IEnumerable<CompatibilityGroup> CompatibilityGroups
     {
-        // Innersloth servers allow disabling server authority by incrementing the version revision by 25.
-        // We should allow crossplay between client versions with this flag set and those without.
-        clientVersion = clientVersion.Normalize();
-
-        if (_supportMap.TryGetValue(clientVersion, out var compatibilityGroup))
-        {
-            return compatibilityGroup;
-        }
-
-        return null;
-    }
-
-    private CompatibilityGroup GetCompatibilityGroupOrDefault(GameVersion clientVersion)
-    {
-        // If the compatibility group is not defined, we assume it is not compatible with anything else than itself
-        return TryGetCompatibilityGroup(clientVersion) ?? new CompatibilityGroup(new[] { clientVersion.Normalize() });
+        get => _compatibilityGroups;
     }
 
     public VersionCompareResult CanConnectToServer(GameVersion clientVersion)
     {
-        if (this.TryGetCompatibilityGroup(clientVersion) != null)
+        if (TryGetCompatibilityGroup(clientVersion) != null)
         {
             return VersionCompareResult.Compatible;
         }
@@ -109,14 +93,16 @@ internal class CompatibilityManager : ICompatibilityManager
 
     void ICompatibilityManager.AddCompatibilityGroup(CompatibilityGroup compatibilityGroup)
     {
-        _logger.LogWarning($"{nameof(AddCompatibilityGroup)} was called by a plugin, this can create unexpected issues. Please proceed carefully");
+        _logger.LogWarning(
+            $"{nameof(AddCompatibilityGroup)} was called by a plugin, this can create unexpected issues. Please proceed carefully");
 
         AddCompatibilityGroup(compatibilityGroup);
     }
 
     void ICompatibilityManager.AddSupportedVersion(CompatibilityGroup compatibilityGroup, GameVersion gameVersion)
     {
-        _logger.LogWarning($"{nameof(AddSupportedVersion)} was called by a plugin, this can create unexpected issues. Please proceed carefully");
+        _logger.LogWarning(
+            $"{nameof(AddSupportedVersion)} was called by a plugin, this can create unexpected issues. Please proceed carefully");
 
         if (compatibilityGroup.GameVersions.Contains(gameVersion))
         {
@@ -126,13 +112,55 @@ internal class CompatibilityManager : ICompatibilityManager
         AddSupportedVersion(compatibilityGroup, gameVersion, true);
     }
 
+    public bool RemoveSupportedVersion(GameVersion removedVersion)
+    {
+        if (_supportMap.Remove(removedVersion, out var compatibilityGroup))
+        {
+            if (!compatibilityGroup.Remove(removedVersion))
+            {
+                throw new InvalidOperationException(
+                    "Removed the version from the support map but it was missing from it's compatibility group");
+            }
+
+            if (!compatibilityGroup.GameVersions.Any())
+            {
+                _compatibilityGroups.Remove(compatibilityGroup);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private CompatibilityGroup? TryGetCompatibilityGroup(GameVersion clientVersion)
+    {
+        // Innersloth servers allow disabling server authority by incrementing the version revision by 25.
+        // We should allow crossplay between client versions with this flag set and those without.
+        clientVersion = clientVersion.Normalize();
+
+        if (_supportMap.TryGetValue(clientVersion, out var compatibilityGroup))
+        {
+            return compatibilityGroup;
+        }
+
+        return null;
+    }
+
+    private CompatibilityGroup GetCompatibilityGroupOrDefault(GameVersion clientVersion)
+    {
+        // If the compatibility group is not defined, we assume it is not compatible with anything else than itself
+        return TryGetCompatibilityGroup(clientVersion) ?? new CompatibilityGroup(new[] { clientVersion.Normalize() });
+    }
+
     private void AddCompatibilityGroup(CompatibilityGroup compatibilityGroup)
     {
         foreach (var gameVersion in compatibilityGroup.GameVersions)
         {
             if (_supportMap.ContainsKey(gameVersion))
             {
-                throw new InvalidOperationException($"Can't add this compatibility group because one if its versions ({gameVersion}) is already added");
+                throw new InvalidOperationException(
+                    $"Can't add this compatibility group because one if its versions ({gameVersion}) is already added");
             }
         }
 
@@ -153,7 +181,8 @@ internal class CompatibilityManager : ICompatibilityManager
 
         if (_supportMap.ContainsKey(gameVersion))
         {
-            throw new InvalidOperationException("Can't add this game version because it's already in another compatibility group");
+            throw new InvalidOperationException(
+                "Can't add this game version because it's already in another compatibility group");
         }
 
         if (addToGroup)
@@ -172,25 +201,5 @@ internal class CompatibilityManager : ICompatibilityManager
         {
             _highestVersionSupported = gameVersion;
         }
-    }
-
-    public bool RemoveSupportedVersion(GameVersion removedVersion)
-    {
-        if (_supportMap.Remove(removedVersion, out var compatibilityGroup))
-        {
-            if (!compatibilityGroup.Remove(removedVersion))
-            {
-                throw new InvalidOperationException("Removed the version from the support map but it was missing from it's compatibility group");
-            }
-
-            if (!compatibilityGroup.GameVersions.Any())
-            {
-                _compatibilityGroups.Remove(compatibilityGroup);
-            }
-
-            return true;
-        }
-
-        return false;
     }
 }

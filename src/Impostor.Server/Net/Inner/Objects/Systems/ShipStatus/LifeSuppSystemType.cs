@@ -15,7 +15,10 @@ public class LifeSuppSystemType : ISystemType, IActivatable
 
     public HashSet<int> CompletedConsoles { get; }
 
-    public bool IsActive => Countdown < 10000.0;
+    public bool IsActive
+    {
+        get => Countdown < 10000.0;
+    }
 
     public void Serialize(IMessageWriter writer, bool initialState)
     {

@@ -9,7 +9,7 @@ namespace Impostor.Api.Events;
 /// <remarks>
 ///     Note that the game just has been created, so no players have joined
 ///     it yet. If you want to know the future host of this game, use the
-///     <see cref="Host"/> property.
+///     <see cref="Host" /> property.
 /// </remarks>
 public interface IGameCreatedEvent : IGameEvent
 {

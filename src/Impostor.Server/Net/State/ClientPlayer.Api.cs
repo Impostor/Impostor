@@ -7,11 +7,20 @@ namespace Impostor.Server.Net.State;
 internal partial class ClientPlayer
 {
     /// <inheritdoc />
-    IClient IClientPlayer.Client => Client;
+    IClient IClientPlayer.Client
+    {
+        get => Client;
+    }
 
     /// <inheritdoc />
-    IGame IClientPlayer.Game => Game;
+    IGame IClientPlayer.Game
+    {
+        get => Game;
+    }
 
     /// <inheritdoc />
-    IInnerPlayerControl? IClientPlayer.Character => Character;
+    IInnerPlayerControl? IClientPlayer.Character
+    {
+        get => Character;
+    }
 }

@@ -6,14 +6,14 @@ public class PlayerOutfit
     // `null` because existing API already exposed this magic value. It's also not 0 (which is
     // the value exposed when serializing) because SetColor anticheat checks exist.
     private const ColorType UnknownColor = (ColorType)(-1);
-
-    private string _playerName = string.Empty;
     private ColorType _color = UnknownColor;
     private string _hatId = "missing";
+    private string _namePlateId = "missing";
     private string _petId = "missing";
+
+    private string _playerName = string.Empty;
     private string _skinId = "missing";
     private string _visorId = "missing";
-    private string _namePlateId = "missing";
 
     public bool IsDirty { get; internal set; }
 
@@ -70,16 +70,19 @@ public class PlayerOutfit
     internal byte NamePlateSequenceId { get; set; }
 
     /// <summary>
-    /// Gets a value indicating whether a player outfit is complete or whether it needs to receive additional cosmetics.
+    ///     Gets a value indicating whether a player outfit is complete or whether it needs to receive additional cosmetics.
     /// </summary>
     /// <returns>true if the outfit is incomplete, false if the outfit is complete.</returns>
-    public bool IsIncomplete => string.IsNullOrEmpty(PlayerName)
-                                || Color == UnknownColor
-                                || HatId == "missing"
-                                || PetId == "missing"
-                                || SkinId == "missing"
-                                || VisorId == "missing"
-                                || NamePlateId == "missing";
+    public bool IsIncomplete
+    {
+        get => string.IsNullOrEmpty(PlayerName)
+               || Color == UnknownColor
+               || HatId == "missing"
+               || PetId == "missing"
+               || SkinId == "missing"
+               || VisorId == "missing"
+               || NamePlateId == "missing";
+    }
 
     public void Serialize(IMessageWriter writer)
     {

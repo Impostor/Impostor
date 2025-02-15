@@ -1,18 +1,17 @@
-using Impostor.Api.Config;
-
-namespace Impostor.Server.Plugins;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using Impostor.Api.Config;
 using Impostor.Api.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+
+namespace Impostor.Server.Plugins;
 
 public static class PluginLoader
 {
@@ -89,7 +88,8 @@ public static class PluginLoader
 
             if (plugin.Count != 1)
             {
-                Logger.Warning("A plugin must define exactly one IPlugin or PluginBase implementation ({0}).", assembly);
+                Logger.Warning("A plugin must define exactly one IPlugin or PluginBase implementation ({0}).",
+                    assembly);
                 continue;
             }
 
@@ -111,7 +111,8 @@ public static class PluginLoader
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<PluginLoaderService>(provider => ActivatorUtilities.CreateInstance<PluginLoaderService>(provider, orderedPlugins));
+            services.AddSingleton<PluginLoaderService>(provider =>
+                ActivatorUtilities.CreateInstance<PluginLoaderService>(provider, orderedPlugins));
             services.AddSingleton<IHostedService>(p => p.GetRequiredService<PluginLoaderService>());
 
             foreach (var plugin in orderedPlugins)

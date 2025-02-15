@@ -10,7 +10,8 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus;
 
 internal class InnerMiraShipStatus : InnerShipStatus, IInnerMiraShipStatus
 {
-    public InnerMiraShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game, MapTypes.MiraHQ)
+    public InnerMiraShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(
+        customMessageManager, game, MapTypes.MiraHQ)
     {
     }
 

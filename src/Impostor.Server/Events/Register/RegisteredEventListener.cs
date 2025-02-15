@@ -12,31 +12,38 @@ namespace Impostor.Server.Events.Register;
 
 internal class RegisteredEventListener : IRegisteredEventListener
 {
-    private static readonly PropertyInfo IsCancelledProperty = typeof(IEventCancelable).GetProperty(nameof(IEventCancelable.IsCancelled))!;
+    private static readonly PropertyInfo IsCancelledProperty =
+        typeof(IEventCancelable).GetProperty(nameof(IEventCancelable.IsCancelled))!;
 
-    private static readonly ConcurrentDictionary<Type, RegisteredEventListener[]> Instances = new ConcurrentDictionary<Type, RegisteredEventListener[]>();
-    private readonly Func<object?, object, IServiceProvider, ValueTask> _invoker;
+    private static readonly ConcurrentDictionary<Type, RegisteredEventListener[]> Instances = new();
     private readonly Type _eventListenerType;
+    private readonly Func<object?, object, IServiceProvider, ValueTask> _invoker;
 
-    public RegisteredEventListener(Type eventType, MethodInfo method, EventListenerAttribute attribute, Type eventListenerType)
+    public RegisteredEventListener(Type eventType, MethodInfo method, EventListenerAttribute attribute,
+        Type eventListenerType)
     {
         EventType = eventType;
         _eventListenerType = eventListenerType;
         Priority = attribute.Priority;
         IgnoreCancelled = attribute.IgnoreCancelled;
-        Method = method.GetFriendlyName(showParameters: false);
+        Method = method.GetFriendlyName(false);
         _invoker = CreateInvoker(method, attribute.IgnoreCancelled);
     }
-
-    public Type EventType { get; }
-
-    public EventPriority Priority { get; }
 
     public int PriorityOrder { get; set; }
 
     public bool IgnoreCancelled { get; }
 
     public string Method { get; }
+
+    public Type EventType { get; }
+
+    public EventPriority Priority { get; }
+
+    public ValueTask InvokeAsync(object? eventHandler, object @event, IServiceProvider provider)
+    {
+        return _invoker(eventHandler, @event, provider);
+    }
 
     public static IReadOnlyList<RegisteredEventListener> FromType(Type type)
     {
@@ -56,7 +63,8 @@ internal class RegisteredEventListener : IRegisteredEventListener
 
         if (returnType != typeof(void) && returnType != typeof(ValueTask))
         {
-            throw new InvalidOperationException($"The method {methodType.GetFriendlyName()} does not return void or ValueTask.");
+            throw new InvalidOperationException(
+                $"The method {methodType.GetFriendlyName()} does not return void or ValueTask.");
         }
 
         // Register the event.
@@ -66,9 +74,11 @@ internal class RegisteredEventListener : IRegisteredEventListener
 
             if (eventType == null)
             {
-                if (methodType.GetParameters().Length == 0 || !typeof(IEvent).IsAssignableFrom(methodType.GetParameters()[0].ParameterType))
+                if (methodType.GetParameters().Length == 0 ||
+                    !typeof(IEvent).IsAssignableFrom(methodType.GetParameters()[0].ParameterType))
                 {
-                    throw new InvalidOperationException($"The first parameter of the method {methodType.GetFriendlyName()} should be the type {nameof(IEvent)}.");
+                    throw new InvalidOperationException(
+                        $"The first parameter of the method {methodType.GetFriendlyName()} should be the type {nameof(IEvent)}.");
                 }
 
                 eventType = methodType.GetParameters()[0].ParameterType;
@@ -76,11 +86,6 @@ internal class RegisteredEventListener : IRegisteredEventListener
 
             yield return new RegisteredEventListener(eventType, methodType, attribute, listenerType);
         }
-    }
-
-    public ValueTask InvokeAsync(object? eventHandler, object @event, IServiceProvider provider)
-    {
-        return _invoker(eventHandler, @event, provider);
     }
 
     private Func<object?, object, IServiceProvider, ValueTask> CreateInvoker(MethodInfo method, bool ignoreCancelled)
@@ -156,10 +161,12 @@ internal class RegisteredEventListener : IRegisteredEventListener
         }
         else
         {
-            throw new InvalidOperationException($"The method {method.GetFriendlyName()} must return void or ValueTask.");
+            throw new InvalidOperationException(
+                $"The method {method.GetFriendlyName()} must return void or ValueTask.");
         }
 
-        return Expression.Lambda<Func<object?, object, IServiceProvider, ValueTask>>(invoke, instance, eventParameter, provider)
+        return Expression
+            .Lambda<Func<object?, object, IServiceProvider, ValueTask>>(invoke, instance, eventParameter, provider)
             .Compile();
     }
 }

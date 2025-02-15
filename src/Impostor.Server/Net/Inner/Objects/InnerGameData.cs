@@ -9,11 +9,20 @@ internal class InnerGameData : IInnerGameData
     private readonly ConcurrentDictionary<byte, InnerPlayerInfo> _allPlayers = new();
     private readonly ConcurrentDictionary<int, InnerPlayerInfo> _allPlayersByClientId = new();
 
-    public int PlayerCount => _allPlayers.Count;
+    public int PlayerCount
+    {
+        get => _allPlayers.Count;
+    }
 
-    public IReadOnlyDictionary<byte, InnerPlayerInfo> Players => _allPlayers;
+    public IReadOnlyDictionary<byte, InnerPlayerInfo> Players
+    {
+        get => _allPlayers;
+    }
 
-    internal IReadOnlyDictionary<int, InnerPlayerInfo> PlayersByClientId => _allPlayersByClientId;
+    internal IReadOnlyDictionary<int, InnerPlayerInfo> PlayersByClientId
+    {
+        get => _allPlayersByClientId;
+    }
 
     public InnerPlayerInfo? GetPlayerById(byte id)
     {

@@ -9,7 +9,7 @@ namespace Impostor.Server.Net.Custom;
 public class CustomMessageManager<T> : ICustomMessageManager<T>
     where T : ICustomMessage
 {
-    private readonly ConcurrentDictionary<byte, T> _messages = new ConcurrentDictionary<byte, T>();
+    private readonly ConcurrentDictionary<byte, T> _messages = new();
 
     public bool TryGet(byte id, [MaybeNullWhen(false)] out T message)
     {

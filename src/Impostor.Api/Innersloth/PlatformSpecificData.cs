@@ -4,7 +4,8 @@ namespace Impostor.Api.Innersloth;
 
 public class PlatformSpecificData
 {
-    public PlatformSpecificData(Platforms platform, string platformName, ulong? xboxPlatformId = null, ulong? psnPlatformId = null)
+    public PlatformSpecificData(Platforms platform, string platformName, ulong? xboxPlatformId = null,
+        ulong? psnPlatformId = null)
     {
         Platform = platform;
         PlatformName = platformName;
@@ -36,10 +37,14 @@ public class PlatformSpecificData
         switch (Platform)
         {
             case Platforms.Xbox:
-                writer.Write(XboxPlatformId ?? throw new NullReferenceException($"{nameof(XboxPlatformId)} shouldn't be null when {nameof(Platform)} is Xbox"));
+                writer.Write(XboxPlatformId ??
+                             throw new NullReferenceException(
+                                 $"{nameof(XboxPlatformId)} shouldn't be null when {nameof(Platform)} is Xbox"));
                 break;
             case Platforms.Playstation:
-                writer.Write(PsnPlatformId ?? throw new NullReferenceException($"{nameof(PsnPlatformId)} shouldn't be null when {nameof(Platform)} is Playstation"));
+                writer.Write(PsnPlatformId ??
+                             throw new NullReferenceException(
+                                 $"{nameof(PsnPlatformId)} shouldn't be null when {nameof(Platform)} is Playstation"));
                 break;
         }
 

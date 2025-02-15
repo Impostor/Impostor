@@ -1,6 +1,6 @@
-﻿namespace Impostor.Api.Plugins;
+﻿using System.Threading.Tasks;
 
-using System.Threading.Tasks;
+namespace Impostor.Api.Plugins;
 
 public class PluginBase : IPlugin
 {

@@ -9,11 +9,20 @@ public class EngineerRoleOptions : IRoleOptions
 
     public byte Version { get; }
 
-    public RoleTypes Type => RoleTypes.Engineer;
-
     public byte Cooldown { get; set; } = 30;
 
     public byte InVentMaxTime { get; set; } = 15;
+
+    public RoleTypes Type
+    {
+        get => RoleTypes.Engineer;
+    }
+
+    public void Serialize(IMessageWriter writer)
+    {
+        writer.Write(Cooldown);
+        writer.Write(InVentMaxTime);
+    }
 
     public static EngineerRoleOptions Deserialize(IMessageReader reader, byte version)
     {
@@ -23,11 +32,5 @@ public class EngineerRoleOptions : IRoleOptions
         options.InVentMaxTime = reader.ReadByte();
 
         return options;
-    }
-
-    public void Serialize(IMessageWriter writer)
-    {
-        writer.Write(Cooldown);
-        writer.Write(InVentMaxTime);
     }
 }

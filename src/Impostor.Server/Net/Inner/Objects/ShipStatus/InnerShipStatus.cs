@@ -19,9 +19,10 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus;
 
 internal abstract class InnerShipStatus : InnerNetObject, IInnerShipStatus
 {
-    private readonly Dictionary<SystemTypes, ISystemType> _systems = new Dictionary<SystemTypes, ISystemType>();
+    private readonly Dictionary<SystemTypes, ISystemType> _systems = new();
 
-    protected InnerShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, MapTypes mapType) : base(customMessageManager, game)
+    protected InnerShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, MapTypes mapType) :
+        base(customMessageManager, game)
     {
         Components.Add(this);
 
@@ -54,9 +55,11 @@ internal abstract class InnerShipStatus : InnerNetObject, IInnerShipStatus
         throw new NotImplementedException();
     }
 
-    public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+    public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader,
+        bool initialState)
     {
-        if (!await ValidateHost(CheatContext.Deserialize, sender) || !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
+        if (!await ValidateHost(CheatContext.Deserialize, sender) ||
+            !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
         {
             return;
         }
@@ -72,7 +75,8 @@ internal abstract class InnerShipStatus : InnerNetObject, IInnerShipStatus
         }
     }
 
-    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
+        IMessageReader reader)
     {
         if (!await ValidateCmd(call, sender, target))
         {
@@ -126,6 +130,6 @@ internal abstract class InnerShipStatus : InnerNetObject, IInnerShipStatus
         var cos = MathF.Cos(f);
         var sin = MathF.Sin(f);
 
-        return new Vector2((self.X * cos) - (sin * self.Y), (self.X * sin) + (cos * self.Y));
+        return new Vector2(self.X * cos - sin * self.Y, self.X * sin + cos * self.Y);
     }
 }

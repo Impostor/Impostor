@@ -15,9 +15,15 @@ public readonly struct GameJoinResult
 
     public GameJoinError Error { get; }
 
-    public bool IsSuccess => Error == GameJoinError.None;
+    public bool IsSuccess
+    {
+        get => Error == GameJoinError.None;
+    }
 
-    public bool IsCustomError => Error == GameJoinError.Custom;
+    public bool IsCustomError
+    {
+        get => Error == GameJoinError.Custom;
+    }
 
     [MemberNotNullWhen(true, nameof(IsCustomError))]
     public string? Message { get; }
@@ -39,7 +45,8 @@ public readonly struct GameJoinResult
     {
         if (error == GameJoinError.Custom)
         {
-            throw new InvalidOperationException($"Custom errors should provide a message, use {nameof(CreateCustomError)} instead.");
+            throw new InvalidOperationException(
+                $"Custom errors should provide a message, use {nameof(CreateCustomError)} instead.");
         }
 
         return new GameJoinResult(error);

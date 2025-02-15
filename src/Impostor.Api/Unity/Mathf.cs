@@ -3,7 +3,10 @@
 public static class Mathf
 {
     /// <summary>
-    ///     <para>Clamps the given value between the given minimum float and maximum float values.  Returns the given value if it is within the min and max range.</para>
+    ///     <para>
+    ///         Clamps the given value between the given minimum float and maximum float values.  Returns the given value if
+    ///         it is within the min and max range.
+    ///     </para>
     /// </summary>
     /// <param name="value">The floating point value to restrict inside the range defined by the min and max values.</param>
     /// <param name="min">The minimum floating point value to compare against.</param>
@@ -49,7 +52,10 @@ public static class Mathf
     /// <returns>
     ///     <para>The interpolated float result between the two float values.</para>
     /// </returns>
-    public static float Lerp(float a, float b, float t) => a + ((b - a) * Clamp01(t));
+    public static float Lerp(float a, float b, float t)
+    {
+        return a + (b - a) * Clamp01(t);
+    }
 
     public static float ReverseLerp(float t)
     {

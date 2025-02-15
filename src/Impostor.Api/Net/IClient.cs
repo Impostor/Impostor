@@ -66,12 +66,12 @@ public interface IClient : IEquatable<IClient>
     IClientPlayer? Player { get; }
 
     /// <summary>
-    /// Gets the version of the game the client is using.
+    ///     Gets the version of the game the client is using.
     /// </summary>
     GameVersion GameVersion { get; }
 
     /// <summary>
-    /// Gets platform specific data of the <see cref="IClient" />.
+    ///     Gets platform specific data of the <see cref="IClient" />.
     /// </summary>
     PlatformSpecificData PlatformSpecificData { get; }
 

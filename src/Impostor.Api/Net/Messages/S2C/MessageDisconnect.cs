@@ -33,7 +33,8 @@ public class MessageDisconnect
         }
     }
 
-    public static void Deserialize(IMessageReader reader, out bool hasReason, out DisconnectReason? reason, out string? message)
+    public static void Deserialize(IMessageReader reader, out bool hasReason, out DisconnectReason? reason,
+        out string? message)
     {
         hasReason = reader.ReadBoolean();
 

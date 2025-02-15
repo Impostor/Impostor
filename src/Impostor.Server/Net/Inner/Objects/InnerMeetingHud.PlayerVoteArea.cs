@@ -21,12 +21,6 @@ internal partial class InnerMeetingHud
 
         public InnerPlayerInfo TargetPlayer { get; }
 
-        public bool IsDead => VoteType == TVoteType.Dead;
-
-        public bool DidVote => VoteType != TVoteType.HasNotVoted;
-
-        public bool DidReport { get; private set; }
-
         public byte VotedForId
         {
             get => _votedForId;
@@ -55,11 +49,26 @@ internal partial class InnerMeetingHud
             }
         }
 
+        public bool IsDead
+        {
+            get => VoteType == TVoteType.Dead;
+        }
+
+        public bool DidVote
+        {
+            get => VoteType != TVoteType.HasNotVoted;
+        }
+
+        public bool DidReport { get; private set; }
+
         public TVoteType? VoteType { get; private set; }
 
         public IInnerPlayerControl? VotedFor { get; private set; }
 
-        IInnerPlayerInfo IInnerMeetingHud.IPlayerVoteArea.TargetPlayer => TargetPlayer;
+        IInnerPlayerInfo IInnerMeetingHud.IPlayerVoteArea.TargetPlayer
+        {
+            get => TargetPlayer;
+        }
 
         internal void Deserialize(IMessageReader reader, bool updateVote)
         {

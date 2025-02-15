@@ -22,15 +22,15 @@ namespace Impostor.Server.Net.Inner.Objects;
 
 internal partial class InnerMeetingHud : InnerNetObject
 {
-    private readonly ILogger<InnerMeetingHud> _logger;
     private readonly IEventManager _eventManager;
+    private readonly ILogger<InnerMeetingHud> _logger;
 
     private readonly CancellationTokenSource _timerToken;
 
-    [AllowNull]
-    private PlayerVoteArea[] _playerStates;
+    [AllowNull] private PlayerVoteArea[] _playerStates;
 
-    public InnerMeetingHud(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerMeetingHud> logger, IEventManager eventManager) : base(customMessageManager, game)
+    public InnerMeetingHud(ICustomMessageManager<ICustomRpc> customMessageManager, Game game,
+        ILogger<InnerMeetingHud> logger, IEventManager eventManager) : base(customMessageManager, game)
     {
         _logger = logger;
         _eventManager = eventManager;
@@ -47,7 +47,8 @@ internal partial class InnerMeetingHud : InnerNetObject
                 if (Game.Options.GameMode is GameModes.Normal or GameModes.NormalFools)
                 {
                     var options = (NormalGameOptions)Game.Options;
-                    await Task.Delay(TimeSpan.FromSeconds(AnimationTime + options.DiscussionTime + options.VotingTime), _timerToken.Token);
+                    await Task.Delay(TimeSpan.FromSeconds(AnimationTime + options.DiscussionTime + options.VotingTime),
+                        _timerToken.Token);
                 }
                 else
                 {
@@ -70,9 +71,11 @@ internal partial class InnerMeetingHud : InnerNetObject
         throw new NotImplementedException();
     }
 
-    public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+    public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader,
+        bool initialState)
     {
-        if (!await ValidateHost(CheatContext.Deserialize, sender) || !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
+        if (!await ValidateHost(CheatContext.Deserialize, sender) ||
+            !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
         {
             return;
         }
@@ -91,8 +94,10 @@ internal partial class InnerMeetingHud : InnerNetObject
 
             if (playerVoteArea != null)
             {
-                var clientPlayer = Game.Players.SingleOrDefault(x => x.Character?.PlayerId == playerVoteArea.TargetPlayer.PlayerId);
-                var updateVote = !playerVoteArea.DidVote && (clientPlayer?.IsHost ?? false) && playerVoteArea.VoteType != VoteType.Missed;
+                var clientPlayer =
+                    Game.Players.SingleOrDefault(x => x.Character?.PlayerId == playerVoteArea.TargetPlayer.PlayerId);
+                var updateVote = !playerVoteArea.DidVote && (clientPlayer?.IsHost ?? false) &&
+                                 playerVoteArea.VoteType != VoteType.Missed;
 
                 playerVoteArea.Deserialize(inner, updateVote);
 
@@ -110,7 +115,8 @@ internal partial class InnerMeetingHud : InnerNetObject
         }
     }
 
-    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
+        IMessageReader reader)
     {
         switch (call)
         {
@@ -181,11 +187,13 @@ internal partial class InnerMeetingHud : InnerNetObject
         if (playerState.DidVote && !playerState.IsDead)
         {
             var player = playerState.TargetPlayer.Controller!;
-            await _eventManager.CallAsync(new PlayerVotedEvent(Game, Game.GetClientPlayer(player!.OwnerId)!, player, playerState.VoteType!.Value, playerState.VotedFor));
+            await _eventManager.CallAsync(new PlayerVotedEvent(Game, Game.GetClientPlayer(player!.OwnerId)!, player,
+                playerState.VoteType!.Value, playerState.VotedFor));
         }
     }
 
-    private async ValueTask<bool> HandleCastVoteAsync(ClientPlayer sender, ClientPlayer? target, byte playerId, byte suspectPlayerId)
+    private async ValueTask<bool> HandleCastVoteAsync(ClientPlayer sender, ClientPlayer? target, byte playerId,
+        byte suspectPlayerId)
     {
         if (sender.IsHost)
         {
@@ -204,7 +212,8 @@ internal partial class InnerMeetingHud : InnerNetObject
 
         if (playerId != sender.Character!.PlayerId)
         {
-            if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, CheatCategory.Ownership, $"Client sent {nameof(RpcCalls.CastVote)} to an unowned {nameof(InnerPlayerControl)}"))
+            if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, CheatCategory.Ownership,
+                    $"Client sent {nameof(RpcCalls.CastVote)} to an unowned {nameof(InnerPlayerControl)}"))
             {
                 return false;
             }
@@ -283,7 +292,7 @@ internal partial class InnerMeetingHud : InnerNetObject
             }
         }
 
-        var self = this.CalculateVotes();
+        var self = CalculateVotes();
         var max = MaxPair(self, out var tie);
         var exiled = tie ? null : Game.GameNet.GameData!.GetPlayerById(max.Key)?.Controller;
 

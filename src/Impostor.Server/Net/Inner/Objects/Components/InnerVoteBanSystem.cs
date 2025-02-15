@@ -17,7 +17,8 @@ internal class InnerVoteBanSystem : InnerNetObject, IInnerVoteBanSystem
     private readonly ILogger<InnerVoteBanSystem> _logger;
     private readonly Dictionary<int, int[]> _votes;
 
-    public InnerVoteBanSystem(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerVoteBanSystem> logger) : base(customMessageManager, game)
+    public InnerVoteBanSystem(ICustomMessageManager<ICustomRpc> customMessageManager, Game game,
+        ILogger<InnerVoteBanSystem> logger) : base(customMessageManager, game)
     {
         _logger = logger;
         _votes = new Dictionary<int, int[]>();
@@ -29,7 +30,8 @@ internal class InnerVoteBanSystem : InnerNetObject, IInnerVoteBanSystem
         throw new NotImplementedException();
     }
 
-    public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+    public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader,
+        bool initialState)
     {
         if (!await ValidateHost(CheatContext.Deserialize, sender))
         {
@@ -62,7 +64,8 @@ internal class InnerVoteBanSystem : InnerNetObject, IInnerVoteBanSystem
         }
     }
 
-    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
+        IMessageReader reader)
     {
         if (call == RpcCalls.AddVote)
         {
@@ -70,7 +73,8 @@ internal class InnerVoteBanSystem : InnerNetObject, IInnerVoteBanSystem
 
             if (clientId != sender.Client.Id)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.AddVote, CheatCategory.Ownership, $"Client sent {nameof(RpcCalls.AddVote)} as other client"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.AddVote, CheatCategory.Ownership,
+                        $"Client sent {nameof(RpcCalls.AddVote)} as other client"))
                 {
                     return false;
                 }

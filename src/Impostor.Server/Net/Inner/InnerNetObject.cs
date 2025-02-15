@@ -19,15 +19,18 @@ internal abstract partial class InnerNetObject : GameObject, IInnerNetObject
         Game = game;
     }
 
+    public Game Game { get; }
+
+    public SpawnFlags SpawnFlags { get; internal set; }
+
     public uint NetId { get; internal set; }
 
     public int OwnerId { get; internal set; }
 
-    public Game Game { get; }
-
-    IGame IInnerNetObject.Game => Game;
-
-    public SpawnFlags SpawnFlags { get; internal set; }
+    IGame IInnerNetObject.Game
+    {
+        get => Game;
+    }
 
     public bool IsOwnedBy(IClientPlayer player)
     {
@@ -37,14 +40,17 @@ internal abstract partial class InnerNetObject : GameObject, IInnerNetObject
 
     public abstract ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState);
 
-    public abstract ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState);
+    public abstract ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader,
+        bool initialState);
 
-    public virtual async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+    public virtual async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
+        IMessageReader reader)
     {
         return await HandleCustomRpcAsync(sender, target, call, reader) ?? await UnregisteredCall(call, sender);
     }
 
-    protected async ValueTask<bool?> HandleCustomRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+    protected async ValueTask<bool?> HandleCustomRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call,
+        IMessageReader reader)
     {
         if (_customMessageManager.TryGet((byte)call, out var customRpc))
         {

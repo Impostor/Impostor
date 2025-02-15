@@ -9,8 +9,8 @@ namespace Impostor.Server.Net.Inner.Objects.GameManager.Logic;
 
 internal abstract class LogicOptions : GameLogicComponent
 {
-    private readonly Game _game;
     private readonly IEventManager _eventManager;
+    private readonly Game _game;
 
     protected LogicOptions(Game game, IEventManager eventManager)
     {

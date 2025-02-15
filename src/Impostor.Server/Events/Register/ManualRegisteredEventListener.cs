@@ -15,7 +15,10 @@ internal class ManualRegisteredEventListener : IRegisteredEventListener
 
     public Type EventType { get; } = typeof(object);
 
-    public EventPriority Priority => _manualEventListener.Priority;
+    public EventPriority Priority
+    {
+        get => _manualEventListener.Priority;
+    }
 
     public ValueTask InvokeAsync(object? eventHandler, object @event, IServiceProvider provider)
     {

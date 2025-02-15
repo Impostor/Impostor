@@ -7,7 +7,8 @@ namespace Impostor.Api.Net.Messages.S2C;
 
 public class Message22QueryPlatformIdsS2C
 {
-    public static void Serialize(IMessageWriter writer, GameCode gameCode, IEnumerable<PlatformSpecificData> playerSpecificDatas)
+    public static void Serialize(IMessageWriter writer, GameCode gameCode,
+        IEnumerable<PlatformSpecificData> playerSpecificDatas)
     {
         writer.StartMessage(MessageFlags.QueryPlatformIds);
         gameCode.Serialize(writer);

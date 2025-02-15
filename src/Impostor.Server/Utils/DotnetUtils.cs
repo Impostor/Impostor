@@ -37,9 +37,6 @@ public static class DotnetUtils
 
     public static string Environment
     {
-        get
-        {
-            return IsDev ? "Development" : "Production";
-        }
+        get => IsDev ? "Development" : "Production";
     }
 }

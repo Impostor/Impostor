@@ -11,7 +11,8 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus;
 
 internal class InnerPolusShipStatus : InnerShipStatus, IInnerPolusShipStatus
 {
-    public InnerPolusShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game, MapTypes.Polus)
+    public InnerPolusShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(
+        customMessageManager, game, MapTypes.Polus)
     {
     }
 
@@ -26,10 +27,10 @@ internal class InnerPolusShipStatus : InnerShipStatus, IInnerPolusShipStatus
         var spawnId = player.PlayerId % 15;
         if (player.PlayerId < halfPlayers)
         {
-            return Data.MeetingSpawnCenter + (new Vector2(0.6f, 0) * spawnId);
+            return Data.MeetingSpawnCenter + new Vector2(0.6f, 0) * spawnId;
         }
 
-        return Data.MeetingSpawnCenter2 + (new Vector2(0.6f, 0) * (spawnId - halfPlayers));
+        return Data.MeetingSpawnCenter2 + new Vector2(0.6f, 0) * (spawnId - halfPlayers);
     }
 
     protected override void AddSystems(Dictionary<SystemTypes, ISystemType> systems)

@@ -12,7 +12,7 @@ public interface IGameManager
     IGame? Find(GameCode code);
 
     /// <summary>
-    /// Creates a new game.
+    ///     Creates a new game.
     /// </summary>
     /// <param name="options">Game options.</param>
     /// <param name="filterOptions">Filter options.</param>

@@ -21,8 +21,8 @@ internal partial class InnerMeetingHud
 
         public void Serialize(IMessageWriter writer)
         {
-            writer.StartMessage(this.VoterId);
-            writer.Write(this.VotedForId);
+            writer.StartMessage(VoterId);
+            writer.Write(VotedForId);
             writer.EndMessage();
         }
     }

@@ -13,10 +13,10 @@ namespace Impostor.Server.Events;
 
 internal class EventManager : IEventManager
 {
-    private readonly ConcurrentDictionary<Type, TemporaryEventRegister> _temporaryEventListeners;
     private readonly ConcurrentDictionary<Type, List<EventHandler>> _cachedEventHandlers;
     private readonly ILogger<EventManager> _logger;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ConcurrentDictionary<Type, TemporaryEventRegister> _temporaryEventListeners;
 
     public EventManager(ILogger<EventManager> logger, IServiceProvider serviceProvider)
     {

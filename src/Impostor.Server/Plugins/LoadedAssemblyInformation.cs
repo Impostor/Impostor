@@ -15,7 +15,10 @@ public class LoadedAssemblyInformation : IAssemblyInformation
 
     public AssemblyName AssemblyName { get; }
 
-    public bool IsPlugin => false;
+    public bool IsPlugin
+    {
+        get => false;
+    }
 
     public Assembly Load(AssemblyLoadContext context)
     {

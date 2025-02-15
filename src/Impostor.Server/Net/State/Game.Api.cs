@@ -16,9 +16,15 @@ internal partial class Game : IGame
 {
     private bool _alreadyCallingOptionsChangedEvent;
 
-    IClientPlayer? IGame.Host => Host;
+    IClientPlayer? IGame.Host
+    {
+        get => Host;
+    }
 
-    IGameNet IGame.GameNet => GameNet;
+    IGameNet IGame.GameNet
+    {
+        get => GameNet;
+    }
 
     public void BanIp(IPAddress ipAddress)
     {
@@ -67,7 +73,8 @@ internal partial class Game : IGame
         // Prevent bad plugins from causing a server crash by recursing into this function
         if (_alreadyCallingOptionsChangedEvent)
         {
-            _logger.LogError("Plugin called SyncSettingsAsync while processing a GameOptionsChangedEvent, aborting to prevent recursion");
+            _logger.LogError(
+                "Plugin called SyncSettingsAsync while processing a GameOptionsChangedEvent, aborting to prevent recursion");
         }
         else
         {

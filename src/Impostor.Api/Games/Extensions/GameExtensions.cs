@@ -13,7 +13,8 @@ public static class GameExtensions
             : game.SendToAllAsync(writer, states);
     }
 
-    public static ValueTask SendToAllExceptAsync(this IGame game, IMessageWriter writer, LimboStates states, IClient client)
+    public static ValueTask SendToAllExceptAsync(this IGame game, IMessageWriter writer, LimboStates states,
+        IClient client)
     {
         if (client == null)
         {
