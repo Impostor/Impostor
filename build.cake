@@ -9,6 +9,7 @@ var tag = workflow.RefType == GitHubActionsRefType.Tag ? workflow.RefName : null
 var buildVersion = FindRegexMatchGroupInFile("./src/Directory.Build.props", @"\<VersionPrefix\>(.*?)\<\/VersionPrefix\>", 1, System.Text.RegularExpressions.RegexOptions.None).Value;
 var buildDir = MakeAbsolute(Directory("./build"));
 
+var target = Argument("target", "Build");
 var configuration = Argument("configuration", "Release");
 
 var msbuildSettings = new DotNetMSBuildSettings();
@@ -139,3 +140,5 @@ Task("Build")
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
 //////////////////////////////////////////////////////////////////////
+
+RunTarget(target);
