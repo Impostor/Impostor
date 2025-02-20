@@ -35,11 +35,12 @@ else
 //////////////////////////////////////////////////////////////////////
 
 // Remove unnecessary files for packaging.
-private void ImpostorPublish(string name, string project, string runtime, bool isServer = false) {
+private void ImpostorPublish(string runtime) {
+    var name = "Impostor_Server";
     var projBuildDir = buildDir.Combine(name + "_" + runtime);
     var projBuildName = name + "_" + buildVersion + "_" + runtime;
 
-    DotNetPublish(project, new DotNetPublishSettings {
+    DotNetPublish("./src/Impostor.Server/Impostor.Server.csproj", new DotNetPublishSettings {
         Configuration = configuration,
         NoRestore = true,
         Runtime = runtime,
@@ -97,19 +98,12 @@ Task("Restore")
 Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
-    .IsDependentOn("Replay")
-    .Does(() => {
-        // Tests.
-        DotNetBuild("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetBuildSettings {
-            Configuration = configuration,
-        });
-            
+    .Does(() => {  
         // Server.
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "win-x64", true);
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "osx-x64", true);
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-x64", true);
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm", true);
-        ImpostorPublish("Impostor-Server", "./src/Impostor.Server/Impostor.Server.csproj", "linux-arm64", true);
+        ImpostorPublish("win-x64");
+        ImpostorPublish("osx-x64");
+        ImpostorPublish("linux-x64");
+        ImpostorPublish("linux-arm64");
 
         // API.
         DotNetPack("./src/Impostor.Api/Impostor.Api.csproj", new DotNetPackSettings {
@@ -119,6 +113,17 @@ Task("Build")
             IncludeSymbols = true,
             MSBuildSettings = msbuildSettings
         });
+
+        // API.
+        DotNetPack("./src/Impostor.Api.Extension/Impostor.Api.Extension.csproj", new DotNetPackSettings
+        {
+            Configuration = configuration,
+            OutputDirectory = buildDir,
+            IncludeSource = true,
+            IncludeSymbols = true,
+            MSBuildSettings = msbuildSettings
+        });
+
 
         if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
             foreach (var file in GetFiles(buildDir + "/*.{nupkg,snupkg}"))

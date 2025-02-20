@@ -33,9 +33,9 @@ jobs:
           dotnet-version: 9.x
 
       - name: Run the Cake script
-        uses: cake-build/cake-action@v1
+        uses: cake-build/cake-action@v3
         with:
-          verbosity: Diagnostic
+          verbosity: Minimal
 
       - uses: softprops/action-gh-release@v1
         if: github.ref_type == 'tag'
@@ -50,4 +50,4 @@ jobs:
       - name: Push NuGet package
         if: github.ref_type == 'tag'
         run: |
-          dotnet nuget push ./build/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_IMPOSTOR }}
+          dotnet nuget push ./build/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET }}
