@@ -9,7 +9,6 @@ var tag = workflow.RefType == GitHubActionsRefType.Tag ? workflow.RefName : null
 var buildVersion = FindRegexMatchGroupInFile("./src/Directory.Build.props", @"\<VersionPrefix\>(.*?)\<\/VersionPrefix\>", 1, System.Text.RegularExpressions.RegexOptions.None).Value;
 var buildDir = MakeAbsolute(Directory("./build"));
 
-var target = Argument("target", "Test");
 var configuration = Argument("configuration", "Release");
 
 var msbuildSettings = new DotNetMSBuildSettings();
@@ -21,7 +20,6 @@ if (tag != null)
 }
 else if (buildId != 0) 
 {
-    buildId += 500; 
     msbuildSettings.VersionSuffix = "ci." + buildId;
     buildVersion += "-ci." + buildId;
 } 
@@ -51,20 +49,20 @@ private void ImpostorPublish(string runtime) {
         MSBuildSettings = msbuildSettings
     });
 
-    if (isServer) {
-        var pluginsDir = projBuildDir.Combine("plugins");
-        var librariesDir = projBuildDir.Combine("libraries");
 
-        CreateDirectory(pluginsDir);
-        CreateDirectory(librariesDir);
+    var pluginsDir = projBuildDir.Combine("plugins");
+    var librariesDir = projBuildDir.Combine("libraries");
 
-        FileWriteText(pluginsDir.CombineWithFilePath("1"), "1");
-        FileWriteText(librariesDir.CombineWithFilePath("1"), "1");
+    CreateDirectory(pluginsDir);
+    CreateDirectory(librariesDir);
 
-        if (runtime == "win-x64") {
-            FileWriteText(projBuildDir.CombineWithFilePath("run.bat"), "@echo off\r\nImpostor.Server.exe\r\npause");
-        }
+    FileWriteText(pluginsDir.CombineWithFilePath("1"), "1");
+    FileWriteText(librariesDir.CombineWithFilePath("1"), "1");
+
+    if (runtime == "win-x64") {
+        FileWriteText(projBuildDir.CombineWithFilePath("run.bat"), "@echo off\r\nImpostor.Server.exe\r\npause");
     }
+
 
     if (runtime == "win-x64") {
         Zip(projBuildDir, buildDir.CombineWithFilePath(projBuildName + ".zip"));
@@ -108,17 +106,17 @@ Task("Build")
         // API.
         DotNetPack("./src/Impostor.Api/Impostor.Api.csproj", new DotNetPackSettings {
             Configuration = configuration,
-            OutputDirectory = buildDir,
+            OutputDirectory = buildDir + "/api",
             IncludeSource = true,
             IncludeSymbols = true,
             MSBuildSettings = msbuildSettings
         });
 
-        // API.
+        // API Exension.
         DotNetPack("./src/Impostor.Api.Extension/Impostor.Api.Extension.csproj", new DotNetPackSettings
         {
             Configuration = configuration,
-            OutputDirectory = buildDir,
+            OutputDirectory = buildDir + "/extension",
             IncludeSource = true,
             IncludeSymbols = true,
             MSBuildSettings = msbuildSettings
@@ -126,7 +124,12 @@ Task("Build")
 
 
         if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
-            foreach (var file in GetFiles(buildDir + "/*.{nupkg,snupkg}"))
+            foreach (var file in GetFiles(buildDir + "/api" + "/*.{nupkg,snupkg}"))
+            {
+                BuildSystem.GitHubActions.Commands.UploadArtifact(file, "Impostor.Api");
+            }
+
+            foreach (var file in GetFiles(buildDir + "/extension" + "/*.{nupkg,snupkg}"))
             {
                 BuildSystem.GitHubActions.Commands.UploadArtifact(file, "Impostor.Api");
             }
@@ -136,5 +139,3 @@ Task("Build")
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
 //////////////////////////////////////////////////////////////////////
-
-RunTarget(target);
