@@ -51,8 +51,14 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
     });
 
     if (isServer) {
-        CreateDirectory(projBuildDir.Combine("plugins"));
-        CreateDirectory(projBuildDir.Combine("libraries"));
+        var pluginsDir = projBuildDir.Combine("plugins");
+        var librariesDir = projBuildDir.Combine("libraries");
+
+        CreateDirectory(pluginsDir);
+        CreateDirectory(librariesDir);
+
+        FileWriteText(pluginsDir.CombineWithFilePath("1"), "1");
+        FileWriteText(librariesDir.CombineWithFilePath("1"), "1");
 
         if (runtime == "win-x64") {
             FileWriteText(projBuildDir.CombineWithFilePath("run.bat"), "@echo off\r\nImpostor.Server.exe\r\npause");
@@ -68,22 +74,6 @@ private void ImpostorPublish(string name, string project, string runtime, bool i
     if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
         BuildSystem.GitHubActions.Commands.UploadArtifact(projBuildDir, projBuildName);
     }
-}
-
-private void ImpostorPublishNF(string name, string project) {
-    var runtime = "win-x64";
-    var projBuildDir = buildDir.Combine(name + "_" + runtime);
-    var projBuildZip = buildDir.CombineWithFilePath(name + "_" + buildVersion + "_" + runtime + ".zip");
-
-    DotNetPublish(project, new DotNetPublishSettings {
-        Configuration = configuration,
-        NoRestore = true,
-        Framework = "net472",
-        OutputDirectory = projBuildDir,
-        MSBuildSettings = msbuildSettings
-    });
-
-    Zip(projBuildDir, projBuildZip);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -102,17 +92,6 @@ Task("Clean")
 Task("Restore")
     .Does(() => {
         DotNetRestore("./src/Impostor.sln");
-    });
-
-Task("Replay")
-    .Does(() => {
-        // D:\Projects\GitHub\Impostor\Impostor\src\Impostor.Tools.ServerReplay\sessions
-        DotNetRun(
-            "./src/Impostor.Tools.ServerReplay/Impostor.Tools.ServerReplay.csproj", 
-            "./src/Impostor.Tools.ServerReplay/sessions", new DotNetRunSettings {
-                Configuration = configuration,
-                NoRestore = true,
-            });
     });
 
 Task("Build")
@@ -147,15 +126,6 @@ Task("Build")
                 BuildSystem.GitHubActions.Commands.UploadArtifact(file, "Impostor.Api");
             }
         }
-    });
-
-Task("Test")
-    .IsDependentOn("Build")
-    .Does(() => {
-        DotNetTest("./src/Impostor.Tests/Impostor.Tests.csproj", new DotNetTestSettings {
-            Configuration = configuration,
-            NoBuild = true
-        });
     });
 
 //////////////////////////////////////////////////////////////////////

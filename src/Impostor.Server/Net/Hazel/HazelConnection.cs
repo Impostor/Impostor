@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Microsoft.Extensions.Logging;
@@ -53,9 +54,16 @@ internal class HazelConnection : IHazelConnection
 
     private async ValueTask ConnectionOnDisconnected(DisconnectedEventArgs e)
     {
-        if (Client != null)
+        try
         {
-            await Client.HandleDisconnectAsync(e.Reason);
+            if (Client != null)
+            {
+                await Client.HandleDisconnectAsync(e.Reason);
+            }
+        }
+        catch
+        {
+            // ignored
         }
     }
 
@@ -65,22 +73,27 @@ internal class HazelConnection : IHazelConnection
         {
             return;
         }
-
+        
         while (true)
         {
             if (e.Message.Position >= e.Message.Length)
             {
                 break;
             }
-
-            using (var message = e.Message.ReadMessage())
-            {
-                await Client.HandleMessageAsync(message, e.Type);
-            }
-
+            
             if (!IsConnected)
             {
                 break;
+            }
+            
+            try
+            {
+                using var message = e.Message.ReadMessage();
+                await Client.HandleMessageAsync(message, e.Type);
+            }
+            catch
+            {
+                _logger.LogWarning("Error readMessage Form {connection}", InnerConnection.EndPoint);
             }
         }
     }

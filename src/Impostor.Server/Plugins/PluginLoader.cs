@@ -5,7 +5,10 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using Impostor.Api.Config;
+using Impostor.Api.Extension;
 using Impostor.Api.Plugins;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Hosting;
@@ -13,10 +16,27 @@ using Serilog;
 
 namespace Impostor.Server.Plugins;
 
-public static class PluginLoader
+internal static class PluginLoader
 {
     private static readonly ILogger Logger = Log.ForContext(typeof(PluginLoader));
+    
+    private static bool IsTargetType(Type type)
+    {
+        if (!type.IsClass)
+            return false;
 
+        if (type.IsAbstract)
+            return false;
+
+        if (typeof(IPlugin).IsAssignableFrom(type))
+            return true;
+
+        if (typeof(IPluginStartup).IsAssignableFrom(type))
+            return true;
+        
+        return false;
+    }
+    
     public static IHostBuilder UsePluginLoader(this IHostBuilder builder, PluginConfig config)
     {
         var assemblyInfos = new List<IAssemblyInformation>();
@@ -63,6 +83,7 @@ public static class PluginLoader
 
         // Find all plugins.
         var plugins = new List<PluginInformation>();
+        var cacher = new TypesCacher(IsTargetType);
 
         foreach (var assembly in assemblies)
         {
@@ -122,6 +143,25 @@ public static class PluginLoader
         });
 
         return builder;
+    }
+
+    public static void ConfigurePluginWeb(this IApplicationBuilder app, IWebHostBuilder webHostBuilder)
+    {
+        var plugins = app.ApplicationServices.GetRequiredService<PluginLoaderService>().Plugins;
+        var mvcBuilder = app.ApplicationServices.GetRequiredService<IMvcBuilder>();
+        foreach (var pluginInfo in plugins)
+        {
+            if (pluginInfo.Startup is IHttpPluginStartup startup)
+            {
+                startup.ConfigureHost(webHostBuilder);
+                startup.ConfigureWebApplication(app);
+            }
+
+            if (pluginInfo.Instance is IHttpPlugin { AssemblyPart: true })
+            {
+                mvcBuilder.AddApplicationPart(pluginInfo.PluginType.Assembly);
+            }
+        }
     }
 
     private static List<PathCheckInfo> CheckPaths(this IEnumerable<string> paths)
@@ -279,4 +319,14 @@ public static class PluginLoader
     }
 
     private record PathCheckInfo(string Path, bool IsDir);
+    
+    private class TypesCacher(Predicate<Type> predicate)
+    {
+        private List<Type> _types = [];
+
+        internal TypesCacher LoaderAssembly(Assembly assembly)
+        {
+            return this;
+        }
+    }
 }

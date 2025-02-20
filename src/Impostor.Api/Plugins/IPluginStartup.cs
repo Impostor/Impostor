@@ -5,7 +5,7 @@ namespace Impostor.Api.Plugins;
 
 public interface IPluginStartup
 {
-    void ConfigureHost(IHostBuilder host);
+    void ConfigureHost(IHostBuilder host) { }
 
-    void ConfigureServices(IServiceCollection services);
+    void ConfigureServices(IServiceCollection services) { }
 }

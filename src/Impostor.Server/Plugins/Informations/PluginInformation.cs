@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Impostor.Api.Plugins;
+using Impostor.Server.Plugins.Informations;
 
 namespace Impostor.Server.Plugins;
 

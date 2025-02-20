@@ -418,7 +418,7 @@ internal partial class Game
 
                 if (player != null)
                 {
-                    await _eventManager.CallAsync(new PlayerSpawnedEvent(this, player, control));
+                    await eventManager.CallAsync(new PlayerSpawnedEvent(this, player, control));
                 }
 
                 break;
@@ -435,7 +435,7 @@ internal partial class Game
                     }
                 }
 
-                await _eventManager.CallAsync(new MeetingStartedEvent(this, meetingHud));
+                await eventManager.CallAsync(new MeetingStartedEvent(this, meetingHud));
                 break;
             }
         }
@@ -481,7 +481,7 @@ internal partial class Game
                 if (TryGetPlayer(control.OwnerId, out var player))
                 {
                     player.Character = null;
-                    await _eventManager.CallAsync(new PlayerDestroyedEvent(this, player, control));
+                    await eventManager.CallAsync(new PlayerDestroyedEvent(this, player, control));
                 }
 
                 break;

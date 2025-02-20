@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,6 +12,7 @@ using Impostor.Api.Games.Managers;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Utils;
 using Impostor.Server.Commands;
+using Impostor.Server.Controllers;
 using Impostor.Server.Events;
 using Impostor.Server.Hubs;
 using Impostor.Server.Net;
@@ -23,6 +23,7 @@ using Impostor.Server.Plugins;
 using Impostor.Server.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.WebSockets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -114,13 +115,16 @@ internal static class Program
                     .Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section))
                     .Configure<CompatibilityConfig>(host.Configuration.GetSection(CompatibilityConfig.Section))
                     .Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section))
-                    .Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section));
+                    .Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section))
+                    .Configure<PluginConfig>(host.Configuration.GetSection(PluginConfig.Section))
+                    .Configure<ExtensionServerConfig>(host.Configuration.GetSection(ExtensionServerConfig.Section));
                 
                 services
+                    .AddSingleton<HttpConnectionManager>()
+                    .AddSingleton<ClientAuthManager>()
                     .AddSingleton<IMessageWriterProvider, MessageWriterProvider>()
                     .AddSingleton<IGameCodeFactory, GameCodeFactory>()
                     .AddSingleton<IEventManager, EventManager>()
-                    .AddSingleton<INetListenerManager, NetListenerManager>()
                     .AddSingleton<IDateTimeProvider, RealDateTimeProvider>()
                     .AddSingleton<ICompatibilityManager, CompatibilityManager>()
                     .AddSingleton<IClientFactory, ClientFactory<Client>>();
@@ -128,7 +132,8 @@ internal static class Program
                 services
                     .AddRequiredSingleton<IServerEnvironment, ServerEnvironment>()
                     .AddRequiredSingleton<IClientManager, ClientManager>()
-                    .AddRequiredSingleton<IGameManager, GameManager>();
+                    .AddRequiredSingleton<IGameManager, GameManager>()
+                    .AddRequiredSingleton<INetListenerManager, NetListenerManager>();
 
                 if (config.EnableCommands)
                     services.AddHostedService<ConsoleCommandService>();
@@ -203,14 +208,29 @@ internal static class Program
 
             hostBuilder.ConfigureServices(collection =>
             {
-                if (config.EnabledSignalRWeb || config.EnabledSignalRMatchmaker)
+                if (config.EnabledSignalRWeb)
                 {
                     collection.AddSignalR();
                 }
+
+                if (config.EnabledHttpMatchmaker || config.EnabledNextApi)
+                {
+                    collection.AddControllers();
+                }
+
+                if (config.EnabledWebSocketMatchmaker)
+                {
+                    collection.AddWebSockets(option =>
+                    {
+                    });
+                }
             });
 
+            
             hostBuilder.Configure(applicationBuilder =>
             {
+                applicationBuilder.ConfigurePluginWeb(hostBuilder);
+                
                 if (config.EnabledSpa)
                 {
                     applicationBuilder.Map("/web", webBuilder =>
@@ -232,6 +252,7 @@ internal static class Program
                         {
                             FileProvider = new PhysicalFileProvider(config.SpaDirectory),
                         };
+                        
                         webBuilder.UseSpaStaticFiles(fileOption);
                         webBuilder.UseSpa(spa =>
                         {
@@ -247,9 +268,9 @@ internal static class Program
                         endpoint.MapHub<WebHub>("/signalr/web");
                     }
 
-                    if (config.EnabledSignalRMatchmaker)
+                    if (config.EnabledHttpMatchmaker || config.EnabledNextApi)
                     {
-                        endpoint.MapHub<MatchmakerHub>("/signalr/matchmaker");
+                        endpoint.MapControllers();
                     }
                 });
             });

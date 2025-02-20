@@ -38,7 +38,6 @@ internal partial class Game(
 {
     private readonly HashSet<IPAddress> _bannedIps = new();
     private readonly CompatibilityConfig _compatibilityConfig = compatibilityConfig.Value;
-    private readonly IEventManager _eventManager = eventManager;
     private readonly ConcurrentDictionary<int, ClientPlayer> _players = new();
     private readonly TimeoutConfig _timeoutConfig = timeoutConfig.Value;
 
@@ -112,7 +111,7 @@ internal partial class Game(
 
             GameState = GameStates.Started;
 
-            await _eventManager.CallAsync(new GameStartedEvent(this));
+            await eventManager.CallAsync(new GameStartedEvent(this));
         }
     }
 

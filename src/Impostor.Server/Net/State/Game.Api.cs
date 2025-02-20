@@ -81,7 +81,7 @@ internal partial class Game : IGame
             try
             {
                 _alreadyCallingOptionsChangedEvent = true;
-                await _eventManager.CallAsync(new GameOptionsChangedEvent(
+                await eventManager.CallAsync(new GameOptionsChangedEvent(
                     this,
                     IGameOptionsChangedEvent.ChangeReason.Api
                 ));

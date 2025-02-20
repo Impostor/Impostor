@@ -15,8 +15,14 @@ public class ExtensionServerConfig
     public string SpaDirectory { get; set; } = "/Web";
 
     public bool EnabledNextApi { get; set; } = false;
+    
+    public string SignalRToken { get; set; } = "NextImpostor";
 
     public bool EnabledSignalRWeb { get; set; } = false;
+    
+    public string MatchmakerToken { get; set; } = "NextImpostor";
 
-    public bool EnabledSignalRMatchmaker { get; set; } = false;
+    public bool EnabledHttpMatchmaker { get; set; } = false;
+    
+    public bool EnabledWebSocketMatchmaker { get; set; } = false;
 }

@@ -2,6 +2,43 @@
   "version": 1,
   "dependencies": {
     "net9.0": {
+      "Microsoft.AspNetCore.Hosting.Abstractions": {
+        "type": "Direct",
+        "requested": "[2.3.0, )",
+        "resolved": "2.3.0",
+        "contentHash": "4ivq53W2k6Nj4eez9wc81ytfGj6HR1NaZJCpOrvghJo9zHuQF57PLhPoQH5ItyCpHXnrN/y7yJDUm+TGYzrx0w==",
+        "dependencies": {
+          "Microsoft.AspNetCore.Hosting.Server.Abstractions": "2.3.0",
+          "Microsoft.AspNetCore.Http.Abstractions": "2.3.0",
+          "Microsoft.Extensions.Hosting.Abstractions": "8.0.1"
+        }
+      },
+      "Microsoft.AspNetCore.Hosting.Server.Abstractions": {
+        "type": "Transitive",
+        "resolved": "2.3.0",
+        "contentHash": "F5iHx7odAbFKBV1DNPDkFFcVmD5Tk7rk+tYm3LMQxHEFFdjlg5QcYb5XhHAefl5YaaPeG6ad+/ck8kSG3/D6kw==",
+        "dependencies": {
+          "Microsoft.AspNetCore.Http.Features": "2.3.0",
+          "Microsoft.Extensions.Configuration.Abstractions": "8.0.0"
+        }
+      },
+      "Microsoft.AspNetCore.Http.Abstractions": {
+        "type": "Transitive",
+        "resolved": "2.3.0",
+        "contentHash": "39r9PPrjA6s0blyFv5qarckjNkaHRA5B+3b53ybuGGNTXEj1/DStQJ4NWjFL6QTRQpL9zt7nDyKxZdJOlcnq+Q==",
+        "dependencies": {
+          "Microsoft.AspNetCore.Http.Features": "2.3.0",
+          "System.Text.Encodings.Web": "8.0.0"
+        }
+      },
+      "Microsoft.AspNetCore.Http.Features": {
+        "type": "Transitive",
+        "resolved": "2.3.0",
+        "contentHash": "f10WUgcsKqrkmnz6gt8HeZ7kyKjYN30PO7cSic1lPtH7paPtnQqXPOveul/SIPI43PhRD4trttg4ywnrEmmJpA==",
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "8.0.0"
+        }
+      },
       "Microsoft.Extensions.Configuration.Abstractions": {
         "type": "Transitive",
         "resolved": "9.0.2",
@@ -68,20 +105,25 @@
       },
       "NextFast.Hazel.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.0.1-dev",
-        "contentHash": "Eljw3/Z3mDEhYcOTGcGkPQUwtzW4oxgsAj65NK64LKdG2IVrfBMcT9cdGQvRcA/oOXn3IGQRA6DHXcqkYFnV/A=="
+        "resolved": "1.0.2-ci.7",
+        "contentHash": "YFTuYOB9UjNj4NelmATDQCJbhAyW4wpRli11HIoBz9b9YVYJOBRGrzP41iih37PB1InlCMlQlP4g/TUJHQ2oqg=="
       },
       "Serilog": {
         "type": "Transitive",
         "resolved": "4.2.1-dev-02340",
         "contentHash": "CCWT2Cnh963brjYZpfFieoXSicgecLMN7+XUL2OSOnxp0NgeWXTDDVcdXEwX3RLUH4UoOJpWsH3qpNdOrfqBTA=="
       },
+      "System.Text.Encodings.Web": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "yev/k9GHAEGx2Rg3/tU6MQh4HGBXJs70y7j1LaM1i/ER9po+6nnQ6RRqTJn1E7Xu0fbIFK80Nh5EoODxrbxwBQ=="
+      },
       "impostor.api": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "[9.0.2, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.2, )",
-          "NextFast.Hazel.Abstractions": "[1.0.1-dev, )",
+          "NextFast.Hazel.Abstractions": "[1.0.2-ci.7, )",
           "Serilog": "[4.2.1-dev-02340, )"
         }
       }

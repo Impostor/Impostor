@@ -25,7 +25,7 @@ internal partial class Game
             HostId = player.Client.Id;
         }
 
-        await _eventManager.CallAsync(new GamePlayerJoinedEvent(this, player));
+        await eventManager.CallAsync(new GamePlayerJoinedEvent(this, player));
     }
 
     private async ValueTask<bool> PlayerRemove(int playerId, bool isBan = false)
@@ -52,7 +52,7 @@ internal partial class Game
         if (HostId == playerId)
         {
             await MigrateHost();
-            await _eventManager.CallAsync(new GameHostChangedEvent(this, player, Host));
+            await eventManager.CallAsync(new GameHostChangedEvent(this, player, Host));
         }
 
         // Game is empty, remove it.
@@ -70,7 +70,7 @@ internal partial class Game
             BanIp(player.Client.Connection.EndPoint.Address);
         }
 
-        await _eventManager.CallAsync(new GamePlayerLeftEvent(this, player, isBan));
+        await eventManager.CallAsync(new GamePlayerLeftEvent(this, player, isBan));
 
         // Player can refuse to be kicked and keep the connection open, check for this.
         _ = Task.Run(async () =>

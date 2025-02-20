@@ -23,7 +23,7 @@ internal partial class Game
         message.CopyTo(packet);
         await SendToAllAsync(packet);
 
-        await _eventManager.CallAsync(new GameStartingEvent(this));
+        await eventManager.CallAsync(new GameStartingEvent(this));
     }
 
     public async ValueTask HandleEndGame(IMessageReader message, GameOverReason gameOverReason)
@@ -49,7 +49,7 @@ internal partial class Game
             await DespawnPlayerInfoAsync(playerInfo);
         }
 
-        await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));
+        await eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));
     }
 
     public async ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic)
@@ -60,7 +60,7 @@ internal partial class Game
         message.CopyTo(packet);
         await SendToAllExceptAsync(packet, sender.Client.Id);
 
-        await _eventManager.CallAsync(new GameAlterEvent(this, isPublic));
+        await eventManager.CallAsync(new GameAlterEvent(this, isPublic));
     }
 
     public async ValueTask HandleRemovePlayer(int playerId, DisconnectReason reason)
@@ -217,7 +217,7 @@ internal partial class Game
         }
 
         var @event = new GamePlayerJoiningEvent(this, player);
-        await _eventManager.CallAsync(@event);
+        await eventManager.CallAsync(@event);
 
         if (@event.JoinResult != null && !@event.JoinResult.Value.IsSuccess)
         {

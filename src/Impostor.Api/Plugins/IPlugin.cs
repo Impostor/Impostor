@@ -5,9 +5,18 @@ namespace Impostor.Api.Plugins;
 
 public interface IPlugin : IEventListener
 {
-    ValueTask EnableAsync();
+    ValueTask EnableAsync()
+    {
+        return default;
+    }
 
-    ValueTask DisableAsync();
+    ValueTask DisableAsync()
+    {
+        return default;
+    }
 
-    ValueTask ReloadAsync();
+    ValueTask ReloadAsync()
+    {
+        return default;
+    }
 }

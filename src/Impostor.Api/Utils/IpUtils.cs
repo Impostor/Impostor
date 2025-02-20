@@ -5,7 +5,7 @@ using System.Net.Sockets;
 
 namespace Impostor.Api.Utils;
 
-internal static class IpUtils
+public static class IpUtils
 {
     private static readonly Dictionary<string, string> CacheResolveIp = new();
 
@@ -41,8 +41,8 @@ internal static class IpUtils
         // Only IPv4.
         if (ipAddress.AddressFamily == AddressFamily.InterNetworkV6)
         {
-            throw new ImpostorConfigException(
-                $"Invalid IP Address entered '{ipAddress}', only IPv4 is supported by Among Us.");
+            /*throw new ImpostorConfigException(
+                $"Invalid IP Address entered '{ipAddress}', only IPv4 is supported by Among Us.");*/
         }
 
         return CacheResolveIp[ip] = ipAddress.ToString();

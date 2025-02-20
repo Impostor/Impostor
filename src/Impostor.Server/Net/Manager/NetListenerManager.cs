@@ -1,13 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Impostor.Api.Config;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Manager;
+using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Utils;
+using Impostor.Server.Events.Client;
+using Impostor.Server.Net.Hazel;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Next.Hazel.Dtls;
@@ -15,11 +21,18 @@ using Next.Hazel.Udp;
 
 namespace Impostor.Server.Net.Manager;
 
-public class NetListenerManager(ILogger<NetListenerManager> logger, ObjectPool<MessageReader> readerPool) : INetListenerManager
+internal sealed class NetListenerManager(
+    ILogger<NetListenerManager> logger,
+    ILogger<HazelConnection> connectionLogger,
+    ObjectPool<MessageReader> readerPool,
+    IEventManager eventManager,
+    ClientManager clientManager,
+    ClientAuthManager clientAuthManager
+    ) : INetListenerManager
 {
     public List<ListenerInfo> Listeners { get; } = [];
 
-    public Dictionary<string, X509Certificate> CachedCertificates { get; private set; } = new();
+    public Dictionary<(string, string), X509Certificate2> CachedCertificates { get; private set; } = new();
 
     public void Create(ListenerConfig config, int index = 0)
     {
@@ -30,27 +43,37 @@ public class NetListenerManager(ILogger<NetListenerManager> logger, ObjectPool<M
         }
 
         NetworkConnectionListener listener = config.IsDtl
-            ? CreateDtls(config.ListenIp, config.ListenPort + 3, OnConnectionAsync)
-            : CreateUdp(config.ListenIp, config.ListenPort, OnConnectionAsync);
+            ? CreateDtls(config.ListenIp, config.ListenPort + 3, ev => OnConnectionAsync(ev, true, config))
+            : CreateUdp(config.ListenIp, config.ListenPort, ev => OnConnectionAsync(ev, false, config));
 
         var authListener = config.HasAuth
             ? CreateDtls(config.ListenIp, config.ListenPort + 2, OnAuthConnectionAsync)
             : null;
-
+        
         Listeners.Add(SetCertificate(config, listener, authListener));
     }
 
     private ListenerInfo SetCertificate(ListenerConfig config, NetworkConnectionListener? listener,
         DtlsConnectionListener? authListener)
     {
-        // TODO: Set certificates
-        if (listener is DtlsConnectionListener)
+        if (!CachedCertificates.TryGetValue((config.CertificatePath, config.PrivateKeyPath), out var certificate))
         {
+            if (File.Exists(config.CertificatePath) && File.Exists(config.PrivateKeyPath))
+            {
+                var newCertificate = DtlsHelper.GetCertificate(File.ReadAllText(config.CertificatePath),
+                    File.ReadAllText(config.PrivateKeyPath));
+                certificate = CachedCertificates[(config.CertificatePath, config.PrivateKeyPath)] = newCertificate;
+            }
         }
 
-        if (authListener is not null)
+        if (certificate == null)
+            return new ListenerInfo(config, listener, authListener);
+        
+        if (listener is DtlsConnectionListener dtlsListener)
         {
+            dtlsListener.SetCertificate(certificate);
         }
+        authListener?.SetCertificate(certificate);
 
         return new ListenerInfo(config, listener, authListener);
     }
@@ -184,16 +207,40 @@ public class NetListenerManager(ILogger<NetListenerManager> logger, ObjectPool<M
         }
     }
 
-    private async ValueTask OnAuthConnectionAsync(NewConnectionEventArgs connection)
+    private async ValueTask OnAuthConnectionAsync(NewConnectionEventArgs eventArgs)
     {
+        AuthHandshakeC2S.Deserialize(eventArgs.HandshakeData, out var version, out var platform, out var matchmakerToken, out var friendCode);
+        var id = clientAuthManager.CreateAuthInfo(version, platform, matchmakerToken, friendCode);
+        using var writer = MessageWriter.Get(MessageType.Reliable);
+        writer.StartMessage(1);
+        writer.Write(id);
+        writer.EndMessage();
+        await eventArgs.Connection.SendAsync(writer);
     }
 
-    private async ValueTask OnConnectionAsync(NewConnectionEventArgs connection)
+    private async ValueTask OnConnectionAsync(NewConnectionEventArgs eventArgs, bool isDtl, ListenerConfig config)
     {
+        // Handshake.
+        HandshakeC2S.Deserialize(
+            eventArgs.HandshakeData, isDtl,
+            out var clientVersion, out var name,
+            out var language, out var chatMode,
+            out var platformSpecificData, out var matchmakerToken,
+            out var lastId, out var friendCode
+            );
+
+        var connection = new HazelConnection(eventArgs.Connection, connectionLogger);
+
+        await eventManager.CallAsync(new ClientConnectionEvent(connection, eventArgs.HandshakeData));
+
+        // Register client
+        await clientManager.RegisterConnectionAsync(connection, name, clientVersion, language, chatMode, platformSpecificData);
     }
     
     public record ListenerInfo(
         ListenerConfig Config,
         NetworkConnectionListener? Listener,
         DtlsConnectionListener? AuthListener);
+
+    public record ConnectionInfo;
 }

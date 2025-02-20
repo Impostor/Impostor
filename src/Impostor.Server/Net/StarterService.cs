@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net;
 
-public class StarterService(NetListenerManager listenerManager, IOptions<ServerConfig> serverConfigOption)
+internal class StarterService(NetListenerManager listenerManager, IOptions<ServerConfig> serverConfigOption)
     : IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
