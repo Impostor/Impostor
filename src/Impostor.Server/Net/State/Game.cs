@@ -92,7 +92,7 @@ internal partial class Game(
             return true;
         }
 
-        player = default;
+        player = null;
         return false;
     }
 

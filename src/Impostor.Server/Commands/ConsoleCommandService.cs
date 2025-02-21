@@ -3,20 +3,30 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Impostor.Api.Config;
+using Impostor.Api.Extension;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Commands;
 
-public class ConsoleCommandService(ILogger<ConsoleCommandService> logger, CommandsManager commandsManager) : BackgroundService
+public class ConsoleCommandService(IServiceProvider serviceProvider, ILogger<ConsoleCommandService> logger, IOptions<ServerConfig> config, CommandManager commandManager) : BackgroundService
 {
     private TextReader Reader { get; } = Console.In;
+    private readonly ServerConfig _config = config.Value;
     
     public override Task StartAsync(CancellationToken cancellationToken)
     {
         Console.OutputEncoding = Console.InputEncoding = Encoding.UTF8;
         
         logger.LogInformation("Starting ConsoleCommandService");
+        foreach (var command in serviceProvider.GetServices<ICommand>())
+        {
+            commandManager.RegisterCommand(command);
+        }
+        
         return base.StartAsync(cancellationToken);
     }
 
@@ -27,14 +37,17 @@ public class ConsoleCommandService(ILogger<ConsoleCommandService> logger, Comman
             var line = await Reader.ReadLineAsync(stoppingToken);
             if (line == null) continue;
             logger.LogDebug("Received input: {line}", line);
-            
-            if (!line.StartsWith('/')) continue;
-            await HandleCommandAsync(line[1..]);
+
+            var prefix = _config.CommandPrefix;
+            var trimLine = line.Trim();
+            if (!trimLine.StartsWith(prefix)) continue;
+            var command = trimLine.Remove(0, prefix.Length);
+            await commandManager.HandleCommandAsync(command);
         }
     }
 
-    private async Task HandleCommandAsync(string command)
+    internal async ValueTask<bool> HandleDefaultCommandAsync(string command, string[] args)
     {
-        var args = command.Split(" ");
+        return false;
     }
 }

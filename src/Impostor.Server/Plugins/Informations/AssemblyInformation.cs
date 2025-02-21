@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace Impostor.Server.Plugins;
+namespace Impostor.Server.Plugins.Informations;
 
 public class AssemblyInformation(AssemblyName assemblyName, string path, bool isPlugin) : IAssemblyInformation
 {

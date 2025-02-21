@@ -100,8 +100,39 @@ internal partial class Game
         // Parse GameData messages.
         while (parent.Position < parent.Length)
         {
-            using var reader = parent.ReadMessage();
+            if (sender.Client.Player == null)
+            {
+                // Disconnect handler was probably invoked, cancel the rest.
+                return false;
+            }
 
+            if (toPlayer && (target == null || !_players.ContainsKey(target.Client.Id)))
+            {
+                // target is disconnected, cancel the rest.
+                return false;
+            }
+
+            using var reader = parent.ReadMessage();
+            try
+            {
+                if (!await HandleGameDataInnerAsync(reader, sender, toPlayer, target))
+                {
+                    parent.RemoveMessage(reader);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Failed to handle GameData message.");
+                parent.RemoveMessage(reader);
+            }
+        }
+
+        return true;
+    }
+
+    private async ValueTask<bool> HandleGameDataInnerAsync(IMessageReader reader, ClientPlayer sender, bool toPlayer,
+        ClientPlayer? target)
+    {
             switch (reader.Tag)
             {
                 case GameDataTag.DataFlag:
@@ -132,14 +163,12 @@ internal partial class Game
 
                         if (messageEvent.HandleRpc != null && messageEvent.HandleRpc.Invoke(sender, target))
                         {
-                            parent.RemoveMessage(reader);
-                            continue;
+                            return false;
                         }
                         
                         if (!await obj.HandleRpcAsync(sender, target, (RpcCalls)rpc, reader))
                         {
-                            parent.RemoveMessage(reader);
-                            continue;
+                            return false;
                         }
                     }
                     else
@@ -183,7 +212,7 @@ internal partial class Game
                                 innerNetObject.GetType().Name,
                                 componentsCount,
                                 components.Count);
-                            continue;
+                            return false;
                         }
 
                         logger.LogDebug(
@@ -221,7 +250,7 @@ internal partial class Game
                             await OnSpawnAsync(sender, obj);
                         }
 
-                        continue;
+                        return false;
                     }
 
                     logger.LogWarning("Couldn't find spawnable object {0}.", objectId);
@@ -341,14 +370,7 @@ internal partial class Game
                 }
             }
 
-            if (sender.Client.Player == null)
-            {
-                // Disconnect handler was probably invoked, cancel the rest.
-                return false;
-            }
-        }
-
-        return true;
+            return true;
     }
 
     private async ValueTask OnSpawnAsync(ClientPlayer sender, InnerNetObject netObj)

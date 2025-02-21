@@ -25,4 +25,8 @@ public class ExtensionServerConfig
     public bool EnabledHttpMatchmaker { get; set; } = false;
     
     public bool EnabledWebSocketMatchmaker { get; set; } = false;
+    
+    public long WebSocketInterval { get; set; } = 120;
+    
+    public long WebSocketTimeout { get; set; } = 3000;
 }

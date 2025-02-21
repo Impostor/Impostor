@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
+using Impostor.Api.Extension;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 
@@ -120,6 +121,7 @@ internal static class Program
                     .Configure<ExtensionServerConfig>(host.Configuration.GetSection(ExtensionServerConfig.Section));
                 
                 services
+                    .AddSingleton(WebHub.WebSink.Sink)
                     .AddSingleton<HttpConnectionManager>()
                     .AddSingleton<ClientAuthManager>()
                     .AddSingleton<IMessageWriterProvider, MessageWriterProvider>()
@@ -133,6 +135,7 @@ internal static class Program
                     .AddRequiredSingleton<IServerEnvironment, ServerEnvironment>()
                     .AddRequiredSingleton<IClientManager, ClientManager>()
                     .AddRequiredSingleton<IGameManager, GameManager>()
+                    .AddRequiredSingleton<ICommandManager, CommandManager>()
                     .AddRequiredSingleton<INetListenerManager, NetListenerManager>();
 
                 if (config.EnableCommands)
@@ -156,6 +159,7 @@ internal static class Program
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .LoggerSet(serverConfig)
+                .WriteTo.Sink(WebHub.WebSink.Sink, serverConfig.LogLevel)
                 .ReadFrom.Configuration(context.Configuration,
                     new ConfigurationReaderOptions(ConfigurationAssemblySource.AlwaysScanDllFiles));
 
@@ -222,6 +226,8 @@ internal static class Program
                 {
                     collection.AddWebSockets(option =>
                     {
+                        option.KeepAliveTimeout = TimeSpan.FromSeconds(config.WebSocketTimeout);
+                        option.KeepAliveInterval = TimeSpan.FromSeconds(config.WebSocketInterval);
                     });
                 }
             });

@@ -22,11 +22,11 @@ if (tag != null)
 else if (buildId != 0) 
 {
     msbuildSettings.VersionSuffix = "ci." + buildId;
-    buildVersion += "-ci." + buildId;
+    buildVersion += "_ci." + buildId;
 } 
 else 
 {
-    buildVersion += "-dev";
+    buildVersion += "_dev";
 }
 
 //////////////////////////////////////////////////////////////////////
