@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Microsoft.Extensions.Logging;
@@ -73,19 +72,19 @@ internal class HazelConnection : IHazelConnection
         {
             return;
         }
-        
+
         while (true)
         {
             if (e.Message.Position >= e.Message.Length)
             {
                 break;
             }
-            
+
             if (!IsConnected)
             {
                 break;
             }
-            
+
             try
             {
                 using var message = e.Message.ReadMessage();

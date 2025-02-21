@@ -12,21 +12,25 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Commands;
 
-public class ConsoleCommandService(IServiceProvider serviceProvider, ILogger<ConsoleCommandService> logger, IOptions<ServerConfig> config, CommandManager commandManager) : BackgroundService
+public class ConsoleCommandService(
+    IServiceProvider serviceProvider,
+    ILogger<ConsoleCommandService> logger,
+    IOptions<ServerConfig> config,
+    CommandManager commandManager) : BackgroundService
 {
-    private TextReader Reader { get; } = Console.In;
     private readonly ServerConfig _config = config.Value;
-    
+    private TextReader Reader { get; } = Console.In;
+
     public override Task StartAsync(CancellationToken cancellationToken)
     {
         Console.OutputEncoding = Console.InputEncoding = Encoding.UTF8;
-        
+
         logger.LogInformation("Starting ConsoleCommandService");
         foreach (var command in serviceProvider.GetServices<ICommand>())
         {
             commandManager.RegisterCommand(command);
         }
-        
+
         return base.StartAsync(cancellationToken);
     }
 
@@ -35,12 +39,20 @@ public class ConsoleCommandService(IServiceProvider serviceProvider, ILogger<Con
         while (!stoppingToken.IsCancellationRequested)
         {
             var line = await Reader.ReadLineAsync(stoppingToken);
-            if (line == null) continue;
+            if (line == null)
+            {
+                continue;
+            }
+
             logger.LogDebug("Received input: {line}", line);
 
             var prefix = _config.CommandPrefix;
             var trimLine = line.Trim();
-            if (!trimLine.StartsWith(prefix)) continue;
+            if (!trimLine.StartsWith(prefix))
+            {
+                continue;
+            }
+
             var command = trimLine.Remove(0, prefix.Length);
             await commandManager.HandleCommandAsync(command);
         }

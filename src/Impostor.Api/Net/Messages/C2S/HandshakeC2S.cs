@@ -5,7 +5,7 @@ namespace Impostor.Api.Net.Messages.C2S;
 public static class HandshakeC2S
 {
     public static void Deserialize(
-        IMessageReader reader, 
+        IMessageReader reader,
         bool isDtl,
         out GameVersion clientVersion,
         out string name,
@@ -29,7 +29,7 @@ public static class HandshakeC2S
             matchmakerToken = string.Empty;
             lastId = reader.ReadUInt32();
         }
-        
+
         language = (Language)reader.ReadUInt32();
         chatMode = (QuickChatModes)reader.ReadByte();
 
@@ -46,9 +46,9 @@ public static class HandshakeC2S
             reader.ReadString();
             reader.ReadUInt32();
         }
-        
+
         /*reader.ReadInt32(); // crossplayFlags, not used yet
-        
+
         reader.ReadByte(); // purpose unknown, seems hardcoded to 0*/
     }
 }

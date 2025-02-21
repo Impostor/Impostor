@@ -7,7 +7,7 @@ public class ListenerConfig
     public string ListenIp { get; set; } = "0.0.0.0";
     public ushort ListenPort { get; set; } = 22023;
     public bool IsDtl { get; set; } = false;
-    
+
     public string PrivateKeyPath { get; set; } = string.Empty;
     public string CertificatePath { get; set; } = string.Empty;
 

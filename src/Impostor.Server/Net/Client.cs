@@ -116,7 +116,9 @@ internal class Client(
         var messageEvent = new GameMessageEvent(false, flag, reader);
         await eventManager.CallAsync(messageEvent);
         if (messageEvent.HasBreak)
+        {
             return;
+        }
 
         switch (flag)
         {

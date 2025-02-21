@@ -29,7 +29,7 @@ internal partial class InnerMeetingHud : InnerNetObject
     [AllowNull] private PlayerVoteArea[] _playerStates;
 
     public InnerMeetingHud(Game game,
-        ILogger<InnerMeetingHud> logger, IEventManager eventManager) : base( game)
+        ILogger<InnerMeetingHud> logger, IEventManager eventManager) : base(game)
     {
         _logger = logger;
         _eventManager = eventManager;

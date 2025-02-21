@@ -25,7 +25,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.2"/>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.2"/>
-    <PackageReference Include="NextFast.Hazel.Abstractions" Version="1.0.2-ci.7" />
+    <PackageReference Include="NextFast.Hazel.Abstractions" Version="1.0.2-ci.7"/>
     <PackageReference Include="Serilog" Version="4.2.1-dev-02340"/>
 
     <ProjectReference Include="..\Impostor.Api.Innersloth.Generator\Impostor.Api.Innersloth.Generator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer"/>
@@ -34,7 +34,7 @@
 
   <ItemGroup>
     <Compile Remove="Config\DebugConfig.cs"/>
-    <Compile Remove="Plugins\PluginBase.cs" />
+    <Compile Remove="Plugins\PluginBase.cs"/>
   </ItemGroup>
 
 </Project>

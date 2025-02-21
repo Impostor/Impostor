@@ -6,6 +6,6 @@ namespace Impostor.Api.Extension;
 
 public interface IHttpPluginStartup : IPluginStartup
 {
-    void ConfigureHost(IWebHostBuilder host) {}
-    void ConfigureWebApplication(IApplicationBuilder app) {}
+    void ConfigureHost(IWebHostBuilder host) { }
+    void ConfigureWebApplication(IApplicationBuilder app) { }
 }

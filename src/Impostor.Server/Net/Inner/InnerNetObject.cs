@@ -2,7 +2,6 @@
 using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
-using Impostor.Server.Events;
 using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner;
@@ -40,7 +39,7 @@ internal abstract partial class InnerNetObject(Game game) : GameObject, IInnerNe
     {
         return await UnregisteredCallAsync(call, sender);
     }
-    
+
     internal virtual ValueTask OnSpawnAsync()
     {
         return default;

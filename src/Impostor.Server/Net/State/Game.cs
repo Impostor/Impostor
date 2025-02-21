@@ -34,7 +34,7 @@ internal partial class Game(
     ICompatibilityManager compatibilityManager,
     IOptions<CompatibilityConfig> compatibilityConfig,
     IOptions<TimeoutConfig> timeoutConfig
-    )
+)
 {
     private readonly HashSet<IPAddress> _bannedIps = new();
     private readonly CompatibilityConfig _compatibilityConfig = compatibilityConfig.Value;

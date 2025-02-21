@@ -8,7 +8,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
-using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Utils;
@@ -28,11 +27,11 @@ internal sealed class NetListenerManager(
     IEventManager eventManager,
     ClientManager clientManager,
     ClientAuthManager clientAuthManager
-    ) : INetListenerManager
+) : INetListenerManager
 {
     public List<ListenerInfo> Listeners { get; } = [];
 
-    public Dictionary<(string, string), X509Certificate2> CachedCertificates { get; private set; } = new();
+    public Dictionary<(string, string), X509Certificate2> CachedCertificates { get; } = new();
 
     public void Create(ListenerConfig config, int index = 0)
     {
@@ -49,7 +48,7 @@ internal sealed class NetListenerManager(
         var authListener = config.HasAuth
             ? CreateDtls(config.ListenIp, config.ListenPort + 2, OnAuthConnectionAsync)
             : null;
-        
+
         Listeners.Add(SetCertificate(config, listener, authListener));
     }
 
@@ -67,12 +66,15 @@ internal sealed class NetListenerManager(
         }
 
         if (certificate == null)
+        {
             return new ListenerInfo(config, listener, authListener);
-        
+        }
+
         if (listener is DtlsConnectionListener dtlsListener)
         {
             dtlsListener.SetCertificate(certificate);
         }
+
         authListener?.SetCertificate(certificate);
 
         return new ListenerInfo(config, listener, authListener);
@@ -209,7 +211,8 @@ internal sealed class NetListenerManager(
 
     private async ValueTask OnAuthConnectionAsync(NewConnectionEventArgs eventArgs)
     {
-        AuthHandshakeC2S.Deserialize(eventArgs.HandshakeData, out var version, out var platform, out var matchmakerToken, out var friendCode);
+        AuthHandshakeC2S.Deserialize(eventArgs.HandshakeData, out var version, out var platform,
+            out var matchmakerToken, out var friendCode);
         var id = clientAuthManager.CreateAuthInfo(version, platform, matchmakerToken, friendCode);
         using var writer = MessageWriter.Get(MessageType.Reliable);
         writer.StartMessage(1);
@@ -227,16 +230,17 @@ internal sealed class NetListenerManager(
             out var language, out var chatMode,
             out var platformSpecificData, out var matchmakerToken,
             out var lastId, out var friendCode
-            );
+        );
 
         var connection = new HazelConnection(eventArgs.Connection, connectionLogger);
 
         await eventManager.CallAsync(new ClientConnectionEvent(connection, eventArgs.HandshakeData));
 
         // Register client
-        await clientManager.RegisterConnectionAsync(connection, name, clientVersion, language, chatMode, platformSpecificData);
+        await clientManager.RegisterConnectionAsync(connection, name, clientVersion, language, chatMode,
+            platformSpecificData);
     }
-    
+
     public record ListenerInfo(
         ListenerConfig Config,
         NetworkConnectionListener? Listener,

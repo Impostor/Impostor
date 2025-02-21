@@ -8,34 +8,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Commands;
 
-public sealed class CommandManager(ConsoleCommandService commandService, IServiceProvider provider,ILogger<CommandManager> logger) : ICommandManager
+public sealed class CommandManager(
+    ConsoleCommandService commandService,
+    IServiceProvider provider,
+    ILogger<CommandManager> logger) : ICommandManager
 {
-    public IReadOnlyList<ICommand> Commands => _allCommands.AsReadOnly();
-    
-    private readonly Dictionary<string,ISingleCommand> _singleCommands = [];
-    private readonly List<ISystemCommand> _systemCommands = [];
     private readonly List<ICommand> _allCommands = [];
-    
-    internal async Task HandleCommandAsync(string commandString)
+
+    private readonly Dictionary<string, ISingleCommand> _singleCommands = [];
+    private readonly List<ISystemCommand> _systemCommands = [];
+
+    public IReadOnlyList<ICommand> Commands
     {
-        var args = commandString.Split(" ");
-        var command = args[0];
-
-        var argArray = args.Skip(1).ToArray();
-        if (await commandService.HandleDefaultCommandAsync(command, argArray))
-            return;
-
-        foreach (var sc in _systemCommands)
-        {
-            if (await sc.InvokeAsync(command, argArray))
-                return;
-        }
-
-        var eventArg = new CommandEventArgs(this, argArray);
-        if (_singleCommands.TryGetValue(command, out var singleCommand))
-        {
-            await singleCommand.InvokeAsync(eventArg);
-        }
+        get => _allCommands.AsReadOnly();
     }
 
     public ICommandManager RegisterCommand(ICommand command)
@@ -60,4 +45,30 @@ public sealed class CommandManager(ConsoleCommandService commandService, IServic
     }
 
     public IServiceProvider ServiceProvider { get; } = provider;
+
+    internal async Task HandleCommandAsync(string commandString)
+    {
+        var args = commandString.Split(" ");
+        var command = args[0];
+
+        var argArray = args.Skip(1).ToArray();
+        if (await commandService.HandleDefaultCommandAsync(command, argArray))
+        {
+            return;
+        }
+
+        foreach (var sc in _systemCommands)
+        {
+            if (await sc.InvokeAsync(command, argArray))
+            {
+                return;
+            }
+        }
+
+        var eventArg = new CommandEventArgs(this, argArray);
+        if (_singleCommands.TryGetValue(command, out var singleCommand))
+        {
+            await singleCommand.InvokeAsync(eventArg);
+        }
+    }
 }

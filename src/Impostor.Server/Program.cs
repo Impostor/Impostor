@@ -9,7 +9,6 @@ using Impostor.Api.Events.Managers;
 using Impostor.Api.Extension;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
-
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Utils;
 using Impostor.Server.Commands;
@@ -64,8 +63,10 @@ internal static class Program
     private static string? GetArg(this string[] args, string name)
     {
         if (!args.Contains(name))
+        {
             return null;
-        
+        }
+
         var index = Array.IndexOf(args, name);
         return index + 1 < args.Length ? args[index + 1] : null;
     }
@@ -73,7 +74,7 @@ internal static class Program
     private static IConfiguration CreateConfiguration(string[] args)
     {
         var configurationBuilder = new ConfigurationBuilder();
-        
+
         configurationBuilder.SetBasePath(args.GetArg("--base") ?? Directory.GetCurrentDirectory());
         configurationBuilder.AddJsonFile(args.GetArg("--config") ?? "config.json", true);
         configurationBuilder.AddEnvironmentVariables(args.GetArg("--prefix") ?? "IMPOSTOR_");
@@ -101,7 +102,8 @@ internal static class Program
         return hostBuilder;
     }
 
-    private static IHostBuilder ConfigureServer(this IHostBuilder builder, IConfiguration configuration, ServerConfig config)
+    private static IHostBuilder ConfigureServer(this IHostBuilder builder, IConfiguration configuration,
+        ServerConfig config)
     {
         builder.ConfigureAppConfiguration(configurationBuilder =>
             {
@@ -111,7 +113,7 @@ internal static class Program
             {
                 services.AddEventPools();
                 services.AddHazel();
-                
+
                 services
                     .Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section))
                     .Configure<CompatibilityConfig>(host.Configuration.GetSection(CompatibilityConfig.Section))
@@ -119,7 +121,7 @@ internal static class Program
                     .Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section))
                     .Configure<PluginConfig>(host.Configuration.GetSection(PluginConfig.Section))
                     .Configure<ExtensionServerConfig>(host.Configuration.GetSection(ExtensionServerConfig.Section));
-                
+
                 services
                     .AddSingleton(WebHub.WebSink.Sink)
                     .AddSingleton<HttpConnectionManager>()
@@ -139,10 +141,15 @@ internal static class Program
                     .AddRequiredSingleton<INetListenerManager, NetListenerManager>();
 
                 if (config.EnableCommands)
+                {
                     services.AddHostedService<ConsoleCommandService>();
-                if (config.EnableNextApi) 
+                }
+
+                if (config.EnableNextApi)
+                {
                     services.AddHostedService<NetApiService>();
-                
+                }
+
                 services.AddHostedService<StarterService>();
             });
         return builder;
@@ -153,7 +160,7 @@ internal static class Program
         hostBuilder.UseSerilog((context, loggerConfiguration) =>
         {
             AssemblyLoadContext.Default.Resolving += LoadSerilogAssembly;
-            
+
             loggerConfiguration
                 .MinimumLevel.Is(serverConfig.LogLevel)
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
@@ -232,11 +239,11 @@ internal static class Program
                 }
             });
 
-            
+
             hostBuilder.Configure(applicationBuilder =>
             {
                 applicationBuilder.ConfigurePluginWeb(hostBuilder);
-                
+
                 if (config.EnabledSpa)
                 {
                     applicationBuilder.Map("/web", webBuilder =>
@@ -253,12 +260,12 @@ internal static class Program
                         {
                             return;
                         }
-                        
+
                         var fileOption = new StaticFileOptions
                         {
                             FileProvider = new PhysicalFileProvider(config.SpaDirectory),
                         };
-                        
+
                         webBuilder.UseSpaStaticFiles(fileOption);
                         webBuilder.UseSpa(spa =>
                         {

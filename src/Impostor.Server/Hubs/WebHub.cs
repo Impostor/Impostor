@@ -10,7 +10,6 @@ namespace Impostor.Server.Hubs;
 
 internal sealed class WebHub : BaseTokenHub
 {
-    
     internal WebHub(IOptions<ExtensionServerConfig> config, WebSink webSink)
     {
         Token = config.Value.SignalRToken;
@@ -32,21 +31,29 @@ internal sealed class WebHub : BaseTokenHub
 
     internal async ValueTask SendLogAsync(string message)
     {
-        foreach (var connection in base.Connections)
+        foreach (var connection in Connections)
         {
-            if (!connection.HasAuthorized) return;
+            if (!connection.HasAuthorized)
+            {
+                return;
+            }
+
             await connection.Client.SendAsync("SendLog", message);
         }
     }
-    
+
     internal class WebSink : ILogEventSink
     {
         internal static readonly WebSink Sink = new();
         internal Func<string, Task>? OnMessage { get; set; }
-        
+
         public void Emit(LogEvent logEvent)
         {
-            if (OnMessage == null) return;
+            if (OnMessage == null)
+            {
+                return;
+            }
+
             var message = logEvent.RenderMessage();
             OnMessage(message);
         }

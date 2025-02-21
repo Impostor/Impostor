@@ -20,24 +20,32 @@ namespace Impostor.Server.Plugins;
 internal static class PluginLoader
 {
     private static readonly ILogger Logger = Log.ForContext(typeof(PluginLoader));
-    
+
     private static bool IsTargetType(Type type)
     {
         if (!type.IsClass)
+        {
             return false;
+        }
 
         if (type.IsAbstract)
+        {
             return false;
+        }
 
         if (typeof(IPlugin).IsAssignableFrom(type))
+        {
             return true;
+        }
 
         if (typeof(IPluginStartup).IsAssignableFrom(type))
+        {
             return true;
-        
+        }
+
         return false;
     }
-    
+
     public static IHostBuilder UsePluginLoader(this IHostBuilder builder, PluginConfig config)
     {
         var assemblyInfos = new List<IAssemblyInformation>();
@@ -320,7 +328,7 @@ internal static class PluginLoader
     }
 
     private record PathCheckInfo(string Path, bool IsDir);
-    
+
     private class TypesCacher(Predicate<Type> predicate)
     {
         private List<Type> _types = [];
