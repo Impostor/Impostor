@@ -7,4 +7,8 @@ public interface ICommandManager
     public ICommandManager RegisterCommand(ICommand command);
 
     public ICommandManager RegisterCommand<T>() where T : ICommand;
+
+    public Task HandleCommandAsync(string commandString);
+
+    public IReadOnlyList<ICommand> Commands { get; }
 }

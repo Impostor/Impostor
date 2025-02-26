@@ -5,12 +5,7 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 
 public class MedScanSystem : ISystemType
 {
-    public MedScanSystem()
-    {
-        UsersList = new List<byte>();
-    }
-
-    public List<byte> UsersList { get; }
+    public List<byte> UsersList { get; } = new();
 
     public void Serialize(IMessageWriter writer, bool initialState)
     {

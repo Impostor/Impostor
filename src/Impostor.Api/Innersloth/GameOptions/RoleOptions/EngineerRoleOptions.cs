@@ -1,13 +1,8 @@
 namespace Impostor.Api.Innersloth.GameOptions.RoleOptions;
 
-public class EngineerRoleOptions : IRoleOptions
+public class EngineerRoleOptions(byte version) : IRoleOptions
 {
-    public EngineerRoleOptions(byte version)
-    {
-        Version = version;
-    }
-
-    public byte Version { get; }
+    public byte Version { get; } = version;
 
     public byte Cooldown { get; set; } = 30;
 

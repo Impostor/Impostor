@@ -5,15 +5,9 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 
 public class ReactorSystemType : ISystemType, IActivatable
 {
-    public ReactorSystemType()
-    {
-        Countdown = 10000f;
-        UserConsolePairs = new HashSet<Tuple<byte, byte>>();
-    }
+    public float Countdown { get; private set; } = 10000f;
 
-    public float Countdown { get; private set; }
-
-    public HashSet<Tuple<byte, byte>> UserConsolePairs { get; }
+    public HashSet<Tuple<byte, byte>> UserConsolePairs { get; } = new();
 
     public bool IsActive
     {

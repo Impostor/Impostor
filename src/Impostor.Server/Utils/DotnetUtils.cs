@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Microsoft.Extensions.Hosting;
 
 namespace Impostor.Server.Utils;
 
@@ -37,6 +38,6 @@ public static class DotnetUtils
 
     public static string Environment
     {
-        get => IsDev ? "Development" : "Production";
+        get => IsDev ? Environments.Development : Environments.Production;
     }
 }

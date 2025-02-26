@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Server", "Impostor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Api", "Impostor.Api\Impostor.Api.csproj", "{E096A7D7-D693-4A13-A526-38CC574D84F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Api.Innersloth.Generator", "Impostor.Api.Innersloth.Generator\Impostor.Api.Innersloth.Generator.csproj", "{8B6C3AC5-E2B2-49F8-854D-22DFB4AB3D31}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Api.Generator", "Impostor.Api.Generator\Impostor.Api.Generator.csproj", "{8B6C3AC5-E2B2-49F8-854D-22DFB4AB3D31}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Api.Extension", "Impostor.Api.Extension\Impostor.Api.Extension.csproj", "{5457D76E-2EF7-441F-88CF-5E5A2FBE94FC}"
 EndProject

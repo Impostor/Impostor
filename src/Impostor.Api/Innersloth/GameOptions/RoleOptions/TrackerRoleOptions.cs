@@ -1,13 +1,8 @@
 namespace Impostor.Api.Innersloth.GameOptions.RoleOptions;
 
-public class TrackerRoleOptions : IRoleOptions
+public class TrackerRoleOptions(byte version) : IRoleOptions
 {
-    public TrackerRoleOptions(byte version)
-    {
-        Version = version;
-    }
-
-    public byte Version { get; }
+    public byte Version { get; } = version;
 
     public byte Cooldown { get; set; } = 15;
 

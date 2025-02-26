@@ -4,12 +4,7 @@ namespace Impostor.Server.Net.Inner;
 
 internal class GameObject
 {
-    public GameObject()
-    {
-        Components = new List<object>();
-    }
-
-    protected List<object> Components { get; }
+    protected List<object> Components { get; } = new();
 
     public List<T> GetComponentsInChildren<T>()
     {

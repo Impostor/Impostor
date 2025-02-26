@@ -10,9 +10,8 @@ namespace Impostor.Server.Hubs;
 
 internal sealed class WebHub : BaseTokenHub
 {
-    internal WebHub(IOptions<ExtensionServerConfig> config, WebSink webSink)
+    internal WebHub(IOptions<ExtensionServerConfig> config, WebSink webSink) : base(config)
     {
-        Token = config.Value.SignalRToken;
         webSink.OnMessage += async message =>
         {
             await SendLogAsync(message);

@@ -1,13 +1,8 @@
 namespace Impostor.Api.Innersloth.GameOptions.RoleOptions;
 
-public class NoisemakerRoleOptions : IRoleOptions
+public class NoisemakerRoleOptions(byte version) : IRoleOptions
 {
-    public NoisemakerRoleOptions(byte version)
-    {
-        Version = version;
-    }
-
-    public byte Version { get; }
+    public byte Version { get; } = version;
 
     public bool ImpostorAlert { get; set; } = true;
 

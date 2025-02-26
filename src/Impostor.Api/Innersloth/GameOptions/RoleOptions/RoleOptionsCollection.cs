@@ -3,14 +3,9 @@ using System.Collections.Generic;
 
 namespace Impostor.Api.Innersloth.GameOptions.RoleOptions;
 
-public class RoleOptionsCollection
+public class RoleOptionsCollection(byte version)
 {
-    public RoleOptionsCollection(byte version)
-    {
-        Version = version;
-    }
-
-    public byte Version { get; }
+    public byte Version { get; } = version;
 
     public Dictionary<RoleTypes, RoleData> Roles { get; } = new();
 

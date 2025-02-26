@@ -3,15 +3,8 @@ using System.Collections.Generic;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 
-public class ElectricalDoors : ISystemType
+public class ElectricalDoors(Dictionary<int, bool> doors) : ISystemType
 {
-    private readonly Dictionary<int, bool> _doors;
-
-    public ElectricalDoors(Dictionary<int, bool> doors)
-    {
-        _doors = doors;
-    }
-
     public void Serialize(IMessageWriter writer, bool initialState)
     {
         throw new NotImplementedException();
@@ -20,9 +13,9 @@ public class ElectricalDoors : ISystemType
     public void Deserialize(IMessageReader reader, bool initialState)
     {
         var num = reader.ReadUInt32();
-        for (var i = 0; i < _doors.Count; i++)
+        for (var i = 0; i < doors.Count; i++)
         {
-            _doors[i] = (num & (ulong)(1L << (i & 31))) > 0UL;
+            doors[i] = (num & (ulong)(1L << (i & 31))) > 0UL;
         }
     }
 }

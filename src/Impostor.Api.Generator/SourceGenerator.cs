@@ -1,15 +1,16 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using CSharpPoet;
-using Impostor.Api.Innersloth.Generator.Generators;
+using Impostor.Api.Generator.Generators;
 using Microsoft.CodeAnalysis;
 
-namespace Impostor.Api.Innersloth.Generator;
+namespace Impostor.Api.Generator;
 
 [Generator(LanguageNames.CSharp)]
 public sealed class SourceGenerator : IIncrementalGenerator
 {
     private const string DataPath = "Innersloth/Data/";
+    private const string LanguagePath = "Languages/";
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -54,10 +55,10 @@ public sealed class SourceGenerator : IIncrementalGenerator
                 throw new InvalidOperationException($"No json files found in Impostor.Api/{DataPath}");
             }
 
-            var enumGenerator = new EnumGenerator(spc, files);
-
+            var generator = new BaseGenerator(spc, files);
+            
+            var enumGenerator = generator.GetEnum();
             enumGenerator.Generate("ColorType", "Impostor.Api.Innersloth.Customization");
-
             enumGenerator.Generate("DisconnectReason", sourceName: "DisconnectReasons");
             enumGenerator.Generate("GameKeywords", flags: true, underlyingType: CSharpEnumUnderlyingType.UnsignedInt);
             enumGenerator.Generate("GameOverReason", underlyingType: CSharpEnumUnderlyingType.Byte);
@@ -69,16 +70,17 @@ public sealed class SourceGenerator : IIncrementalGenerator
             enumGenerator.Generate("SystemTypes", underlyingType: CSharpEnumUnderlyingType.Byte);
             enumGenerator.Generate("Language", sourceName: "SupportedLangs");
             enumGenerator.Generate("TaskTypes");
-
             enumGenerator.Generate("RpcCalls", "Impostor.Api.Net.Inner", underlyingType: CSharpEnumUnderlyingType.Byte);
 
-            var mapDataGenerator = new MapDataGenerator(spc, files);
-
+            var mapDataGenerator = generator.GetMapData();
             var mapNames = new[] { "Skeld", "Mira", "April", "Polus", "Airship", "Fungle" };
             foreach (var mapName in mapNames)
             {
                 mapDataGenerator.Generate(mapName);
             }
+            
+            /*var languageGenerator = generator.GetLanguage();
+            languageGenerator.Generate("English");*/
         });
     }
 
@@ -86,12 +88,17 @@ public sealed class SourceGenerator : IIncrementalGenerator
     {
         public bool TryGetRelativePath(string path, [NotNullWhen(true)] out string? relativePath)
         {
-            if (
-                path.NormalizePath().TryTrimStart(ProjectDirectory, out relativePath) &&
-                relativePath.TryTrimStart(DataPath, out relativePath)
-            )
+            if (path.NormalizePath().TryTrimStart(ProjectDirectory, out var projectPath))
             {
-                return true;
+                if (projectPath.TryTrimStart(DataPath, out relativePath))
+                {
+                    return true;
+                }
+
+                if (projectPath.TryTrimStart(LanguagePath, out relativePath))
+                {
+                    return true;
+                }
             }
 
             relativePath = null;

@@ -4,9 +4,9 @@ public class ExtensionServerConfig
 {
     public const string Section = "ExtensionServer";
 
-    public bool Enable { get; set; } = false;
+    public bool Enable { get; set; } = true;
 
-    public string ListenIp { get; set; } = "0.0.0.0";
+    public string ListenIp { get; set; } = "127.0.0.1";
 
     public ushort ListenPort { get; set; } = 22025;
 
@@ -14,17 +14,16 @@ public class ExtensionServerConfig
 
     public string SpaDirectory { get; set; } = "/Web";
 
+    public bool UseAuth { get; set; } = true;
+    public string Token { get; set; } = "NextImpostor";
+
     public bool EnabledNextApi { get; set; } = false;
 
-    public string SignalRToken { get; set; } = "NextImpostor";
+    public bool EnabledSignalR { get; set; } = false;
 
-    public bool EnabledSignalRWeb { get; set; } = false;
+    public bool EnabledHttpApi { get; set; } = true;
 
-    public string MatchmakerToken { get; set; } = "NextImpostor";
-
-    public bool EnabledHttpMatchmaker { get; set; } = false;
-
-    public bool EnabledWebSocketMatchmaker { get; set; } = false;
+    public bool EnabledWebSocket{ get; set; } = false;
 
     public long WebSocketInterval { get; set; } = 120;
 

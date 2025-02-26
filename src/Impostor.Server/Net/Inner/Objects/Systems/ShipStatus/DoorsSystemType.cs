@@ -4,15 +4,9 @@ using Impostor.Api.Innersloth;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 
-public class DoorsSystemType : ISystemType
+public class DoorsSystemType(Dictionary<int, bool> doors) : ISystemType
 {
-    private readonly Dictionary<int, bool> _doors;
     private readonly Dictionary<SystemTypes, float> _timers = new();
-
-    public DoorsSystemType(Dictionary<int, bool> doors)
-    {
-        _doors = doors;
-    }
 
     public void Serialize(IMessageWriter writer, bool initialState)
     {
@@ -30,9 +24,9 @@ public class DoorsSystemType : ISystemType
             _timers[systemType] = value;
         }
 
-        for (var j = 0; j < _doors.Count; j++)
+        for (var j = 0; j < doors.Count; j++)
         {
-            _doors[j] = reader.ReadBoolean();
+            doors[j] = reader.ReadBoolean();
         }
     }
 }

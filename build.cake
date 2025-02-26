@@ -35,7 +35,7 @@ else
 
 // Remove unnecessary files for packaging.
 private void ImpostorPublish(string runtime) {
-    var name = "Impostor_Server";
+    var name = "Next_Impostor_Server";
     var projBuildDir = buildDir.Combine(name + "_" + runtime);
     var projBuildName = name + "_" + buildVersion + "_" + runtime;
 
@@ -47,7 +47,7 @@ private void ImpostorPublish(string runtime) {
         PublishSingleFile = true,
         PublishTrimmed = false,
         OutputDirectory = projBuildDir,
-        MSBuildSettings = msbuildSettings
+        MSBuildSettings = msbuildSettings,
     });
 
 
@@ -102,7 +102,6 @@ Task("Build")
         ImpostorPublish("win-x64");
         ImpostorPublish("osx-x64");
         ImpostorPublish("linux-x64");
-        ImpostorPublish("linux-arm64");
 
         // API.
         DotNetPack("./src/Impostor.Api/Impostor.Api.csproj", new DotNetPackSettings {

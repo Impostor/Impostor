@@ -1,13 +1,8 @@
 namespace Impostor.Api.Innersloth.GameOptions.RoleOptions;
 
-public class ShapeshifterRoleOptions : IRoleOptions
+public class ShapeshifterRoleOptions(byte version) : IRoleOptions
 {
-    public ShapeshifterRoleOptions(byte version)
-    {
-        Version = version;
-    }
-
-    public byte Version { get; }
+    public byte Version { get; } = version;
 
     public bool LeaveSkin { get; set; }
 

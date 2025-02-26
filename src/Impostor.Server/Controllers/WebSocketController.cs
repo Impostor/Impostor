@@ -7,16 +7,14 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Controllers;
 
-public sealed class MatchmakerController(
-    IOptions<ExtensionServerConfig> config,
-    HttpConnectionManager connectionManager) : ControllerBase
+public sealed class WebSocketController(IOptions<ExtensionServerConfig> config) : ControllerBase
 {
     private readonly ExtensionServerConfig _config = config.Value;
 
-    [Route("/matchmaker/websocket")]
+    [Route("/websocket")]
     public async Task WebSocketAsync()
     {
-        if (!_config.EnabledWebSocketMatchmaker)
+        if (!_config.EnabledWebSocket)
         {
             return;
         }

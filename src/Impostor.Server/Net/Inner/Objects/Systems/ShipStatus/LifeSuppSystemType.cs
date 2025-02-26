@@ -5,15 +5,9 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 
 public class LifeSuppSystemType : ISystemType, IActivatable
 {
-    public LifeSuppSystemType()
-    {
-        Countdown = 10000f;
-        CompletedConsoles = new HashSet<int>();
-    }
+    public float Countdown { get; private set; } = 10000f;
 
-    public float Countdown { get; private set; }
-
-    public HashSet<int> CompletedConsoles { get; }
+    public HashSet<int> CompletedConsoles { get; } = new();
 
     public bool IsActive
     {

@@ -157,19 +157,16 @@ internal static class PluginLoader
     public static void ConfigurePluginWeb(this IApplicationBuilder app, IWebHostBuilder webHostBuilder)
     {
         var plugins = app.ApplicationServices.GetRequiredService<PluginLoaderService>().Plugins;
-        var mvcBuilder = app.ApplicationServices.GetRequiredService<IMvcBuilder>();
+        
         foreach (var pluginInfo in plugins)
         {
-            if (pluginInfo.Startup is IHttpPluginStartup startup)
+            if (pluginInfo.Startup is not IHttpPluginStartup startup)
             {
-                startup.ConfigureHost(webHostBuilder);
-                startup.ConfigureWebApplication(app);
+                continue;
             }
 
-            if (pluginInfo.Instance is IHttpPlugin { AssemblyPart: true })
-            {
-                mvcBuilder.AddApplicationPart(pluginInfo.PluginType.Assembly);
-            }
+            startup.ConfigureHost(webHostBuilder);
+            startup.ConfigureWebApplication(app);
         }
     }
 

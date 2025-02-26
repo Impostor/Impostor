@@ -16,7 +16,7 @@ public class ConsoleCommandService(
     IServiceProvider serviceProvider,
     ILogger<ConsoleCommandService> logger,
     IOptions<ServerConfig> config,
-    CommandManager commandManager) : BackgroundService
+    ICommandManager commandManager) : BackgroundService
 {
     private readonly ServerConfig _config = config.Value;
     private TextReader Reader { get; } = Console.In;
@@ -56,10 +56,5 @@ public class ConsoleCommandService(
             var command = trimLine.Remove(0, prefix.Length);
             await commandManager.HandleCommandAsync(command);
         }
-    }
-
-    internal async ValueTask<bool> HandleDefaultCommandAsync(string command, string[] args)
-    {
-        return false;
     }
 }

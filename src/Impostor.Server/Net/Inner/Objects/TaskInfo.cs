@@ -9,33 +9,23 @@ using Impostor.Server.Events.Player;
 
 namespace Impostor.Server.Net.Inner.Objects;
 
-internal class TaskInfo : ITaskInfo
+internal class TaskInfo(InnerPlayerInfo playerInfo, IEventManager eventManager, uint id, TaskData? task)
+    : ITaskInfo
 {
-    private readonly IEventManager _eventManager;
-    private readonly InnerPlayerInfo _playerInfo;
+    public uint Id { get; internal set; } = id;
 
-    public TaskInfo(InnerPlayerInfo playerInfo, IEventManager eventManager, uint id, TaskData? task)
-    {
-        _playerInfo = playerInfo;
-        _eventManager = eventManager;
-        Id = id;
-        Task = task;
-    }
-
-    public uint Id { get; internal set; }
-
-    public TaskData? Task { get; internal set; }
+    public TaskData? Task { get; internal set; } = task;
 
     public bool Complete { get; internal set; }
 
     public async ValueTask CompleteAsync()
     {
-        if (_playerInfo.Controller == null)
+        if (playerInfo.Controller == null)
         {
             throw new ImpostorException("Can't complete a task that doesn't have a player assigned");
         }
 
-        var player = _playerInfo.Controller;
+        var player = playerInfo.Controller;
 
         if (Complete)
         {
@@ -50,7 +40,7 @@ internal class TaskInfo : ITaskInfo
         await player.Game.FinishRpcAsync(writer);
 
         // Notify plugins.
-        await _eventManager.CallAsync(new PlayerCompletedTaskEvent(player.Game,
+        await eventManager.CallAsync(new PlayerCompletedTaskEvent(player.Game,
             player.Game.GetClientPlayer(player.OwnerId)!, player, this));
     }
 

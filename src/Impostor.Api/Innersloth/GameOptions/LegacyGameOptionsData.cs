@@ -2,17 +2,12 @@ using Impostor.Api.Innersloth.GameOptions.RoleOptions;
 
 namespace Impostor.Api.Innersloth.GameOptions;
 
-public class LegacyGameOptionsData : IGameOptions
+public class LegacyGameOptionsData(byte version = LegacyGameOptionsData.LatestVersion) : IGameOptions
 {
     /// <summary>
     ///     The latest major version of the game client.
     /// </summary>
     public const int LatestVersion = 5;
-
-    public LegacyGameOptionsData(byte version = LatestVersion)
-    {
-        Version = version;
-    }
 
     /// <summary>
     ///     Gets or sets the Player speed modifier.
@@ -111,7 +106,7 @@ public class LegacyGameOptionsData : IGameOptions
     /// <summary>
     ///     Gets or sets host's version of the game.
     /// </summary>
-    public byte Version { get; set; }
+    public byte Version { get; set; } = version;
 
     public GameModes GameMode
     {

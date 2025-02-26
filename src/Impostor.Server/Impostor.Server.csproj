@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RuntimeIdentifiers>win-x64;linux-x64;linux-arm;linux-arm64;osx-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <Nullable>enable</Nullable>
     <SelfContained>false</SelfContained>
-    <OutDir>E:\Next\ServerTest\</OutDir>
+    <OutDir>E:/Next/ServerTest/</OutDir>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -23,15 +23,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="9.0.2"/>
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.0.2"/>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2"/>
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="9.0.2"/>
     <PackageReference Include="NextFast.Hazel" Version="1.0.2-ci.7"/>
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0"/>
+    <PackageReference Include="Scalar.AspNetCore" Version="2.0.18" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.1-dev-02307" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.1-dev-02317"/>
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.1-dev-00953" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
+    <PackageReference Include="UUID" Version="1.1.0" />
   </ItemGroup>
 
 </Project>

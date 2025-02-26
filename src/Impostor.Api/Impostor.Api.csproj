@@ -28,13 +28,13 @@
     <PackageReference Include="NextFast.Hazel.Abstractions" Version="1.0.2-ci.7"/>
     <PackageReference Include="Serilog" Version="4.2.1-dev-02340"/>
 
-    <ProjectReference Include="..\Impostor.Api.Innersloth.Generator\Impostor.Api.Innersloth.Generator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer"/>
+    <ProjectReference Include="..\Impostor.Api.Generator\Impostor.Api.Generator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <AdditionalFiles Include="Innersloth/Data/**/*.json"/>
+    <AdditionalFiles Include="Languages/*.json"/>
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Config\DebugConfig.cs"/>
     <Compile Remove="Plugins\PluginBase.cs"/>
   </ItemGroup>
-
 </Project>

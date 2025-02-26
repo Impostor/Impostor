@@ -8,10 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Commands;
 
-public sealed class CommandManager(
-    ConsoleCommandService commandService,
-    IServiceProvider provider,
-    ILogger<CommandManager> logger) : ICommandManager
+public sealed class CommandManager(IServiceProvider provider) : ICommandManager
 {
     private readonly List<ICommand> _allCommands = [];
 
@@ -46,13 +43,13 @@ public sealed class CommandManager(
 
     public IServiceProvider ServiceProvider { get; } = provider;
 
-    internal async Task HandleCommandAsync(string commandString)
+    public async Task HandleCommandAsync(string commandString)
     {
         var args = commandString.Split(" ");
         var command = args[0];
 
         var argArray = args.Skip(1).ToArray();
-        if (await commandService.HandleDefaultCommandAsync(command, argArray))
+        if (await HandleDefaultCommandAsync(command, argArray))
         {
             return;
         }
@@ -70,5 +67,10 @@ public sealed class CommandManager(
         {
             await singleCommand.InvokeAsync(eventArg);
         }
+    }
+    
+    internal async ValueTask<bool> HandleDefaultCommandAsync(string command, string[] args)
+    {
+        return false;
     }
 }

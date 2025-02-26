@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using Impostor.Api.Config;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Hubs;
 
-public class BaseTokenHub : Hub
+public class BaseTokenHub(IOptions<ExtensionServerConfig> extensionConfig) : Hub
 {
-    public virtual string Token { get; protected set; } = "";
+    public string Token { get; } = extensionConfig.Value.Token;
     public List<HubConnection> Connections { get; protected set; } = [];
 
     public override async Task OnConnectedAsync()
     {
         var connection = new HubConnection(Context, Clients.Caller, Context.ConnectionId);
         Connections.Add(connection);
+        
         if (Token != "")
         {
             await SetTokenAuthorized(connection);

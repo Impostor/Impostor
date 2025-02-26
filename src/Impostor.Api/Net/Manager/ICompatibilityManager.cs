@@ -73,14 +73,9 @@ public interface ICompatibilityManager
     /// <returns>True iff this version was on the current compatibility list.</returns>
     public bool RemoveSupportedVersion(GameVersion removedVersion);
 
-    public sealed class CompatibilityGroup
+    public sealed class CompatibilityGroup(IEnumerable<GameVersion> gameVersions)
     {
-        private readonly List<GameVersion> _gameVersions;
-
-        public CompatibilityGroup(IEnumerable<GameVersion> gameVersions)
-        {
-            _gameVersions = gameVersions.ToList();
-        }
+        private readonly List<GameVersion> _gameVersions = gameVersions.ToList();
 
         public IReadOnlyList<GameVersion> GameVersions
         {

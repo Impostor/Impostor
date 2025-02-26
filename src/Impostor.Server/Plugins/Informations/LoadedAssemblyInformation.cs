@@ -3,17 +3,9 @@ using System.Runtime.Loader;
 
 namespace Impostor.Server.Plugins.Informations;
 
-public class LoadedAssemblyInformation : IAssemblyInformation
+public class LoadedAssemblyInformation(Assembly assembly) : IAssemblyInformation
 {
-    private readonly Assembly _assembly;
-
-    public LoadedAssemblyInformation(Assembly assembly)
-    {
-        AssemblyName = assembly.GetName();
-        _assembly = assembly;
-    }
-
-    public AssemblyName AssemblyName { get; }
+    public AssemblyName AssemblyName { get; } = assembly.GetName();
 
     public bool IsPlugin
     {
@@ -22,6 +14,6 @@ public class LoadedAssemblyInformation : IAssemblyInformation
 
     public Assembly Load(AssemblyLoadContext context)
     {
-        return _assembly;
+        return assembly;
     }
 }

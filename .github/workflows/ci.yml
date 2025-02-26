@@ -2,11 +2,15 @@ name: CI
 
 on:
   push:
+    branches:
+      - build
     paths:
       - '.github/workflows/ci.yml'
       - 'src/**/**'
       - 'build.cake'
   pull_request:
+    branches:
+      - build
     paths:
       - '.github/workflows/ci.yml'
       - 'src/**/**'

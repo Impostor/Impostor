@@ -1,5 +1,6 @@
 ﻿using Impostor.Api.Extension;
 using Impostor.Api.Plugins;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace SelfHttpMatchmaker;
@@ -7,9 +8,12 @@ namespace SelfHttpMatchmaker;
 [ImpostorPlugin("SelfHttpMatchmaker.Impostor.Next")]
 public class SelfHttpMatchmakerPlugin : IHttpPlugin, IHttpPluginStartup
 {
-    public bool AssemblyPart
+    public void ConfigureHost(IWebHostBuilder host)
     {
-        get => true;
+        host.ConfigureServices(service =>
+        {
+            service.AddMvc().AddApplicationPart(typeof(SelfHttpMatchmakerPlugin).Assembly);
+        });
     }
 
     public void ConfigureServices(IServiceCollection services)

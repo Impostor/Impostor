@@ -3,7 +3,7 @@ using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Impostor.Api.Innersloth.Generator;
+namespace Impostor.Api.Generator;
 
 public class Vector2Converter : JsonConverter<Vector2>
 {

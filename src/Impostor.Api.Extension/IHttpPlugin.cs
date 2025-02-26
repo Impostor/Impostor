@@ -4,8 +4,4 @@ namespace Impostor.Api.Extension;
 
 public interface IHttpPlugin : IPlugin
 {
-    bool AssemblyPart
-    {
-        get => false;
-    }
 }

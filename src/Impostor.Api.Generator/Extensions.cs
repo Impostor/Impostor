@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 
-namespace Impostor.Api.Innersloth.Generator;
+namespace Impostor.Api.Generator;
 
 internal static class Extensions
 {

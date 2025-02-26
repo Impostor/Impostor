@@ -1,9 +1,11 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Text;
 using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Extension;
@@ -21,6 +23,7 @@ using Impostor.Server.Net.Manager;
 using Impostor.Server.Net.Messages;
 using Impostor.Server.Plugins;
 using Impostor.Server.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.WebSockets;
@@ -28,10 +31,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Next.Hazel.Extensions;
 using Serilog;
 using Serilog.Events;
 using Serilog.Settings.Configuration;
+using Scalar.AspNetCore;
 
 namespace Impostor.Server;
 
@@ -203,6 +208,7 @@ internal static class Program
         };
     }
 
+    internal static UUID CurrentUuid = UUID.New();
     private static IHostBuilder ConfigureExtension(this IHostBuilder builder, ExtensionServerConfig config)
     {
         if (!config.Enable)
@@ -210,28 +216,55 @@ internal static class Program
             return builder;
         }
 
+        Log.Information("Enable Server Extension");
         return builder.ConfigureWebHostDefaults(hostBuilder =>
         {
             hostBuilder.ConfigureKestrel(options =>
             {
+                Log.Information("Http Listen {ip} {port}", config.ListenIp, config.ListenPort);
                 options.Listen(IPAddress.Parse(config.ListenIp.ResolveIp()), config.ListenPort);
             });
-
-            hostBuilder.ConfigureServices(collection =>
+            
+            hostBuilder.ConfigureServices((host,services) =>
             {
-                if (config.EnabledSignalRWeb)
+                if (config.EnabledSignalR)
                 {
-                    collection.AddSignalR();
+                    services.AddSignalR();
+                }
+                
+                if (config.EnabledHttpApi)
+                {
+                    services.AddControllers();
+
+                    if (config.UseAuth)
+                    {
+                        services
+                            .AddAuthentication()
+                            .AddJwtBearer(options =>
+                            { 
+                                options.TokenValidationParameters = new TokenValidationParameters
+                                {
+                                    ValidateIssuer = false,
+                                    ValidateAudience = false,
+                                    ValidateIssuerSigningKey = true,
+                                    ValidateLifetime = true,
+                                    IssuerSigningKey =
+                                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(CurrentUuid.ToString())),
+                                };
+                            })
+                            .Services
+                            .AddSingleton<JwtSecurityTokenHandler>();
+                    }
+
+                    if (host.HostingEnvironment.IsDevelopment())
+                    {
+                        services.AddOpenApi();
+                    }
                 }
 
-                if (config.EnabledHttpMatchmaker || config.EnabledNextApi)
+                if (config.EnabledWebSocket)
                 {
-                    collection.AddControllers();
-                }
-
-                if (config.EnabledWebSocketMatchmaker)
-                {
-                    collection.AddWebSockets(option =>
+                    services.AddWebSockets(option =>
                     {
                         option.KeepAliveTimeout = TimeSpan.FromSeconds(config.WebSocketTimeout);
                         option.KeepAliveInterval = TimeSpan.FromSeconds(config.WebSocketInterval);
@@ -240,23 +273,39 @@ internal static class Program
             });
 
 
-            hostBuilder.Configure(applicationBuilder =>
+            hostBuilder.Configure((builderContext,applicationBuilder) =>
             {
+                var isDev = builderContext.HostingEnvironment.IsDevelopment();
+                
                 applicationBuilder.ConfigurePluginWeb(hostBuilder);
 
+                if (config is { EnabledHttpApi: true, UseAuth: true })
+                {
+                    applicationBuilder
+                        .UseAuthentication()
+                        .UseAuthorization();
+                }
+
+                if (config.EnabledWebSocket)
+                {
+                    Log.Information("Enable Websocket");
+                    applicationBuilder.UseWebSockets();
+                }
+                
                 if (config.EnabledSpa)
                 {
+                    Log.Information("Enable Spa");
                     applicationBuilder.Map("/web", webBuilder =>
                     {
-                        if (DotnetUtils.IsDev)
+                        if (isDev)
                         {
                             webBuilder.UseSpa(spa =>
                             {
-                                spa.UseProxyToSpaDevelopmentServer("http://localhost:2500");
+                                spa.UseProxyToSpaDevelopmentServer("http://localhost:5173");
                             });
                         }
 
-                        if (DotnetUtils.IsDev || !Directory.Exists(config.SpaDirectory))
+                        if (isDev || !Directory.Exists(config.SpaDirectory))
                         {
                             return;
                         }
@@ -265,7 +314,7 @@ internal static class Program
                         {
                             FileProvider = new PhysicalFileProvider(config.SpaDirectory),
                         };
-
+                        
                         webBuilder.UseSpaStaticFiles(fileOption);
                         webBuilder.UseSpa(spa =>
                         {
@@ -274,16 +323,26 @@ internal static class Program
                     });
                 }
 
+                applicationBuilder.UseRouting();
                 applicationBuilder.UseEndpoints(endpoint =>
                 {
-                    if (config.EnabledSignalRWeb)
+                    if (config.EnabledSignalR)
                     {
+                        Log.Information("Enable SignalR");
                         endpoint.MapHub<WebHub>("/signalr/web");
                     }
 
-                    if (config.EnabledHttpMatchmaker || config.EnabledNextApi)
+                    if (config.EnabledHttpApi)
                     {
+                        Log.Information("Enable Http Api");
                         endpoint.MapControllers();
+
+                        if (isDev)
+                        {
+                            Log.Information("Map OpenApi and Scalar");
+                            endpoint.MapScalarApiReference();
+                            endpoint.MapOpenApi();
+                        }
                     }
                 });
             });

@@ -1,13 +1,8 @@
 namespace Impostor.Api.Innersloth.GameOptions.RoleOptions;
 
-public class PhantomRoleOptions : IRoleOptions
+public class PhantomRoleOptions(byte version) : IRoleOptions
 {
-    public PhantomRoleOptions(byte version)
-    {
-        Version = version;
-    }
-
-    public byte Version { get; }
+    public byte Version { get; } = version;
 
     public byte Cooldown { get; set; } = 15;
 

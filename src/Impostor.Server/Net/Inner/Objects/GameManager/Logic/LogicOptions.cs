@@ -7,28 +7,19 @@ using Impostor.Server.Net.State;
 
 namespace Impostor.Server.Net.Inner.Objects.GameManager.Logic;
 
-internal abstract class LogicOptions : GameLogicComponent
+internal abstract class LogicOptions(Game game, IEventManager eventManager) : GameLogicComponent
 {
-    private readonly IEventManager _eventManager;
-    private readonly Game _game;
-
-    protected LogicOptions(Game game, IEventManager eventManager)
-    {
-        _game = game;
-        _eventManager = eventManager;
-    }
-
     public override ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState)
     {
-        GameOptionsFactory.Serialize(writer, _game.Options);
+        GameOptionsFactory.Serialize(writer, game.Options);
         return ValueTask.FromResult(true);
     }
 
     public override async ValueTask DeserializeAsync(IMessageReader reader, bool initialState)
     {
-        GameOptionsFactory.DeserializeInto(reader, _game.Options);
-        await _eventManager.CallAsync(new GameOptionsChangedEvent(
-            _game,
+        GameOptionsFactory.DeserializeInto(reader, game.Options);
+        await eventManager.CallAsync(new GameOptionsChangedEvent(
+            game,
             IGameOptionsChangedEvent.ChangeReason.Host
         ));
     }

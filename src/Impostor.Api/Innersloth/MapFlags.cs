@@ -11,4 +11,5 @@ public enum MapFlags
     Dleks = 1 << 3,
     Airship = 1 << 4,
     Fungle = 1 << 5,
+    All = Skeld | MiraHQ | Polus | Dleks | Airship | Fungle,
 }

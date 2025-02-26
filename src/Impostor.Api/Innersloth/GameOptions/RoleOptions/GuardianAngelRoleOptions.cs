@@ -1,13 +1,8 @@
 namespace Impostor.Api.Innersloth.GameOptions.RoleOptions;
 
-public class GuardianAngelRoleOptions : IRoleOptions
+public class GuardianAngelRoleOptions(byte version) : IRoleOptions
 {
-    public GuardianAngelRoleOptions(byte version)
-    {
-        Version = version;
-    }
-
-    public byte Version { get; }
+    public byte Version { get; } = version;
 
     public byte Cooldown { get; set; } = 60;
 

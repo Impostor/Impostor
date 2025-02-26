@@ -5,20 +5,13 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 
 public class HeliSabotageSystemType : ISystemType, IActivatable
 {
-    public HeliSabotageSystemType()
-    {
-        Countdown = 10000f;
-        ActiveConsoles = new HashSet<Tuple<byte, byte>>();
-        CompletedConsoles = new HashSet<byte>();
-    }
-
-    public float Countdown { get; private set; }
+    public float Countdown { get; private set; } = 10000f;
 
     public float Timer { get; private set; }
 
-    public HashSet<Tuple<byte, byte>> ActiveConsoles { get; }
+    public HashSet<Tuple<byte, byte>> ActiveConsoles { get; } = new();
 
-    public HashSet<byte> CompletedConsoles { get; }
+    public HashSet<byte> CompletedConsoles { get; } = new();
 
     public bool IsActive
     {

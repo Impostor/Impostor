@@ -3,23 +3,17 @@
 namespace Impostor.Api.Plugins;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class ImpostorPluginAttribute : Attribute
+public class ImpostorPluginAttribute(string id) : Attribute
 {
-    public ImpostorPluginAttribute(string id)
-    {
-        Id = id;
-    }
-
     [Obsolete("Use (string id) constructor to avoid redundancy")]
-    public ImpostorPluginAttribute(string id, string name, string author, string version)
+    public ImpostorPluginAttribute(string id, string name, string author, string version) : this(id)
     {
-        Id = id;
         Name = name;
         Author = author;
         Version = version;
     }
 
-    public string Id { get; }
+    public string Id { get; } = id;
 
     public string? Name { get; }
 

@@ -7,15 +7,13 @@ using System.Text.Json;
 using CSharpPoet;
 using Microsoft.CodeAnalysis;
 
-namespace Impostor.Api.Innersloth.Generator.Generators;
+namespace Impostor.Api.Generator.Generators;
 
-public sealed class MapDataGenerator : BaseGenerator
+public sealed class MapDataGenerator(
+    SourceProductionContext sourceProductionContext,
+    ImmutableArray<(string RelativePath, string Content)> files)
+    : BaseGenerator(sourceProductionContext, files)
 {
-    public MapDataGenerator(SourceProductionContext sourceProductionContext,
-        ImmutableArray<(string RelativePath, string Content)> files) : base(sourceProductionContext, files)
-    {
-    }
-
     private T? Deserialize<T>(string name, string fileName)
     {
         return JsonSerializer.Deserialize<T>(
@@ -141,21 +139,8 @@ public sealed class MapDataGenerator : BaseGenerator
         };
     }
 
-    private sealed class DictionaryData
+    private sealed class DictionaryData(string keyType, string valueType, string name, Action<CodeWriter> body)
     {
-        private readonly Action<CodeWriter> _body;
-        private readonly string _keyType;
-        private readonly string _name;
-        private readonly string _valueType;
-
-        public DictionaryData(string keyType, string valueType, string name, Action<CodeWriter> body)
-        {
-            _keyType = keyType;
-            _valueType = valueType;
-            _name = name;
-            _body = body;
-        }
-
         public DictionaryData(string valueType, string name, Action<CodeWriter> body) : this("int", valueType, name,
             body)
         {
@@ -163,12 +148,12 @@ public sealed class MapDataGenerator : BaseGenerator
 
         public void WriteInitializer(CodeWriter writer)
         {
-            writer.WriteLine($"{_name} = new Dictionary<{_keyType}, {_valueType}>");
+            writer.WriteLine($"{name} = new Dictionary<{keyType}, {valueType}>");
             writer.WriteLine("{");
 
             using (writer.Indent())
             {
-                _body(writer);
+                body(writer);
             }
 
             writer.WriteLine("}.AsReadOnly();");
@@ -176,7 +161,7 @@ public sealed class MapDataGenerator : BaseGenerator
 
         public CSharpProperty CreateProperty()
         {
-            return new CSharpProperty($"IReadOnlyDictionary<{_keyType}, {_valueType}>", _name)
+            return new CSharpProperty($"IReadOnlyDictionary<{keyType}, {valueType}>", name)
             {
                 Getter = new CSharpProperty.Accessor(),
                 IsOverride = true,

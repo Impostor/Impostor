@@ -5,15 +5,13 @@ using System.Text.Json;
 using CSharpPoet;
 using Microsoft.CodeAnalysis;
 
-namespace Impostor.Api.Innersloth.Generator.Generators;
+namespace Impostor.Api.Generator.Generators;
 
-public sealed class EnumGenerator : BaseGenerator
+public sealed class EnumGenerator(
+    SourceProductionContext sourceProductionContext,
+    ImmutableArray<(string RelativePath, string Content)> files)
+    : BaseGenerator(sourceProductionContext, files)
 {
-    public EnumGenerator(SourceProductionContext sourceProductionContext,
-        ImmutableArray<(string RelativePath, string Content)> files) : base(sourceProductionContext, files)
-    {
-    }
-
     public void Generate(string name, string? @namespace = null, string? sourceName = null, bool flags = false,
         CSharpEnumUnderlyingType underlyingType = CSharpEnumUnderlyingType.Int)
     {
