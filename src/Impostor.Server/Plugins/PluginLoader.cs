@@ -55,6 +55,7 @@ internal static class PluginLoader
         var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
         matcher.AddInclude("*.dll");
         matcher.AddExclude("Impostor.Api.dll");
+        matcher.AddExclude("Impostor.Api.Extension.dll");
 
         config
             .PluginPaths
@@ -72,16 +73,21 @@ internal static class PluginLoader
         {
             Logger.Verbose("Loading assembly {0} v{1}", name.Name, name.Version);
 
-            // Some plugins may be referencing another Impostor.Api version and try to load it.
-            // We want to only use the one shipped with the server.
-            if (name.Name == "Impostor.Api")
+            switch (name.Name)
             {
-                return typeof(IPlugin).Assembly;
+                // Some plugins may be referencing another Impostor.Api version and try to load it.
+                // We want to only use the one shipped with the server.
+                case "Impostor.Api":
+                    return typeof(IPlugin).Assembly;
+                case "Impostor.Api.Extension":
+                    return typeof(IHttpPluginStartup).Assembly;
+                default:
+                {
+                    var info = assemblyInfos.FirstOrDefault(a => a.AssemblyName.Name == name.Name);
+
+                    return info?.Load(loadContext);
+                }
             }
-
-            var info = assemblyInfos.FirstOrDefault(a => a.AssemblyName.Name == name.Name);
-
-            return info?.Load(loadContext);
         };
 
         // TODO: Catch uncaught exceptions.
@@ -129,23 +135,31 @@ internal static class PluginLoader
                     .Select(Activator.CreateInstance)
                     .Cast<IPluginStartup>()
                     .FirstOrDefault(),
-                plugin.Single()));
+                plugin.Single())
+            {
+                Assembly = assembly,
+            });
         }
 
-        var orderedPlugins = LoadOrderPlugins(plugins);
+        AllPluginLoad = LoadOrderPlugins(plugins);
 
-        foreach (var plugin in orderedPlugins)
+        foreach (var plugin in AllPluginLoad)
         {
             plugin.Startup?.ConfigureHost(builder);
+
+            if (plugin.Startup is IHttpPluginStartup { AssemblyPart: true })
+            {
+                plugin.AssemblyPart = true;
+            }
         }
 
         builder.ConfigureServices(services =>
         {
             services.AddSingleton<PluginLoaderService>(provider =>
-                ActivatorUtilities.CreateInstance<PluginLoaderService>(provider, orderedPlugins));
+                ActivatorUtilities.CreateInstance<PluginLoaderService>(provider, AllPluginLoad));
             services.AddSingleton<IHostedService>(p => p.GetRequiredService<PluginLoaderService>());
 
-            foreach (var plugin in orderedPlugins)
+            foreach (var plugin in AllPluginLoad)
             {
                 plugin.Startup?.ConfigureServices(services);
             }
@@ -154,11 +168,21 @@ internal static class PluginLoader
         return builder;
     }
 
+    internal static List<PluginInformation> AllPluginLoad = [];
+
+    internal static IMvcBuilder ConfigurePluginMvc(this IMvcBuilder builder)
+    {
+        foreach (var plugin in AllPluginLoad.Where(n => n.AssemblyPart))
+        {
+            builder.AddApplicationPart(plugin.Assembly);
+        }
+        
+        return builder;
+    }
+
     public static void ConfigurePluginWeb(this IApplicationBuilder app, IWebHostBuilder webHostBuilder)
     {
-        var plugins = app.ApplicationServices.GetRequiredService<PluginLoaderService>().Plugins;
-        
-        foreach (var pluginInfo in plugins)
+        foreach (var pluginInfo in AllPluginLoad)
         {
             if (pluginInfo.Startup is not IHttpPluginStartup startup)
             {
@@ -328,10 +352,17 @@ internal static class PluginLoader
 
     private class TypesCacher(Predicate<Type> predicate)
     {
-        private List<Type> _types = [];
+        private readonly List<Type> _types = [];
 
         internal TypesCacher LoaderAssembly(Assembly assembly)
         {
+            foreach (var type in assembly.GetTypes())
+            {
+                if (predicate(type))
+                {
+                    _types.Add(type);
+                }
+            }
             return this;
         }
     }

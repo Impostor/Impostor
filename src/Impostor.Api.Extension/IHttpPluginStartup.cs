@@ -6,6 +6,8 @@ namespace Impostor.Api.Extension;
 
 public interface IHttpPluginStartup : IPluginStartup
 {
+    public virtual bool AssemblyPart { get => false; } 
+    
     void ConfigureHost(IWebHostBuilder host) { }
     void ConfigureWebApplication(IApplicationBuilder app) { }
 }

@@ -59,6 +59,7 @@ internal sealed class NetListenerManager(
         {
             if (File.Exists(config.CertificatePath) && File.Exists(config.PrivateKeyPath))
             {
+                logger.LogInformation("New certificate loaded: {certificatePath} {privateKeyPath}", config.CertificatePath, config.PrivateKeyPath);
                 var newCertificate = DtlsHelper.GetCertificate(File.ReadAllText(config.CertificatePath),
                     File.ReadAllText(config.PrivateKeyPath));
                 certificate = CachedCertificates[(config.CertificatePath, config.PrivateKeyPath)] = newCertificate;
@@ -119,19 +120,7 @@ internal sealed class NetListenerManager(
             logger.LogWarning("Ip: {ip} Port:{port} already exists", config.ListenIp, config.ListenPort);
             return false;
         }
-
-        // Hazel current does not support dtl and auth
-        if (config.HasAuth || config.IsDtl)
-        {
-            logger.LogWarning("dtl and auth not supported yet");
-            return false;
-        }
-
-        if (config is { HasAuth: true, IsDtl: true })
-        {
-            logger.LogWarning("dtl not supported auth");
-            return false;
-        }
+        
 
         if ((config.PrivateKeyPath == string.Empty || config.CertificatePath == string.Empty) &&
             (config.HasAuth || config.IsDtl))
@@ -218,6 +207,7 @@ internal sealed class NetListenerManager(
         writer.StartMessage(1);
         writer.Write(id);
         writer.EndMessage();
+        logger.LogInformation("Has New Auth Ip:{ip} LastId:{Id}", eventArgs.Connection.EndPoint.ToString(), id);
         await eventArgs.Connection.SendAsync(writer);
     }
 
@@ -231,6 +221,10 @@ internal sealed class NetListenerManager(
             out var platformSpecificData, out var matchmakerToken,
             out var lastId, out var friendCode
         );
+        
+        logger.LogInformation(
+            "Has New Connection Ip:{ip} isDtl:{dtl} Name:{name} Token:{token} FriendCode:{code} LastId:{Id}",
+            eventArgs.Connection.EndPoint.ToString(), isDtl, name, matchmakerToken, friendCode, lastId);
 
         var connection = new HazelConnection(eventArgs.Connection, connectionLogger);
 

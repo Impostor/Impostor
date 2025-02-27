@@ -4,15 +4,12 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <OutDir>E:/Next/ServerTest/plugins</OutDir>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="../../Impostor.Api/Impostor.Api.csproj"/>
     <ProjectReference Include="../../Impostor.Api.Extension/Impostor.Api.Extension.csproj"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\"/>
   </ItemGroup>
 
   <ItemGroup>

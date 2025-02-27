@@ -32,6 +32,8 @@ public class PluginInformation
     {
         get => _attribute.Id;
     }
+    
+    public Assembly Assembly { get; internal set; }
 
     public string Name { get; }
 
@@ -46,6 +48,8 @@ public class PluginInformation
     public Type PluginType { get; }
 
     public IPlugin? Instance { get; set; }
+    
+    public bool AssemblyPart { get; internal set; }
 
     public override string ToString()
     {

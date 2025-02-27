@@ -211,7 +211,7 @@ internal static class Program
     internal static UUID CurrentUuid = UUID.New();
     private static IHostBuilder ConfigureExtension(this IHostBuilder builder, ExtensionServerConfig config)
     {
-        if (!config.Enable)
+        if (!config.Enabled)
         {
             return builder;
         }
@@ -234,7 +234,9 @@ internal static class Program
                 
                 if (config.EnabledHttpApi)
                 {
-                    services.AddControllers();
+                    services
+                        .AddControllers()
+                        .ConfigurePluginMvc();
 
                     if (config.UseAuth)
                     {

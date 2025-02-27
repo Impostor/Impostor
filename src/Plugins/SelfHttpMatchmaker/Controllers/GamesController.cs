@@ -22,8 +22,7 @@ namespace SelfHttpMatchmaker.Controllers;
 public sealed class GamesController(
     IGameManager gameManager,
     ListingManager listingManager,
-    IOptions<ServerConfig> serverConfig,
-    ILogger<GamesController> logger) : ControllerBase
+    IOptions<ServerConfig> serverConfig) : ControllerBase
 {
     private readonly ServerConfig _config = serverConfig.Value;
     private HostServer? _hostServer;
@@ -119,7 +118,9 @@ public class HostServer
     {
         return new HostServer
         {
+#pragma warning disable CS0618 // 类型或成员已过时
             Ip = ipAddress.Address,
+#pragma warning restore CS0618 // 类型或成员已过时
             Port = port,
         };
     }
