@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
@@ -102,28 +103,52 @@ namespace Impostor.Api.Net.Inner.Objects
         ValueTask MurderPlayerAsync(IInnerPlayerControl target, MurderResultFlags result);
 
         /// <summary>
-        ///     Murder <paramref name="target" /> player successfully.
+        /// Murder <paramref name="target" /> player.
+        /// </summary>
+        /// <param name="target">Target player to murder.</param>
+        /// <param name="result">The result of the murder operation.</param>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask ForceMurderPlayerAsync(IInnerPlayerControl target, MurderResultFlags result);
+
+        /// <summary>
+        ///     Murder <paramref name="target" /> player after validating if this is a valid kill.
         /// </summary>
         /// <param name="target">Target player to murder.</param>
         /// <exception cref="ImpostorProtocolException">Thrown when player is not the impostor.</exception>
         /// <exception cref="ImpostorProtocolException">Thrown when player is dead.</exception>
         /// <exception cref="ImpostorProtocolException">Thrown when target is dead.</exception>
         /// <returns>Task that must be awaited.</returns>
+        [Obsolete("Please switch to version with the MurderResultFlags argument")]
         ValueTask MurderPlayerAsync(IInnerPlayerControl target);
 
         /// <summary>
         ///     Protect <paramref name="target" /> player.
         /// </summary>
         /// <param name="target">Target player to protect.</param>
-        /// <exception cref="ImpostorProtocolException">Thrown when target is a guardian angel.</exception>
+        /// <exception cref="ImpostorProtocolException">Thrown when target is dead.</exception>
         /// <returns>Task that must be awaited.</returns>
         ValueTask ProtectPlayerAsync(IInnerPlayerControl target);
+
+        /// <summary>
+        ///     Protect <paramref name="target" /> player.
+        /// </summary>
+        /// <param name="target">Target player to protect.</param>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask ForceProtectPlayerAsync(IInnerPlayerControl target);
+
+        /// <summary>
+        ///     Exile the current player. This doesn't produce a body to be reported.
+        ///     Visible to all players.
+        /// </summary>
+        /// <exception cref="ImpostorProtocolException">Thrown if player to be exiled is already dead.</exception>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask ExileAsync();
 
         /// <summary>
         ///     Exile the current player. This doesn't produce a body to be reported.
         ///     Visible to all players.
         /// </summary>
         /// <returns>Task that must be awaited.</returns>
-        ValueTask ExileAsync();
+        ValueTask ForceExileAsync();
     }
 }

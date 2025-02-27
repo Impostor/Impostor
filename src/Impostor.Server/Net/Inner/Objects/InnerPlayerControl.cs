@@ -936,16 +936,6 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            // Host-only mods intentionally desync players, so it may appear that one killing role (like a genuine impostor) is killing another
-            // killing role (like an sheriff). So this needs to be allowed if the host requested authority.
-            if (target == null || (target.PlayerInfo.IsImpostor && !_game.IsHostAuthoritive))
-            {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow, "Client tried to murder invalid target"))
-                {
-                    return false;
-                }
-            }
-
             PlayerInfo.LastMurder = _dateTimeProvider.UtcNow - TimeSpan.FromMilliseconds(sender.Client.Connection.AveragePing);
             IsMurdering = target;
 
@@ -956,9 +946,24 @@ namespace Impostor.Server.Net.Inner.Objects
                 return true;
             }
 
-            if (target != null)
+            if (target == null)
+            {
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow, "Client tried to murder a nonexisting target"))
+                {
+                    return false;
+                }
+            }
+            else
             {
                 var result = target.IsProtected ? MurderResultFlags.FailedProtected : MurderResultFlags.Succeeded;
+
+                if (!ValidateMurderPlayer(target, result, out var invalidReason))
+                {
+                    if (await sender.Client.ReportCheatAsync(RpcCalls.CheckMurder, CheatCategory.GameFlow, invalidReason))
+                    {
+                        return false;
+                    }
+                }
 
                 var evt = new PlayerCheckMurderEvent(Game, sender, this, target, result);
                 await _eventManager.CallAsync(evt);
@@ -966,7 +971,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 if (!evt.IsCancelled)
                 {
                     target.ProtectedOn = null; // Clear GA protection in all cases
-                    await MurderPlayerAsync(target, evt.Result);
+
+                    // Don't repeat checks as they were already done in ValidateMP
+                    await ForceMurderPlayerAsync(target, evt.Result);
                 }
             }
 
