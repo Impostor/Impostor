@@ -24,6 +24,8 @@
 
         public bool EnableTargetChecks { get; set; } = true;
 
+        public bool EnableInvalidObjectChecks { get; set; } = true;
+
         public bool ForbidProtocolExtensions { get; set; } = true;
     }
 }

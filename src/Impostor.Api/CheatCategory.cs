@@ -26,6 +26,9 @@ public enum CheatCategory
     /// <summary>A packet was sent to a player that should be broadcasted, or vice versa.</summary>
     Target,
 
+    /// <summary>A packet was sent on an invalid network object, like a PlayerControl without PlayerInfo.</summary>
+    InvalidObject,
+
     /// <summary>Legacy category for unsorted anticheat checks.</summary>
     Other,
 }
