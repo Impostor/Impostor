@@ -37,11 +37,6 @@ jobs:
         with:
           verbosity: Minimal
 
-      - name: Push Package
-        if: github.ref_type != 'tag'
-        run: |
-          dotnet nuget push ./build/*.nupkg --source ${{ secrets.SERVERURL }} --api-key ${{ secrets.DEVAPIKEY }}
-
       - uses: softprops/action-gh-release@v1
         if: github.ref_type == 'tag'
         with:
@@ -55,4 +50,4 @@ jobs:
       - name: Push NuGet package
         if: github.ref_type == 'tag'
         run: |
-          dotnet nuget push ./build/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET }}
+          dotnet nuget push ./build/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET }}
