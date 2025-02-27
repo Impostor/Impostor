@@ -29,7 +29,7 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     Gets the <see cref="IInnerPlayerInfo" /> of the <see cref="IInnerPlayerControl" />.
         ///     Contains metadata about the player.
         /// </summary>
-        IInnerPlayerInfo PlayerInfo { get; }
+        IInnerPlayerInfo? PlayerInfo { get; }
 
         /// <summary>
         ///     Sets the name of the current <see cref="IInnerPlayerControl" />.

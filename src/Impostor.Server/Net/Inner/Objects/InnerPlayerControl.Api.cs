@@ -17,10 +17,15 @@ namespace Impostor.Server.Net.Inner.Objects
 
         IInnerCustomNetworkTransform IInnerPlayerControl.NetworkTransform => NetworkTransform;
 
-        IInnerPlayerInfo IInnerPlayerControl.PlayerInfo => PlayerInfo;
+        IInnerPlayerInfo? IInnerPlayerControl.PlayerInfo => PlayerInfo;
 
         public async ValueTask SetNameAsync(string name)
         {
+            if (PlayerInfo == null)
+            {
+                throw new ImpostorProtocolException("Cannot set name, PlayerInfo is null");
+            }
+
             PlayerInfo.CurrentOutfit.PlayerName = name;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetName);
@@ -30,6 +35,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetColorAsync(ColorType color)
         {
+            if (PlayerInfo == null)
+            {
+                throw new ImpostorProtocolException("Cannot set color, PlayerInfo is null");
+            }
+
             PlayerInfo.CurrentOutfit.Color = color;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetColor);
@@ -39,6 +49,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetHatAsync(string hatId)
         {
+            if (PlayerInfo == null)
+            {
+                throw new ImpostorProtocolException("Cannot set hat, PlayerInfo is null");
+            }
+
             PlayerInfo.CurrentOutfit.HatId = hatId;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetHatStr);
@@ -48,6 +63,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetPetAsync(string petId)
         {
+            if (PlayerInfo == null)
+            {
+                throw new ImpostorProtocolException("Cannot set pet, PlayerInfo is null");
+            }
+
             PlayerInfo.CurrentOutfit.PetId = petId;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetPetStr);
@@ -57,6 +77,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetSkinAsync(string skinId)
         {
+            if (PlayerInfo == null)
+            {
+                throw new ImpostorProtocolException("Cannot set skin, PlayerInfo is null");
+            }
+
             PlayerInfo.CurrentOutfit.SkinId = skinId;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetSkinStr);
@@ -66,6 +91,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetVisorAsync(string visorId)
         {
+            if (PlayerInfo == null)
+            {
+                throw new ImpostorProtocolException("Cannot set visor, PlayerInfo is null");
+            }
+
             PlayerInfo.CurrentOutfit.VisorId = visorId;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetVisorStr);
@@ -75,6 +105,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask SetNamePlateAsync(string nameplateId)
         {
+            if (PlayerInfo == null)
+            {
+                throw new ImpostorProtocolException("Cannot set nameplate, PlayerInfo is null");
+            }
+
             PlayerInfo.CurrentOutfit.NamePlateId = nameplateId;
 
             using var writer = Game.StartRpc(NetId, RpcCalls.SetNamePlateStr);
@@ -103,13 +138,21 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private bool ValidateMurderPlayer(IInnerPlayerControl target, MurderResultFlags result, [NotNullWhen(false)] out string? invalidReason)
         {
-            if (!PlayerInfo.IsImpostor)
+            if (PlayerInfo == null)
+            {
+                invalidReason = "Tried to murder a player, but the murderer didn't have a playerinfo";
+            }
+            else if (!PlayerInfo.IsImpostor)
             {
                 invalidReason = "Tried to murder a player, but murderer was not an impostor.";
             }
             else if (PlayerInfo.IsDead)
             {
                 invalidReason = "Tried to murder a player, but murderer was not alive.";
+            }
+            else if (target.PlayerInfo == null)
+            {
+                invalidReason = "Tried to murder a player, but the murderer didn't have a playerinfo";
             }
             else if (target.PlayerInfo.IsImpostor)
             {
@@ -159,7 +202,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask ProtectPlayerAsync(IInnerPlayerControl target)
         {
-            if (target.PlayerInfo.IsDead)
+            if (target.PlayerInfo == null)
+            {
+                throw new ImpostorProtocolException("Tried to exile a player, but target didn't have a playerinfo");
+            }
+            else if (target.PlayerInfo.IsDead)
             {
                 throw new ImpostorProtocolException("Tried to protect a player that is dead");
             }
@@ -172,13 +219,17 @@ namespace Impostor.Server.Net.Inner.Objects
             ((InnerPlayerControl)target).Protect(this);
 
             using var writer = Game.StartRpc(NetId, RpcCalls.ProtectPlayer);
-            Rpc45ProtectPlayer.Serialize(writer, target, PlayerInfo.CurrentOutfit.Color);
+            Rpc45ProtectPlayer.Serialize(writer, target, PlayerInfo?.CurrentOutfit.Color ?? ColorType.Red);
             await Game.FinishRpcAsync(writer);
         }
 
         public async ValueTask ExileAsync()
         {
-            if (PlayerInfo.IsDead)
+            if (PlayerInfo == null)
+            {
+                throw new ImpostorProtocolException("Tried to exile a player, but target didn't have a playerinfo");
+            }
+            else if (PlayerInfo.IsDead)
             {
                 throw new ImpostorProtocolException("Tried to exile a player, but target was not alive.");
             }
