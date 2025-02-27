@@ -2,15 +2,11 @@ name: CI
 
 on:
   push:
-    branches:
-      - build
     paths:
       - '.github/workflows/ci.yml'
       - 'src/**/**'
       - 'build.cake'
   pull_request:
-    branches:
-      - build
     paths:
       - '.github/workflows/ci.yml'
       - 'src/**/**'
@@ -40,6 +36,11 @@ jobs:
         uses: cake-build/cake-action@v3
         with:
           verbosity: Minimal
+
+      - name: Push Package
+        if: github.ref_type != 'tag'
+        run: |
+          dotnet nuget push ./build/*.nupkg --source ${{ secrets.SERVERURL }} --api-key ${{ secrets.DEVAPIKEY }}
 
       - uses: softprops/action-gh-release@v1
         if: github.ref_type == 'tag'
