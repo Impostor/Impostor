@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
@@ -100,23 +101,45 @@ namespace Impostor.Server.Net.Inner.Objects
             await Game.FinishRpcAsync(writer, player.OwnerId);
         }
 
-        public async ValueTask MurderPlayerAsync(IInnerPlayerControl target, MurderResultFlags result)
+        private bool ValidateMurderPlayer(IInnerPlayerControl target, MurderResultFlags result, [NotNullWhen(false)] out string? invalidReason)
         {
             if (!PlayerInfo.IsImpostor)
             {
-                throw new ImpostorProtocolException("Tried to murder a player, but murderer was not the impostor.");
+                invalidReason = "Tried to murder a player, but murderer was not an impostor.";
             }
-
-            if (PlayerInfo.IsDead)
+            else if (PlayerInfo.IsDead)
             {
-                throw new ImpostorProtocolException("Tried to murder a player, but murderer was not alive.");
+                invalidReason = "Tried to murder a player, but murderer was not alive.";
             }
-
-            if (target.PlayerInfo.IsDead)
+            else if (target.PlayerInfo.IsImpostor)
             {
-                throw new ImpostorProtocolException("Tried to murder a player, but target was not alive.");
+                invalidReason = "Tried to murder a player, but target is an impostor";
+            }
+            else if (target.PlayerInfo.IsDead)
+            {
+                invalidReason = "Tried to murder a player, but target was not alive.";
+            }
+            else
+            {
+                invalidReason = null;
+                return true;
             }
 
+            return false;
+        }
+
+        public async ValueTask MurderPlayerAsync(IInnerPlayerControl target, MurderResultFlags result)
+        {
+            if (!ValidateMurderPlayer(target, result, out var reason))
+            {
+                throw new ImpostorProtocolException(reason);
+            }
+
+            await ForceMurderPlayerAsync(target, result);
+        }
+
+        public async ValueTask ForceMurderPlayerAsync(IInnerPlayerControl target, MurderResultFlags result)
+        {
             if (!result.IsFailed())
             {
                 ((InnerPlayerControl)target).Die(DeathReason.Kill);
@@ -136,11 +159,16 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public async ValueTask ProtectPlayerAsync(IInnerPlayerControl target)
         {
-            if (target.PlayerInfo.RoleType == RoleTypes.GuardianAngel)
+            if (target.PlayerInfo.IsDead)
             {
-                throw new ImpostorProtocolException("Tried to protect another Guardian Angel");
+                throw new ImpostorProtocolException("Tried to protect a player that is dead");
             }
 
+            await ForceProtectPlayerAsync(target);
+        }
+
+        public async ValueTask ForceProtectPlayerAsync(IInnerPlayerControl target)
+        {
             ((InnerPlayerControl)target).Protect(this);
 
             using var writer = Game.StartRpc(NetId, RpcCalls.ProtectPlayer);
@@ -155,6 +183,11 @@ namespace Impostor.Server.Net.Inner.Objects
                 throw new ImpostorProtocolException("Tried to exile a player, but target was not alive.");
             }
 
+            await ForceExileAsync();
+        }
+
+        public async ValueTask ForceExileAsync()
+        {
             // Update player.
             Die(DeathReason.Exile);
 
