@@ -73,6 +73,7 @@ namespace Impostor.Server.Net
                 CheatCategory.Ownership => _antiCheatConfig.EnableOwnershipChecks,
                 CheatCategory.Role => _antiCheatConfig.EnableRoleChecks,
                 CheatCategory.Target => _antiCheatConfig.EnableTargetChecks,
+                CheatCategory.InvalidObject => _antiCheatConfig.EnableInvalidObjectChecks,
                 CheatCategory.Other => true,
                 _ => LogUnknownCategory(category),
             };
