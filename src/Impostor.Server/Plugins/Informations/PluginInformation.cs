@@ -10,11 +10,10 @@ public class PluginInformation
 {
     private readonly ImpostorPluginAttribute _attribute;
 
-    public PluginInformation(IPluginStartup? startup, Type pluginType)
+    public PluginInformation(IPluginStartup? startup, Type pluginType, Assembly assembly)
     {
         _attribute = pluginType.GetCustomAttribute<ImpostorPluginAttribute>()!;
-
-        var assembly = pluginType.Assembly;
+        
         Name = _attribute.Name ??
                assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? assembly.GetName().Name!;
         Author = _attribute.Author ?? assembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? string.Empty;
@@ -26,6 +25,7 @@ public class PluginInformation
             .Select(t => new DependencyInformation(t)).ToList();
         Startup = startup;
         PluginType = pluginType;
+        Assembly = assembly;
     }
 
     public string Id

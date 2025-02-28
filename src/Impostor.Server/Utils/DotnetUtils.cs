@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 
 namespace Impostor.Server.Utils;
@@ -6,6 +8,11 @@ namespace Impostor.Server.Utils;
 public static class DotnetUtils
 {
     private static string? _version;
+
+    public static IActionResult OkJson<T>(this T content)
+    {
+        return new OkObjectResult(JsonSerializer.Serialize(content));
+    }
 
     public static string Version
     {

@@ -683,8 +683,8 @@
       },
       "NextFast.Hazel.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.0.2-ci.7",
-        "contentHash": "YFTuYOB9UjNj4NelmATDQCJbhAyW4wpRli11HIoBz9b9YVYJOBRGrzP41iih37PB1InlCMlQlP4g/TUJHQ2oqg=="
+        "resolved": "1.0.2-ci.8",
+        "contentHash": "eaYyO/+c1l48bjq7ZbGRRohn6FIkDnyMrN8/zO4rxwVeIl6Tbdmw9FnrXXg7BxHzDcuSJP8AZcjXmfq6L8ovvQ=="
       },
       "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl": {
         "type": "Transitive",
@@ -1632,7 +1632,7 @@
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "[9.0.2, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.2, )",
-          "NextFast.Hazel.Abstractions": "[1.0.2-ci.7, )",
+          "NextFast.Hazel.Abstractions": "[1.0.2-ci.8, )",
           "Serilog": "[4.2.1-dev-02340, )"
         }
       },

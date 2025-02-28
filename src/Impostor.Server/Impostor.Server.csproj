@@ -29,7 +29,7 @@
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.0.2"/>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2"/>
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="9.0.2"/>
-    <PackageReference Include="NextFast.Hazel" Version="1.0.2-ci.7"/>
+    <PackageReference Include="NextFast.Hazel" Version="1.0.2-ci.8"/>
     <PackageReference Include="Scalar.AspNetCore" Version="2.0.18" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.1-dev-02307" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.1-dev-02317"/>

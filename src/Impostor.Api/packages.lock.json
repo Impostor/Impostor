@@ -26,9 +26,9 @@
       },
       "NextFast.Hazel.Abstractions": {
         "type": "Direct",
-        "requested": "[1.0.2-ci.7, )",
-        "resolved": "1.0.2-ci.7",
-        "contentHash": "YFTuYOB9UjNj4NelmATDQCJbhAyW4wpRli11HIoBz9b9YVYJOBRGrzP41iih37PB1InlCMlQlP4g/TUJHQ2oqg=="
+        "requested": "[1.0.2-ci.8, )",
+        "resolved": "1.0.2-ci.8",
+        "contentHash": "eaYyO/+c1l48bjq7ZbGRRohn6FIkDnyMrN8/zO4rxwVeIl6Tbdmw9FnrXXg7BxHzDcuSJP8AZcjXmfq6L8ovvQ=="
       },
       "Serilog": {
         "type": "Direct",

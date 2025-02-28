@@ -73,14 +73,14 @@
       },
       "NextFast.Hazel": {
         "type": "Direct",
-        "requested": "[1.0.2-ci.7, )",
-        "resolved": "1.0.2-ci.7",
-        "contentHash": "DMkvup+qwilMhG1BGWKkzpqNRswp7FbyUu6nQMfF1I7rtAw5yTKxH6eJPDlhq4qlJZWYbMlDCLSqbiAGEOOB6w==",
+        "requested": "[1.0.2-ci.8, )",
+        "resolved": "1.0.2-ci.8",
+        "contentHash": "y1m+ZDYmqGORe0dsYpPblcWt9kin/LKBZTtGGPiPc2704giUUXEhTWrnAqZMfvGQZmtBRlF/KnxxuQn/63cOVg==",
         "dependencies": {
           "BouncyCastle.Cryptography": "2.5.1",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.2",
           "Microsoft.Extensions.ObjectPool": "9.0.2",
-          "NextFast.Hazel.Abstractions": "1.0.2-ci.7",
+          "NextFast.Hazel.Abstractions": "1.0.2-ci.8",
           "Serilog": "4.2.1-dev-02340"
         }
       },
@@ -481,8 +481,8 @@
       },
       "NextFast.Hazel.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.0.2-ci.7",
-        "contentHash": "YFTuYOB9UjNj4NelmATDQCJbhAyW4wpRli11HIoBz9b9YVYJOBRGrzP41iih37PB1InlCMlQlP4g/TUJHQ2oqg=="
+        "resolved": "1.0.2-ci.8",
+        "contentHash": "eaYyO/+c1l48bjq7ZbGRRohn6FIkDnyMrN8/zO4rxwVeIl6Tbdmw9FnrXXg7BxHzDcuSJP8AZcjXmfq6L8ovvQ=="
       },
       "Serilog": {
         "type": "Transitive",
@@ -522,7 +522,7 @@
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "[9.0.2, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.2, )",
-          "NextFast.Hazel.Abstractions": "[1.0.2-ci.7, )",
+          "NextFast.Hazel.Abstractions": "[1.0.2-ci.8, )",
           "Serilog": "[4.2.1-dev-02340, )"
         }
       },

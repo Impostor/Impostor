@@ -4,6 +4,7 @@ using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Manager;
+using Impostor.Server.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Impostor.Server.Controllers;
@@ -37,6 +38,17 @@ public sealed class PublicController(IGameManager gameManager, IClientManager cl
             Host = game.Host?.Client.Name ?? "Unknown",
         });
 
-        return Ok(JsonSerializer.Serialize(list));
+        return list.OkJson();
+    }
+
+    [HttpGet]
+    public IActionResult ImpostorInfo()
+    {
+        return new
+        {
+            DotnetUtils.Version,
+            DotnetUtils.Environment,
+            DotnetUtils.IsDev,
+        }.OkJson();
     }
 }

@@ -135,10 +135,7 @@ internal static class PluginLoader
                     .Select(Activator.CreateInstance)
                     .Cast<IPluginStartup>()
                     .FirstOrDefault(),
-                plugin.Single())
-            {
-                Assembly = assembly,
-            });
+                plugin.Single(), assembly));
         }
 
         AllPluginLoad = LoadOrderPlugins(plugins);
