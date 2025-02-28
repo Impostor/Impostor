@@ -23,10 +23,6 @@ else if (buildId != 0)
 {
     msbuildSettings.VersionSuffix = "ci." + buildId;
     buildVersion += "_ci." + buildId;
-} 
-else 
-{
-    buildVersion += "_dev";
 }
 
 //////////////////////////////////////////////////////////////////////
