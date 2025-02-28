@@ -2,11 +2,15 @@ name: CI
 
 on:
   push:
+    branches:
+      - preview
     paths:
       - '.github/workflows/ci.yml'
       - 'src/**/**'
       - 'build.cake'
   pull_request:
+    branches:
+      - preview
     paths:
       - '.github/workflows/ci.yml'
       - 'src/**/**'
@@ -45,9 +49,8 @@ jobs:
             ./build/*.zip
             ./build/*.tar.gz
             ./build/*.nupkg
-            ./build/*.snupkg
 
-      - name: Push NuGet package
-        if: github.ref_type == 'tag'
+      - name: Publish to NuGet
         run: |
-          dotnet nuget push ./build/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET }}
+          dotnet nuget push ./build/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGETKEY }}
+
