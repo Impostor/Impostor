@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.2"/>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.2"/>
     <PackageReference Include="NextFast.Hazel.Abstractions" Version="1.0.2-ci.8"/>

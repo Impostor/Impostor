@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
+using Impostor.Api.Extension.Events;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
@@ -102,19 +103,19 @@ internal class GameManager : IGameManager
             return null;
         }
 
-        var @event = new GameCreationEvent(this, owner);
+        var @event = new GameCreationEvent(owner, this, options, filterOptions);
         await _eventManager.CallAsync(@event);
 
-        if (@event.IsCancelled)
+        if (@event.Cancel)
         {
             return null;
         }
 
-        var (success, game) = await TryCreateAsync(options, filterOptions, owner, @event.GameCode);
+        var (success, game) = await TryCreateAsync(options, filterOptions, owner, @event);
 
         for (var i = 0; i < 10 && !success; i++)
         {
-            (success, game) = await TryCreateAsync(options, filterOptions, owner);
+            (success, game) = await TryCreateAsync(options, filterOptions, owner, @event);
         }
 
         if (owner != null)
@@ -131,9 +132,9 @@ internal class GameManager : IGameManager
     }
 
     private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(IGameOptions options,
-        GameFilterOptions filterOptions, IClient? owner, GameCode? desiredGameCode = null)
+        GameFilterOptions filterOptions, IClient? owner, GameCreationEvent? creationEvent = null)
     {
-        var gameCode = desiredGameCode ?? _gameCodeFactory.Create();
+        var gameCode = await _gameCodeFactory.CreateAsync(creationEvent);
         var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, gameCode, options, filterOptions);
 
         if (!_games.TryAdd(gameCode, game))

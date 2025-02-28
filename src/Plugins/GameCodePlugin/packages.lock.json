@@ -2,9 +2,13 @@
   "version": 1,
   "dependencies": {
     "net9.0": {
+      "JetBrains.Annotations": {
+        "type": "Transitive",
+        "resolved": "2024.3.0",
+        "contentHash": "ox5pkeLQXjvJdyAB4b2sBYAlqZGLh3PjSnP1bQNVx72ONuTJ9+34/+Rq91Fc0dG29XG9RgZur9+NcP4riihTug=="
+      },
       "Microsoft.AspNetCore.Hosting.Abstractions": {
-        "type": "Direct",
-        "requested": "[2.3.0, )",
+        "type": "Transitive",
         "resolved": "2.3.0",
         "contentHash": "4ivq53W2k6Nj4eez9wc81ytfGj6HR1NaZJCpOrvghJo9zHuQF57PLhPoQH5ItyCpHXnrN/y7yJDUm+TGYzrx0w==",
         "dependencies": {
@@ -12,11 +16,6 @@
           "Microsoft.AspNetCore.Http.Abstractions": "2.3.0",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1"
         }
-      },
-      "JetBrains.Annotations": {
-        "type": "Transitive",
-        "resolved": "2024.3.0",
-        "contentHash": "ox5pkeLQXjvJdyAB4b2sBYAlqZGLh3PjSnP1bQNVx72ONuTJ9+34/+Rq91Fc0dG29XG9RgZur9+NcP4riihTug=="
       },
       "Microsoft.AspNetCore.Hosting.Server.Abstractions": {
         "type": "Transitive",
@@ -131,6 +130,13 @@
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.2, )",
           "NextFast.Hazel.Abstractions": "[1.0.2-ci.8, )",
           "Serilog": "[4.2.1-dev-02340, )"
+        }
+      },
+      "impostor.api.extension": {
+        "type": "Project",
+        "dependencies": {
+          "Impostor.Api": "[1.10.2-dev, )",
+          "Microsoft.AspNetCore.Hosting.Abstractions": "[2.3.0, )"
         }
       }
     }

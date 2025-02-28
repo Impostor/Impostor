@@ -1,7 +1,9 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Impostor.Api.Events;
 
+[MeansImplicitUse]
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public class EventListenerAttribute : Attribute
 {

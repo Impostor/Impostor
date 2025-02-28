@@ -143,6 +143,11 @@
         "resolved": "2.5.1",
         "contentHash": "zy8TMeTP+1FH2NrLaNZtdRbBdq7u5MI+NFZQOBSM69u5RFkciinwzV2eveY6Kjf5MzgsYvvl6kTStsj3JrXqkg=="
       },
+      "JetBrains.Annotations": {
+        "type": "Transitive",
+        "resolved": "2024.3.0",
+        "contentHash": "ox5pkeLQXjvJdyAB4b2sBYAlqZGLh3PjSnP1bQNVx72ONuTJ9+34/+Rq91Fc0dG29XG9RgZur9+NcP4riihTug=="
+      },
       "Microsoft.AspNetCore.Hosting.Abstractions": {
         "type": "Transitive",
         "resolved": "2.3.0",
@@ -520,6 +525,7 @@
       "impostor.api": {
         "type": "Project",
         "dependencies": {
+          "JetBrains.Annotations": "[2024.3.0, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[9.0.2, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.2, )",
           "NextFast.Hazel.Abstractions": "[1.0.2-ci.8, )",

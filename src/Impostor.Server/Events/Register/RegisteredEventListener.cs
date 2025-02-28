@@ -50,7 +50,7 @@ internal class RegisteredEventListener : IRegisteredEventListener
         return Instances.GetOrAdd(type, t =>
         {
             return t.GetMethods()
-                .Where(m => !m.IsStatic && m.GetCustomAttributes(typeof(EventListenerAttribute), false).Any())
+                .Where(m => !m.IsStatic && m.GetCustomAttributes(typeof(EventListenerAttribute), false).Length != 0)
                 .SelectMany(m => FromMethod(t, m))
                 .ToArray();
         });

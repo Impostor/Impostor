@@ -22,6 +22,11 @@
           "Microsoft.Extensions.DependencyInjection": "8.0.1"
         }
       },
+      "JetBrains.Annotations": {
+        "type": "Transitive",
+        "resolved": "2024.3.0",
+        "contentHash": "ox5pkeLQXjvJdyAB4b2sBYAlqZGLh3PjSnP1bQNVx72ONuTJ9+34/+Rq91Fc0dG29XG9RgZur9+NcP4riihTug=="
+      },
       "Microsoft.AspNetCore.Antiforgery": {
         "type": "Transitive",
         "resolved": "2.3.0",
@@ -1630,6 +1635,7 @@
       "impostor.api": {
         "type": "Project",
         "dependencies": {
+          "JetBrains.Annotations": "[2024.3.0, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[9.0.2, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.2, )",
           "NextFast.Hazel.Abstractions": "[1.0.2-ci.8, )",
