@@ -37,5 +37,5 @@ jobs:
 
       - name: Publish to NuGet
         run: |
-          dotnet nuget push "./build/*.nupkg" -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGETKEY }}
+          dotnet nuget push "./build/**/*.nupkg" -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGETKEY }}
 
