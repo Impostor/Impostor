@@ -10,6 +10,9 @@
     <PackageProjectUrl>https://github.com/Next-Fast/Impostor</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Next-Fast/Impostor</RepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>

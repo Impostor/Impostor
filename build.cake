@@ -127,7 +127,7 @@ Task("Build")
 
             foreach (var file in GetFiles(buildDir + "/extension" + "/*.{nupkg,snupkg}"))
             {
-                BuildSystem.GitHubActions.Commands.UploadArtifact(file, "Impostor.Api");
+                BuildSystem.GitHubActions.Commands.UploadArtifact(file, "Impostor.Api.Extension");
             }
         }
     });

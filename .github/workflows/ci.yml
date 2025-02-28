@@ -34,8 +34,12 @@ jobs:
         with:
           verbosity: Minimal
           script-path: ./build.cake
-
-      - name: Publish to NuGet
+      
+      - name: Publish API To NuGet
         run: |
-          dotnet nuget push "./build/**/*.nupkg" -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGETKEY }}
+          dotnet nuget push "./build/api/*.nupkg" -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGETKEY }}
+
+      - name: Publish Extension to NuGet
+        run: |
+          dotnet nuget push "./build/extension/*.nupkg" -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGETKEY }}
 
