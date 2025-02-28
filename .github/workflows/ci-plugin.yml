@@ -1,20 +1,20 @@
-name: CI
+name: CI Plugin
 
 on:
   push:
     branches:
       - preview
     paths:
-      - '.github/workflows/ci.yml'
-      - 'src/Impostor*/**'
-      - 'build.cake'
+      - '.github/workflows/ci-plugin.yml'
+      - 'src/Plugins/**'
+      - 'build-plugin.cake'
   pull_request:
     branches:
       - preview
     paths:
-      - '.github/workflows/ci.yml'
-      - 'src/Impostor*/**'
-      - 'build.cake'
+      - '.github/workflows/ci-plugin.yml'
+      - 'src/Plugins/**'
+      - 'build-plugin.cake'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -40,9 +40,5 @@ jobs:
         uses: cake-build/cake-action@v3
         with:
           verbosity: Minimal
-          script-path: ./build.cake
-
-      - name: Publish to NuGet
-        run: |
-          dotnet nuget push ./build/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGETKEY }}
+          script-path: ./build-plugin.cake
 
