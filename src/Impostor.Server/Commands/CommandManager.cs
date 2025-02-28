@@ -68,8 +68,8 @@ public sealed class CommandManager(IServiceProvider provider) : ICommandManager
             await singleCommand.InvokeAsync(eventArg);
         }
     }
-    
-    internal async ValueTask<bool> HandleDefaultCommandAsync(string command, string[] args)
+
+    private async ValueTask<bool> HandleDefaultCommandAsync(string command, string[] args)
     {
         return false;
     }
