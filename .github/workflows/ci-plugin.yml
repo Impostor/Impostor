@@ -8,13 +8,6 @@ on:
       - '.github/workflows/ci-plugin.yml'
       - 'src/Plugins/**'
       - 'build-plugin.cake'
-  pull_request:
-    branches:
-      - preview
-    paths:
-      - '.github/workflows/ci-plugin.yml'
-      - 'src/Plugins/**'
-      - 'build-plugin.cake'
 jobs:
   build:
     runs-on: ubuntu-latest

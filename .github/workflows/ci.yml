@@ -8,13 +8,6 @@ on:
       - '.github/workflows/ci.yml'
       - 'src/Impostor*/**'
       - 'build.cake'
-  pull_request:
-    branches:
-      - preview
-    paths:
-      - '.github/workflows/ci.yml'
-      - 'src/Impostor*/**'
-      - 'build.cake'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,5 +37,5 @@ jobs:
 
       - name: Publish to NuGet
         run: |
-          dotnet nuget push ./build/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGETKEY }}
+          dotnet nuget push "./build/*.nupkg" -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGETKEY }}
 

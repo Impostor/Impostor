@@ -48,21 +48,25 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() => {
         DotNetBuild("./src/Plugins/SelfHttpMatchmaker/SelfHttpMatchmaker.csproj", new DotNetBuildSettings {
-            OutputDirectory = buildDir,
             Configuration = configuration,
-            MSBuildSettings = msbuildSettings
+            NoRestore = true,
+            Runtime = runtime,
+            OutputDirectory = buildDir + "/SelfHttpMatchmaker",
+            MSBuildSettings = msbuildSettings,
         });
 
         DotNetBuild("./src/Plugins/GameCodePlugin/GameCodePlugin.csproj", new DotNetBuildSettings {
-            OutputDirectory = buildDir,
             Configuration = configuration,
-            MSBuildSettings = msbuildSettings
+            NoRestore = true,
+            Runtime = runtime,
+            OutputDirectory = buildDir + "/GameCodePlugin",
+            MSBuildSettings = msbuildSettings,
         });
 
         if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
-            BuildSystem.GitHubActions.Commands.UploadArtifact(buildDir + "/SelfHttpMatchmaker.dll", "SelfHttpMatchmaker");
+            BuildSystem.GitHubActions.Commands.UploadArtifact(buildDir + "/SelfHttpMatchmaker", "SelfHttpMatchmaker");
 
-            BuildSystem.GitHubActions.Commands.UploadArtifact(buildDir + "/GameCodePlugin.dll", "GameCodePlugin");
+            BuildSystem.GitHubActions.Commands.UploadArtifact(buildDir + "/GameCodePlugin", "GameCodePlugin");
         }
     });
 
