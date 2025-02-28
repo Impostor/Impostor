@@ -56,9 +56,8 @@ Task("Build")
         });
 
         if (BuildSystem.GitHubActions.IsRunningOnGitHubActions) {
-            BuildSystem.GitHubActions.Commands.UploadArtifact(dir1.Combine("SelfHttpMatchmaker.dll"), "SelfHttpMatchmaker");
-
-            BuildSystem.GitHubActions.Commands.UploadArtifact(dir2.Combine("GameCodePlugin.dll"), "GameCodePlugin");
+            BuildSystem.GitHubActions.Commands.UploadArtifact(dir1 + "/", "SelfHttpMatchmaker");
+            BuildSystem.GitHubActions.Commands.UploadArtifact(dir2 + "/", "GameCodePlugin");
         }
     });
 
