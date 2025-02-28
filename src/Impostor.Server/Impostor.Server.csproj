@@ -7,7 +7,6 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <Nullable>enable</Nullable>
     <SelfContained>false</SelfContained>
-    <OutDir>E:/Next/ServerTest/</OutDir>
   </PropertyGroup>
 
   <ItemGroup>

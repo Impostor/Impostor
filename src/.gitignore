@@ -112,3 +112,5 @@ UpgradeLog*.htm
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+Output/

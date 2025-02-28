@@ -11,7 +11,7 @@ public class GameCodeFactory(IEventManager eventManager) : IGameCodeFactory
     {
         var @event = new GameCodeCreateEvent(creationEvent);
         await eventManager.CallAsync(@event);
-        return GameCode.Create();
+        return @event.Result ?? GameCode.Create();
     }
     
     public async ValueTask<GameCode> Create()

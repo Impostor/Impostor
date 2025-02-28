@@ -4,7 +4,6 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <OutDir>E:/Next/ServerTest/plugins</OutDir>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1632,7 +1632,7 @@
           "System.Xml.XPath": "4.3.0"
         }
       },
-      "impostor.api": {
+      "NextImpostor.Api": {
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2024.3.0, )",
@@ -1642,11 +1642,11 @@
           "Serilog": "[4.2.1-dev-02340, )"
         }
       },
-      "impostor.api.extension": {
+      "NextImpostor.Api.Extension": {
         "type": "Project",
         "dependencies": {
-          "Impostor.Api": "[1.10.2-dev, )",
-          "Microsoft.AspNetCore.Hosting.Abstractions": "[2.3.0, )"
+          "Microsoft.AspNetCore.Hosting.Abstractions": "[2.3.0, )",
+          "NextImpostor.Api": "[1.10.2-dev, )"
         }
       }
     }

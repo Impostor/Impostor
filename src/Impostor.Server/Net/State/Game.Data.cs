@@ -142,7 +142,7 @@ internal partial class Game
                 {
                     await obj.DeserializeAsync(sender, target, reader, false);
                 }
-                else
+                else if (_antiCheatConfig.Enabled)
                 {
                     logger.LogWarning("Received DataFlag for unregistered NetId {0}.", netId);
                 }
@@ -173,7 +173,7 @@ internal partial class Game
                         return false;
                     }
                 }
-                else
+                else if (_antiCheatConfig.Enabled)
                 {
                     logger.LogWarning("Received RpcFlag for unregistered NetId {0}.", netId);
                 }
