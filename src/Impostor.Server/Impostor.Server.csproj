@@ -10,13 +10,6 @@
     <OutDir>E:/Next/ServerTest/</OutDir>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <AssemblyName>Impostor.Server</AssemblyName>
-    <AssemblyTitle>Impostor.Server</AssemblyTitle>
-    <Product>Impostor.Server</Product>
-    <Copyright>Copyright © AeonLucid 2020</Copyright>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj"/>
     <ProjectReference Include="..\Impostor.Api.Extension\Impostor.Api.Extension.csproj"/>

@@ -38,19 +38,12 @@ Task("Clean")
         }
     });
 
-Task("Restore")
-    .Does(() => {
-        DotNetRestore("./src/Impostor.sln");
-    });
-
 Task("Build")
     .IsDependentOn("Clean")
-    .IsDependentOn("Restore")
     .Does(() => {
         var dir1 = buildDir.Combine("SelfHttpMatchmaker");
         DotNetBuild("./src/Plugins/SelfHttpMatchmaker/SelfHttpMatchmaker.csproj", new DotNetBuildSettings {
             Configuration = configuration,
-            NoRestore = true,
             OutputDirectory = dir1,
             MSBuildSettings = msbuildSettings,
         });
@@ -58,7 +51,6 @@ Task("Build")
         var dir2 = buildDir.Combine("SelfHttpMatchmaker");
         DotNetBuild("./src/Plugins/GameCodePlugin/GameCodePlugin.csproj", new DotNetBuildSettings {
             Configuration = configuration,
-            NoRestore = true,
             OutputDirectory = dir2,
             MSBuildSettings = msbuildSettings,
         });

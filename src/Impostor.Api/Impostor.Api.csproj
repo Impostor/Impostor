@@ -7,15 +7,15 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <AssemblyName>Impostor.Api</AssemblyName>
     <AssemblyTitle>Impostor.Api</AssemblyTitle>
-    <Authors>AeonLucid</Authors>
+    <Authors>AeonLucid;Next-Fast</Authors>
     <Description>An api library for Impostor, an Among Us private server. You need this package to write plugins for Impostor.</Description>
-    <PackageId>Impostor.Api</PackageId>
+    <PackageId>NextImpostor.Api</PackageId>
     <PackageTags>Among Us;Impostor;Impostor Plugin</PackageTags>
     <PackageIconUrl>https://raw.githubusercontent.com/Impostor/Impostor/dev/docs/images/logo_64.png</PackageIconUrl>
     <PackageIcon>logo_64.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/Impostor/Impostor</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Next-Fast/Impostor</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/Impostor/Impostor</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Next-Fast/Impostor</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

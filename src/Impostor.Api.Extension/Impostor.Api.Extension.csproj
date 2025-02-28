@@ -1,13 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>NextImpostor.Api.Extension</PackageId>
+    <PackageTags>Among Us;Impostor;Impostor Plugin</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/Impostor/Impostor/dev/docs/images/logo_64.png</PackageIconUrl>
+    <PackageIcon>logo_64.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/Next-Fast/Impostor</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Next-Fast/Impostor</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="../Impostor.Api/Impostor.Api.csproj"/>
+    <None Include="../../docs/images/logo_64.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>
