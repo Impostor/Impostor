@@ -97,5 +97,15 @@ namespace Impostor.Server.Net.State
                 await SendToAllAsync(writer);
             }
         }
+
+        public async ValueTask StartGameAsync()
+        {
+            using (var writer = MessageWriter.Get(MessageType.Reliable))
+            {
+                WriteStartGameMessage(writer, false);
+
+                await SendToAllAsync(writer);
+            }
+        }
     }
 }
