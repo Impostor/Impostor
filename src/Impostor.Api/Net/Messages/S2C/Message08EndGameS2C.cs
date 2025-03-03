@@ -11,8 +11,6 @@ namespace Impostor.Api.Net.Messages.S2C
             writer.StartMessage(MessageFlags.EndGame);
             gameCode.Serialize(writer);
             writer.Write((byte)gameOverReason);
-
-            // Show ad should always be false on custom server
             writer.Write(false);
             writer.EndMessage();
         }
