@@ -29,6 +29,14 @@ namespace Impostor.Server.Net.State
 
         public async ValueTask HandleEndGame(IMessageReader message, GameOverReason gameOverReason)
         {
+            var @event = new GameEndedEvent(this, gameOverReason);
+            await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));
+
+            if (@event.IsCancelled)
+            {
+                return;
+            }
+
             GameState = GameStates.Ended;
 
             // Broadcast end of the game.
@@ -49,8 +57,6 @@ namespace Impostor.Server.Net.State
             {
                 await DespawnPlayerInfoAsync(playerInfo);
             }
-
-            await _eventManager.CallAsync(new GameEndedEvent(this, gameOverReason));
         }
 
         public async ValueTask HandleAlterGame(IMessageReader message, IClientPlayer sender, bool isPublic)
