@@ -24,10 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.2"/>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.2"/>
-    <PackageReference Include="NextFast.Hazel.Abstractions" Version="1.0.2-ci.8"/>
+    <PackageReference Include="NextFast.Hazel.Abstractions" Version="1.0.2-ci.11" />
     <PackageReference Include="Serilog" Version="4.2.1-dev-02340"/>
 
     <ProjectReference Include="..\Impostor.Api.Generator\Impostor.Api.Generator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />

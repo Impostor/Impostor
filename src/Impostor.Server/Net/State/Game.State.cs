@@ -4,7 +4,6 @@ using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Server.Events;
-using Impostor.Server.Net.Hazel;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Net.State;

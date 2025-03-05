@@ -10,8 +10,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Impostor.Server.Controllers;
 
 [ApiController]
-[Route("api/[controller]/[action]")]
-public sealed class PublicController(IGameManager gameManager, IClientManager clientManager) : ControllerBase
+[Route("api/public/[action]")]
+public sealed class PublicController(
+    IGameManager gameManager,
+    IClientManager clientManager,
+    INetListenerManager listenerManager
+    ) : ControllerBase
 {
     [HttpGet]
     public IActionResult RoomCount()
@@ -50,5 +54,20 @@ public sealed class PublicController(IGameManager gameManager, IClientManager cl
             DotnetUtils.Environment,
             DotnetUtils.IsDev,
         }.OkJson();
+    }
+
+    [HttpGet]
+    public IActionResult AvailableListener()
+    {
+        var listener = listenerManager.GetAvailableListener();
+        if (listener == null)
+            return BadRequest("No available listener");
+        
+        return Ok(new
+        {
+            listener.PublicIp,
+            listener.PublicPort,
+            listener.IsHttps,
+        }.OkJson());
     }
 }

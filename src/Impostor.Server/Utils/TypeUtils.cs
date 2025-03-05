@@ -3,9 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
-namespace Impostor.Server;
+namespace Impostor.Server.Utils;
 
-internal static class TypeExtensions
+internal static class TypeUtils
 {
     /// <summary>
     ///     Get the friendly name for the type.
@@ -13,7 +13,7 @@ internal static class TypeExtensions
     /// <param name="type">The type.</param>
     /// <returns>The friendly name.</returns>
     [SuppressMessage("ReSharper", "SA1503", Justification = "Readability")]
-    public static string GetFriendlyName(this Type type)
+    public static string GetFriendlyName(this Type? type)
     {
         if (type == null)
         {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Impostor.Api.Net;
 using Microsoft.Extensions.Logging;
 
-namespace Impostor.Server.Net.Hazel;
+namespace Impostor.Server.Net;
 
 internal class HazelConnection : IHazelConnection
 {
@@ -44,6 +44,11 @@ internal class HazelConnection : IHazelConnection
     public ValueTask DisconnectAsync(string? reason, IMessageWriter? writer = null)
     {
         return InnerConnection.Disconnect(reason, writer as MessageWriter);
+    }
+
+    public IMessageWriter GetWriter(MessageType option = MessageType.Unreliable)
+    {
+        return MessageWriter.Get(option);
     }
 
     public void DisposeInnerConnection()

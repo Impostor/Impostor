@@ -7,6 +7,7 @@ using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Net.Manager;
 using Impostor.Api.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,9 +23,9 @@ namespace SelfHttpMatchmaker.Controllers;
 public sealed class GamesController(
     IGameManager gameManager,
     ListingManager listingManager,
-    IOptions<ServerConfig> serverConfig) : ControllerBase
+    INetListenerManager listenerManager
+    ) : ControllerBase
 {
-    private readonly ServerConfig _config = serverConfig.Value;
     private HostServer? _hostServer;
 
     private HostServer HostServer
@@ -43,7 +44,7 @@ public sealed class GamesController(
 
     private ListenerConfig Listener
     {
-        get => _config.Listeners.FirstOrDefault() ?? throw new InvalidOperationException();
+        get => listenerManager.GetAvailableListener() ?? throw new InvalidOperationException();
     }
 
     /// <summary>

@@ -42,4 +42,6 @@ public interface IHazelConnection
     /// <param name="writer">A message to send with disconnect packet.</param>
     /// <returns>Task that must be awaited.</returns>
     ValueTask DisconnectAsync(string? reason, IMessageWriter? writer = null);
+    
+    IMessageWriter GetWriter(MessageType option = MessageType.Unreliable);
 }

@@ -12,4 +12,6 @@ public class ListenerConfig
     public string CertificatePath { get; set; } = string.Empty;
 
     public bool HasAuth { get; set; } = false;
+    
+    public bool IsHttps { get; set; } = false;
 }

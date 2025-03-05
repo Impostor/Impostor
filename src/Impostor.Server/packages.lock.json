@@ -71,24 +71,30 @@
         "resolved": "9.0.2",
         "contentHash": "nWx7uY6lfkmtpyC2dGc0IxtrZZs/LnLCQHw3YYQucbqWj8a27U/dZ+eh72O3ZiolqLzzLkVzoC+w/M8dZwxRTw=="
       },
+      "Microsoft.NET.ILLink.Tasks": {
+        "type": "Direct",
+        "requested": "[9.0.0, )",
+        "resolved": "9.0.0",
+        "contentHash": "zAwp213evC3UkimtVXRb+Dlgc/40QG145nmZDtp2LO9zJJMfrp+i/87BnXN7tRXEA4liyzdFkjqG1HE8/RPb4A=="
+      },
       "NextFast.Hazel": {
         "type": "Direct",
-        "requested": "[1.0.2-ci.8, )",
-        "resolved": "1.0.2-ci.8",
-        "contentHash": "y1m+ZDYmqGORe0dsYpPblcWt9kin/LKBZTtGGPiPc2704giUUXEhTWrnAqZMfvGQZmtBRlF/KnxxuQn/63cOVg==",
+        "requested": "[1.0.2-ci.11, )",
+        "resolved": "1.0.2-ci.11",
+        "contentHash": "O91B8Nv16dZlq3qQBAAEsbY6CCpa4BZsCNVikG9cmEmdkjQ3A4iCY+PPOrvrKMe62MQ88CwsSkxdGEu4qrEPfA==",
         "dependencies": {
           "BouncyCastle.Cryptography": "2.5.1",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.2",
           "Microsoft.Extensions.ObjectPool": "9.0.2",
-          "NextFast.Hazel.Abstractions": "1.0.2-ci.8",
+          "NextFast.Hazel.Abstractions": "1.0.2-ci.11",
           "Serilog": "4.2.1-dev-02340"
         }
       },
       "Scalar.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.0.18, )",
-        "resolved": "2.0.18",
-        "contentHash": "nS8Sw6wRO1A/dARn3q9R6znIBfddJcmAczI5uMROBGWkO2KG/ad/Ld+UeUePTxGr1+6humJSOxI7An+q4q3oGA=="
+        "requested": "[2.0.23, )",
+        "resolved": "2.0.23",
+        "contentHash": "SkVRfyJdpSlSxevh+Ht2egJzyz34XhFt6cy/iH5vg6K2vWHCOaH/yvc1gtUTnctjY90ejQqcPQGg39tqHb+ZAQ=="
       },
       "Serilog.Extensions.Hosting": {
         "type": "Direct",
@@ -145,8 +151,8 @@
       },
       "JetBrains.Annotations": {
         "type": "Transitive",
-        "resolved": "2024.3.0",
-        "contentHash": "ox5pkeLQXjvJdyAB4b2sBYAlqZGLh3PjSnP1bQNVx72ONuTJ9+34/+Rq91Fc0dG29XG9RgZur9+NcP4riihTug=="
+        "resolved": "2025.1.0-eap1",
+        "contentHash": "5ApJk9xbFOdbz7L8W9LAA63DIMbqC1p81KOYLeLu+d3Pj9yC83aZBQgHce/LCCu9j/mzVZxEUl70rDoUEGs7Gg=="
       },
       "Microsoft.AspNetCore.Hosting.Abstractions": {
         "type": "Transitive",
@@ -486,8 +492,8 @@
       },
       "NextFast.Hazel.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.0.2-ci.8",
-        "contentHash": "eaYyO/+c1l48bjq7ZbGRRohn6FIkDnyMrN8/zO4rxwVeIl6Tbdmw9FnrXXg7BxHzDcuSJP8AZcjXmfq6L8ovvQ=="
+        "resolved": "1.0.2-ci.11",
+        "contentHash": "J1rG0f5wWecv3ekxLuju2RD9eGMS7oxnQLFoBacj2QV/pLiQDGEDpdbQLUHHFDcVdvJQKnQfS3ZpU6Jew7xh2g=="
       },
       "Serilog": {
         "type": "Transitive",
@@ -525,10 +531,10 @@
       "NextImpostor.Api": {
         "type": "Project",
         "dependencies": {
-          "JetBrains.Annotations": "[2024.3.0, )",
+          "JetBrains.Annotations": "[2025.1.0-eap1, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[9.0.2, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.2, )",
-          "NextFast.Hazel.Abstractions": "[1.0.2-ci.8, )",
+          "NextFast.Hazel.Abstractions": "[1.0.2-ci.11, )",
           "Serilog": "[4.2.1-dev-02340, )"
         }
       },

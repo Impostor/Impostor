@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
@@ -60,7 +61,7 @@ internal partial class Game
     {
         var writer = MessageWriter.Get(type);
 
-        if (targetClientId == null || targetClientId < 0)
+        if (targetClientId is null or < 0)
         {
             writer.StartMessage(MessageFlags.GameData);
             Code.Serialize(writer);

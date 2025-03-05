@@ -4,8 +4,8 @@
     "net9.0": {
       "JetBrains.Annotations": {
         "type": "Transitive",
-        "resolved": "2024.3.0",
-        "contentHash": "ox5pkeLQXjvJdyAB4b2sBYAlqZGLh3PjSnP1bQNVx72ONuTJ9+34/+Rq91Fc0dG29XG9RgZur9+NcP4riihTug=="
+        "resolved": "2025.1.0-eap1",
+        "contentHash": "5ApJk9xbFOdbz7L8W9LAA63DIMbqC1p81KOYLeLu+d3Pj9yC83aZBQgHce/LCCu9j/mzVZxEUl70rDoUEGs7Gg=="
       },
       "Microsoft.AspNetCore.Hosting.Abstractions": {
         "type": "Transitive",
@@ -109,8 +109,8 @@
       },
       "NextFast.Hazel.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.0.2-ci.8",
-        "contentHash": "eaYyO/+c1l48bjq7ZbGRRohn6FIkDnyMrN8/zO4rxwVeIl6Tbdmw9FnrXXg7BxHzDcuSJP8AZcjXmfq6L8ovvQ=="
+        "resolved": "1.0.2-ci.11",
+        "contentHash": "J1rG0f5wWecv3ekxLuju2RD9eGMS7oxnQLFoBacj2QV/pLiQDGEDpdbQLUHHFDcVdvJQKnQfS3ZpU6Jew7xh2g=="
       },
       "Serilog": {
         "type": "Transitive",
@@ -125,10 +125,10 @@
       "NextImpostor.Api": {
         "type": "Project",
         "dependencies": {
-          "JetBrains.Annotations": "[2024.3.0, )",
+          "JetBrains.Annotations": "[2025.1.0-eap1, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[9.0.2, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.2, )",
-          "NextFast.Hazel.Abstractions": "[1.0.2-ci.8, )",
+          "NextFast.Hazel.Abstractions": "[1.0.2-ci.11, )",
           "Serilog": "[4.2.1-dev-02340, )"
         }
       },
