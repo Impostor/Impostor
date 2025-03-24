@@ -27,12 +27,18 @@ jobs:
       - name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=aeonlucid/impostor
+          DOCKER_IMAGE=miniduikboot/impostor-staging
           VERSION=noop
           VERSIONSUFFIX=docker
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             VERSION=${GITHUB_REF#refs/tags/}
             VERSIONSUFFIX=none
+          elif [[ $GITHUB_REF == refs/heads/stable ]]; then
+            VERSION=stable
+            VERSIONSUFFIX=docker.${{ github.run_number }}
+          elif [[ $GITHUB_REF == refs/heads/dev ]]; then
+            VERSION=dev
+            VERSIONSUFFIX=docker.${{ github.run_number }}
           elif [[ $GITHUB_REF == refs/heads/* ]]; then
             VERSION=nightly
             VERSIONSUFFIX=docker.${{ github.run_number }}

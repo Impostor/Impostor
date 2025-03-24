@@ -26,15 +26,15 @@ Depending on your host you may also need to port forward Impostor to the interne
 
 ## Using Docker
 
-[![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor?sort=semver)](https://hub.docker.com/r/aeonlucid/impostor)
-[![Docker Image](https://img.shields.io/docker/v/aeonlucid/impostor/nightly)](https://hub.docker.com/r/aeonlucid/impostor)
+[![Docker Image](https://img.shields.io/docker/v/miniduikboot/impostor-staging?sort=semver)](https://hub.docker.com/r/miniduikboot/impostor-staging)
+[![Docker Image](https://img.shields.io/docker/v/miniduikboot/impostor-staging/nightly)](https://hub.docker.com/r/miniduikboot/impostor-staging)
 
 Docker is a program that allows you to run programs like Impostor in a container.
 
 After installing Docker, you can just start a Docker container with `docker run`:
 
 ```
-docker run -p 22023:22023/tcp -p 22023:22023/udp -e IMPOSTOR_Server__PublicIp=your.public.ip.here aeonlucid/impostor:nightly
+docker run -p 22023:22023/tcp -p 22023:22023/udp -e IMPOSTOR_Server__PublicIp=your.public.ip.here miniduikboot/impostor-staging:stable
 ```
 
 Please replace `your.public.ip.here` with the public IP address of your server. This is the address Among Us will try to reach your server at.
@@ -43,14 +43,14 @@ To configure the docker container, either use environment variables or mount con
 
 ## Using Docker Compose
 
-Docker Compose allows you to start a Docker container using a prefined configuration. This is an example configuration you can continue on:
+Docker Compose allows you to start a Docker container using a predefined configuration. This is an example configuration you can continue on:
 
 ```
 version: '3.4'
 
 services:
   impostor:
-    image: aeonlucid/impostor:nightly
+    image: miniduikboot/impostor-staging:stable
     container_name: impostor
     ports:
       - 22023:22023/tcp # Add "127.0.0.1:" if you're using a reverse proxy to terminate HTTPS
