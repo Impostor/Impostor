@@ -2,7 +2,9 @@ name: Docker
 
 on:
   push:
-    branches: master
+    branches:
+      - dev
+      - stable
     paths:
       - 'src/Impostor.Server/**'
       - 'src/Impostor.Shared/**'
