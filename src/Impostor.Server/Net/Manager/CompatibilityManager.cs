@@ -21,6 +21,7 @@ internal class CompatibilityManager : ICompatibilityManager
             new GameVersion(2024, 4, 1), // 2024.8.13
             new GameVersion(2024, 4, 2), // 2024.9.4
             new GameVersion(2024, 8, 10), // 2024.10.29
+            new GameVersion(2024, 8, 11), // 16.0.0 (2025-03-25)
         },
     };
 
