@@ -71,6 +71,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
             enumGenerator.Generate("Language", sourceName: "SupportedLangs");
             enumGenerator.Generate("TaskTypes");
             enumGenerator.Generate("RpcCalls", "Impostor.Api.Net.Inner", underlyingType: CSharpEnumUnderlyingType.Byte);
+            enumGenerator.Generate("Filters", underlyingType: CSharpEnumUnderlyingType.Byte);
 
             var mapDataGenerator = generator.GetMapData();
             var mapNames = new[] { "Skeld", "Mira", "April", "Polus", "Airship", "Fungle" };

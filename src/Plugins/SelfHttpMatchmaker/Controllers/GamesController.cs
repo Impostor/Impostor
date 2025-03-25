@@ -1,8 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
@@ -10,8 +8,8 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Utils;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SelfHttpMatchmaker.Types;
 
 namespace SelfHttpMatchmaker.Controllers;
 
@@ -23,8 +21,8 @@ namespace SelfHttpMatchmaker.Controllers;
 public sealed class GamesController(
     IGameManager gameManager,
     ListingManager listingManager,
-    INetListenerManager listenerManager
-    ) : ControllerBase
+    INetListenerManager listenerManager,
+    IOptions<ExtensionServerConfig> config) : ControllerBase
 {
     private HostServer? _hostServer;
 
@@ -65,7 +63,7 @@ public sealed class GamesController(
         }
 
         var token =
-            JsonSerializer.Deserialize<TokenController.Token>(Convert.FromBase64String(authorization.Parameter));
+            JsonSerializer.Deserialize<Token>(Convert.FromBase64String(authorization.Parameter));
         if (token == null)
         {
             return BadRequest();
@@ -107,82 +105,24 @@ public sealed class GamesController(
     {
         return Ok(HostServer);
     }
-}
 
-public class HostServer
-{
-    [JsonPropertyName("Ip")] public required long Ip { get; init; }
-
-    [JsonPropertyName("Port")] public required ushort Port { get; init; }
-
-    public static HostServer From(IPAddress ipAddress, ushort port)
+    [HttpGet("{gameId:int}")]
+    public IActionResult FindGameInfo(int gameId)
     {
-        return new HostServer
+        var code = GameCode.From(gameId);
+        var game = gameManager.Find(code);
+        if (game == null)
         {
-#pragma warning disable CS0618 // 类型或成员已过时
-            Ip = ipAddress.Address,
-#pragma warning restore CS0618 // 类型或成员已过时
-            Port = port,
-        };
-    }
-}
+            return NotFound(new MatchmakerResponse(new MatchmakerError(DisconnectReason.GameNotFound)));
+        }
 
-[method: SetsRequiredMembers]
-public class MatchmakerResponse(MatchmakerError error)
-{
-    [JsonPropertyName("Errors")] public required MatchmakerError[] Errors { get; init; } = new[] { error };
-}
-
-[method: SetsRequiredMembers]
-public class MatchmakerError(DisconnectReason reason)
-{
-    [JsonPropertyName("Reason")] public required DisconnectReason Reason { get; init; } = reason;
-}
-
-public class GameListing
-{
-    [JsonPropertyName("IP")] public required long Ip { get; init; }
-
-    [JsonPropertyName("Port")] public required ushort Port { get; init; }
-
-    [JsonPropertyName("GameId")] public required int GameId { get; init; }
-
-    [JsonPropertyName("PlayerCount")] public required int PlayerCount { get; init; }
-
-    [JsonPropertyName("HostName")] public required string HostName { get; init; }
-
-    [JsonPropertyName("HostPlatformName")] public required string HostPlatformName { get; init; }
-
-    [JsonPropertyName("Platform")] public required Platforms Platform { get; init; }
-
-    [JsonPropertyName("Age")] public required int Age { get; init; }
-
-    [JsonPropertyName("MaxPlayers")] public required int MaxPlayers { get; init; }
-
-    [JsonPropertyName("NumImpostors")] public required int NumImpostors { get; init; }
-
-    [JsonPropertyName("MapId")] public required MapTypes MapId { get; init; }
-
-    [JsonPropertyName("Language")] public required GameKeywords Language { get; init; }
-
-    public static GameListing From(IGame game, long ip, ushort port)
-    {
-        var platform = game.Host?.Client.PlatformSpecificData;
-
-        return new GameListing
+        var res = new FindGameByCodeResponse
         {
-            Ip = ip,
-            Port = port,
-            GameId = game.Code,
-            PlayerCount = game.PlayerCount,
-            HostName = game.DisplayName ?? game.Host?.Client.Name ?? "Unknown host",
-            HostPlatformName = platform?.PlatformName ?? string.Empty,
-            Platform = platform?.Platform ?? Platforms.Unknown,
-            Age = 0,
-            MaxPlayers = game.Options.MaxPlayers,
-            NumImpostors = game.Options.NumImpostors,
-            MapId = game.Options.Map,
-            Language = game.Options.Keywords,
+            Errors = [],
+            Game = GameListing.From(game, HostServer.Ip, HostServer.Port),
+            Region = StringNames.NoTranslation,
+            UntranslatedRegion = config.Value.RegionName,
         };
+        return Ok(res);
     }
 }

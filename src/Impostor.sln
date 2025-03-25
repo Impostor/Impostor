@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelfHttpMatchmaker", "Plugi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameCodePlugin", "Plugins\GameCodePlugin\GameCodePlugin.csproj", "{F19C0CC2-55FE-41D9-9372-8361EAE1B356}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckUpdateStarter", "CheckUpdateStarter\CheckUpdateStarter.csproj", "{EEFC045B-EF04-4556-B14D-46641C14C5FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,14 @@ Global
 		{F19C0CC2-55FE-41D9-9372-8361EAE1B356}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{F19C0CC2-55FE-41D9-9372-8361EAE1B356}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F19C0CC2-55FE-41D9-9372-8361EAE1B356}.Release|x86.ActiveCfg = Release|Any CPU
+		{EEFC045B-EF04-4556-B14D-46641C14C5FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEFC045B-EF04-4556-B14D-46641C14C5FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEFC045B-EF04-4556-B14D-46641C14C5FF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EEFC045B-EF04-4556-B14D-46641C14C5FF}.Debug|x86.Build.0 = Debug|Any CPU
+		{EEFC045B-EF04-4556-B14D-46641C14C5FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEFC045B-EF04-4556-B14D-46641C14C5FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEFC045B-EF04-4556-B14D-46641C14C5FF}.Release|x86.ActiveCfg = Release|Any CPU
+		{EEFC045B-EF04-4556-B14D-46641C14C5FF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,4 @@
-using Impostor.Api.Plugins;
-
-namespace Impostor.Api.Extension;
+namespace Impostor.Api.Extension.Plugins;
 
 /*public interface IHttpPlugin : IPlugin
 {

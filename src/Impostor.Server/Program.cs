@@ -9,6 +9,8 @@ using System.Text;
 using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Extension;
+using Impostor.Api.Extension.Commands;
+using Impostor.Api.Extension.Utils;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Net.Manager;
@@ -122,12 +124,12 @@ internal static class Program
                     .AddPolicy<PlayerMovementEvent.PlayerMovementEventObjectPolicy, PlayerMovementEvent>();
 
                 services
-                    .Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section))
-                    .Configure<CompatibilityConfig>(host.Configuration.GetSection(CompatibilityConfig.Section))
-                    .Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section))
-                    .Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section))
-                    .Configure<PluginConfig>(host.Configuration.GetSection(PluginConfig.Section))
-                    .Configure<ExtensionServerConfig>(host.Configuration.GetSection(ExtensionServerConfig.Section));
+                    .ConfigureSection<AntiCheatConfig>(host.Configuration, AntiCheatConfig.Section)
+                    .ConfigureSection<CompatibilityConfig>(host.Configuration, CompatibilityConfig.Section)
+                    .ConfigureSection<ServerConfig>(host.Configuration, ServerConfig.Section)
+                    .ConfigureSection<TimeoutConfig>(host.Configuration, TimeoutConfig.Section)
+                    .ConfigureSection<PluginConfig>(host.Configuration, PluginConfig.Section)
+                    .ConfigureSection<ExtensionServerConfig>(host.Configuration, ExtensionServerConfig.Section);
 
                 services
                     .AddSingleton(WebHub.WebSink.Sink)
