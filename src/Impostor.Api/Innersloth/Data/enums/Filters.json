@@ -1,0 +1,18 @@
+{
+  "Tags" : 0,
+  "PlayerSpeed": 1,
+  "Roles": 2,
+  "KillCooldown": 3,
+  "VotingTime": 4,
+  "NumImposters": 5,
+  "VisualTasks": 6,
+  "AnonymousVotes": 7,
+  "ConfirmEjects": 8,
+  "DiscussionTime": 9,
+  "EmergencyCooldown": 10,
+  "NumEmergencyMeetings": 11,
+  "NumCommonTasks": 12,
+  "NumShortTasks": 13,
+  "NumLongTasks": 14,
+  "KillDistance": 15
+}

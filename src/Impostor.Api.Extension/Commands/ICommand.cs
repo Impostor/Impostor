@@ -1,4 +1,4 @@
-namespace Impostor.Api.Extension;
+namespace Impostor.Api.Extension.Commands;
 
 public interface ICommand;
 

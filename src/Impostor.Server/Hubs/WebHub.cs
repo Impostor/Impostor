@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Impostor.Api.Config;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using Serilog.Core;
@@ -8,20 +9,17 @@ using Serilog.Events;
 
 namespace Impostor.Server.Hubs;
 
-internal sealed class WebHub : BaseTokenHub
+[Authorize]
+internal sealed class WebHub : Hub
 {
-    internal WebHub(IOptions<ExtensionServerConfig> config, WebSink webSink) : base(config)
+    internal WebHub(IOptions<ExtensionServerConfig> config, WebSink webSink)
     {
         webSink.OnMessage += async message =>
         {
             await SendLogAsync(message);
         };
     }
-
-    public override Task OnConnectedAsync()
-    {
-        return base.OnConnectedAsync();
-    }
+    
 
     internal ValueTask HandleCommandAsync(string command)
     {
@@ -30,15 +28,7 @@ internal sealed class WebHub : BaseTokenHub
 
     internal async ValueTask SendLogAsync(string message)
     {
-        foreach (var connection in Connections)
-        {
-            if (!connection.HasAuthorized)
-            {
-                return;
-            }
-
-            await connection.Client.SendAsync("SendLog", message);
-        }
+        await Clients.All.SendAsync("OnLog", message);
     }
 
     internal class WebSink : ILogEventSink

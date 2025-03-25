@@ -1,6 +1,6 @@
 using System.Numerics;
 using System.Threading.Tasks;
-using Impostor.Api.Net;
+using Impostor.Api;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects.Components;
 
@@ -16,11 +16,9 @@ internal partial class InnerCustomNetworkTransform : IInnerCustomNetworkTransfor
         await SnapToAsync(Game.GetClientPlayer(OwnerId)!, position, minSid);
 
         // Broadcast to all clients.
-        using (var writer = Game.StartRpc(NetId, RpcCalls.SnapTo))
-        {
-            writer.Write(position);
-            writer.Write(_lastSequenceId);
-            await Game.FinishRpcAsync(writer);
-        }
+        using var writer = Game.StartRpc(NetId, RpcCalls.SnapTo);
+        writer.Write(position);
+        writer.Write(_lastSequenceId);
+        await Game.FinishRpcAsync(writer);
     }
 }

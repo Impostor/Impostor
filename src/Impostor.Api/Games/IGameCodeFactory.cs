@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Impostor.Api.Extension.Events;
+using Impostor.Api.Events;
 
 namespace Impostor.Api.Games;
 

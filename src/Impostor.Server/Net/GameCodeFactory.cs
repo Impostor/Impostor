@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Impostor.Api.Events;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Extension.Events;
 using Impostor.Api.Games;
@@ -11,7 +12,7 @@ public class GameCodeFactory(IEventManager eventManager) : IGameCodeFactory
     {
         var @event = new GameCodeCreateEvent(creationEvent);
         await eventManager.CallAsync(@event);
-        return GameCode.Create();
+        return @event.Result ?? GameCode.Create();
     }
     
     public async ValueTask<GameCode> Create()

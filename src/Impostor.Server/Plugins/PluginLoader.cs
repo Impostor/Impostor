@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 using Impostor.Api.Config;
 using Impostor.Api.Extension;
+using Impostor.Api.Extension.Plugins;
 using Impostor.Api.Plugins;
 using Impostor.Server.Plugins.Informations;
 using Microsoft.AspNetCore.Builder;

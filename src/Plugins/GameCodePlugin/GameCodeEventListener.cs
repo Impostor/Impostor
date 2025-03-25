@@ -6,24 +6,20 @@ using Impostor.Api.Games;
 namespace GameCodePlugin;
 
 #pragma warning disable CA1822
-public class GameCodeEventListener : IEventListener
+public class GameCodeEventListener(GameCodeStateManager stateManager) : IEventListener
 {
     [EventListener]
 
     public void OnCreateCode(GameCodeCreateEvent @event)
     {
-        var state = GameCodePlugin.Codes.FirstOrDefault(used => !used);
-        if (state == null) return;
-        @event.Result = new EventOutcome<GameCode>(state.Code);
-        state.Used = true;
+        var code = stateManager.GetCode();
+        if (code == null) return;
+        @event.Result = new EventOutcome<GameCode>(code.Value);
     }
 
     [EventListener]
     public void OnReleaseCode(IGameDestroyedEvent @event)
     {
-        var code = @event.Game.Code;
-        var state = GameCodePlugin.Codes.FirstOrDefault(state => state.Code == code);
-        if (state == null) return;
-        state.Used = false;
+        stateManager.ReleaseCode(@event.Game.Code);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Impostor.Api.Extension;
+using Impostor.Api.Extension.Plugins;
 using Impostor.Api.Plugins;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

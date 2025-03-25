@@ -59,8 +59,8 @@ public static class Mathf
 
     public static float ReverseLerp(float t)
     {
-        const float range = 50f;
+        const float Range = 50f;
 
-        return Clamp((t - -range) / (range - -range), 0f, 1f);
+        return Clamp((t - -Range) / (Range - -Range), 0f, 1f);
     }
 }

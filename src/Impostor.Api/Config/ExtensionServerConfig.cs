@@ -28,4 +28,6 @@ public class ExtensionServerConfig
     public long WebSocketInterval { get; set; } = 120;
 
     public long WebSocketTimeout { get; set; } = 3000;
+    
+    public string RegionName { get; set; } = "Default Impostor";
 }

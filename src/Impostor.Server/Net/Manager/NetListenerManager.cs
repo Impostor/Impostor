@@ -12,7 +12,6 @@ using Impostor.Api.Net.Manager;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Utils;
 using Impostor.Server.Events.Client;
-using Impostor.Server.Net.Hazel;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Next.Hazel.Dtls;
@@ -120,13 +119,16 @@ internal sealed class NetListenerManager(
             logger.LogWarning("Ip: {ip} Port:{port} already exists", config.ListenIp, config.ListenPort);
             return false;
         }
-        
 
-        if ((config.PrivateKeyPath == string.Empty || config.CertificatePath == string.Empty) &&
-            (config.HasAuth || config.IsDtl))
+        if (config.HasAuth || config.IsDtl)
         {
-            logger.LogWarning("private key or certificate path is empty not supported dtl and auth");
-            return false;
+            logger.LogWarning("Dtls and auth is not supported yet");
+            
+            if (config is { PrivateKeyPath: "" } or { CertificatePath: "" })
+            {
+                logger.LogWarning("private key or certificate path is empty not use dtl and auth");
+                return false;
+            }
         }
 
         return true;
@@ -235,10 +237,13 @@ internal sealed class NetListenerManager(
             platformSpecificData);
     }
 
+    public ListenerConfig? GetAvailableListener()
+    {
+        return Listeners.FirstOrDefault()?.Config;
+    }
+
     public record ListenerInfo(
         ListenerConfig Config,
         NetworkConnectionListener? Listener,
         DtlsConnectionListener? AuthListener);
-
-    public record ConnectionInfo;
 }

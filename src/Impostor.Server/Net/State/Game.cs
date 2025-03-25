@@ -33,13 +33,14 @@ internal partial class Game(
     IEventManager eventManager,
     ICompatibilityManager compatibilityManager,
     IOptions<CompatibilityConfig> compatibilityConfig,
-    IOptions<TimeoutConfig> timeoutConfig
-)
+    IOptions<TimeoutConfig> timeoutConfig,
+    IOptions<AntiCheatConfig> antiCheatConfig)
 {
     private readonly HashSet<IPAddress> _bannedIps = new();
     private readonly CompatibilityConfig _compatibilityConfig = compatibilityConfig.Value;
     private readonly ConcurrentDictionary<int, ClientPlayer> _players = new();
     private readonly TimeoutConfig _timeoutConfig = timeoutConfig.Value;
+    private readonly AntiCheatConfig _antiCheatConfig = antiCheatConfig.Value;
 
     public ClientPlayer? Host
     {

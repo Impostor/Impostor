@@ -9,6 +9,8 @@ using System.Text;
 using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Extension;
+using Impostor.Api.Extension.Commands;
+using Impostor.Api.Extension.Utils;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Net.Manager;
@@ -16,6 +18,7 @@ using Impostor.Api.Utils;
 using Impostor.Server.Commands;
 using Impostor.Server.Controllers;
 using Impostor.Server.Events;
+using Impostor.Server.Events.Player;
 using Impostor.Server.Hubs;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Factories;
@@ -116,16 +119,17 @@ internal static class Program
             })
             .ConfigureServices((host, services) =>
             {
-                services.AddEventPools();
-                services.AddHazel();
+                services
+                    .AddHazel()
+                    .AddPolicy<PlayerMovementEvent.PlayerMovementEventObjectPolicy, PlayerMovementEvent>();
 
                 services
-                    .Configure<AntiCheatConfig>(host.Configuration.GetSection(AntiCheatConfig.Section))
-                    .Configure<CompatibilityConfig>(host.Configuration.GetSection(CompatibilityConfig.Section))
-                    .Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section))
-                    .Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section))
-                    .Configure<PluginConfig>(host.Configuration.GetSection(PluginConfig.Section))
-                    .Configure<ExtensionServerConfig>(host.Configuration.GetSection(ExtensionServerConfig.Section));
+                    .ConfigureSection<AntiCheatConfig>(host.Configuration, AntiCheatConfig.Section)
+                    .ConfigureSection<CompatibilityConfig>(host.Configuration, CompatibilityConfig.Section)
+                    .ConfigureSection<ServerConfig>(host.Configuration, ServerConfig.Section)
+                    .ConfigureSection<TimeoutConfig>(host.Configuration, TimeoutConfig.Section)
+                    .ConfigureSection<PluginConfig>(host.Configuration, PluginConfig.Section)
+                    .ConfigureSection<ExtensionServerConfig>(host.Configuration, ExtensionServerConfig.Section);
 
                 services
                     .AddSingleton(WebHub.WebSink.Sink)
@@ -139,7 +143,6 @@ internal static class Program
                     .AddSingleton<IClientFactory, ClientFactory<Client>>();
 
                 services
-                    .AddRequiredSingleton<IServerEnvironment, ServerEnvironment>()
                     .AddRequiredSingleton<IClientManager, ClientManager>()
                     .AddRequiredSingleton<IGameManager, GameManager>()
                     .AddRequiredSingleton<ICommandManager, CommandManager>()
@@ -219,6 +222,11 @@ internal static class Program
         Log.Information("Enable Server Extension");
         return builder.ConfigureWebHostDefaults(hostBuilder =>
         {
+            if (config.EnabledSpa)
+            {
+                hostBuilder.UseWebRoot(config.SpaDirectory);
+            }
+            
             hostBuilder.ConfigureKestrel(options =>
             {
                 Log.Information("Http Listen {ip} {port}", config.ListenIp, config.ListenPort);
@@ -272,6 +280,14 @@ internal static class Program
                         option.KeepAliveInterval = TimeSpan.FromSeconds(config.WebSocketInterval);
                     });
                 }
+
+                if (config.EnabledSpa)
+                {
+                    services.AddSpaStaticFiles(configuration =>
+                    {
+                        configuration.RootPath = config.SpaDirectory;
+                    });
+                }
             });
 
 
@@ -311,16 +327,10 @@ internal static class Program
                         {
                             return;
                         }
-
-                        var fileOption = new StaticFileOptions
-                        {
-                            FileProvider = new PhysicalFileProvider(config.SpaDirectory),
-                        };
                         
-                        webBuilder.UseSpaStaticFiles(fileOption);
-                        webBuilder.UseSpa(spa =>
+                        webBuilder.UseSpaStaticFiles();
+                        webBuilder.UseSpa(configuration =>
                         {
-                            spa.Options.DefaultPageStaticFileOptions = fileOption;
                         });
                     });
                 }
