@@ -113,6 +113,23 @@ public sealed class GamesController : ControllerBase
         return Ok(new FindGameByCodeResponse(GameListingV2.From(game)));
     }
 
+    [HttpGet("filtered")]
+    public IActionResult ShowFilteredLobbies()
+    {
+        // TODO: implement this stub
+        var response = new
+        {
+            games = Array.Empty<GameListingV2>(),
+            metadata = new
+            {
+                allGamesCount = _gameManager.Games.Count(),
+                matchingGamesCount = 0,
+            },
+        };
+
+        return Ok(response);
+    }
+
     private static uint ConvertAddressToNumber(IPAddress address)
     {
 #pragma warning disable CS0618 // Among Us only supports IPv4
