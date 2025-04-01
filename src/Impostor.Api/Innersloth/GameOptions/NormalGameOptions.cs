@@ -131,7 +131,7 @@ public class NormalGameOptions : IGameOptions
     /// <summary>
     ///     Gets or sets the experience level of people in the lobby: Beginner, Intermediate or Expert.
     /// </summary>
-    public byte Tag { get; set; } = 0;
+    public GameTags Tag { get; set; } = 0;
 
     public RoleOptionsCollection RoleOptions { get; set; }
 
@@ -180,7 +180,7 @@ public class NormalGameOptions : IGameOptions
 
         if (Version >= 9)
         {
-            Tag = reader.ReadByte();
+            Tag = (GameTags)reader.ReadByte();
         }
 
         RoleOptions.Deserialize(reader);

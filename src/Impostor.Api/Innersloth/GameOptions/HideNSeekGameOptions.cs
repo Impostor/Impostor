@@ -96,7 +96,7 @@ public class HideNSeekGameOptions : IGameOptions
     /// <summary>
     ///     Gets or sets the experience level of people in the lobby: Beginner, Intermediate or Expert.
     /// </summary>
-    public byte Tag { get; set; } = 0;
+    public GameTags Tag { get; set; } = 0;
 
     public static HideNSeekGameOptions Deserialize(IMessageReader reader, byte version)
     {
@@ -140,7 +140,7 @@ public class HideNSeekGameOptions : IGameOptions
 
         if (Version >= 9)
         {
-            Tag = reader.ReadByte();
+            Tag = (GameTags)reader.ReadByte();
         }
 
         if (Version > LatestVersion)
