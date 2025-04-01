@@ -51,6 +51,7 @@ public sealed class GamesController : ControllerBase
     [HttpGet]
     public IActionResult Index(int mapId, GameKeywords lang, int numImpostors, [FromHeader] AuthenticationHeaderValue authorization)
     {
+        // NOTE: this method is no longer used by Among Us 16.0.0 and is only kept for backwards compatibility
         if (authorization.Scheme != "Bearer" || authorization.Parameter == null)
         {
             return BadRequest();
@@ -76,6 +77,7 @@ public sealed class GamesController : ControllerBase
     [HttpPost]
     public IActionResult Post(int gameId)
     {
+        // NOTE: this method is no longer used by Among Us 16.0.0 and is only kept for backwards compatibility
         var code = new GameCode(gameId);
         var game = _gameManager.Find(code);
 
