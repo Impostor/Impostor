@@ -110,7 +110,7 @@ public sealed class GamesController : ControllerBase
             return NotFound(new FindGameByCodeResponse(new MatchmakerError(DisconnectReason.GameNotFound)));
         }
 
-        return Ok(new FindGameByCodeResponse(GameListingV2.From(game)));
+        return Ok(new FindGameByCodeResponse(GameListing.From(game)));
     }
 
     [HttpGet("filtered")]
@@ -119,7 +119,7 @@ public sealed class GamesController : ControllerBase
         // TODO: implement this stub
         var response = new
         {
-            games = Array.Empty<GameListingV2>(),
+            games = Array.Empty<GameListing>(),
             metadata = new
             {
                 allGamesCount = _gameManager.Games.Count(),
@@ -184,82 +184,22 @@ public sealed class GamesController : ControllerBase
         public required DisconnectReason Reason { get; init; }
     }
 
-    private class GameListing
-    {
-        [JsonPropertyName("IP")]
-        public required uint Ip { get; init; }
-
-        [JsonPropertyName("Port")]
-        public required ushort Port { get; init; }
-
-        [JsonPropertyName("GameId")]
-        public required int GameId { get; init; }
-
-        [JsonPropertyName("PlayerCount")]
-        public required int PlayerCount { get; init; }
-
-        [JsonPropertyName("HostName")]
-        public required string HostName { get; init; }
-
-        [JsonPropertyName("HostPlatformName")]
-        public required string HostPlatformName { get; init; }
-
-        [JsonPropertyName("Platform")]
-        public required Platforms Platform { get; init; }
-
-        [JsonPropertyName("Age")]
-        public required int Age { get; init; }
-
-        [JsonPropertyName("MaxPlayers")]
-        public required int MaxPlayers { get; init; }
-
-        [JsonPropertyName("NumImpostors")]
-        public required int NumImpostors { get; init; }
-
-        [JsonPropertyName("MapId")]
-        public required MapTypes MapId { get; init; }
-
-        [JsonPropertyName("Language")]
-        public required GameKeywords Language { get; init; }
-
-        public static GameListing From(IGame game)
-        {
-            var platform = game.Host?.Client.PlatformSpecificData;
-
-            return new GameListing
-            {
-                Ip = ConvertAddressToNumber(game.PublicIp.Address),
-                Port = (ushort)game.PublicIp.Port,
-                GameId = game.Code,
-                PlayerCount = game.PlayerCount,
-                HostName = game.DisplayName ?? game.Host?.Client.Name ?? "Unknown host",
-                HostPlatformName = platform?.PlatformName ?? string.Empty,
-                Platform = platform?.Platform ?? Platforms.Unknown,
-                Age = 0,
-                MaxPlayers = game.Options.MaxPlayers,
-                NumImpostors = game.Options.NumImpostors,
-                MapId = game.Options.Map,
-                Language = game.Options.Keywords,
-            };
-        }
-    }
-
     private class FindGameByCodeResponse
     {
         [SetsRequiredMembers]
         public FindGameByCodeResponse(MatchmakerError error) => (Errors, Game) = (new[] { error }, null);
 
         [SetsRequiredMembers]
-        public FindGameByCodeResponse(GameListingV2 game) => (Errors, Game) = (null, game);
+        public FindGameByCodeResponse(GameListing game) => (Errors, Game) = (null, game);
 
         [JsonPropertyName("Errors")]
         public required MatchmakerError[]? Errors { get; init; }
 
         [JsonPropertyName("Game")]
-        public required GameListingV2? Game { get; init; }
+        public required GameListing? Game { get; init; }
     }
 
-    private class GameListingV2
+    private class GameListing
     {
         [JsonPropertyName("IP")]
         public required uint Ip { get; init; }
@@ -306,11 +246,11 @@ public sealed class GamesController : ControllerBase
         [JsonPropertyName("Options")]
         public required string Options { get; init; }
 
-        public static GameListingV2 From(IGame game)
+        public static GameListing From(IGame game)
         {
             var platform = game.Host?.Client.PlatformSpecificData;
 
-            return new GameListingV2
+            return new GameListing
             {
                 Ip = ConvertAddressToNumber(game.PublicIp.Address),
                 Port = (ushort)game.PublicIp.Port,
