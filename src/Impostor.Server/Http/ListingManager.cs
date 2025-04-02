@@ -141,7 +141,7 @@ public sealed class ListingManager
 
                 var matchesAllFilters = true;
 
-                // Hard coded to only check map, languages, impostornum, chatmode
+                // Hard coded to only check map, languages, impostornum, chatmode, tags
                 foreach (var filter in filterSet.Filters)
                 {
                     switch (filter.OptionType)
@@ -161,11 +161,24 @@ public sealed class ListingManager
 
                             break;
                         case "int":
-                            if (filter.SubFilter is IntGameFilter intFilter && intFilter.OptionEnum is Int32OptionNames.NumImpostors)
+                            if (filter.SubFilter is IntGameFilter intFilter)
                             {
-                                if (!intFilter.AcceptedValues.Contains(game.Options.NumImpostors))
+                                switch (intFilter.OptionEnum)
                                 {
-                                    matchesAllFilters = false;
+                                    case Int32OptionNames.NumImpostors:
+                                        if (!intFilter.AcceptedValues.Contains(game.Options.NumImpostors))
+                                        {
+                                            matchesAllFilters = false;
+                                        }
+
+                                        break;
+                                    case Int32OptionNames.Tag:
+                                        if (!intFilter.AcceptedValues.Contains((int)game.Options.Tag))
+                                        {
+                                            matchesAllFilters = false;
+                                        }
+
+                                        break;
                                 }
                             }
 
