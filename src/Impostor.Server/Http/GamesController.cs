@@ -5,10 +5,12 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Web;
 using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameFilters;
 using Impostor.Server.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -116,20 +118,47 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("filtered")]
-    public IActionResult ShowFilteredLobbies()
+    public IActionResult ShowFilteredLobbies([FromQuery] string filter)
     {
-        // TODO: implement this stub
-        var response = new
+        if (string.IsNullOrEmpty(filter))
         {
-            games = Array.Empty<GameListing>(),
-            metadata = new
-            {
-                allGamesCount = _gameManager.Games.Count(),
-                matchingGamesCount = 0,
-            },
-        };
+            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "filter query para not provided")));
+        }
 
-        return Ok(response);
+        try
+        {
+            var decodedFilter = HttpUtility.UrlDecode(filter);
+            var filtersList = JsonSerializer.Deserialize<GameFiltersList>(decodedFilter);
+
+            // filterSets wont be null. It must at least have ChatFilter and LangFilter
+            if (filtersList == null || filtersList.FilterSets.Count == 0)
+            {
+                return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "No filterSets detected")));
+            }
+
+            var filteredGames = _listingManager.FindListingsV2(HttpContext, filtersList);
+            var gameListings = filteredGames.Select(GameListing.From).ToList();
+
+            var response = new
+            {
+                games = gameListings,
+                metadata = new
+                {
+                    allGamesCount = _gameManager.Games.Count(),
+                    matchingGamesCount = gameListings.Count,
+                },
+            };
+
+            return Ok(response);
+        }
+        catch (JsonException ex)
+        {
+            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Unable to deserialize filter json")));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Unknown excpetion caught in filter")));
+        }
     }
 
     private static uint ConvertAddressToNumber(IPAddress address)
@@ -177,13 +206,18 @@ public sealed class GamesController : ControllerBase
     private class MatchmakerError
     {
         [SetsRequiredMembers]
-        public MatchmakerError(DisconnectReason reason)
+        public MatchmakerError(DisconnectReason reason, string message = "")
         {
             Reason = reason;
+            Message = message;
         }
 
         [JsonPropertyName("Reason")]
         public required DisconnectReason Reason { get; init; }
+
+        [JsonPropertyName("Message")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public required string Message { get; init; } = string.Empty;
     }
 
     private class FindGameByCodeResponse

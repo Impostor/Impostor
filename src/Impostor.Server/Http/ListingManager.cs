@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Http;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameFilters;
 using Impostor.Api.Net.Manager;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -101,6 +103,109 @@ public sealed class ListingManager
                 yield break;
             }
         }
+    }
+
+    public IEnumerable<IGame> FindListingsV2(HttpContext ctx, GameFiltersList filtersList, int maxListings = 10)
+    {
+        if (filtersList == null || filtersList.FilterSets.Count == 0)
+        {
+            return Enumerable.Empty<IGame>();
+        }
+
+        var result = new List<IGame>();
+        var resultCount = 0;
+
+        // Not sure what is this. Used for Reacotr.Impostor?
+        var filters = _listingFilters.Select(f => f.GetFilter(ctx)).ToArray();
+
+        foreach (var game in _gameManager.Games)
+        {
+            if (!game.IsPublic || game.GameState != GameStates.NotStarted || game.PlayerCount >= game.Options.MaxPlayers)
+            {
+                continue;
+            }
+
+            if (!filters.All(filter => filter(game)))
+            {
+                continue;
+            }
+
+            var matchesAnyFilterSet = false;
+            foreach (var filterSet in filtersList.FilterSets)
+            {
+                // Not sure how to handle normal fools and seek fools
+                if (game.Options.GameMode != filterSet.GameMode)
+                {
+                    continue;
+                }
+
+                var matchesAllFilters = true;
+
+                // Hard coded to only check map, languages, impostornum, chatmode
+                foreach (var filter in filterSet.Filters)
+                {
+                    switch (filter.OptionType)
+                    {
+                        case "map":
+                            if (filter.SubFilter is MapGameFilter mapFilter && ((1 << (int)game.Options.Map) & mapFilter.AcceptedValues) == 0)
+                            {
+                                matchesAllFilters = false;
+                            }
+
+                            break;
+                        case "languages":
+                            if (filter.SubFilter is LanguageFilter langFilter && game.Options.Keywords != (GameKeywords)langFilter.AcceptedValues)
+                            {
+                                matchesAllFilters = false;
+                            }
+
+                            break;
+                        case "int":
+                            if (filter.SubFilter is IntGameFilter intFilter && intFilter.OptionEnum is Int32OptionNames.NumImpostors)
+                            {
+                                if (!intFilter.AcceptedValues.Contains(game.Options.NumImpostors))
+                                {
+                                    matchesAllFilters = false;
+                                }
+                            }
+
+                            break;
+                        case "chat":
+                            if (filter.SubFilter is ChatModeGameFilter chatFilter && game.Host != null)
+                            {
+                                if (((byte)game.Host.Client.ChatMode & chatFilter.AcceptedValues) == 0)
+                                {
+                                    matchesAllFilters = false;
+                                }
+                            }
+
+                            break;
+                    }
+
+                    if (!matchesAllFilters)
+                    {
+                        break;
+                    }
+                }
+
+                if (matchesAllFilters)
+                {
+                    matchesAnyFilterSet = true;
+                    break;
+                }
+            }
+
+            if (matchesAnyFilterSet)
+            {
+                result.Add(game);
+                if (++resultCount >= maxListings)
+                {
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
     private static bool IsGameDesired(IGame game, int map, int impostorCount, GameKeywords language)
