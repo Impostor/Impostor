@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Impostor.Api.Innersloth.GameFilters
 {
@@ -33,7 +34,7 @@ namespace Impostor.Api.Innersloth.GameFilters
         [OnSerializing]
         internal void OnSerializing(StreamingContext context)
         {
-            this.SubFilterString = JsonConvert.SerializeObject(this.SubFilter);
+            this.SubFilterString = JsonSerializer.Serialize(this.SubFilter);
         }
 
         [OnDeserialized]
@@ -49,19 +50,19 @@ namespace Impostor.Api.Innersloth.GameFilters
                 switch (type)
                 {
                     case "int":
-                        return JsonConvert.DeserializeObject<IntGameFilter>(filterString);
+                        return JsonSerializer.Deserialize<IntGameFilter>(filterString);
                     case "platform":
-                        return JsonConvert.DeserializeObject<PlatformGameFilter>(filterString);
+                        return JsonSerializer.Deserialize<PlatformGameFilter>(filterString);
                     case "cat":
-                        return JsonConvert.DeserializeObject<CategorizedGameFilter>(filterString);
+                        return JsonSerializer.Deserialize<CategorizedGameFilter>(filterString);
                     case "languages":
-                        return JsonConvert.DeserializeObject<LanguageFilter>(filterString);
+                        return JsonSerializer.Deserialize<LanguageFilter>(filterString);
                     case "chat":
-                        return JsonConvert.DeserializeObject<ChatModeGameFilter>(filterString);
+                        return JsonSerializer.Deserialize<ChatModeGameFilter>(filterString);
                     case "map":
-                        return JsonConvert.DeserializeObject<MapGameFilter>(filterString);
+                        return JsonSerializer.Deserialize<MapGameFilter>(filterString);
                     case "bool":
-                        return JsonConvert.DeserializeObject<BoolGameFilter>(filterString);
+                        return JsonSerializer.Deserialize<BoolGameFilter>(filterString);
                     default:
                         return null;
                 }
