@@ -71,14 +71,6 @@ namespace Impostor.Api.Innersloth.GameFilters
             return null;
         }
 
-        public const string FILTER_TYPE_BOOL = "bool";
-        public const string FILTER_TYPE_INT = "int";
-        public const string FILTER_TYPE_CATEGORIZED = "cat";
-        public const string FILTER_TYPE_MAP = "map";
-        public const string FILTER_TYPE_PLATFORM = "platform";
-        public const string FILTER_TYPE_CHAT = "chat";
-        public const string FILTER_TYPE_LANG = "languages";
-
         public string OptionType;
         public string Key;
         public string SubFilterString;
