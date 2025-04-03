@@ -4,7 +4,7 @@ namespace Impostor.Api.Innersloth.GameOptions;
 
 public class NormalGameOptions : IGameOptions
 {
-    public const int LatestVersion = 8;
+    public const int LatestVersion = 9;
 
     public NormalGameOptions(byte version = LatestVersion)
     {
@@ -128,6 +128,11 @@ public class NormalGameOptions : IGameOptions
     /// </summary>
     public TaskBarUpdate TaskBarUpdate { get; set; } = TaskBarUpdate.Always;
 
+    /// <summary>
+    ///     Gets or sets the experience level of people in the lobby: Beginner, Intermediate or Expert.
+    /// </summary>
+    public GameTags Tag { get; set; } = 0;
+
     public RoleOptionsCollection RoleOptions { get; set; }
 
     public static NormalGameOptions Deserialize(IMessageReader reader, byte version)
@@ -173,6 +178,11 @@ public class NormalGameOptions : IGameOptions
         AnonymousVotes = reader.ReadBoolean();
         TaskBarUpdate = (TaskBarUpdate)reader.ReadByte();
 
+        if (Version >= 9)
+        {
+            Tag = (GameTags)reader.ReadByte();
+        }
+
         RoleOptions.Deserialize(reader);
 
         if (Version > LatestVersion)
@@ -216,6 +226,11 @@ public class NormalGameOptions : IGameOptions
         writer.Write(VisualTasks);
         writer.Write(AnonymousVotes);
         writer.Write((byte)TaskBarUpdate);
+
+        if (Version >= 9)
+        {
+            writer.Write((byte)Tag);
+        }
 
         RoleOptions.Serialize(writer);
 
