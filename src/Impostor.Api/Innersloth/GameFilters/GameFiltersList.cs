@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Impostor.Api.Innersloth.GameFilters
 {
     [Serializable]
     public class GameFiltersList
     {
-        public List<GameFilterSet> FilterSets = new List<GameFilterSet>
-        {
-            new GameFilterSet()
-        };
+        [JsonPropertyName("FilterSets")]
+        public required List<GameFilterSet> FilterSets { get; set; }
     }
 }

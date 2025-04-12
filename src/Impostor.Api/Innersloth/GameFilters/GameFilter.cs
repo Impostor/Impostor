@@ -8,27 +8,30 @@ namespace Impostor.Api.Innersloth.GameFilters
     [Serializable]
     public class GameFilter
     {
-        [JsonIgnore]
-        public ISubFilter SubFilter { get; private set; }
-
-        public GameFilter(string key, ISubFilter subFilter)
-        {
-            this.OptionType = subFilter.FilterType;
-            this.Key = key;
-            this.SubFilter = subFilter;
-        }
-
-        public void ModifySubFilter(ISubFilter subFilter)
-        {
-            this.SubFilter = subFilter;
-        }
-
         [JsonConstructor]
-        private GameFilter(string optionType, string key, string subFilterString)
+        public GameFilter(string optionType, string key, string subFilterString)
         {
             this.OptionType = optionType;
             this.Key = key;
             this.SubFilterString = subFilterString;
+            this.SubFilter = ResolveSubFilter(OptionType, SubFilterString);
+        }
+
+        [JsonIgnore]
+        public ISubFilter SubFilter { get; set; }
+
+        [JsonPropertyName("OptionType")]
+        public required string OptionType { get; set; }
+
+        [JsonPropertyName("Key")]
+        public required string Key { get; set; }
+
+        [JsonPropertyName("SubFilterString")]
+        public required string SubFilterString { get; set; }
+
+        public void ModifySubFilter(ISubFilter subFilter)
+        {
+            this.SubFilter = subFilter;
         }
 
         [OnSerializing]
@@ -47,32 +50,35 @@ namespace Impostor.Api.Innersloth.GameFilters
         {
             if (type != null)
             {
-                switch (type)
+                switch (type.ToLower())
                 {
                     case "int":
-                        return JsonSerializer.Deserialize<IntGameFilter>(filterString);
+                        return JsonSerializer.Deserialize<IntGameFilter>(filterString)
+                               ?? throw new InvalidOperationException("Deserialization returned null for IntGameFilter");
                     case "platform":
-                        return JsonSerializer.Deserialize<PlatformGameFilter>(filterString);
+                        return JsonSerializer.Deserialize<PlatformGameFilter>(filterString)
+                               ?? throw new InvalidOperationException("Deserialization returned null for PlatformGameFilter");
                     case "cat":
-                        return JsonSerializer.Deserialize<CategorizedGameFilter>(filterString);
+                        return JsonSerializer.Deserialize<CategorizedGameFilter>(filterString)
+                               ?? throw new InvalidOperationException("Deserialization returned null for CategorizedGameFilter");
                     case "languages":
-                        return JsonSerializer.Deserialize<LanguageFilter>(filterString);
+                        return JsonSerializer.Deserialize<LanguageFilter>(filterString)
+                               ?? throw new InvalidOperationException("Deserialization returned null for LanguageFilter");
                     case "chat":
-                        return JsonSerializer.Deserialize<ChatModeGameFilter>(filterString);
+                        return JsonSerializer.Deserialize<ChatModeGameFilter>(filterString)
+                               ?? throw new InvalidOperationException("Deserialization returned null for ChatModeGameFilter");
                     case "map":
-                        return JsonSerializer.Deserialize<MapGameFilter>(filterString);
+                        return JsonSerializer.Deserialize<MapGameFilter>(filterString)
+                               ?? throw new InvalidOperationException("Deserialization returned null for MapGameFilter");
                     case "bool":
-                        return JsonSerializer.Deserialize<BoolGameFilter>(filterString);
+                        return JsonSerializer.Deserialize<BoolGameFilter>(filterString)
+                               ?? throw new InvalidOperationException("Deserialization returned null for BoolGameFilter");
                     default:
-                        return null;
+                        throw new InvalidOperationException("No type matches subfilter");
                 }
             }
 
-            return null;
+            throw new InvalidOperationException("Must provide type for sub filter");
         }
-
-        public string OptionType;
-        public string Key;
-        public string SubFilterString;
     }
 }

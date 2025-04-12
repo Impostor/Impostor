@@ -11,8 +11,10 @@ using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameFilters;
+using Impostor.Hazel.UPnP;
 using Impostor.Server.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Http;
@@ -27,6 +29,7 @@ public sealed class GamesController : ControllerBase
     private readonly IGameManager _gameManager;
     private readonly ListingManager _listingManager;
     private readonly HostServer _hostServer;
+    private readonly ILogger<GamesController> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GamesController"/> class.
@@ -34,12 +37,13 @@ public sealed class GamesController : ControllerBase
     /// <param name="gameManager">GameManager containing a list of games.</param>
     /// <param name="listingManager">ListingManager responsible for filtering.</param>
     /// <param name="serverConfig">Impostor configuration section containing the public ip address of this server.</param>
-    public GamesController(IGameManager gameManager, ListingManager listingManager, IOptions<ServerConfig> serverConfig)
+    public GamesController(IGameManager gameManager, ListingManager listingManager, IOptions<ServerConfig> serverConfig, ILogger<GamesController> logger)
     {
         _gameManager = gameManager;
         _listingManager = listingManager;
         var config = serverConfig.Value;
         _hostServer = HostServer.From(IPAddress.Parse(config.ResolvePublicIp()), config.PublicPort);
+        _logger = logger;
     }
 
     /// <summary>
@@ -131,9 +135,13 @@ public sealed class GamesController : ControllerBase
             var filtersList = JsonSerializer.Deserialize<GameFiltersList>(decodedFilter);
 
             // filterSets wont be null. It must at least have ChatFilter and LangFilter
-            if (filtersList == null || filtersList.FilterSets.Count == 0)
+            // Vanilla game only builds one filterSet and InnerSloth officials only handles first one (though you can send multiple filter sets. sloths only handle the first)
+            if (filtersList == null || filtersList.FilterSets.Count != 1
+                || filtersList.FilterSets[0].Filters.Count < 2
+                || !filtersList.FilterSets[0].Filters.Any(x => x.OptionType == "languages")
+                || !filtersList.FilterSets[0].Filters.Any(x => x.OptionType == "chat"))
             {
-                return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "No filterSets detected")));
+                return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Invaild filterSets")));
             }
 
             var filteredGames = _listingManager.FindListingsV2(HttpContext, filtersList);
@@ -153,11 +161,11 @@ public sealed class GamesController : ControllerBase
         }
         catch (JsonException ex)
         {
-            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Unable to deserialize filter json")));
+            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Unable to deserialize filter json" + ex)));
         }
         catch (Exception ex)
         {
-            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Unknown excpetion caught in filter")));
+            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Unknown excpetion caught in filter" + ex)));
         }
     }
 

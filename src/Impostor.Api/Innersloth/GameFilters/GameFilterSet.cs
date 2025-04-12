@@ -1,25 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Impostor.Api.Innersloth.GameFilters
 {
     [Serializable]
     public class GameFilterSet
     {
-        public GameFilterSet(GameModes mode)
+        [JsonConstructor]
+        public GameFilterSet(GameModes gameMode, List<GameFilter> filters)
         {
-            this.GameMode = mode;
-            this.Filters = new List<GameFilter>();
+            GameMode = gameMode;
+            Filters = filters;
         }
 
-        public GameFilterSet()
-        {
-            this.GameMode = GameModes.Normal;
-            this.Filters = new List<GameFilter>();
-        }
+        [JsonPropertyName("GameMode")]
+        public required GameModes GameMode { get; set; }
 
-        public GameModes GameMode;
-
-        public List<GameFilter> Filters;
+        [JsonPropertyName("Filters")]
+        public required List<GameFilter> Filters { get; set; }
     }
 }
