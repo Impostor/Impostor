@@ -476,5 +476,138 @@
         "usableDistance": 1
       }
     ]
+  },
+  "29": {
+    "type": "NormalPlayerTask",
+    "taskType": "VentCleaning",
+    "length": "Short",
+    "consoles": [
+      {
+        "id": 0,
+        "room": "Admin",
+        "position": {
+          "x": -2.544,
+          "y": -9.955201
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 2,
+        "room": "Cafeteria",
+        "position": {
+          "x": -4.2588,
+          "y": -0.27600002
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 13,
+        "room": "Nav",
+        "position": {
+          "x": -16.008001,
+          "y": -6.3840003
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 12,
+        "room": "Nav",
+        "position": {
+          "x": -16.008001,
+          "y": -3.1680002
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 7,
+        "room": "Weapons",
+        "position": {
+          "x": -8.820001,
+          "y": 3.3240001
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 10,
+        "room": "Shields",
+        "position": {
+          "x": -9.5232,
+          "y": -14.337601
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 1,
+        "room": "Hallway",
+        "position": {
+          "x": -9.384,
+          "y": -6.438
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 3,
+        "room": "Electrical",
+        "position": {
+          "x": 9.7764,
+          "y": -8.034
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 8,
+        "room": "Reactor",
+        "position": {
+          "x": 20.796001,
+          "y": -6.9528003
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 11,
+        "room": "Reactor",
+        "position": {
+          "x": 21.876,
+          "y": -3.0516002
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 9,
+        "room": "LowerEngine",
+        "position": {
+          "x": 15.2508,
+          "y": -13.656001
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 4,
+        "room": "UpperEngine",
+        "position": {
+          "x": 15.288,
+          "y": 2.52
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 5,
+        "room": "Security",
+        "position": {
+          "x": 12.534,
+          "y": -6.9492
+        },
+        "usableDistance": 1
+      },
+      {
+        "id": 6,
+        "room": "MedBay",
+        "position": {
+          "x": 10.608001,
+          "y": -4.176
+        },
+        "usableDistance": 1
+      }
+    ]
   }
 }
