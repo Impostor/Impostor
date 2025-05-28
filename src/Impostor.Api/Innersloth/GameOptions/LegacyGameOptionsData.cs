@@ -145,6 +145,8 @@ public class LegacyGameOptionsData : IGameOptions
     /// </summary>
     public bool IsDefaults { get; set; } = true;
 
+    public GameTags Tag { get; set; } = 0;
+
     public static LegacyGameOptionsData Deserialize(IMessageReader reader, byte version)
     {
         var options = new LegacyGameOptionsData(version);
