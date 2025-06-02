@@ -41,6 +41,7 @@ namespace Impostor.Server.Net
                 _serverConfig.ResolvePublicIp(),
                 _serverConfig.PublicPort);
 
+            var runningOutsideContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == null;
             if (_serverConfig.PublicIp == "127.0.0.1")
             {
                 // NOTE: If this warning annoys you, set your PublicIp to "localhost"
@@ -48,11 +49,9 @@ namespace Impostor.Server.Net
                 _logger.LogError("To allow people on other devices to connect to your server, change this value to your Public IP address");
                 _logger.LogError("For more info on how to do this see https://github.com/Impostor/Impostor/blob/master/docs/Server-configuration.md");
             }
-
-            var runningOutsideContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == null;
-            if (_httpServerConfig.ListenIp == "0.0.0.0" && runningOutsideContainer)
+            else if (_httpServerConfig.ListenIp == "0.0.0.0" && runningOutsideContainer)
             {
-                _logger.LogWarning("Your HTTP server is exposed to the public internet, we recommend setting up a reverse proxy and enabling HTTPS");
+                _logger.LogWarning("Since Among Us 16.0.5 it is required to support HTTPS for players to connect, we recommend setting up a reverse proxy:");
                 _logger.LogWarning("See https://github.com/Impostor/Impostor/blob/master/docs/Http-server.md for instructions");
             }
         }
