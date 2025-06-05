@@ -29,7 +29,7 @@ internal class CompatibilityManager : ICompatibilityManager
         new[]
         {
             new GameVersion(2025, 4, 15), // 16.0.5 (2025-05-20)
-        }
+        },
     };
 
     private readonly List<CompatibilityGroup> _compatibilityGroups = new();
