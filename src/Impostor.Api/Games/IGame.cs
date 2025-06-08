@@ -77,6 +77,12 @@ namespace Impostor.Api.Games
         ValueTask SetPrivacyAsync(bool isPublic);
 
         /// <summary>
+        ///     Start the game.
+        /// </summary>
+        /// <returns>A <see cref="ValueTask" /> representing the asynchronous operation.</returns>
+        ValueTask StartGameAsync();
+
+        /// <summary>
         ///     Send the message to all players.
         /// </summary>
         /// <param name="writer">Message to send.</param>
