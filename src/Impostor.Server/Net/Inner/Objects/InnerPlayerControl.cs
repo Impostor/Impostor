@@ -130,8 +130,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc01CompleteTask.Deserialize(reader, out var taskId);
-                    await HandleCompleteTask(sender, taskId);
-                    break;
+                    return await HandleCompleteTask(sender, taskId);
                 }
 
                 case RpcCalls.SyncSettings:

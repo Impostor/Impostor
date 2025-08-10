@@ -2,7 +2,7 @@
 
 namespace Impostor.Api.Events.Player
 {
-    public interface IPlayerCompletedTaskEvent : IPlayerEvent, Impostor.Api.Events.IEventCancelable
+    public interface IPlayerCompletedTaskEvent : IPlayerEvent, IEventCancelable
     {
         ITaskInfo Task { get; }
     }
