@@ -615,14 +615,14 @@ namespace Impostor.Server.Net.Inner.Objects
             ProtectedBy = guardianAngel;
         }
 
-        private async ValueTask HandleCompleteTask(ClientPlayer sender, uint taskId)
+        private async ValueTask<bool> HandleCompleteTask(ClientPlayer sender, uint taskId)
         {
             TaskInfo? task = null;
             if (PlayerInfo == null)
             {
                 if (await sender.Client.ReportCheatAsync(RpcCalls.CompleteTask, CheatCategory.InvalidObject, "PlayerControl doesn't have PlayerInfo"))
                 {
-                    return;
+                    return false;
                 }
             }
             else
@@ -633,12 +633,20 @@ namespace Impostor.Server.Net.Inner.Objects
             if (task != null)
             {
                 task.Complete = true;
-                await _eventManager.CallAsync(new PlayerCompletedTaskEvent(Game, sender, this, task));
+                var @event = new PlayerCompletedTaskEvent(Game, sender, this, task);
+                await _eventManager.CallAsync(@event);
+
+                if (@event.IsCancelled)
+                {
+                    return false; // Don't broadcast the RPC if cancelled
+                }
             }
             else
             {
                 _logger.LogWarning($"Client sent {nameof(RpcCalls.CompleteTask)} with a taskIndex that is not in their {nameof(InnerPlayerInfo)}");
             }
+
+            return true; // Broadcast the RPC if not cancelled
         }
 
         private async ValueTask<bool> HandleCheckName(ClientPlayer sender, string name)
