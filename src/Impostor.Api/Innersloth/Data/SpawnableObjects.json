@@ -5,7 +5,7 @@
   "4": "PlayerControl",
   "5": "MiraShipStatus",
   "6": "PolusShipStatus",
-  "7": "ShipStatus",
+  "7": "SkeldShipStatus",
   "8": "AirshipStatus",
   "9": "HideAndSeekManager",
   "10": "NormalGameManager",
