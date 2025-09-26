@@ -30,6 +30,10 @@ internal class CompatibilityManager : ICompatibilityManager
         {
             new GameVersion(2025, 4, 15), // 16.0.5 (2025-05-20)
         },
+        new[]
+        {
+            new GameVersion(2025, 7, 15), // 17.0.0 (2025-09-09)
+        },
     };
 
     private readonly List<CompatibilityGroup> _compatibilityGroups = new();
