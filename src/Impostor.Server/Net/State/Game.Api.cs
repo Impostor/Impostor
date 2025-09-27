@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages;
@@ -96,6 +97,20 @@ namespace Impostor.Server.Net.State
 
                 await SendToAllAsync(writer);
             }
+        }
+
+        public async ValueTask StartGameAsync()
+        {
+            GameState = GameStates.Starting;
+
+            using (var writer = MessageWriter.Get(MessageType.Reliable))
+            {
+                WriteStartGameMessage(writer, false);
+
+                await SendToAllAsync(writer);
+            }
+
+            await _eventManager.CallAsync(new GameStartingEvent(this));
         }
     }
 }
