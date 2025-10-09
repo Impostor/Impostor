@@ -25,7 +25,7 @@ namespace Impostor.Api.Net.Messages.C2S
             using var platformReader = reader.ReadMessage();
             platformSpecificData = new PlatformSpecificData(platformReader);
 
-            if (clientVersion.Normalize() == Version.V3)
+            if (clientVersion.Normalize() <= Version.V3)
             {
                 // Crossplay flag was removed in 2021.12.14, friendcode was added instead
                 reader.ReadInt32();
