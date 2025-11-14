@@ -118,18 +118,32 @@ public sealed class GamesController : ControllerBase
     [HttpGet("filtered")]
     public IActionResult ShowFilteredLobbies()
     {
-        // TODO: implement this stub
-        var response = new
+        try
         {
-            games = Array.Empty<GameListing>(),
-            metadata = new
-            {
-                allGamesCount = _gameManager.Games.Count(),
-                matchingGamesCount = 0,
-            },
-        };
+            var publicGames = _gameManager.Games
+                .Where(game => game.IsPublic &&
+                              game.GameState == GameStates.NotStarted &&
+                              game.PlayerCount < game.Options.MaxPlayers)
+                .ToList();
 
-        return Ok(response);
+            var gameListings = publicGames.Select(GameListing.From).ToList();
+
+            var response = new
+            {
+                Games = gameListings,
+                Metadata = new
+                {
+                    allGamesCount = _gameManager.Games.Count(),
+                    matchingGamesCount = gameListings.Count,
+                },
+            };
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Failed to retrieve game list", details = ex.Message });
+        }
     }
 
     private static uint ConvertAddressToNumber(IPAddress address)
