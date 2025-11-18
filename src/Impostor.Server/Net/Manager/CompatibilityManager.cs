@@ -34,6 +34,7 @@ internal class CompatibilityManager : ICompatibilityManager
         {
             new GameVersion(2025, 7, 15), // 17.0.0 (2025-09-09)
             new GameVersion(2025, 9, 12), // 17.0.1 (2025-10-14)
+            new GameVersion(2025, 10, 9), // 17.1   (2025-11-18)
         },
     };
 
