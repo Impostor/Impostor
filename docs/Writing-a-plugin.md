@@ -69,7 +69,6 @@ Now the `Impostor.Api` is installed, you need to create a class for your plugin.
 
 ```csharp
 using System.Threading.Tasks;
-using Impostor.Api.Events.Managers;
 using Impostor.Api.Plugins;
 using Microsoft.Extensions.Logging;
 
@@ -77,12 +76,9 @@ namespace Impostor.Plugins.Example
 {
     /// <summary>
     ///     The metadata information of your plugin, this is required.
+    ///     Note: The multi-parameter constructor is obsolete. Use the single string ID parameter.
     /// </summary>
-    [ImpostorPlugin(
-        package: "gg.impostor.example",
-        name: "Example",
-        author: "AeonLucid",
-        version: "1.0.0")]
+    [ImpostorPlugin("gg.impostor.example")]
     public class ExamplePlugin : PluginBase // This is also required ": PluginBase".
     {
         /// <summary>
@@ -91,19 +87,13 @@ namespace Impostor.Plugins.Example
         private readonly ILogger<ExamplePlugin> _logger;
 
         /// <summary>
-        ///     The constructor of the plugin. There are a few parameters you can add here and they
-        ///     will be injected automatically by the server, two examples are used here.
-        ///
-        ///     They are not necessary but very recommended.
+        ///     The constructor of the plugin. Parameters are automatically injected
+        ///     by the server's dependency injection system.
         /// </summary>
         /// <param name="logger">
         ///     A logger to write messages in the console.
         /// </param>
-        /// <param name="eventManager">
-        ///     An event manager to register event listeners.
-        ///     Useful if you want your plugin to interact with the game.
-        /// </param>
-        public ExamplePlugin(ILogger<ExamplePlugin> logger, IEventManager eventManager)
+        public ExamplePlugin(ILogger<ExamplePlugin> logger)
         {
             _logger = logger;
         }
@@ -169,20 +159,21 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnGameStarted(IGameStartedEvent e)
         {
-            _logger.LogInformation($"Game is starting.");
+            _logger.LogInformation("Game is starting.");
 
             // This prints out for all players if they are impostor or crewmate.
             foreach (var player in e.Game.Players)
             {
-                var info = player.Character.PlayerInfo;
+                // Note: Use null-forgiving operator (!) as Character is guaranteed to exist when game starts
+                var info = player.Character!.PlayerInfo;
                 var isImpostor = info.IsImpostor;
                 if (isImpostor)
                 {
-                    _logger.LogInformation($"- {info.PlayerName} is an impostor.");
+                    _logger.LogInformation("- {PlayerName} is an impostor.", info.PlayerName);
                 }
                 else
                 {
-                    _logger.LogInformation($"- {info.PlayerName} is a crewmate.");
+                    _logger.LogInformation("- {PlayerName} is a crewmate.", info.PlayerName);
                 }
             }
         }
@@ -190,13 +181,13 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnGameEnded(IGameEndedEvent e)
         {
-            _logger.LogInformation($"Game has ended.");
+            _logger.LogInformation("Game has ended.");
         }
 
         [EventListener]
         public void OnPlayerChat(IPlayerChatEvent e)
         {
-            _logger.LogInformation($"{e.PlayerControl.PlayerInfo.PlayerName} said {e.Message}");
+            _logger.LogInformation("{PlayerName} said {Message}", e.PlayerControl.PlayerInfo.PlayerName, e.Message);
         }
     }
 }
@@ -204,7 +195,38 @@ namespace Impostor.Plugins.Example.Handlers
 
 ## 6. Registering the event listener
 
-The last step to get your plugin working is to register the event listener, so the server knows about it. Go back to your plugin class and modify it as below.
+The last step to get your plugin working is to register the event listener with the dependency injection system. The **modern and recommended approach** is to use `IPluginStartup`:
+
+Create a new class called `ExamplePluginStartup.cs`:
+
+```csharp
+using Impostor.Api.Events;
+using Impostor.Api.Plugins;
+using Impostor.Plugins.Example.Handlers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+namespace Impostor.Plugins.Example
+{
+    public class ExamplePluginStartup : IPluginStartup
+    {
+        public void ConfigureHost(IHostBuilder host)
+        {
+            // Optional: Configure host settings if needed
+        }
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // Register your event listeners as singletons
+            services.AddSingleton<IEventListener, GameEventListener>();
+        }
+    }
+}
+```
+
+**Alternative (Legacy) Approach:**
+
+If you prefer manual registration (not recommended), you can register listeners in the plugin's `EnableAsync` method:
 
 ```csharp
 using System;
@@ -216,30 +238,22 @@ using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example
 {
-    [ImpostorPlugin(
-        package: "gg.impostor.example",
-        name: "Example",
-        author: "AeonLucid",
-        version: "1.0.0")]
+    [ImpostorPlugin("gg.impostor.example")]
     public class ExamplePlugin : PluginBase
     {
         private readonly ILogger<ExamplePlugin> _logger;
-        // Add the line below!
         private readonly IEventManager _eventManager;
-        // Add the line below!
         private IDisposable _unregister;
 
         public ExamplePlugin(ILogger<ExamplePlugin> logger, IEventManager eventManager)
         {
             _logger = logger;
-            // Add the line below!
             _eventManager = eventManager;
         }
 
         public override ValueTask EnableAsync()
         {
             _logger.LogInformation("Example is being enabled.");
-            // Add the line below!
             _unregister = _eventManager.RegisterListener(new GameEventListener(_logger));
             return default;
         }
@@ -247,14 +261,14 @@ namespace Impostor.Plugins.Example
         public override ValueTask DisableAsync()
         {
             _logger.LogInformation("Example is being disabled.");
-            // Add the line below!
-            _unregister.Dispose();
+            _unregister?.Dispose();
             return default;
         }
     }
 }
-
 ```
+
+**Recommendation:** Use the `IPluginStartup` approach as it integrates better with dependency injection and allows automatic cleanup.
 
 ## 7. Build and run your plugin
 
@@ -274,18 +288,167 @@ Some extra information that might be useful for those developing plugins.
 
 ### Event listeners
 
-- You can have multiple event listener on the same event.
-- An event listener can be given a priority `[EventListener(EventPriority.Normal)]` and is called in order.
-- It is not recommended to block for a long time inside `EventListener` because the events are called from inside the packet handlers. Blocking too long causes the client to time out. You should create a new `Task` for operations that will take a lot of time. 
+- You can have multiple event listeners on the same event.
+- An event listener can be given a priority `[EventListener(EventPriority.High)]` or `[EventListener(EventPriority.Low)]`. Default is `EventPriority.Normal`. Higher priority listeners execute first.
+- Event handlers can return `void`, `ValueTask`, or `async ValueTask` depending on whether you need async operations.
+- It is not recommended to block for a long time inside `EventListener` because the events are called from inside the packet handlers. Blocking too long causes the client to time out. You should create a new `Task` for operations that will take a lot of time.
+
+**Event Cancellation:**
+
+Some events implement `IEventCancelable` and can be cancelled to prevent the action:
+
+```csharp
+[EventListener]
+public void OnPlayerChat(IPlayerChatEvent e)
+{
+    // Cancel chat messages containing bad words
+    if (e.Message.Contains("badword"))
+    {
+        e.IsCancelled = true;
+        _logger.LogWarning("Blocked inappropriate message from {Player}", e.PlayerControl.PlayerInfo.PlayerName);
+    }
+}
+```
+
+**Async Event Handlers:**
+
+```csharp
+[EventListener]
+public async ValueTask OnPlayerSpawned(IPlayerSpawnedEvent e)
+{
+    // Wait before modifying player
+    await Task.Delay(TimeSpan.FromSeconds(3));
+
+    // Modify player color
+    await e.PlayerControl.SetColorAsync(ColorType.Pink);
+}
+```
+
+**Available Event Types:**
+
+- **Game Events:** `IGameCreationEvent`, `IGameCreatedEvent`, `IGameStartingEvent`, `IGameStartedEvent`, `IGameEndedEvent`, `IGameDestroyedEvent`, `IGameHostChangedEvent`, `IGameOptionsChangedEvent`
+- **Player Events:** `IGamePlayerJoinedEvent`, `IGamePlayerLeftEvent`, `IPlayerSpawnedEvent`, `IPlayerDestroyedEvent`, `IPlayerChatEvent`, `IPlayerStartMeetingEvent`, `IPlayerEnterVentEvent`, `IPlayerExitVentEvent`, `IPlayerVentEvent`, `IPlayerCompletedTaskEvent`, `IPlayerVotedEvent`
+- **Meeting Events:** `IMeetingStartedEvent`, `IMeetingEndedEvent`
+- **Client Events:** `IClientConnectedEvent`, `IClientDisconnectedEvent`
+
+### Player manipulation and cosmetics
+
+You can modify player properties using the `IPlayerControl` interface. **Important:** Cosmetics now use string identifiers instead of numeric enums.
+
+**Changing player cosmetics:**
+
+```csharp
+[EventListener]
+public async ValueTask OnPlayerChat(IPlayerChatEvent e)
+{
+    if (e.Message == "makemepretty")
+    {
+        await e.PlayerControl.SetColorAsync(ColorType.Pink);
+        await e.PlayerControl.SetHatAsync("hat_pk05_Cheese");
+        await e.PlayerControl.SetSkinAsync("skin_Police");
+        await e.PlayerControl.SetPetAsync("pet_alien1");
+        await e.PlayerControl.SetNameAsync("Pretty Player");
+    }
+}
+```
+
+**Common cosmetic string IDs:**
+- Hats: `"hat_pk05_Cheese"`, `"hat_pk01_Antenna"`, `"hat_baseball"`, etc.
+- Skins: `"skin_Police"`, `"skin_Astronaut"`, `"skin_Mechanic"`, etc.
+- Pets: `"pet_alien1"`, `"pet_Bedcrab"`, `"pet_Hamster"`, etc.
+
+**Other player operations:**
+
+```csharp
+// Teleport player
+await playerControl.NetworkTransform.SnapToAsync(new Vector2(x, y));
+
+// Send chat message as player
+await playerControl.SendChatAsync("Hello from plugin!");
+
+// Complete all tasks
+foreach (var task in playerControl.PlayerInfo.Tasks)
+{
+    await task.CompleteAsync();
+}
+
+// Murder a player (if impostor)
+await playerControl.MurderPlayerAsync(targetPlayer);
+```
+
+### Game manipulation
+
+Access and modify game settings:
+
+```csharp
+[EventListener]
+public async ValueTask OnPlayerChat(IPlayerChatEvent e)
+{
+    if (e.Message == "speed")
+    {
+        // Modify game options
+        e.Game.Options.NumImpostors = 2;
+
+        if (e.Game.Options is NormalGameOptions normalOptions)
+        {
+            normalOptions.KillCooldown = 10f;
+            normalOptions.PlayerSpeedMod = 2.5f;
+            normalOptions.CrewLightMod = 1.5f;
+        }
+
+        // Sync changes to all clients
+        await e.Game.SyncSettingsAsync();
+    }
+}
+```
 
 ### Dependency injection
 
 - The main plugin class is constructed by the `IServiceProvider` of the server and can inject everything the server uses. A few examples are:
-  - `ILogger<T>`
-  - `IEventManager`
-  - `IClientManager`
-  - `IOptions<ServerConfig>`
+  - `ILogger<T>` - Structured logging
+  - `IEventManager` - Event system
+  - `IClientManager` - Access connected clients
+  - `IGameManager` - Create and manage games
+  - `IOptions<ServerConfig>` - Server configuration
+  - `IOptions<AntiCheatConfig>` - Anti-cheat settings
 - You can add your own classes and `EventListener` implementation to the `IServiceProvider` by creating a new class and implementing `IPluginStartup`. Make sure to register them as a singleton `services.AddSingleton<IEventListener, GameEventListener>();`.
+
+**Creating games programmatically:**
+
+```csharp
+using Impostor.Api.Games.Managers;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
+
+public class ExamplePlugin : PluginBase
+{
+    private readonly IGameManager _gameManager;
+
+    public ExamplePlugin(ILogger<ExamplePlugin> logger, IGameManager gameManager)
+    {
+        _logger = logger;
+        _gameManager = gameManager;
+    }
+
+    public override async ValueTask EnableAsync()
+    {
+        // Create a game with default options
+        var game = await _gameManager.CreateAsync(
+            new NormalGameOptions(),
+            GameFilterOptions.CreateDefault()
+        );
+
+        if (game != null)
+        {
+            game.DisplayName = "My Plugin Game";
+            await game.SetPrivacyAsync(false); // true = private, false = public
+            _logger.LogInformation("Created game {GameCode}", game.Code.Code);
+        }
+
+        return default;
+    }
+}
+```
 
 ### Server configuration
 
