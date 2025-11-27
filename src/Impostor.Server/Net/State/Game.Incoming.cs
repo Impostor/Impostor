@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
+using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
 using Impostor.Server.Events;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,9 +21,9 @@ namespace Impostor.Server.Net.State
         {
             GameState = GameStates.Starting;
 
-            using var packet = MessageWriter.Get(MessageType.Reliable);
-            message.CopyTo(packet);
-            await SendToAllAsync(packet);
+            using var writer = MessageWriter.Get(MessageType.Reliable);
+            message.CopyTo(writer);
+            await SendToAllAsync(writer);
 
             await _eventManager.CallAsync(new GameStartingEvent(this));
         }
@@ -32,11 +33,9 @@ namespace Impostor.Server.Net.State
             GameState = GameStates.Ended;
 
             // Broadcast end of the game.
-            using (var packet = MessageWriter.Get(MessageType.Reliable))
-            {
-                message.CopyTo(packet);
-                await SendToAllAsync(packet);
-            }
+            using var writer = MessageWriter.Get(MessageType.Reliable);
+            Message08EndGameS2C.Serialize(writer, Code, gameOverReason);
+            await SendToAllAsync(writer);
 
             // Put all players in the correct limbo state.
             foreach (var player in _players)
@@ -57,9 +56,9 @@ namespace Impostor.Server.Net.State
         {
             IsPublic = isPublic;
 
-            using var packet = MessageWriter.Get(MessageType.Reliable);
-            message.CopyTo(packet);
-            await SendToAllExceptAsync(packet, sender.Client.Id);
+            using var writer = MessageWriter.Get(MessageType.Reliable);
+            message.CopyTo(writer);
+            await SendToAllExceptAsync(writer, sender.Client.Id);
 
             await _eventManager.CallAsync(new GameAlterEvent(this, isPublic));
         }
