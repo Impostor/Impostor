@@ -1183,9 +1183,35 @@ namespace Impostor.Server.Net.Inner.Objects
         private async ValueTask<bool> HandleSendChat(ClientPlayer sender, string message)
         {
             var @event = new PlayerChatEvent(Game, sender, this, message);
+
+            // See https://github.com/Innersloth-LLC/AmongUsModdingInformation?tab=readme-ov-file#chat-commands
+            // Details not mentioned:
+            // - If the host sends a message that starts with /cmd, it is sent to all players
+            // - If the message starts with " /cmd" (note the space) it is sent to all players
+            if (Game.IsHostAuthoritive && !sender.IsHost && message.StartsWith("/cmd"))
+            {
+                @event.SendToAllPlayers = false;
+            }
+
             await _eventManager.CallAsync(@event);
 
-            return !@event.IsCancelled;
+            if (@event.IsCancelled)
+            {
+                return false;
+            }
+            else if (@event.SendToAllPlayers == false)
+            {
+                if (Game.Host != null)
+                {
+                    await SendChatToPlayerAsync(message, Game.Host.Character);
+                }
+
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         private async ValueTask HandleStartMeeting(byte targetId)
