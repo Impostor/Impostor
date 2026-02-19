@@ -37,7 +37,8 @@ internal class CompatibilityManager : ICompatibilityManager
             new GameVersion(2025, 10, 9), // 17.1   (2025-11-18)
             new GameVersion(2025, 11, 6), // 17.1.1 (2025-12-03, mobile only)
             new GameVersion(2025, 12, 8), // 17.1.2 (2025-12-11, mobile only)
-            new GameVersion(2025, 11, 5), // 17.2   (2026-02-18, not a typo, Innersloth went backwards)
+            new GameVersion(2025, 11, 5), // 17.2   (2026-02-17, not a typo, Innersloth went backwards)
+            new GameVersion(2026, 1, 22), // 17.2   (2026-02-19, hotfix)
         },
     };
 
