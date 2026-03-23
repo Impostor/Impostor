@@ -468,7 +468,7 @@ namespace Impostor.Server.Net.State
 
         private async ValueTask SyncServerObjectsAsync(ClientPlayer sender)
         {
-            foreach (var obj in _allObjectsFast.Values.ToList())
+            foreach (var obj in _allObjectsFast.Values)
             {
                 if (obj.OwnerId == ServerOwned)
                 {
