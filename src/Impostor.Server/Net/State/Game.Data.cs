@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -60,9 +61,7 @@ namespace Impostor.Server.Net.State
 
         private static readonly Dictionary<Type, uint> SpawnableObjectIds = SpawnableObjects.ToDictionary((i) => i.Value, (i) => i.Key);
 
-        private readonly List<InnerNetObject> _allObjects = new List<InnerNetObject>();
-
-        private readonly Dictionary<uint, InnerNetObject> _allObjectsFast = new Dictionary<uint, InnerNetObject>();
+        private readonly ConcurrentDictionary<uint, InnerNetObject> _allObjectsFast = new ConcurrentDictionary<uint, InnerNetObject>();
 
         private uint _nextNetId = MinServerNetId;
 
@@ -533,25 +532,12 @@ namespace Impostor.Server.Net.State
 
         private bool AddNetObject(InnerNetObject obj)
         {
-            if (_allObjectsFast.ContainsKey(obj.NetId))
-            {
-                return false;
-            }
-
-            _allObjects.Add(obj);
-            _allObjectsFast.Add(obj.NetId, obj);
-            return true;
+            return _allObjectsFast.TryAdd(obj.NetId, obj);
         }
 
         private void RemoveNetObject(InnerNetObject obj)
         {
-            var index = _allObjects.IndexOf(obj);
-            if (index > -1)
-            {
-                _allObjects.RemoveAt(index);
-            }
-
-            _allObjectsFast.Remove(obj.NetId);
+            _allObjectsFast.TryRemove(obj.NetId, out _);
         }
     }
 }
