@@ -135,6 +135,7 @@ namespace Impostor.Server.Net.State
                 await PlayerAdd(sender);
             }
 
+            sender.Character = null;
             sender.InitializeSpawnTimeout();
 
             using (var message = MessageWriter.Get(MessageType.Reliable))
