@@ -15,5 +15,7 @@ namespace Impostor.Server.Events
         public IGame Game { get; }
 
         public GameOverReason GameOverReason { get; }
+
+        public bool IsCancelled { get; set; }
     }
 }
