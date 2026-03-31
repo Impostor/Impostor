@@ -40,6 +40,7 @@ internal class CompatibilityManager : ICompatibilityManager
             new GameVersion(2025, 11, 5), // 17.2   (2026-02-17, build 6630, not a typo, Innersloth went backwards)
             new GameVersion(2026, 1, 22), // 17.2   (2026-02-19, build 6686, hotfix)
             new GameVersion(2026, 2, 2),  // 17.2.2 (2026-03-17, build 6768)
+            new GameVersion(2026, 1, 12), // 17.3   (2026-03-31, build 6803)
         },
     };
 
