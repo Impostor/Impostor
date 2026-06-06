@@ -42,6 +42,8 @@ internal class CompatibilityManager : ICompatibilityManager
             new GameVersion(2026, 2, 2),  // 17.2.2 (2026-03-17, build 6768)
             new GameVersion(2026, 1, 12), // 17.3   (2026-03-31, build 6803)
             new GameVersion(2026, 3, 17), // 17.3.1 (2026-04-08, build 6841, mobile only)
+            new GameVersion(2026, 3, 18), // 17.4   (2026-06-05, build 7044, pc only)
+            new GameVersion(2026, 4, 23), // 17.4   (2026-06-05, build 7045, mobile only)
         },
     };
 
