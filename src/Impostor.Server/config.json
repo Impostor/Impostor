@@ -23,7 +23,7 @@
     "EnableTargetChecks": true,
     "ForbidProtocolExtensions": true,
     "EnablePacketSizeChecks": true,
-    "PacketSizeLimit": 1168
+    "PacketSizeLimit": 1153
   },
   "Timeout": {
     "SpawnTimeout": 2500,
