@@ -65,7 +65,7 @@ namespace Impostor.Server.Net.Hazel
 
             // Check raw message size against the configured limit.
             // Innersloth requires full packet ≤ 1200 bytes (1168 bytes payload after 32 bytes IP+UDP headers).
-            if (_antiCheatConfig.Enabled && _antiCheatConfig.EnablePacketSizeChecks && e.Message.Length > _antiCheatConfig.PacketSizeLimit)
+            if (e.Message.Length > _antiCheatConfig.PacketSizeLimit)
             {
                 if (await Client.ReportCheatAsync(
                         new CheatContext("RootMessage"),
