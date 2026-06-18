@@ -22,7 +22,8 @@
     "EnableRoleChecks": true,
     "EnableTargetChecks": true,
     "ForbidProtocolExtensions": true,
-    "LimitRate": 1500
+    "EnablePacketSizeChecks": true,
+    "PacketSizeLimit": 1168
   },
   "Timeout": {
     "SpawnTimeout": 2500,

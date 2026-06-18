@@ -30,6 +30,8 @@ namespace Impostor.Api.Config
 
         public bool ForbidProtocolExtensions { get; set; } = true;
 
-        public int LimitRate { get; set; } = 1500;
+        public bool EnablePacketSizeChecks { get; set; } = true;
+
+        public int PacketSizeLimit { get; set; } = 1168;
     }
 }

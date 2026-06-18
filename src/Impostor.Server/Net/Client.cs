@@ -238,18 +238,6 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    // Check outer message size against the configured limit.
-                    if (_antiCheatConfig.Enabled && reader.Length > _antiCheatConfig.LimitRate)
-                    {
-                        if (await ReportCheatAsync(
-                                new CheatContext(MessageFlags.FlagToString(flag)),
-                                CheatCategory.PacketSize,
-                                $"Message size {reader.Length} exceeds limit {_antiCheatConfig.LimitRate}"))
-                        {
-                            return;
-                        }
-                    }
-
                     var toPlayer = flag == MessageFlags.GameDataTo;
 
                     var position = reader.Position;
@@ -295,33 +283,9 @@ namespace Impostor.Server.Net
                         return;
                     }
 
-                    // Check outer PackedGameDataTo message size.
-                    if (_antiCheatConfig.Enabled && reader.Length > _antiCheatConfig.LimitRate * 10)
-                    {
-                        if (await ReportCheatAsync(
-                                new CheatContext(MessageFlags.FlagToString(flag)),
-                                CheatCategory.PacketSize,
-                                $"PackedGameDataTo outer size {reader.Length} exceeds limit {_antiCheatConfig.LimitRate * 10}"))
-                        {
-                            return;
-                        }
-                    }
-
                     while (reader.Position < reader.Length)
                     {
                         using var packed = reader.ReadMessage();
-
-                        // Check each packed sub-message size.
-                        if (_antiCheatConfig.Enabled && packed.Length > _antiCheatConfig.LimitRate)
-                        {
-                            if (await ReportCheatAsync(
-                                    new CheatContext(MessageFlags.FlagToString(flag)),
-                                    CheatCategory.PacketSize,
-                                    $"Packed sub-message size {packed.Length} exceeds limit {_antiCheatConfig.LimitRate}"))
-                            {
-                                return;
-                            }
-                        }
 
                         if (packed.Tag != MessageFlags.GameDataTo)
                         {
