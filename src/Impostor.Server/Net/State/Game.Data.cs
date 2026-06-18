@@ -120,7 +120,21 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjects.TryGetValue(netId, out var obj))
                         {
-                            if (!await obj.HandleRpcAsync(sender, target, (RpcCalls)reader.ReadByte(), reader))
+                            var callId = (RpcCalls)reader.ReadByte();
+
+                            // Check RPC packet size against the configured limit.
+                            if (_antiCheatConfig.Enabled && reader.Length > _antiCheatConfig.LimitRate)
+                            {
+                                if (await sender.Client.ReportCheatAsync(
+                                        callId,
+                                        CheatCategory.PacketSize,
+                                        $"RPC packet size {reader.Length} exceeds limit {_antiCheatConfig.LimitRate}"))
+                                {
+                                    return false;
+                                }
+                            }
+
+                            if (!await obj.HandleRpcAsync(sender, target, callId, reader))
                             {
                                 parent.RemoveMessage(reader);
                                 continue;

@@ -21,7 +21,8 @@
     "EnableOwnershipChecks": true,
     "EnableRoleChecks": true,
     "EnableTargetChecks": true,
-    "ForbidProtocolExtensions": true
+    "ForbidProtocolExtensions": true,
+    "LimitRate": 1500
   },
   "Timeout": {
     "SpawnTimeout": 2500,

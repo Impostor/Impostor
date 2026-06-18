@@ -29,5 +29,7 @@ namespace Impostor.Api.Config
         public bool EnableTargetChecks { get; set; } = true;
 
         public bool ForbidProtocolExtensions { get; set; } = true;
+
+        public int LimitRate { get; set; } = 1500;
     }
 }
