@@ -32,6 +32,6 @@ namespace Impostor.Api.Config
 
         public bool EnablePacketSizeChecks { get; set; } = true;
 
-        public int PacketSizeLimit { get; set; } = 1153;
+        public int PacketSizeLimit { get; set; } = 1203;
     }
 }
