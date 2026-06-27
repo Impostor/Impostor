@@ -4,8 +4,8 @@
     "net8.0": {
       "Impostor.Hazel.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.0.0",
-        "contentHash": "x56AEsY5fKU2Z5O7ZrzEqKfr62kq/C05Aevcciwz5yMfOQlpwuFI1awgNGJsoe+bcx+XnFc3+l+eadtY72aZsg=="
+        "resolved": "1.0.1",
+        "contentHash": "de2bMj78xDXOWwyqQVk8o4vbZKGfAgOjnWnkKB1IGGovNtxLeBF8jy3wH5moTZB6juTnLf0ptkCDkRi8c2OcjA=="
       },
       "Microsoft.AspNetCore.Http.Abstractions": {
         "type": "Transitive",
@@ -102,7 +102,7 @@
       "impostor.api": {
         "type": "Project",
         "dependencies": {
-          "Impostor.Hazel.Abstractions": "[1.0.0, )",
+          "Impostor.Hazel.Abstractions": "[1.0.1, )",
           "Microsoft.AspNetCore.Http.Abstractions": "[2.2.0, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[8.0.0, )",
           "Microsoft.Extensions.Logging.Abstractions": "[8.0.0, )"
