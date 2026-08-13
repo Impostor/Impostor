@@ -268,10 +268,30 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.PackedGameDataTo:
                 {
+                    if (Player == null)
+                    {
+                        return;
+                    }
+
+                    var game = Player.Game;
+
+                    // Innersloth Special: this message uses PackedInt32 instead of a normal int32
+                    var code = reader.ReadPackedInt32();
+
+                    if (code != game.Code.Value)
+                    {
+                        _logger.LogWarning("gcm2 {0} {1}", code, game.Code.Value);
+                        return;
+                    }
+
                     // We're limiting this to hosts right now. If you have a use case for this for
                     // players to use this feature, we're open to changing this.
-                    if (!IsPacketAllowed(reader, true, flag))
+                    if (game.HostId != Id)
                     {
+                        await ReportCheatAsync(
+                            new CheatContext(MessageFlags.FlagToString(flag)),
+                            CheatCategory.MustBeHost,
+                            "Client sent a PackedGameDataTo message");
                         return;
                     }
 
