@@ -85,6 +85,14 @@ public sealed class SourceGenerator : IIncrementalGenerator
             enumGenerator.Generate("SystemTypes", underlyingType: CSharpEnumUnderlyingType.Byte);
             enumGenerator.Generate("Language", sourceName: "SupportedLangs");
             enumGenerator.Generate("TaskTypes");
+            enumGenerator.Generate("BoolOptionNames", "Impostor.Api.Innersloth.GameFilters");
+            enumGenerator.Generate("ByteOptionNames", "Impostor.Api.Innersloth.GameFilters");
+            enumGenerator.Generate("CategorizedOptionNames", "Impostor.Api.Innersloth.GameFilters");
+            enumGenerator.Generate("FloatArrayOptionNames", "Impostor.Api.Innersloth.GameFilters");
+            enumGenerator.Generate("FloatOptionNames", "Impostor.Api.Innersloth.GameFilters");
+            enumGenerator.Generate("Int32ArrayOptionNames", "Impostor.Api.Innersloth.GameFilters");
+            enumGenerator.Generate("Int32OptionNames", "Impostor.Api.Innersloth.GameFilters");
+            enumGenerator.Generate("UInt32OptionNames", "Impostor.Api.Innersloth.GameFilters");
 
             enumGenerator.Generate("RpcCalls", "Impostor.Api.Net.Inner", underlyingType: CSharpEnumUnderlyingType.Byte);
 
