@@ -126,7 +126,7 @@ public sealed class GamesController : ControllerBase
     {
         if (string.IsNullOrEmpty(filter))
         {
-            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "filter query para not provided")));
+            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "filter query parameter not provided")));
         }
 
         try
@@ -141,7 +141,7 @@ public sealed class GamesController : ControllerBase
                 || !filtersList.FilterSets[0].Filters.Any(x => x.OptionType == "languages")
                 || !filtersList.FilterSets[0].Filters.Any(x => x.OptionType == "chat"))
             {
-                return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Invaild filterSets")));
+                return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Invalid filterSets")));
             }
 
             var filteredGames = _listingManager.FindListingsV2(HttpContext, filtersList);
@@ -165,7 +165,7 @@ public sealed class GamesController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Unknown excpetion caught in filter" + ex)));
+            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Unknown exception caught in filter" + ex)));
         }
     }
 

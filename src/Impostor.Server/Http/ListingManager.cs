@@ -115,7 +115,7 @@ public sealed class ListingManager
         var result = new List<IGame>();
         var resultCount = 0;
 
-        // Not sure what is this. Used for Reacotr.Impostor?
+        // Apply custom filters from API
         var filters = _listingFilters.Select(f => f.GetFilter(ctx)).ToArray();
 
         foreach (var game in _gameManager.Games)
