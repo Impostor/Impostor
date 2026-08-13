@@ -14,7 +14,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
     <PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="all" />
 
-    <PackageReference Include="System.Text.Json" Version="8.0.4" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />
 

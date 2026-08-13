@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
@@ -28,13 +29,14 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     Gets the <see cref="IInnerPlayerInfo" /> of the <see cref="IInnerPlayerControl" />.
         ///     Contains metadata about the player.
         /// </summary>
-        IInnerPlayerInfo PlayerInfo { get; }
+        IInnerPlayerInfo? PlayerInfo { get; }
 
         /// <summary>
         ///     Sets the name of the current <see cref="IInnerPlayerControl" />.
         ///     Visible to all players.
         /// </summary>
         /// <param name="name">A name for the player.</param>
+        /// <exception cref="ImpostorProtocolException">Thrown when player doesn't have a PlayerInfo.</exception>
         /// <returns>Task that must be awaited.</returns>
         ValueTask SetNameAsync(string name);
 
@@ -43,6 +45,7 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     Visible to all players.
         /// </summary>
         /// <param name="colorType">A color for the player.</param>
+        /// <exception cref="ImpostorProtocolException">Thrown when player doesn't have a PlayerInfo.</exception>
         /// <returns>Task that must be awaited.</returns>
         ValueTask SetColorAsync(ColorType colorType);
 
@@ -51,6 +54,7 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     Visible to all players.
         /// </summary>
         /// <param name="hatId">An hat for the player.</param>
+        /// <exception cref="ImpostorProtocolException">Thrown when player doesn't have a PlayerInfo.</exception>
         /// <returns>Task that must be awaited.</returns>
         ValueTask SetHatAsync(string hatId);
 
@@ -59,6 +63,7 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     Visible to all players.
         /// </summary>
         /// <param name="petId">A pet for the player.</param>
+        /// <exception cref="ImpostorProtocolException">Thrown when player doesn't have a PlayerInfo.</exception>
         /// <returns>Task that must be awaited.</returns>
         ValueTask SetPetAsync(string petId);
 
@@ -67,6 +72,7 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     Visible to all players.
         /// </summary>
         /// <param name="skinId">A skin for the player.</param>
+        /// <exception cref="ImpostorProtocolException">Thrown when player doesn't have a PlayerInfo.</exception>
         /// <returns>Task that must be awaited.</returns>
         ValueTask SetSkinAsync(string skinId);
 
@@ -114,32 +120,60 @@ namespace Impostor.Api.Net.Inner.Objects
         /// <exception cref="ImpostorProtocolException">Thrown when player is not the impostor.</exception>
         /// <exception cref="ImpostorProtocolException">Thrown when player is dead.</exception>
         /// <exception cref="ImpostorProtocolException">Thrown when target is dead.</exception>
+        /// <exception cref="ImpostorProtocolException">Thrown when player or target player doesn't have a PlayerInfo.</exception>
         /// <returns>Task that must be awaited.</returns>
         ValueTask MurderPlayerAsync(IInnerPlayerControl target, MurderResultFlags result);
 
         /// <summary>
-        ///     Murder <paramref name="target" /> player successfully.
+        /// Murder <paramref name="target" /> player.
+        /// </summary>
+        /// <param name="target">Target player to murder.</param>
+        /// <param name="result">The result of the murder operation.</param>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask ForceMurderPlayerAsync(IInnerPlayerControl target, MurderResultFlags result);
+
+        /// <summary>
+        ///     Murder <paramref name="target" /> player after validating if this is a valid kill.
         /// </summary>
         /// <param name="target">Target player to murder.</param>
         /// <exception cref="ImpostorProtocolException">Thrown when player is not the impostor.</exception>
         /// <exception cref="ImpostorProtocolException">Thrown when player is dead.</exception>
         /// <exception cref="ImpostorProtocolException">Thrown when target is dead.</exception>
+        /// <exception cref="ImpostorProtocolException">Thrown when player or target player doesn't have a PlayerInfo.</exception>
         /// <returns>Task that must be awaited.</returns>
+        [Obsolete("Please switch to version with the MurderResultFlags argument")]
         ValueTask MurderPlayerAsync(IInnerPlayerControl target);
 
         /// <summary>
         ///     Protect <paramref name="target" /> player.
         /// </summary>
         /// <param name="target">Target player to protect.</param>
-        /// <exception cref="ImpostorProtocolException">Thrown when target is a guardian angel.</exception>
+        /// <exception cref="ImpostorProtocolException">Thrown when target is dead.</exception>
+        /// <exception cref="ImpostorProtocolException">Thrown when player or target player doesn't have a PlayerInfo.</exception>
         /// <returns>Task that must be awaited.</returns>
         ValueTask ProtectPlayerAsync(IInnerPlayerControl target);
+
+        /// <summary>
+        ///     Protect <paramref name="target" /> player.
+        /// </summary>
+        /// <param name="target">Target player to protect.</param>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask ForceProtectPlayerAsync(IInnerPlayerControl target);
+
+        /// <summary>
+        ///     Exile the current player. This doesn't produce a body to be reported.
+        ///     Visible to all players.
+        /// </summary>
+        /// <exception cref="ImpostorProtocolException">Thrown if player to be exiled is already dead.</exception>
+        /// <exception cref="ImpostorProtocolException">Thrown when player or target player doesn't have a PlayerInfo.</exception>
+        /// <returns>Task that must be awaited.</returns>
+        ValueTask ExileAsync();
 
         /// <summary>
         ///     Exile the current player. This doesn't produce a body to be reported.
         ///     Visible to all players.
         /// </summary>
         /// <returns>Task that must be awaited.</returns>
-        ValueTask ExileAsync();
+        ValueTask ForceExileAsync();
     }
 }

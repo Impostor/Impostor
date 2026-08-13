@@ -1,4 +1,4 @@
-﻿using Impostor.Api.Events.Player;
+using Impostor.Api.Events.Player;
 using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
@@ -24,5 +24,7 @@ namespace Impostor.Server.Events.Player
         public string Message { get; }
 
         public bool IsCancelled { get; set; }
+
+        public bool SendToAllPlayers { get; set; } = true;
     }
 }

@@ -18,7 +18,7 @@ namespace Impostor.Api.Net.Messages.S2C
             writer.Write(hostId);
             writer.Write(player.Client.Name);
             player.Client.PlatformSpecificData.Serialize(writer);
-            writer.WritePacked(player.Character?.PlayerInfo.PlayerLevel ?? 1);
+            writer.WritePacked(player.Character?.PlayerInfo?.PlayerLevel ?? 1);
 
             // ProductUserId and FriendCode are not yet known, so set them to an empty string
             writer.Write(string.Empty);

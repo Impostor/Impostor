@@ -287,7 +287,7 @@ namespace Impostor.Server.Net.Inner.Objects
             var max = MaxPair(self, out var tie);
             var exiled = tie ? null : Game.GameNet.GameData!.GetPlayerById(max.Key)?.Controller;
 
-            if (exiled != null)
+            if (exiled != null && exiled.PlayerInfo != null)
             {
                 exiled.PlayerInfo.LastDeathReason = DeathReason.Exile;
                 await _eventManager.CallAsync(new PlayerExileEvent(Game, Game.GetClientPlayer(exiled!.OwnerId)!, exiled));

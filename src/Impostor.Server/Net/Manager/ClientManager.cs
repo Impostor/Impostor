@@ -101,8 +101,8 @@ namespace Impostor.Server.Net.Manager
                 return;
             }
 
-            // Warn when players connect using the +25 flag that disables server authority. The host authority version
-            // of 2024.6.18 contains various bugs that break the game, so print a message if this mode is in use
+            // Warn when players connect using the +25 flag that disables server authority.
+            // This changes game behaviour, so we'd like to know if it's in use.
             if (clientVersion.HasDisableServerAuthorityFlag)
             {
                 if (!_compatibilityConfig.AllowHostAuthority)
@@ -112,7 +112,7 @@ namespace Impostor.Server.Net.Manager
                     return;
                 }
 
-                _logger.LogWarning("Player {Name} connected with server authority disabled, this may cause issues as there are known bugs in this mode. Please mention that this mode is in use when asking for support.", name);
+                _logger.LogInformation("Player {Name} connected with server authority disabled, please mention that this mode is in use when asking for support.", name);
             }
 
             if (name.Length > 10)

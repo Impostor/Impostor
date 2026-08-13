@@ -139,7 +139,10 @@ namespace Impostor.Server.Net.State
         /// <returns>True if there is player other than exceptBy that uses that color.</returns>
         internal bool IsColorUsed(ColorType color, IInnerPlayerControl? exceptBy = null)
         {
-            return Players.Any(p => p.Character != null && p.Character != exceptBy && p.Character.PlayerInfo.CurrentOutfit.Color == color);
+            return Players.Any(p => p.Character != null &&
+                               p.Character != exceptBy &&
+                               p.Character.PlayerInfo != null &&
+                               p.Character.PlayerInfo.CurrentOutfit.Color == color);
         }
 
         private ValueTask BroadcastJoinMessage(IMessageWriter message, bool clear, ClientPlayer player)

@@ -22,7 +22,7 @@ namespace Impostor.Api.Net.Messages.S2C
                 writer.WritePacked(ply.Client.Id);
                 writer.Write(ply.Client.Name);
                 ply.Client.PlatformSpecificData.Serialize(writer);
-                writer.WritePacked(ply.Character?.PlayerInfo.PlayerLevel ?? 1);
+                writer.WritePacked(ply.Character?.PlayerInfo?.PlayerLevel ?? 1);
 
                 // ProductUserId and FriendCode are not yet known, so set them to an empty string
                 writer.Write(string.Empty);

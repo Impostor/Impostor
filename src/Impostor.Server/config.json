@@ -21,7 +21,9 @@
     "EnableOwnershipChecks": true,
     "EnableRoleChecks": true,
     "EnableTargetChecks": true,
-    "ForbidProtocolExtensions": true
+    "ForbidProtocolExtensions": true,
+    "EnablePacketSizeChecks": true,
+    "PacketSizeLimit": 1203
   },
   "Timeout": {
     "SpawnTimeout": 2500,

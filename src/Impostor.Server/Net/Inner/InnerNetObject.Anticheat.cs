@@ -73,9 +73,16 @@ namespace Impostor.Server.Net.Inner
             return true;
         }
 
-        protected async ValueTask<bool> ValidateImpostor(CheatContext context, IClientPlayer sender, InnerPlayerInfo playerInfo, bool value = true)
+        protected async ValueTask<bool> ValidateImpostor(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, bool value = true)
         {
-            if (playerInfo.IsImpostor != value)
+            if (playerInfo == null)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check if Impostor, playerInfo not set"))
+                {
+                    return false;
+                }
+            }
+            else if (playerInfo.IsImpostor != value)
             {
                 if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed impostor check"))
                 {
@@ -86,9 +93,16 @@ namespace Impostor.Server.Net.Inner
             return true;
         }
 
-        protected async ValueTask<bool> ValidateCanVent(CheatContext context, IClientPlayer sender, InnerPlayerInfo playerInfo, bool value = true)
+        protected async ValueTask<bool> ValidateCanVent(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, bool value = true)
         {
-            if (playerInfo.CanVent != value)
+            if (playerInfo == null)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check if can vent, playerInfo not set"))
+                {
+                    return false;
+                }
+            }
+            else if (playerInfo.CanVent != value)
             {
                 if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed can vent check"))
                 {
@@ -99,9 +113,16 @@ namespace Impostor.Server.Net.Inner
             return true;
         }
 
-        protected async ValueTask<bool> ValidateRole(CheatContext context, IClientPlayer sender, InnerPlayerInfo playerInfo, RoleTypes role)
+        protected async ValueTask<bool> ValidateRole(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, RoleTypes role)
         {
-            if (playerInfo.RoleType != role)
+            if (playerInfo == null)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check role, playerInfo not set"))
+                {
+                    return false;
+                }
+            }
+            else if (playerInfo.RoleType != role)
             {
                 if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, $"Failed role = {role} check"))
                 {

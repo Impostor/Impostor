@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Hazel;
@@ -11,6 +12,7 @@ using Impostor.Server.Net.Hazel;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net
 {
@@ -20,18 +22,21 @@ namespace Impostor.Server.Net
         private readonly ClientManager _clientManager;
         private readonly ObjectPool<MessageReader> _readerPool;
         private readonly ILogger<HazelConnection> _connectionLogger;
+        private readonly IOptions<AntiCheatConfig> _antiCheatOptions;
         private UdpConnectionListener? _connection;
 
         public Matchmaker(
             IEventManager eventManager,
             ClientManager clientManager,
             ObjectPool<MessageReader> readerPool,
-            ILogger<HazelConnection> connectionLogger)
+            ILogger<HazelConnection> connectionLogger,
+            IOptions<AntiCheatConfig> antiCheatOptions)
         {
             _eventManager = eventManager;
             _clientManager = clientManager;
             _readerPool = readerPool;
             _connectionLogger = connectionLogger;
+            _antiCheatOptions = antiCheatOptions;
         }
 
         public async ValueTask StartAsync(IPEndPoint ipEndPoint)
@@ -64,7 +69,7 @@ namespace Impostor.Server.Net
             // Handshake.
             HandshakeC2S.Deserialize(e.HandshakeData, out var clientVersion, out var name, out var language, out var chatMode, out var platformSpecificData);
 
-            var connection = new HazelConnection(e.Connection, _connectionLogger);
+            var connection = new HazelConnection(e.Connection, _connectionLogger, _antiCheatOptions);
 
             await _eventManager.CallAsync(new ClientConnectionEvent(connection, e.HandshakeData));
 
