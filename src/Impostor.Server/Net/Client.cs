@@ -466,7 +466,8 @@ namespace Impostor.Server.Net
             var game = Player.Game;
 
             // GameCode must match code of the current game assigned to the player.
-            if (message.ReadInt32() != game.Code)
+            var code = message.ReadInt32();
+            if (code != game.Code.Value)
             {
                 return false;
             }
