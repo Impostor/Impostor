@@ -313,7 +313,7 @@ namespace Impostor.Server.Net
                             return;
                         }
 
-                        if (packed.ReadInt32() != Player!.Game.Code)
+                        if (packed.ReadInt32() != game.Code.Value)
                         {
                             _logger.LogWarning("PackedGameDataTo contained GameDataTo for the wrong game.");
                             return;
