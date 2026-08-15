@@ -132,6 +132,18 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
+                    var position = reader.Position;
+                    var statesLength = reader.ReadPackedInt32();
+                    reader.Seek(position);
+
+                    if (statesLength < 0 || statesLength > Game.Options.MaxPlayers)
+                    {
+                        if (await sender.Client.ReportCheatAsync(call, CheatCategory.ProtocolExtension, $"Client sent {nameof(RpcCalls.VotingComplete)} with invalid voter state length {statesLength}, max allowed is {Game.Options.MaxPlayers}"))
+                        {
+                            return false;
+                        }
+                    }
+
                     Rpc23VotingComplete.Deserialize(reader, out var states, out var playerId, out var tie);
                     foreach (var messageReader in states)
                     {
