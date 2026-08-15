@@ -8,6 +8,8 @@ namespace Impostor.Api.Net;
 
 public static class MessageReaderExtensions
 {
+    public static int BytesRemaining(this IMessageReader reader) => reader.Length - reader.Position;
+
     public static GameVersion ReadGameVersion(this IMessageReader reader)
     {
         return new GameVersion(reader.ReadInt32());
