@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner.Objects;
@@ -19,8 +20,13 @@ namespace Impostor.Server.Net.Inner.Objects
             throw new NotImplementedException();
         }
 
-        public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState, MessageType messageType)
         {
+            if (!await ValidateReliable(CheatContext.Deserialize, sender, messageType))
+            {
+                return;
+            }
+
             throw new NotImplementedException();
         }
     }

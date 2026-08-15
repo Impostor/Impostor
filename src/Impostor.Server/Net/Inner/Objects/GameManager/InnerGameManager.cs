@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Inner;
@@ -51,8 +52,13 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
         return _logicComponents.IndexOf(logic);
     }
 
-    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+    public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader, MessageType messageType)
     {
+        if (!await ValidateReliable(call, sender, messageType))
+        {
+            return false;
+        }
+
         // Let all logic components process this RPC. If at least one component handles it, return true.
         var result = false;
         foreach (var logicComponent in _logicComponents)
@@ -63,7 +69,7 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
         // If no component accepted it, try and find a custom RPC that can deal with it.
         if (!result)
         {
-            result |= await base.HandleRpcAsync(sender, target, call, reader);
+            result |= await base.HandleRpcAsync(sender, target, call, reader, messageType);
         }
 
         return result;
@@ -74,8 +80,13 @@ internal abstract class InnerGameManager : InnerNetObject, IInnerGameManager
         throw new System.NotImplementedException();
     }
 
-    public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+    public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState, MessageType messageType)
     {
+        if (!await ValidateReliable(CheatContext.Deserialize, sender, messageType))
+        {
+            return;
+        }
+
         while (reader.Position < reader.Length)
         {
             var innerReader = reader.ReadMessage();

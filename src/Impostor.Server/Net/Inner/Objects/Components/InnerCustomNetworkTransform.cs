@@ -59,8 +59,13 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             return new ValueTask<bool>(true);
         }
 
-        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState, MessageType messageType)
         {
+            if (initialState && !await ValidateReliable(CheatContext.Deserialize, sender, messageType))
+            {
+                return;
+            }
+
             var sequenceId = reader.ReadUInt16();
 
             if (initialState)
@@ -90,8 +95,13 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             }
         }
 
-        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader, MessageType messageType)
         {
+            if (!await ValidateReliable(call, sender, messageType))
+            {
+                return false;
+            }
+
             if (call == RpcCalls.SnapTo)
             {
                 if (!await ValidateOwnership(call, sender))
@@ -122,7 +132,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 return true;
             }
 
-            return await base.HandleRpcAsync(sender, target, call, reader);
+            return await base.HandleRpcAsync(sender, target, call, reader, messageType);
         }
 
         internal async ValueTask SetPositionAsync(IClientPlayer sender, Vector2 position)

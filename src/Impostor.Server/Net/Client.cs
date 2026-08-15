@@ -241,7 +241,7 @@ namespace Impostor.Server.Net
                     var toPlayer = flag == MessageFlags.GameDataTo;
 
                     var position = reader.Position;
-                    var verified = await Player!.Game.HandleGameDataAsync(reader, Player, toPlayer);
+                    var verified = await Player!.Game.HandleGameDataAsync(reader, Player, toPlayer, messageType);
                     reader.Seek(position);
 
                     if (verified && Player != null)
@@ -320,7 +320,7 @@ namespace Impostor.Server.Net
                         }
 
                         var position = packed.Position;
-                        var verified = await Player.Game.HandleGameDataAsync(packed, Player, true);
+                        var verified = await Player.Game.HandleGameDataAsync(packed, Player, true, messageType);
                         packed.Seek(position);
 
                         if (!verified || Player == null)

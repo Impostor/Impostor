@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
@@ -133,8 +134,13 @@ namespace Impostor.Server.Net.Inner.Objects
             return new ValueTask<bool>(true);
         }
 
-        public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState, MessageType messageType)
         {
+            if (!await ValidateReliable(CheatContext.Deserialize, sender, messageType))
+            {
+                return;
+            }
+
             PlayerId = reader.ReadByte();
             ClientId = reader.ReadPackedInt32();
 
@@ -179,11 +185,16 @@ namespace Impostor.Server.Net.Inner.Objects
             reader.ReadString(); // FriendCode
             reader.ReadString(); // PUID
 
-            return ValueTask.CompletedTask;
+            return;
         }
 
-        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader, MessageType messageType)
         {
+            if (!await ValidateReliable(call, sender, messageType))
+            {
+                return false;
+            }
+
             switch (call)
             {
                 case RpcCalls.SetTasks:
@@ -192,7 +203,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     break;
 
                 default:
-                    return await base.HandleRpcAsync(sender, target, call, reader);
+                    return await base.HandleRpcAsync(sender, target, call, reader, messageType);
             }
 
             return true;
