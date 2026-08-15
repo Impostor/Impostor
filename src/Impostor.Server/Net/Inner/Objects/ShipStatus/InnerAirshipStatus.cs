@@ -11,8 +11,9 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 {
     internal class InnerAirshipStatus : InnerShipStatus, IInnerAirshipStatus
     {
-        public InnerAirshipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game, MapTypes.Airship)
+        public InnerAirshipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, ICustomMessageManager<ICustomSystemType> customSystemManager, Game game) : base(customMessageManager, customSystemManager, game, MapTypes.Airship)
         {
+            InitializeSystems();
         }
 
         public Vector2 PreSpawnLocation { get; } = new Vector2(-25f, 40f);
@@ -36,13 +37,14 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
         {
             base.AddSystems(systems);
 
-            systems.Add(SystemTypes.Doors, new DoorsSystemType(Doors));
+            systems.Add(SystemTypes.Doors, new DoorsSystemType(Doors, Data.Doors));
             systems.Add(SystemTypes.Comms, new HudOverrideSystemType());
             systems.Add(SystemTypes.GapRoom, new MovingPlatformBehaviour());
-            systems.Add(SystemTypes.Reactor, new HeliSabotageSystemType());
-            systems.Add(SystemTypes.Decontamination, new ElectricalDoors(Doors));
-            systems.Add(SystemTypes.Decontamination2, new AutoDoorsSystemType(Doors));
+            systems.Add(SystemTypes.HeliSabotage, new HeliSabotageSystemType());
+            systems.Add(SystemTypes.Decontamination, new ElectricalDoors());
+            systems.Add(SystemTypes.Decontamination2, new AutoDoorsSystemType(Doors, Data.Doors));
             systems.Add(SystemTypes.Security, new SecurityCameraSystemType());
+            systems.Add(SystemTypes.Ventilation, new VentilationSystemType());
         }
     }
 }

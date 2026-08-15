@@ -30,6 +30,11 @@ public static class MessageWriterExtensions
         }
     }
 
+    public static void Write(this IMessageWriter writer, IMessageWriter message, bool includeHeader)
+    {
+        writer.Write(message.ToByteArray(includeHeader));
+    }
+
     public static void Write(this IMessageWriter writer, Vector2 vector)
     {
         writer.Write((ushort)(Mathf.ReverseLerp(vector.X) * (double)ushort.MaxValue));

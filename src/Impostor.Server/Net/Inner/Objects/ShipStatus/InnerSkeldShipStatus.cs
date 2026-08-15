@@ -10,19 +10,21 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 {
     internal class InnerSkeldShipStatus : InnerShipStatus, IInnerSkeldShipStatus
     {
-        public InnerSkeldShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game, MapTypes.Skeld)
+        public InnerSkeldShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, ICustomMessageManager<ICustomSystemType> customSystemManager, Game game) : base(customMessageManager, customSystemManager, game, MapTypes.Skeld)
         {
+            InitializeSystems();
         }
 
         protected override void AddSystems(Dictionary<SystemTypes, ISystemType> systems)
         {
             base.AddSystems(systems);
 
-            systems.Add(SystemTypes.Doors, new AutoDoorsSystemType(Doors));
+            systems.Add(SystemTypes.Doors, new AutoDoorsSystemType(Doors, Data.Doors));
             systems.Add(SystemTypes.Comms, new HudOverrideSystemType());
             systems.Add(SystemTypes.Security, new SecurityCameraSystemType());
-            systems.Add(SystemTypes.Reactor, new ReactorSystemType());
-            systems.Add(SystemTypes.LifeSupp, new LifeSuppSystemType());
+            systems.Add(SystemTypes.Reactor, new ReactorSystemType(30f, SystemTypes.Reactor));
+            systems.Add(SystemTypes.LifeSupp, new LifeSuppSystemType(30f));
+            systems.Add(SystemTypes.Ventilation, new VentilationSystemType());
         }
     }
 }
