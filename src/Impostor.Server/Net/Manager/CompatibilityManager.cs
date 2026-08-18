@@ -47,7 +47,8 @@ internal class CompatibilityManager : ICompatibilityManager
         },
         new[]
         {
-            new GameVersion(2026, 7, 15), // 18.0   (2026-08-18, build 7238)
+            new GameVersion(2026, 7, 15), // 18.0   (2026-08-18, build 7238, pc only)
+            new GameVersion(2026, 7, 16), // 18.0   (2026-08-18, build 7238, mobile only)
         },
     };
 
