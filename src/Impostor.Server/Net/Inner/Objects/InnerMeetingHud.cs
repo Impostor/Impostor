@@ -22,6 +22,8 @@ namespace Impostor.Server.Net.Inner.Objects
 {
     internal partial class InnerMeetingHud : InnerNetObject
     {
+        private static readonly GameVersion JudgeMinVersion = new GameVersion(2026, 7, 15); // 18.0
+
         private readonly ILogger<InnerMeetingHud> _logger;
         private readonly IEventManager _eventManager;
 
@@ -108,6 +110,17 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
                 }
             }
+
+            if (sender.Client.GameVersion >= JudgeMinVersion)
+            {
+                var overruleQueueListLength = reader.ReadPackedInt32();
+                for (var i = 0; i < overruleQueueListLength; i++)
+                {
+                    var msg = reader.ReadMessage();
+
+                    // TODO parse and handle JudgeOverrule
+                }
+            }
         }
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
@@ -158,6 +171,22 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
 
                     Rpc25ClearVote.Deserialize(reader);
+                    break;
+                }
+
+                case RpcCalls.QueueOverruleVotes:
+                {
+                    if (!await ValidateRole(call, sender, sender.Character!.PlayerInfo, RoleTypes.Judge) ||
+                        !await ValidateTarget(call, sender, target) ||
+                        !await ValidateHost(call, target!))
+                    {
+                        return false;
+                    }
+
+                    var judgePlayerId = reader.ReadByte();
+                    var targetPlayerId = reader.ReadByte();
+                    var overruleNonce = reader.ReadUInt16();
+
                     break;
                 }
 
