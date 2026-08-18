@@ -45,6 +45,10 @@ internal class CompatibilityManager : ICompatibilityManager
             new GameVersion(2026, 3, 18), // 17.4   (2026-06-05, build 7044, pc only)
             new GameVersion(2026, 4, 23), // 17.4   (2026-06-05, build 7045, mobile only)
         },
+        new[]
+        {
+            new GameVersion(2026, 7, 15), // 18.0   (2026-08-18, build 7238)
+        },
     };
 
     private readonly List<CompatibilityGroup> _compatibilityGroups = new();
