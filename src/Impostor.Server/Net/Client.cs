@@ -138,7 +138,7 @@ namespace Impostor.Server.Net
 
                     if (flag == MessageFlags.HostModdedGame)
                     {
-                        Message00HostGameC2S.DeserializeModded(reader, out gameOptions, out _, out gameFilterOptions, out var parsedModGuid);
+                        Message25HostModdedGameC2S.Deserialize(reader, out gameOptions, out _, out gameFilterOptions, out var parsedModGuid);
                         modGuid = parsedModGuid;
                     }
                     else

@@ -21,11 +21,5 @@ namespace Impostor.Api.Net.Messages.C2S
             crossplayFlags = (CrossplayFlags)reader.ReadInt32();
             gameFilterOptions = GameFilterOptions.Deserialize(reader);
         }
-
-        public static void DeserializeModded(IMessageReader reader, out IGameOptions gameOptions, out CrossplayFlags crossplayFlags, out GameFilterOptions gameFilterOptions, out Guid modGuid)
-        {
-            Deserialize(reader, out gameOptions, out crossplayFlags, out gameFilterOptions);
-            modGuid = new Guid(reader.ReadBytes(16).Span);
-        }
     }
 }

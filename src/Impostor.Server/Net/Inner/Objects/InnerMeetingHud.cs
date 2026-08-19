@@ -151,11 +151,23 @@ namespace Impostor.Server.Net.Inner.Objects
                         return false;
                     }
 
-                    var hasOverruleFields = sender.Client.GameVersion >= JudgeMinVersion;
-                    Rpc23VotingComplete.Deserialize(reader, hasOverruleFields, out var states, out var playerId, out var tie, out var wasOverruled, out var overrideId);
-                    foreach (var messageReader in states)
+                    if (sender.Client.GameVersion >= JudgeMinVersion)
                     {
-                        messageReader.Dispose();
+                        Rpc23VotingComplete.Deserialize(reader, out var states, out var playerId, out var tie, out var wasOverruled, out var overrideId);
+
+                        foreach (var messageReader in states)
+                        {
+                            messageReader.Dispose();
+                        }
+                    }
+                    else
+                    {
+                        Rpc23VotingComplete.Deserialize(reader, out var states, out var playerId, out var tie);
+
+                        foreach (var messageReader in states)
+                        {
+                            messageReader.Dispose();
+                        }
                     }
 
                     // This would be a nice place to implement an anti cheat.
