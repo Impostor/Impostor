@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
@@ -17,6 +18,12 @@ namespace Impostor.Api.Games
         GameCode Code { get; }
 
         GameStates GameState { get; }
+
+        /// <summary>
+        /// Gets the mod registration GUID of the host, if the game was hosted by a modded client (tag <c>25</c>).
+        /// <c>null</c> when the host is a vanilla client.
+        /// </summary>
+        Guid? ModGuid { get; }
 
         IGameNet GameNet { get; }
 

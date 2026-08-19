@@ -192,6 +192,13 @@ public sealed class ListingManager
                             }
 
                             break;
+                        case "mod":
+                            if (filter.SubFilter is ModGameFilter modFilter && game.ModGuid != modFilter.AcceptedValues)
+                            {
+                                matchesAllFilters = false;
+                            }
+
+                            break;
                     }
 
                     if (!matchesAllFilters)

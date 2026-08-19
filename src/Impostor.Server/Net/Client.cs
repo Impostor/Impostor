@@ -124,12 +124,21 @@ namespace Impostor.Server.Net
             switch (flag)
             {
                 case MessageFlags.HostGame:
+                case MessageFlags.HostModdedGame:
                 {
                     // Read game settings.
                     Message00HostGameC2S.Deserialize(reader, out var gameOptions, out _, out var gameFilterOptions);
 
+                    Guid? modGuid = null;
+
+                    // A modded host appends its mod registration GUID after the filter options.
+                    if (flag == MessageFlags.HostModdedGame)
+                    {
+                        modGuid = new Guid(reader.ReadBytes(16).ToArray());
+                    }
+
                     // Create game.
-                    var game = await _gameManager.CreateAsync(this, gameOptions, gameFilterOptions);
+                    var game = await _gameManager.CreateAsync(this, gameOptions, gameFilterOptions, modGuid);
 
                     if (game == null)
                     {

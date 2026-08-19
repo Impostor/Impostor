@@ -86,6 +86,8 @@ namespace Impostor.Server.Net.State
 
         public GameFilterOptions FilterOptions { get; }
 
+        public Guid? ModGuid { get; set; }
+
         public IDictionary<object, object> Items { get; }
 
         public int PlayerCount => _players.Count;

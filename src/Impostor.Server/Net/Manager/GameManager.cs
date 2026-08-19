@@ -85,7 +85,7 @@ namespace Impostor.Server.Net.Manager
             await _eventManager.CallAsync(new GameDestroyedEvent(game));
         }
 
-        public async ValueTask<IGame?> CreateAsync(IClient? owner, IGameOptions options, GameFilterOptions filterOptions)
+        public async ValueTask<IGame?> CreateAsync(IClient? owner, IGameOptions options, GameFilterOptions filterOptions, Guid? modGuid = null)
         {
             if (owner != null && !_gamesCreatedBy.TryAdd(owner, null))
             {
@@ -101,11 +101,11 @@ namespace Impostor.Server.Net.Manager
                 return null;
             }
 
-            var (success, game) = await TryCreateAsync(options, filterOptions, owner, @event.GameCode);
+            var (success, game) = await TryCreateAsync(options, filterOptions, owner, modGuid, @event.GameCode);
 
             for (var i = 0; i < 10 && !success; i++)
             {
-                (success, game) = await TryCreateAsync(options, filterOptions, owner);
+                (success, game) = await TryCreateAsync(options, filterOptions, owner, modGuid);
             }
 
             if (owner != null)
@@ -126,10 +126,11 @@ namespace Impostor.Server.Net.Manager
             return CreateAsync(null, options, filterOptions);
         }
 
-        private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(IGameOptions options, GameFilterOptions filterOptions, IClient? owner, GameCode? desiredGameCode = null)
+        private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(IGameOptions options, GameFilterOptions filterOptions, IClient? owner, Guid? modGuid, GameCode? desiredGameCode = null)
         {
             var gameCode = desiredGameCode ?? _gameCodeFactory.Create();
             var game = ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options, filterOptions);
+            game.ModGuid = modGuid;
 
             if (!_games.TryAdd(gameCode, game))
             {
