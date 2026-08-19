@@ -42,7 +42,7 @@ namespace Impostor.Server.Net
             {
                 return false;
             }
-            
+
             if (Player != null && Player.Game.ModGuid != null)
             {
                 return false;
