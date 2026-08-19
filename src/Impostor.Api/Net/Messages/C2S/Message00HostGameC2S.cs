@@ -1,4 +1,3 @@
-using System;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameOptions;
 
