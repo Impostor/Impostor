@@ -257,9 +257,6 @@ public sealed class GamesController : ControllerBase
         [JsonPropertyName("PlayerCount")]
         public required int PlayerCount { get; init; }
 
-        [JsonPropertyName("ModGuid")]
-        public string? ModGuid { get; init; }
-
         [JsonPropertyName("HostName")]
         public required string HostName { get; init; }
 
@@ -303,7 +300,6 @@ public sealed class GamesController : ControllerBase
                 Port = (ushort)game.PublicIp.Port,
                 GameId = game.Code,
                 PlayerCount = game.PlayerCount,
-                ModGuid = game.ModGuid?.ToString(),
                 HostName = game.DisplayName ?? game.Host?.Client.Name ?? "Unknown host",
                 TrueHostName = game.DisplayName ?? game.Host?.Client.Name ?? "Unknown host",
                 HostPlatformName = platform?.PlatformName ?? string.Empty,
