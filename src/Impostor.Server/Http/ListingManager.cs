@@ -59,6 +59,7 @@ public sealed class ListingManager
             {
                 continue;
             }
+
             if (game.ModGuid != null)
             {
                 continue;
@@ -141,6 +142,7 @@ public sealed class ListingManager
                 {
                     continue;
                 }
+
                 if (game.ModGuid != null && !filterSet.Filters.Any(f => f.OptionType == "mod"))
                 {
                     continue;

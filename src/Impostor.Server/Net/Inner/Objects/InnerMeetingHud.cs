@@ -310,7 +310,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 _judgeOverrules.Add(new JudgeOverrule(judgePlayerId, targetPlayerId, overruleNonce));
             }
         }
-        
+
         private JudgeOverrule? GetWinningOverrule()
         {
             var gameData = Game.GameNet.GameData!;
@@ -393,7 +393,7 @@ namespace Impostor.Server.Net.Inner.Objects
             var self = this.CalculateVotes();
             var max = MaxPair(self, out var tie);
             var exiled = tie ? null : Game.GameNet.GameData!.GetPlayerById(max.Key)?.Controller;
-            
+
             // exile or others?
             var wasOverruled = false;
             ushort overrideId = 0;
