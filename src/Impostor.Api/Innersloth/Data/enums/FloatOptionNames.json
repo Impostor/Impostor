@@ -24,5 +24,8 @@
   "TrackerCooldown": 1550,
   "TrackerDuration": 1551,
   "TrackerDelay": 1552,
-  "NoisemakerAlertDuration": 1600
+  "NoisemakerAlertDuration": 1600,
+  "ViperDissolveTime": 1601,
+  "DetectiveSuspectLimit": 1602,
+  "JudgeTaskRequirementPercentage": 1620
 }

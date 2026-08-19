@@ -1,4 +1,4 @@
-﻿using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameOptions;
 
 namespace Impostor.Api.Net.Messages.C2S

@@ -5,6 +5,7 @@ using Impostor.Api;
 using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
@@ -38,6 +39,11 @@ namespace Impostor.Server.Net
         public override async ValueTask<bool> ReportCheatAsync(CheatContext context, CheatCategory category, string message)
         {
             if (!_antiCheatConfig.Enabled)
+            {
+                return false;
+            }
+
+            if (Player != null && Player.Game.ModGuid != null)
             {
                 return false;
             }
@@ -124,17 +130,35 @@ namespace Impostor.Server.Net
             switch (flag)
             {
                 case MessageFlags.HostGame:
+                case MessageFlags.HostModdedGame:
                 {
-                    // Read game settings.
-                    Message00HostGameC2S.Deserialize(reader, out var gameOptions, out _, out var gameFilterOptions);
+                    IGameOptions gameOptions;
+                    GameFilterOptions gameFilterOptions;
+                    Guid? modGuid = null;
+
+                    if (flag == MessageFlags.HostModdedGame)
+                    {
+                        Message25HostModdedGameC2S.Deserialize(reader, out gameOptions, out _, out gameFilterOptions, out var parsedModGuid);
+                        modGuid = parsedModGuid;
+                    }
+                    else
+                    {
+                        // Read game settings.
+                        Message00HostGameC2S.Deserialize(reader, out gameOptions, out _, out gameFilterOptions);
+                    }
 
                     // Create game.
-                    var game = await _gameManager.CreateAsync(this, gameOptions, gameFilterOptions);
+                    var game = await _gameManager.CreateAsync(this, gameOptions, gameFilterOptions, modGuid);
 
                     if (game == null)
                     {
                         await DisconnectAsync(DisconnectReason.GameNotFound);
                         return;
+                    }
+
+                    if (modGuid != null)
+                    {
+                        _logger.LogInformation("Client {Name} ({Id}) hosted a modded game with mod GUID {ModGuid}.", Name, Id, modGuid);
                     }
 
                     // Code in the packet below will be used in JoinGame.

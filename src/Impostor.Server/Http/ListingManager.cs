@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
@@ -57,6 +56,11 @@ public sealed class ListingManager
         foreach (var game in this._gameManager.Games)
         {
             if (!game.IsPublic || game.GameState != GameStates.NotStarted || game.PlayerCount >= game.Options.MaxPlayers)
+            {
+                continue;
+            }
+
+            if (game.ModGuid != null)
             {
                 continue;
             }
@@ -139,6 +143,11 @@ public sealed class ListingManager
                     continue;
                 }
 
+                if (game.ModGuid != null && !filterSet.Filters.Any(f => f.OptionType == "mod"))
+                {
+                    continue;
+                }
+
                 var matchesAllFilters = true;
 
                 // Hard coded to only check map, languages, impostornum, chatmode, tags
@@ -190,6 +199,13 @@ public sealed class ListingManager
                                 {
                                     matchesAllFilters = false;
                                 }
+                            }
+
+                            break;
+                        case "mod":
+                            if (filter.SubFilter is ModFilter modFilter && game.ModGuid != modFilter.AcceptedValues)
+                            {
+                                matchesAllFilters = false;
                             }
 
                             break;

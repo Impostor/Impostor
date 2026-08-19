@@ -11,7 +11,6 @@ using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameFilters;
-using Impostor.Hazel.UPnP;
 using Impostor.Server.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -37,6 +36,7 @@ public sealed class GamesController : ControllerBase
     /// <param name="gameManager">GameManager containing a list of games.</param>
     /// <param name="listingManager">ListingManager responsible for filtering.</param>
     /// <param name="serverConfig">Impostor configuration section containing the public ip address of this server.</param>
+    /// <param name="logger">DI injected logger.</param>
     public GamesController(IGameManager gameManager, ListingManager listingManager, IOptions<ServerConfig> serverConfig, ILogger<GamesController> logger)
     {
         _gameManager = gameManager;

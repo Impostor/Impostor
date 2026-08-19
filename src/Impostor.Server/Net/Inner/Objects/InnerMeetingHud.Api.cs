@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Impostor.Api.Net.Inner.Objects;
 
@@ -9,5 +9,7 @@ namespace Impostor.Server.Net.Inner.Objects
         IReadOnlyCollection<IInnerMeetingHud.IPlayerVoteArea> IInnerMeetingHud.PlayerStates => Array.AsReadOnly(_playerStates);
 
         IInnerPlayerInfo? IInnerMeetingHud.Reporter => Reporter;
+
+        IReadOnlyCollection<IInnerMeetingHud.IJudgeOverrule> IInnerMeetingHud.JudgeOverrules => JudgeOverrules;
     }
 }
