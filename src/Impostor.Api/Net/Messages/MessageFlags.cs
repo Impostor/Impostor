@@ -29,6 +29,7 @@ namespace Impostor.Api.Net.Messages
         public const byte QueryPlatformIds = 22;
         public const byte QueryLobbyInfo = 23;
         public const byte EndGameHostMigration = 24;
+        public const byte HostModdedGame = 25;
         public const byte PackedGameDataTo = 26;
 
         private static readonly Dictionary<byte, string> FlagCache;
