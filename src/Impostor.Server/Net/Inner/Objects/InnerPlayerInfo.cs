@@ -51,9 +51,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public bool Disconnected { get; internal set; }
 
-        public bool IsImpostor => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.ImpostorGhost or RoleTypes.Phantom;
+        public bool IsImpostor => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.ImpostorGhost or RoleTypes.Phantom or RoleTypes.Viper;
 
-        public bool CanVent => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Engineer;
+        public bool CanVent => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper or RoleTypes.Engineer;
 
         public bool IsDead { get; internal set; }
 
