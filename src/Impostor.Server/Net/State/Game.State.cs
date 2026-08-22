@@ -136,7 +136,7 @@ namespace Impostor.Server.Net.State
             var limboPlayers = _players.Where(x => x.Value.Limbo == LimboStates.WaitingForHost);
             foreach (var (_, player) in limboPlayers)
             {
-                await HandleJoinGameNext(player, false);
+                await HandleJoinGameNew(player, false);
             }
         }
     }
