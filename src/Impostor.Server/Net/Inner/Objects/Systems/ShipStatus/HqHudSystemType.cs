@@ -1,36 +1,36 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 {
-    public class HeliSabotageSystemType : ISystemType, IActivatable
+    public class HqHudSystemType : ISystemType, IActivatable
     {
-        private readonly HashSet<ActiveConsoleData> _activeConsoles = new();
+        private readonly HashSet<Tuple<byte, byte>> _activeConsoles = new();
         private readonly HashSet<byte> _completedConsoles = new();
 
-        public HeliSabotageSystemType()
+        public HqHudSystemType()
         {
-            Countdown = 10000f;
             _completedConsoles.Add(0);
             _completedConsoles.Add(1);
         }
-
-        public float Countdown { get; private set; }
 
         public float Timer { get; private set; }
 
         public bool IsActive => _completedConsoles.Count < 2;
 
+        public float NumComplete => _completedConsoles.Count;
+
+        public float PercentActive => Timer / 10f;
+
         public void Serialize(IMessageWriter writer, bool initialState)
         {
-            writer.Write(Countdown);
-            writer.Write(Timer);
-
             writer.WritePacked(_activeConsoles.Count);
             foreach (var activeConsole in _activeConsoles)
             {
-                writer.Write(activeConsole.PlayerId);
-                writer.Write(activeConsole.ConsoleId);
+                writer.Write(activeConsole.Item1);
+                writer.Write(activeConsole.Item2);
             }
 
             writer.WritePacked(_completedConsoles.Count);
@@ -42,20 +42,15 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
 
         public void Deserialize(IMessageReader reader, bool initialState)
         {
-            Countdown = reader.ReadSingle();
-            Timer = reader.ReadSingle();
             _activeConsoles.Clear();
-            _completedConsoles.Clear();
-
-            var activeCount = reader.ReadPackedUInt32();
-
+            var activeCount = reader.ReadPackedInt32();
             for (var i = 0; i < activeCount; i++)
             {
-                _activeConsoles.Add(new ActiveConsoleData(reader.ReadByte(), reader.ReadByte()));
+                _activeConsoles.Add(new Tuple<byte, byte>(reader.ReadByte(), reader.ReadByte()));
             }
 
-            var completedCount = reader.ReadPackedUInt32();
-
+            _completedConsoles.Clear();
+            var completedCount = reader.ReadPackedInt32();
             for (var i = 0; i < completedCount; i++)
             {
                 _completedConsoles.Add(reader.ReadByte());
@@ -76,15 +71,14 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             {
                 case 0x80:
                     Timer = -1f;
-                    Countdown = 90f;
                     _completedConsoles.Clear();
                     _activeConsoles.Clear();
                     break;
                 case 0x40 when playerControl != null:
-                    _activeConsoles.Add(new ActiveConsoleData(playerControl.PlayerId, consoleId));
+                    _activeConsoles.Add(new Tuple<byte, byte>(playerControl.PlayerId, consoleId));
                     break;
                 case 0x20 when playerControl != null:
-                    _activeConsoles.Remove(new ActiveConsoleData(playerControl.PlayerId, consoleId));
+                    _activeConsoles.Remove(new Tuple<byte, byte>(playerControl.PlayerId, consoleId));
                     break;
                 case 0x10:
                     Timer = 10f;
@@ -93,6 +87,14 @@ namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus
             }
         }
 
-        private readonly record struct ActiveConsoleData(byte PlayerId, byte ConsoleId);
+        internal bool IsConsoleActive(int consoleId)
+        {
+            return _activeConsoles.Any(x => x.Item2 == (byte)consoleId);
+        }
+
+        internal bool IsConsoleOkay(int consoleId)
+        {
+            return _completedConsoles.Contains((byte)consoleId);
+        }
     }
 }
