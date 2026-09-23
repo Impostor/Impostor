@@ -90,9 +90,10 @@ namespace Impostor.Server.Net.Inner.Objects
             throw new NotImplementedException();
         }
 
-        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState, MessageType messageType)
         {
-            if (!await ValidateHost(CheatContext.Deserialize, sender))
+            if (!await ValidateReliable(CheatContext.Deserialize, sender, messageType) ||
+                !await ValidateHost(CheatContext.Deserialize, sender))
             {
                 return;
             }
@@ -105,8 +106,13 @@ namespace Impostor.Server.Net.Inner.Objects
             PlayerId = reader.ReadByte();
         }
 
-        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader, MessageType messageType)
         {
+            if (call != RpcCalls.PlayAnimation && !await ValidateReliable(call, sender, messageType))
+            {
+                return false;
+            }
+
             switch (call)
             {
                 case RpcCalls.PlayAnimation:
@@ -585,7 +591,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
 
                 default:
-                    return await base.HandleRpcAsync(sender, target, call, reader);
+                    return await base.HandleRpcAsync(sender, target, call, reader, messageType);
             }
 
             return true;

@@ -37,18 +37,18 @@ namespace Impostor.Server.Net.Inner
 
         public abstract ValueTask<bool> SerializeAsync(IMessageWriter writer, bool initialState);
 
-        public abstract ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState);
+        public abstract ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState, MessageType messageType);
 
-        public virtual async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public virtual async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader, MessageType messageType)
         {
-            return await HandleCustomRpcAsync(sender, target, call, reader) ?? await UnregisteredCall(call, sender);
+            return await HandleCustomRpcAsync(sender, target, call, reader, messageType) ?? await UnregisteredCall(call, sender);
         }
 
-        protected async ValueTask<bool?> HandleCustomRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        protected async ValueTask<bool?> HandleCustomRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader, MessageType messageType)
         {
             if (_customMessageManager.TryGet((byte)call, out var customRpc))
             {
-                return await customRpc.HandleRpcAsync(this, sender, target, reader);
+                return await customRpc.HandleRpcAsync(this, sender, target, reader, messageType);
             }
 
             return null;

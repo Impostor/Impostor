@@ -54,9 +54,11 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
             throw new NotImplementedException();
         }
 
-        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState, MessageType messageType)
         {
-            if (!await ValidateHost(CheatContext.Deserialize, sender) || !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
+            if (!await ValidateReliable(CheatContext.Deserialize, sender, messageType) ||
+                !await ValidateHost(CheatContext.Deserialize, sender) ||
+                !await ValidateBroadcast(CheatContext.Deserialize, sender, target))
             {
                 return;
             }
@@ -72,8 +74,13 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
             }
         }
 
-        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader, MessageType messageType)
         {
+            if (!await ValidateReliable(call, sender, messageType))
+            {
+                return false;
+            }
+
             switch (call)
             {
                 case RpcCalls.CloseDoorsOfType:
@@ -101,7 +108,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
                 }
 
                 default:
-                    return await base.HandleRpcAsync(sender, target, call, reader);
+                    return await base.HandleRpcAsync(sender, target, call, reader, messageType);
             }
 
             return true;

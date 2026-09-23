@@ -29,9 +29,10 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             throw new NotImplementedException();
         }
 
-        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState, MessageType messageType)
         {
-            if (!await ValidateHost(CheatContext.Deserialize, sender))
+            if (!await ValidateReliable(CheatContext.Deserialize, sender, messageType) ||
+                !await ValidateHost(CheatContext.Deserialize, sender))
             {
                 return;
             }
@@ -62,8 +63,13 @@ namespace Impostor.Server.Net.Inner.Objects.Components
             }
         }
 
-        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
+        public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader, MessageType messageType)
         {
+            if (!await ValidateReliable(call, sender, messageType))
+            {
+                return false;
+            }
+
             if (call == RpcCalls.AddVote)
             {
                 Rpc26AddVote.Deserialize(reader, out var clientId, out var targetClientId);
@@ -79,7 +85,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 return true;
             }
 
-            return await base.HandleRpcAsync(sender, target, call, reader);
+            return await base.HandleRpcAsync(sender, target, call, reader, messageType);
         }
     }
 }

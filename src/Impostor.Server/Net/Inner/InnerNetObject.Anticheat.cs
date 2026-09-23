@@ -73,6 +73,19 @@ namespace Impostor.Server.Net.Inner
             return true;
         }
 
+        protected async ValueTask<bool> ValidateReliable(CheatContext context, IClientPlayer sender, MessageType messageType)
+        {
+            if (messageType != MessageType.Reliable)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.ProtocolExtension, "Client sent reliable-only game data using an unreliable message"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         protected async ValueTask<bool> ValidateImpostor(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, bool value = true)
         {
             if (playerInfo == null)
