@@ -5,6 +5,7 @@ using Impostor.Api;
 using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
@@ -38,6 +39,11 @@ namespace Impostor.Server.Net
         public override async ValueTask<bool> ReportCheatAsync(CheatContext context, CheatCategory category, string message)
         {
             if (!_antiCheatConfig.Enabled)
+            {
+                return false;
+            }
+
+            if (Player != null && Player.Game.ModGuid != null)
             {
                 return false;
             }
@@ -80,6 +86,7 @@ namespace Impostor.Server.Net
                     CheatingHostMode.Never => true,
                     _ => true,
                 },
+                CheatCategory.PacketSize => _antiCheatConfig.EnablePacketSizeChecks,
                 CheatCategory.Other => true,
                 _ => LogUnknownCategory(category),
             };
@@ -123,17 +130,35 @@ namespace Impostor.Server.Net
             switch (flag)
             {
                 case MessageFlags.HostGame:
+                case MessageFlags.HostModdedGame:
                 {
-                    // Read game settings.
-                    Message00HostGameC2S.Deserialize(reader, out var gameOptions, out _, out var gameFilterOptions);
+                    IGameOptions gameOptions;
+                    GameFilterOptions gameFilterOptions;
+                    Guid? modGuid = null;
+
+                    if (flag == MessageFlags.HostModdedGame)
+                    {
+                        Message25HostModdedGameC2S.Deserialize(reader, out gameOptions, out _, out gameFilterOptions, out var parsedModGuid);
+                        modGuid = parsedModGuid;
+                    }
+                    else
+                    {
+                        // Read game settings.
+                        Message00HostGameC2S.Deserialize(reader, out gameOptions, out _, out gameFilterOptions);
+                    }
 
                     // Create game.
-                    var game = await _gameManager.CreateAsync(this, gameOptions, gameFilterOptions);
+                    var game = await _gameManager.CreateAsync(this, gameOptions, gameFilterOptions, modGuid);
 
                     if (game == null)
                     {
                         await DisconnectAsync(DisconnectReason.GameNotFound);
                         return;
+                    }
+
+                    if (modGuid != null)
+                    {
+                        _logger.LogInformation("Client {Name} ({Id}) hosted a modded game with mod GUID {ModGuid}.", Name, Id, modGuid);
                     }
 
                     // Code in the packet below will be used in JoinGame.
@@ -267,10 +292,30 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.PackedGameDataTo:
                 {
+                    if (Player == null)
+                    {
+                        return;
+                    }
+
+                    var game = Player.Game;
+
+                    // Innersloth Special: this message uses PackedInt32 instead of a normal int32
+                    var code = reader.ReadPackedInt32();
+
+                    if (code != game.Code.Value)
+                    {
+                        _logger.LogWarning("gcm2 {0} {1}", code, game.Code.Value);
+                        return;
+                    }
+
                     // We're limiting this to hosts right now. If you have a use case for this for
                     // players to use this feature, we're open to changing this.
-                    if (!IsPacketAllowed(reader, true, flag))
+                    if (game.HostId != Id)
                     {
+                        await ReportCheatAsync(
+                            new CheatContext(MessageFlags.FlagToString(flag)),
+                            CheatCategory.MustBeHost,
+                            "Client sent a PackedGameDataTo message");
                         return;
                     }
 
@@ -292,7 +337,7 @@ namespace Impostor.Server.Net
                             return;
                         }
 
-                        if (packed.ReadInt32() != Player!.Game.Code)
+                        if (packed.ReadInt32() != game.Code.Value)
                         {
                             _logger.LogWarning("PackedGameDataTo contained GameDataTo for the wrong game.");
                             return;
@@ -445,7 +490,8 @@ namespace Impostor.Server.Net
             var game = Player.Game;
 
             // GameCode must match code of the current game assigned to the player.
-            if (message.ReadInt32() != game.Code)
+            var code = message.ReadInt32();
+            if (code != game.Code.Value)
             {
                 return false;
             }

@@ -1,0 +1,14 @@
+{
+  "KillCooldown": 0,
+  "PlayerSpeed": 1,
+  "EmergencyMeetingCount": 2,
+  "EmergencyMeetingCooldown": 3,
+  "DiscussionTime": 4,
+  "VotingTime": 5,
+  "CrewmateVision": 6,
+  "HidingTime": 7,
+  "MaxTimeInVent": 8,
+  "ImposterVision": 9,
+  "FinalHideTime": 10,
+  "FinalHideImposterSpeed": 11
+}

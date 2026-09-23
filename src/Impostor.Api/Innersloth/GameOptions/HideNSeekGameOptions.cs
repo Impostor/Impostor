@@ -2,7 +2,7 @@ namespace Impostor.Api.Innersloth.GameOptions;
 
 public class HideNSeekGameOptions : IGameOptions
 {
-    public const int LatestVersion = 10;
+    public const int LatestVersion = 11;
 
     public HideNSeekGameOptions(byte version = LatestVersion)
     {
@@ -107,6 +107,11 @@ public class HideNSeekGameOptions : IGameOptions
 
     public void Deserialize(IMessageReader reader)
     {
+        if (Version > LatestVersion)
+        {
+            IGameOptions.ThrowUnknownVersion<HideNSeekGameOptions>(Version);
+        }
+
         if (Version >= 8)
         {
             SpecialMode = (SpecialGameModes)reader.ReadByte();
@@ -141,11 +146,6 @@ public class HideNSeekGameOptions : IGameOptions
         if (Version >= 9)
         {
             Tag = (GameTags)reader.ReadByte();
-        }
-
-        if (Version > LatestVersion)
-        {
-            IGameOptions.ThrowUnknownVersion<HideNSeekGameOptions>(Version);
         }
     }
 

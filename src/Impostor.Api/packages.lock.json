@@ -4,9 +4,9 @@
     "net8.0": {
       "Impostor.Hazel.Abstractions": {
         "type": "Direct",
-        "requested": "[1.0.0, )",
-        "resolved": "1.0.0",
-        "contentHash": "x56AEsY5fKU2Z5O7ZrzEqKfr62kq/C05Aevcciwz5yMfOQlpwuFI1awgNGJsoe+bcx+XnFc3+l+eadtY72aZsg=="
+        "requested": "[1.0.1, )",
+        "resolved": "1.0.1",
+        "contentHash": "de2bMj78xDXOWwyqQVk8o4vbZKGfAgOjnWnkKB1IGGovNtxLeBF8jy3wH5moTZB6juTnLf0ptkCDkRi8c2OcjA=="
       },
       "Microsoft.AspNetCore.Http.Abstractions": {
         "type": "Direct",
@@ -39,6 +39,12 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0"
         }
+      },
+      "Microsoft.NET.ILLink.Tasks": {
+        "type": "Direct",
+        "requested": "[8.0.30, )",
+        "resolved": "8.0.30",
+        "contentHash": "SfmwuZjUPBTEoBMAsXZ/hWkaEK9oL+Y/UtAx7N6RyWHfcMt9J0ExrNPuOgTyPbCXIyiTBFsxFNrPLEZNPmJcvA=="
       },
       "StyleCop.Analyzers": {
         "type": "Direct",
@@ -117,6 +123,7 @@
         "resolved": "4.5.0",
         "contentHash": "Xg4G4Indi4dqP1iuAiMSwpiWS54ZghzR644OtsRCm/m/lBMG8dUBhLVN7hLm8NNrNTR+iGbshCPTwrvxZPlm4g=="
       }
-    }
+    },
+    "net8.0/win-x64": {}
   }
 }

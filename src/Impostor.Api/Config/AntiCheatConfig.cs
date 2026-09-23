@@ -29,5 +29,9 @@ namespace Impostor.Api.Config
         public bool EnableTargetChecks { get; set; } = true;
 
         public bool ForbidProtocolExtensions { get; set; } = true;
+
+        public bool EnablePacketSizeChecks { get; set; } = true;
+
+        public int PacketSizeLimit { get; set; } = 1203;
     }
 }

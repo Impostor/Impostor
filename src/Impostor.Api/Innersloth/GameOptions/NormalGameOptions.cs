@@ -4,7 +4,7 @@ namespace Impostor.Api.Innersloth.GameOptions;
 
 public class NormalGameOptions : IGameOptions
 {
-    public const int LatestVersion = 10;
+    public const int LatestVersion = 11;
 
     public NormalGameOptions(byte version = LatestVersion)
     {
@@ -144,6 +144,11 @@ public class NormalGameOptions : IGameOptions
 
     public void Deserialize(IMessageReader reader)
     {
+        if (Version > LatestVersion)
+        {
+            IGameOptions.ThrowUnknownVersion<NormalGameOptions>(Version);
+        }
+
         if (Version >= 8)
         {
             SpecialMode = (SpecialGameModes)reader.ReadByte();
@@ -184,11 +189,6 @@ public class NormalGameOptions : IGameOptions
         }
 
         RoleOptions.Deserialize(reader);
-
-        if (Version > LatestVersion)
-        {
-            IGameOptions.ThrowUnknownVersion<NormalGameOptions>(Version);
-        }
     }
 
     public void Serialize(IMessageWriter writer)

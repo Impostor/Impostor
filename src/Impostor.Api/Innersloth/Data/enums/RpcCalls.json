@@ -59,5 +59,6 @@
   "CheckVanish": 62,
   "StartVanish": 63,
   "CheckAppear": 64,
-  "StartAppear": 65
+  "StartAppear": 65,
+  "QueueOverruleVotes": 66
 }

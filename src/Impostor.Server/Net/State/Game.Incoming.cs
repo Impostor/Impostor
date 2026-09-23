@@ -210,18 +210,18 @@ namespace Impostor.Server.Net.State
                 return GameJoinResult.FromError(GameJoinError.InvalidLimbo);
             }
 
-            if (GameState == GameStates.Ended)
-            {
-                await HandleJoinGameNext(player, isNew);
-                return GameJoinResult.CreateSuccess(player);
-            }
-
             var @event = new GamePlayerJoiningEvent(this, player);
             await _eventManager.CallAsync(@event);
 
             if (@event.JoinResult != null && !@event.JoinResult.Value.IsSuccess)
             {
                 return @event.JoinResult.Value;
+            }
+
+            if (GameState == GameStates.Ended)
+            {
+                await HandleJoinGameNext(player, isNew);
+                return GameJoinResult.CreateSuccess(player);
             }
 
             await HandleJoinGameNew(player, isNew);
