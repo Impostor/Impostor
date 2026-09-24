@@ -43,5 +43,21 @@ namespace Impostor.Api.Net.Inner.Objects
         DateTimeOffset LastMurder { get; }
 
         uint PlayerLevel { get; }
+
+        /// <summary>
+        ///     Gets the friendcode of the player, as resolved by the matchmaker.
+        /// </summary>
+        /// <remarks>
+        ///     Null when the matchmaker did not supply a friendcode.
+        /// </remarks>
+        string? FriendCode { get; }
+
+        /// <summary>
+        ///     Gets the platform user id of the player, as resolved by the matchmaker.
+        /// </summary>
+        /// <remarks>
+        ///     Null when the matchmaker did not supply a puid.
+        /// </remarks>
+        string? Puid { get; }
     }
 }

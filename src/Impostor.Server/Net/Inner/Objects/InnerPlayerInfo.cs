@@ -59,6 +59,12 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public DeathReason LastDeathReason { get; internal set; }
 
+        /// <inheritdoc />
+        public string? FriendCode => Game.GetClientPlayer(ClientId)?.FriendCode;
+
+        /// <inheritdoc />
+        public string? Puid => Game.GetClientPlayer(ClientId)?.Puid;
+
         public List<TaskInfo> Tasks { get; internal set; } = new List<TaskInfo>(0);
 
         public DateTimeOffset LastMurder { get; set; }
@@ -128,8 +134,9 @@ namespace Impostor.Server.Net.Inner.Objects
                 Tasks[i].Serialize(writer);
             }
 
-            writer.Write(string.Empty); // FriendCode
-            writer.Write(string.Empty); // PUID
+            // Resolved by the matchmaker and pushed onto the player by a plugin
+            writer.Write(FriendCode ?? string.Empty);
+            writer.Write(Puid ?? string.Empty);
             return new ValueTask<bool>(true);
         }
 
