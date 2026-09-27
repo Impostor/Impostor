@@ -45,18 +45,18 @@ namespace Impostor.Api.Net.Inner.Objects
         uint PlayerLevel { get; }
 
         /// <summary>
-        ///     Gets the friendcode of the player, as set by a plugin.
+        ///     Gets the friendcode of the player.
         /// </summary>
         /// <remarks>
-        ///     Null when plugin did not supply a friendcode.
+        ///     Impostor's HTTP server does not resolve friendcodes, so this value will remain null unless a plugin has written a value on the player's client.
         /// </remarks>
         string? FriendCode { get; }
 
         /// <summary>
-        ///     Gets the platform user id of the player, as set by a plugin.
+        ///     Gets the puid of the player.
         /// </summary>
         /// <remarks>
-        ///     Null when plugin did not supply a puid.
+        ///     Impostor's HTTP server does not resolve puids, so this value will remain null unless a plugin has written a value on the player's client.
         /// </remarks>
         string? Puid { get; }
     }

@@ -61,18 +61,18 @@ namespace Impostor.Api.Net
         IDictionary<object, object> Items { get; }
 
         /// <summary>
-        ///     Gets or sets the friendcode of the player, as set by a plugin.
+        ///     Gets or sets the friendcode of the player.
         /// </summary>
         /// <remarks>
-        ///     Null when plugin did not supply a friendcode.
+        ///     Impostor's HTTP server does not resolve friendcodes, so this value will remain null unless a plugin has written a value in this field.
         /// </remarks>
         string? FriendCode { get; set; }
 
         /// <summary>
-        ///     Gets or sets the platform user id of the player, as set by a plugin.
+        ///     Gets or sets the puid of the player.
         /// </summary>
         /// <remarks>
-        ///     Null when plugin did not supply a puid.
+        ///     Impostor's HTTP server does not resolve puids, so this value will remain null unless a plugin has written a value in this field.
         /// </remarks>
         string? Puid { get; set; }
 
