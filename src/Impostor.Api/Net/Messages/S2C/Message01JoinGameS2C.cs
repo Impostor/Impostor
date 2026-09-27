@@ -19,8 +19,6 @@ namespace Impostor.Api.Net.Messages.S2C
             writer.Write(player.Client.Name);
             player.Client.PlatformSpecificData.Serialize(writer);
             writer.WritePacked(player.Character?.PlayerInfo?.PlayerLevel ?? 1);
-
-            // Resolved by the matchmaker
             writer.Write(player.Client.FriendCode ?? string.Empty);
             writer.Write(player.Client.Puid ?? string.Empty);
             writer.EndMessage();

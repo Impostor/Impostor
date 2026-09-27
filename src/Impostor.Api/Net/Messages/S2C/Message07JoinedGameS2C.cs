@@ -23,8 +23,6 @@ namespace Impostor.Api.Net.Messages.S2C
                 writer.Write(ply.Client.Name);
                 ply.Client.PlatformSpecificData.Serialize(writer);
                 writer.WritePacked(ply.Character?.PlayerInfo?.PlayerLevel ?? 1);
-
-                // Resolved by the matchmaker
                 writer.Write(ply.Client.FriendCode ?? string.Empty);
                 writer.Write(ply.Client.Puid ?? string.Empty);
             }

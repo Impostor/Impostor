@@ -59,10 +59,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public DeathReason LastDeathReason { get; internal set; }
 
-        /// <inheritdoc />
         public string? FriendCode => Game.GetClientPlayer(ClientId)?.Client.FriendCode;
 
-        /// <inheritdoc />
         public string? Puid => Game.GetClientPlayer(ClientId)?.Client.Puid;
 
         public List<TaskInfo> Tasks { get; internal set; } = new List<TaskInfo>(0);
