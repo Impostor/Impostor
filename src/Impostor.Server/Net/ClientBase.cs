@@ -40,6 +40,10 @@ namespace Impostor.Server.Net
 
         public ClientPlayer? Player { get; set; }
 
+        public string? FriendCode { get; set; }
+
+        public string? Puid { get; set; }
+
         public ColorType? PreviousColor { get; set; } = null;
 
         IClientPlayer? IClient.Player => Player;

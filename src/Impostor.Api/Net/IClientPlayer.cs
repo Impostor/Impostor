@@ -25,22 +25,6 @@ namespace Impostor.Api.Net
         /// </summary>
         LimboStates Limbo { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the friendcode of the player, as resolved by the matchmaker.
-        /// </summary>
-        /// <remarks>
-        ///     Null when the matchmaker did not supply a friendcode.
-        /// </remarks>
-        string? FriendCode { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the platform user id of the player, as resolved by the matchmaker.
-        /// </summary>
-        /// <remarks>
-        ///     Null when the matchmaker did not supply a puid.
-        /// </remarks>
-        string? Puid { get; set; }
-
         IInnerPlayerControl? Character { get; }
 
         public bool IsHost { get; }
