@@ -20,9 +20,9 @@ namespace Impostor.Api.Net.Messages.S2C
             player.Client.PlatformSpecificData.Serialize(writer);
             writer.WritePacked(player.Character?.PlayerInfo?.PlayerLevel ?? 1);
 
-            // ProductUserId and FriendCode are not yet known, so set them to an empty string
-            writer.Write(string.Empty);
-            writer.Write(string.Empty);
+            // Resolved by the matchmaker
+            writer.Write(player.Client.FriendCode ?? string.Empty);
+            writer.Write(player.Client.Puid ?? string.Empty);
             writer.EndMessage();
         }
 
