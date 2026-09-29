@@ -13248,6 +13248,19 @@
   },
   {
     "type": "Visor",
+    "name": "visor_impostorShine",
+    "free": false,
+    "storeName": "",
+    "beanCost": 0,
+    "starCost": 0,
+    "bundleId": "",
+    "chipOffset": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  {
+    "type": "Visor",
     "name": "visor_cosmic_alien",
     "free": false,
     "storeName": "",

@@ -27,5 +27,6 @@
   "NoisemakerAlertDuration": 1600,
   "ViperDissolveTime": 1601,
   "DetectiveSuspectLimit": 1602,
-  "JudgeTaskRequirementPercentage": 1620
+  "JudgeTaskRequirementPercentage": 1620,
+  "SpiritGuideCooldownSeconds": 1640
 }
