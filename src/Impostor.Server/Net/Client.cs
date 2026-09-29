@@ -87,6 +87,7 @@ namespace Impostor.Server.Net
                     _ => true,
                 },
                 CheatCategory.PacketSize => _antiCheatConfig.EnablePacketSizeChecks,
+                CheatCategory.ItemLimits => _antiCheatConfig.EnableItemLimitChecks,
                 CheatCategory.Other => true,
                 _ => LogUnknownCategory(category),
             };

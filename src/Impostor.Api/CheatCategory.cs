@@ -35,6 +35,9 @@ public enum CheatCategory
     /// <summary>A packet was sent that exceeded the maximum allowed RPC size.</summary>
     PacketSize,
 
+    /// <summary>A packet was sent with more items than possible in the game.</summary>
+    ItemLimits,
+
     /// <summary>Legacy category for unsorted anticheat checks.</summary>
     Other,
 }
