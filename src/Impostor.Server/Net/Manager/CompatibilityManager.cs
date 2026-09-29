@@ -50,6 +50,10 @@ internal class CompatibilityManager : ICompatibilityManager
             new GameVersion(2026, 7, 15), // 18.0   (2026-08-18, build 7238, pc only)
             new GameVersion(2026, 7, 16), // 18.0   (2026-08-18, build 7238, mobile only)
         },
+        new[]
+        {
+            new GameVersion(2026, 7, 20), // 2026.9.29 (build 7489, Steam)
+        },
     };
 
     private readonly List<CompatibilityGroup> _compatibilityGroups = new();

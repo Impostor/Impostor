@@ -30,6 +30,20 @@ public sealed class CompatibilityManagerTests
 
     private readonly CompatibilityManager _compatibilityManager = new(NullLogger<CompatibilityManager>.Instance, DefaultSupportedVersions);
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(25)]
+    public void September2026BuildIsSupportedWithoutMixingWithAugust(int revision)
+    {
+        var manager = new CompatibilityManager(NullLogger<CompatibilityManager>.Instance);
+        var version = new GameVersion(2026, 7, 20, revision);
+
+        Assert.Equal(VersionCompareResult.Compatible, manager.CanConnectToServer(version));
+        Assert.Equal(GameJoinError.None, manager.CanJoinGame(new GameVersion(2026, 7, 20), version));
+        Assert.Equal(GameJoinError.ClientOutdated, manager.CanJoinGame(version, new GameVersion(2026, 7, 15)));
+        Assert.Equal(GameJoinError.ClientTooNew, manager.CanJoinGame(new GameVersion(2026, 7, 16), version));
+    }
+
     public static IEnumerable<object[]> CanConnectToServerData =>
         new List<object[]>
         {

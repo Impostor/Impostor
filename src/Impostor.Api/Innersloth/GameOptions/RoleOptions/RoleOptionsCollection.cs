@@ -17,12 +17,13 @@ public class RoleOptionsCollection
     public void Deserialize(IMessageReader reader)
     {
         var count = reader.ReadPackedInt32();
+        Roles.Clear();
         Roles.EnsureCapacity(count);
         for (var i = 0; i < count; i++)
         {
             var roleType = (RoleTypes)reader.ReadInt16();
             var roleRate = RoleRate.Deserialize(reader);
-            var roleOptionsReader = reader.ReadMessage();
+            using var roleOptionsReader = reader.ReadMessage();
             IRoleOptions roleOptions = roleType switch
             {
                 RoleTypes.Scientist => ScientistRoleOptions.Deserialize(roleOptionsReader, Version),
@@ -35,6 +36,7 @@ public class RoleOptionsCollection
                 RoleTypes.Detective => DetectiveRoleOptions.Deserialize(roleOptionsReader, Version),
                 RoleTypes.Viper => ViperRoleOptions.Deserialize(roleOptionsReader, Version),
                 RoleTypes.Judge => JudgeRoleOptions.Deserialize(roleOptionsReader, Version),
+                RoleTypes.SpiritGuide => SpiritGuideRoleOptions.Deserialize(roleOptionsReader, Version),
                 _ => throw new ArgumentOutOfRangeException(nameof(roleType), roleType, null),
             };
 

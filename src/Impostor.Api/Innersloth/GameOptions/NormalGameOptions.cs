@@ -4,7 +4,7 @@ namespace Impostor.Api.Innersloth.GameOptions;
 
 public class NormalGameOptions : IGameOptions
 {
-    public const int LatestVersion = 11;
+    public const int LatestVersion = 12;
 
     public NormalGameOptions(byte version = LatestVersion)
     {

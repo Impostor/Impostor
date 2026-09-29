@@ -100,6 +100,19 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
                     break;
                 }
 
+                case RpcCalls.SpiritGuideMessage:
+                {
+                    // This is sent on ShipStatus directly to the recipient, not to the host.
+                    if (!await ValidateTarget(call, sender, target) ||
+                        !await ValidateRole(call, sender, sender.Character?.PlayerInfo, RoleTypes.SpiritGuide))
+                    {
+                        return false;
+                    }
+
+                    Rpc67SpiritGuideMessage.Deserialize(reader, out _);
+                    break;
+                }
+
                 default:
                     return await base.HandleRpcAsync(sender, target, call, reader);
             }
