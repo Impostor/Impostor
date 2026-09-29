@@ -109,6 +109,18 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
                     }
 
                     Rpc67SpiritGuideMessage.Deserialize(reader, out var images);
+
+                    if (images.Length == 0 || images.Length > 3)
+                    {
+                        if (await sender.Client.ReportCheatAsync(
+                            RpcCalls.SpiritGuideMessage,
+                            CheatCategory.ItemLimits,
+                            $"Client sent {images.Length} images (allowed: 1, 2 or 3)"))
+                        {
+                            return false;
+                        }
+                    }
+
                     break;
                 }
 

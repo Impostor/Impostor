@@ -17,7 +17,7 @@ public class SpiritGuideRoleOptions : IRoleOptions
     {
         var options = new SpiritGuideRoleOptions(version);
 
-        options.SpiritGuideCooldownSeconds = (int)reader.ReadByte();
+        options.SpiritGuideCooldownSeconds = reader.ReadByte();
 
         return options;
     }
