@@ -79,7 +79,7 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
                 case RpcCalls.CloseDoorsOfType:
                 {
                     if (!await ValidateCmd(call, sender, target) ||
-                        !await ValidateImpostor(call, sender, sender.Character!.PlayerInfo))
+                        !await ValidateImpostor(call, sender, sender.Character?.PlayerInfo))
                     {
                         return false;
                     }
@@ -97,6 +97,18 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 
                     // TODO: properly deserialize this RPC
                     // Rpc35UpdateSystem.Deserialize(reader, Game, out var systemType, out var playerControl, out var sequenceId, out var state, out var ventId);
+                    break;
+                }
+
+                case RpcCalls.SpiritGuideMessage:
+                {
+                    if (!await ValidateTarget(call, sender, target) ||
+                        !await ValidateRole(call, sender, sender.Character?.PlayerInfo, RoleTypes.SpiritGuide))
+                    {
+                        return false;
+                    }
+
+                    Rpc67SpiritGuideMessage.Deserialize(reader, out var images);
                     break;
                 }
 

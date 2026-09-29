@@ -60,5 +60,6 @@
   "StartVanish": 63,
   "CheckAppear": 64,
   "StartAppear": 65,
-  "QueueOverruleVotes": 66
+  "QueueOverruleVotes": 66,
+  "SpiritGuideMessage": 67
 }
