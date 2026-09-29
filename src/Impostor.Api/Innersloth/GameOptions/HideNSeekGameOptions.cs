@@ -2,7 +2,7 @@ namespace Impostor.Api.Innersloth.GameOptions;
 
 public class HideNSeekGameOptions : IGameOptions
 {
-    public const int LatestVersion = 11;
+    public const int LatestVersion = 12;
 
     public HideNSeekGameOptions(byte version = LatestVersion)
     {
