@@ -392,7 +392,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
                     else
                     {
-                        if (role is RoleTypes.ImpostorGhost or RoleTypes.CrewmateGhost or RoleTypes.GuardianAngel)
+                        if (role is RoleTypes.ImpostorGhost or RoleTypes.CrewmateGhost or RoleTypes.GuardianAngel or RoleTypes.SpiritGuide)
                         {
                             PlayerInfo.RoleWhenAlive = PlayerInfo.RoleType;
                             PlayerInfo.IsDead = true;
