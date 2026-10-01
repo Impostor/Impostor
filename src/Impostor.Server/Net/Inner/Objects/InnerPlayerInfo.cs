@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
@@ -51,11 +52,31 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public bool Disconnected { get; internal set; }
 
-        public bool IsImpostor => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.ImpostorGhost or RoleTypes.Phantom or RoleTypes.Viper;
+        public bool IsGhost => RoleType is { } role && role.IsGhostRole();
 
-        public bool CanVent => RoleType is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper or RoleTypes.Engineer;
+        public bool IsImpostor => RoleType is { } role && role.IsImpostorRole();
+
+        public bool CanVent => RoleType is { } role && role.CanVent();
+
+        public bool CanDoTasks => RoleType is { } role && role.CanDoTasks();
+
+        public bool CanKill => RoleType is { } role && role.CanKill();
+
+        public bool CanSabotage => RoleType is { } role && role.CanSabotage();
+
+        public bool CanShapeshift => RoleType is { } role && role.CanShapeshift();
+
+        public bool CanVanish => RoleType is { } role && role.CanVanish();
+
+        public bool CanProtect => RoleType is { } role && role.CanProtect();
+
+        public bool CanOverrule => RoleType is { } role && role.CanOverrule();
+
+        public bool CanSendPhoto => RoleType is { } role && role.CanSendPhoto();
 
         public bool IsDead { get; internal set; }
+
+        public bool IsAlive => !IsDead;
 
         public DeathReason LastDeathReason { get; internal set; }
 

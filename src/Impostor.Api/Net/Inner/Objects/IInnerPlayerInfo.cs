@@ -27,6 +27,11 @@ namespace Impostor.Api.Net.Inner.Objects
         /// </summary>
         bool IsDead { get; }
 
+        /// <summary>
+        ///     Gets a value indicating whether the player is alive in the current game.
+        /// </summary>
+        bool IsAlive { get; }
+
         Dictionary<PlayerOutfitType, PlayerOutfit> Outfits { get; }
 
         PlayerOutfitType CurrentOutfitType { get; set; }

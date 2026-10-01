@@ -261,7 +261,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
         private async ValueTask<bool> HandleQueueOverruleVotesAsync(ClientPlayer sender, ClientPlayer? target, byte judgePlayerId, byte targetPlayerId, ushort overruleNonce)
         {
-            if (!await ValidateRole(RpcCalls.QueueOverruleVotes, sender, sender.Character?.PlayerInfo, RoleTypes.Judge) ||
+            if (!await ValidateCanOverrule(RpcCalls.QueueOverruleVotes, sender, sender.Character?.PlayerInfo) ||
                 !await ValidateTarget(RpcCalls.QueueOverruleVotes, sender, target) ||
                 !await ValidateHost(RpcCalls.QueueOverruleVotes, target!))
             {

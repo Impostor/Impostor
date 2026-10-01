@@ -392,7 +392,7 @@ namespace Impostor.Server.Net.Inner.Objects
                     }
                     else
                     {
-                        if (role is RoleTypes.ImpostorGhost or RoleTypes.CrewmateGhost or RoleTypes.GuardianAngel or RoleTypes.SpiritGuide)
+                        if (role.IsGhostRole())
                         {
                             PlayerInfo.RoleWhenAlive = PlayerInfo.RoleType;
                             PlayerInfo.IsDead = true;
@@ -424,7 +424,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 case RpcCalls.Shapeshift:
                 {
                     if (!await ValidateHost(call, sender) ||
-                        !await ValidateRole(call, sender, PlayerInfo, RoleTypes.Shapeshifter) ||
+                        !await ValidateCanShapeshift(call, sender, PlayerInfo) ||
                         !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
@@ -438,7 +438,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 case RpcCalls.CheckMurder:
                 {
                     if (!await ValidateOwnership(call, sender) ||
-                        !await ValidateImpostor(call, sender, PlayerInfo) ||
+                        !await ValidateCanKill(call, sender, PlayerInfo) ||
                         !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
@@ -451,7 +451,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 case RpcCalls.CheckProtect:
                 {
                     if (!await ValidateOwnership(call, sender) ||
-                        !await ValidateRole(call, sender, PlayerInfo, RoleTypes.GuardianAngel) ||
+                        !await ValidateCanProtect(call, sender, PlayerInfo) ||
                         !await ValidateBroadcast(call, sender, target))
                     {
                         return false;
@@ -513,7 +513,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 case RpcCalls.CheckShapeshift:
                 {
                     if (!await ValidateOwnership(call, sender) ||
-                        !await ValidateRole(call, sender, PlayerInfo, RoleTypes.Shapeshifter) ||
+                        !await ValidateCanShapeshift(call, sender, PlayerInfo) ||
                         !await ValidateCmd(call, sender, target))
                     {
                         return false;
@@ -537,7 +537,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 case RpcCalls.CheckVanish:
                 {
                     if (!await ValidateOwnership(call, sender) ||
-                        !await ValidateRole(call, sender, PlayerInfo, RoleTypes.Phantom) ||
+                        !await ValidateCanVanish(call, sender, PlayerInfo) ||
                         !await ValidateCmd(call, sender, target))
                     {
                         return false;
@@ -562,7 +562,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 case RpcCalls.CheckAppear:
                 {
                     if (!await ValidateOwnership(call, sender) ||
-                        !await ValidateRole(call, sender, PlayerInfo, RoleTypes.Phantom) ||
+                        !await ValidateCanVanish(call, sender, PlayerInfo) ||
                         !await ValidateCmd(call, sender, target))
                     {
                         return false;
@@ -1133,7 +1133,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 }
             }
 
-            if (target != null && target.PlayerInfo != null && !target.PlayerInfo.IsDead)
+            if (target?.PlayerInfo?.IsAlive == true)
             {
                 // In host authoritive mode every client has to figure out if the kill was prevented by guardian protection on it's own
                 if ((result & MurderResultFlags.Succeeded) != 0 && target.IsProtected)
@@ -1170,7 +1170,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 return true;
             }
 
-            if (!await ValidateRole(RpcCalls.ProtectPlayer, sender, PlayerInfo, RoleTypes.GuardianAngel))
+            if (!await ValidateCanProtect(RpcCalls.ProtectPlayer, sender, PlayerInfo))
             {
                 return false;
             }

@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
@@ -113,18 +114,158 @@ namespace Impostor.Server.Net.Inner
             return true;
         }
 
-        protected async ValueTask<bool> ValidateRole(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, RoleTypes role)
+        protected async ValueTask<bool> ValidateCanDoTask(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, bool value = true)
         {
             if (playerInfo == null)
             {
-                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check role, playerInfo not set"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check if can do tasks, playerInfo not set"))
                 {
                     return false;
                 }
             }
-            else if (playerInfo.RoleType != role)
+            else if (playerInfo.CanDoTasks != value)
             {
-                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, $"Failed role = {role} check"))
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed can do tasks check"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        protected async ValueTask<bool> ValidateCanKill(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, bool value = true)
+        {
+            if (playerInfo == null)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check if can kill, playerInfo not set"))
+                {
+                    return false;
+                }
+            }
+            else if (playerInfo.CanKill != value)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed can kill check"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        protected async ValueTask<bool> ValidateCanSabotage(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, bool value = true)
+        {
+            if (playerInfo == null)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check if can sabotage, playerInfo not set"))
+                {
+                    return false;
+                }
+            }
+            else if (playerInfo.CanSabotage != value)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed can sabotage check"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        protected async ValueTask<bool> ValidateCanShapeshift(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, bool value = true)
+        {
+            if (playerInfo == null)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check if can shapeshift, playerInfo not set"))
+                {
+                    return false;
+                }
+            }
+            else if (playerInfo.CanShapeshift != value)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed can shapeshift check"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        protected async ValueTask<bool> ValidateCanVanish(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, bool value = true)
+        {
+            if (playerInfo == null)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check if can vanish, playerInfo not set"))
+                {
+                    return false;
+                }
+            }
+            else if (playerInfo.CanVanish != value)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed can vanish check"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        protected async ValueTask<bool> ValidateCanProtect(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, bool value = true)
+        {
+            if (playerInfo == null)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check if can protect, playerInfo not set"))
+                {
+                    return false;
+                }
+            }
+            else if (playerInfo.CanProtect != value)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed can protect check"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        protected async ValueTask<bool> ValidateCanOverrule(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, bool value = true)
+        {
+            if (playerInfo == null)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check if can overrule, playerInfo not set"))
+                {
+                    return false;
+                }
+            }
+            else if (playerInfo.CanOverrule != value)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed can overrule check"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        protected async ValueTask<bool> ValidateCanSendPhoto(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, bool value = true)
+        {
+            if (playerInfo == null)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check if can send photo, playerInfo not set"))
+                {
+                    return false;
+                }
+            }
+            else if (playerInfo.CanSendPhoto != value)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed can send photo check"))
                 {
                     return false;
                 }
