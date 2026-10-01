@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
@@ -106,6 +105,26 @@ namespace Impostor.Server.Net.Inner
             else if (playerInfo.CanVent != value)
             {
                 if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, "Failed can vent check"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        protected async ValueTask<bool> ValidateRole(CheatContext context, IClientPlayer sender, InnerPlayerInfo? playerInfo, RoleTypes role)
+        {
+            if (playerInfo == null)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.InvalidObject, "Couldn't check role, playerInfo not set"))
+                {
+                    return false;
+                }
+            }
+            else if (playerInfo.RoleType != role)
+            {
+                if (await sender.Client.ReportCheatAsync(context, CheatCategory.Role, $"Failed role = {role} check"))
                 {
                     return false;
                 }
