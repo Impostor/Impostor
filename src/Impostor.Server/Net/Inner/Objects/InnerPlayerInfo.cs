@@ -184,7 +184,25 @@ namespace Impostor.Server.Net.Inner.Objects
             var friendCode = reader.ReadString();
             var puid = reader.ReadString();
 
-            await ValidateIdentifiersAsync(CheatContext.Deserialize, sender, ClientId, friendCode, puid);
+            await ValidateIdentifiersAsync(sender, friendCode, puid);
+        }
+
+        private async ValueTask ValidateIdentifiersAsync(IClientPlayer sender, string? friendCode, string? puid)
+        {
+            if (Game.GetClientPlayer(ClientId) is not { } owner)
+            {
+                return;
+            }
+
+            var mismatch = (!string.IsNullOrEmpty(friendCode) && owner.Client.FriendCode != null && owner.Client.FriendCode != friendCode)
+                || (!string.IsNullOrEmpty(puid) && owner.Client.Puid != null && owner.Client.Puid != puid);
+
+            if (!mismatch)
+            {
+                return;
+            }
+
+            await sender.Client.ReportCheatAsync(CheatContext.Deserialize, CheatCategory.Identifiers, $"Claimed identifiers for player {ClientId} do not match the values known for that player");
         }
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)

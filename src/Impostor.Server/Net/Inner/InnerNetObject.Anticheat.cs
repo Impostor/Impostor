@@ -133,26 +133,6 @@ namespace Impostor.Server.Net.Inner
             return true;
         }
 
-        protected async ValueTask<bool> ValidateIdentifiersAsync(CheatContext context, IClientPlayer sender, int clientid, string? friendCode, string? puid)
-        {
-            if (Game.GetClientPlayer(clientid) is not { } owner)
-            {
-                return false;
-            }
-
-            var mismatch = (!string.IsNullOrEmpty(friendCode) && owner.Client.FriendCode != null && owner.Client.FriendCode != friendCode)
-                || (!string.IsNullOrEmpty(puid) && owner.Client.Puid != null && owner.Client.Puid != puid);
-
-            if (!mismatch)
-            {
-                return false;
-            }
-
-            await sender.Client.ReportCheatAsync(context, CheatCategory.Identifiers, $"Claimed identifiers for player {clientid} do not match the values known for that player");
-
-            return true;
-        }
-
         protected async ValueTask<bool> UnregisteredCall(CheatContext context, IClientPlayer sender)
         {
             if (await sender.Client.ReportCheatAsync(context, CheatCategory.ProtocolExtension, "Client sent unregistered call"))
