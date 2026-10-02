@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,7 @@ using Impostor.Api.Net.Inner;
 using Impostor.Api.Unity;
 using Impostor.Server.Events.Meeting;
 using Impostor.Server.Events.Player;
+using Impostor.Server.Net.Anticheat;
 using Impostor.Server.Net.Inner;
 using Impostor.Server.Net.Inner.Objects;
 using Impostor.Server.Net.Inner.Objects.Components;
@@ -120,6 +121,11 @@ namespace Impostor.Server.Net.State
                         var netId = reader.ReadPackedUInt32();
                         if (_allObjects.TryGetValue(netId, out var obj))
                         {
+                            if (!await InnerNetObject.ValidateRpcRate(this, new CheatContext(nameof(GameDataTag.RpcFlag)), sender, obj, toPlayer))
+                            {
+                                return false;
+                            }
+
                             if (!await obj.HandleRpcAsync(sender, target, (RpcCalls)reader.ReadByte(), reader))
                             {
                                 parent.RemoveMessage(reader);
@@ -368,6 +374,7 @@ namespace Impostor.Server.Net.State
                 case InnerShipStatus shipStatus:
                 {
                     GameNet.ShipStatus = shipStatus;
+                    AntiCheat.NoteRoundStarted();
                     break;
                 }
 
@@ -398,11 +405,14 @@ namespace Impostor.Server.Net.State
                         await _eventManager.CallAsync(new PlayerSpawnedEvent(this, player, control));
                     }
 
+                    AntiCheat.For(control.PlayerId).SpawnedAt = AntiCheatState.Now;
                     break;
                 }
 
                 case InnerMeetingHud meetingHud:
                 {
+                    AntiCheat.NoteMeetingOpened();
+
                     foreach (var player in _players.Values)
                     {
                         if (GameNet.ShipStatus != null)
@@ -438,6 +448,13 @@ namespace Impostor.Server.Net.State
                 case InnerShipStatus:
                 {
                     GameNet.ShipStatus = null;
+                    AntiCheat.NoteRoundEnded();
+                    break;
+                }
+
+                case InnerMeetingHud:
+                {
+                    AntiCheat.NoteMeetingClosed();
                     break;
                 }
 

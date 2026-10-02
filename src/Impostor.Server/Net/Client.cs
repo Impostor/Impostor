@@ -88,6 +88,11 @@ namespace Impostor.Server.Net
                 },
                 CheatCategory.PacketSize => _antiCheatConfig.EnablePacketSizeChecks,
                 CheatCategory.ItemLimits => _antiCheatConfig.EnableItemLimitChecks,
+                CheatCategory.Murder => _antiCheatConfig.EnableMurderChecks,
+                CheatCategory.Sabotage => _antiCheatConfig.EnableSabotageChecks,
+                CheatCategory.Meeting => _antiCheatConfig.EnableMeetingChecks,
+                CheatCategory.Voting => _antiCheatConfig.EnableVotingChecks,
+                CheatCategory.RateLimit => _antiCheatConfig.EnableRateLimits,
                 CheatCategory.Other => true,
                 _ => LogUnknownCategory(category),
             };

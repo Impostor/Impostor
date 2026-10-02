@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -124,7 +124,8 @@ namespace Impostor.Server.Net.Inner.Objects
                 case RpcCalls.CompleteTask:
                 {
                     if (!await ValidateOwnership(call, sender) ||
-                        !await ValidateBroadcast(call, sender, target))
+                        !await ValidateBroadcast(call, sender, target) ||
+                        !await ValidateTaskCompletion(call, sender, PlayerId))
                     {
                         return false;
                     }
@@ -255,7 +256,8 @@ namespace Impostor.Server.Net.Inner.Objects
                 case RpcCalls.ReportDeadBody:
                 {
                     if (!await ValidateOwnership(call, sender) ||
-                        !await ValidateBroadcast(call, sender, target))
+                        !await ValidateBroadcast(call, sender, target) ||
+                        !await ValidateMeetingTiming(call, sender))
                     {
                         return false;
                     }
@@ -291,7 +293,8 @@ namespace Impostor.Server.Net.Inner.Objects
                 case RpcCalls.StartMeeting:
                 {
                     if (!await ValidateHost(call, sender) ||
-                        !await ValidateBroadcast(call, sender, target))
+                        !await ValidateBroadcast(call, sender, target) ||
+                        !await ValidateMeetingTiming(call, sender))
                     {
                         return false;
                     }
@@ -1063,6 +1066,11 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 PlayerInfo.LastMurder = _dateTimeProvider.UtcNow - TimeSpan.FromMilliseconds(sender.Client.Connection.AveragePing);
                 IsMurdering = target;
+            }
+
+            if (!await ValidateMurder(RpcCalls.CheckMurder, sender, PlayerId, target))
+            {
+                return false;
             }
 
             // Check if host authority mode is on

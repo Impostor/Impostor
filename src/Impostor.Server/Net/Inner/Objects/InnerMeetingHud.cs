@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -146,7 +146,8 @@ namespace Impostor.Server.Net.Inner.Objects
 
                 case RpcCalls.VotingComplete:
                 {
-                    if (!await ValidateHost(call, sender))
+                    if (!await ValidateHost(call, sender) ||
+                        !await ValidateVoterCount(call, sender, reader))
                     {
                         return false;
                     }
@@ -238,6 +239,11 @@ namespace Impostor.Server.Net.Inner.Objects
                 {
                     return false;
                 }
+            }
+
+            if (!await ValidateVoteCast(RpcCalls.CastVote, sender))
+            {
+                return false;
             }
 
             if (playerId != sender.Character!.PlayerId)

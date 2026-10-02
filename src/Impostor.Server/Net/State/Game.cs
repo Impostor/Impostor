@@ -16,7 +16,9 @@ using Impostor.Api.Net.Inner.Objects;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Server.Events;
+using Impostor.Server.Net.Anticheat;
 using Impostor.Server.Net.Manager;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -70,7 +72,10 @@ namespace Impostor.Server.Net.State
             _compatibilityConfig = compatibilityConfig.Value;
             _timeoutConfig = timeoutConfig.Value;
             Items = new ConcurrentDictionary<object, object>();
+            AntiCheat = new AntiCheatState(options, serviceProvider.GetRequiredService<IOptions<AntiCheatConfig>>().Value);
         }
+
+        internal AntiCheatState AntiCheat { get; }
 
         public IPEndPoint PublicIp { get; }
 

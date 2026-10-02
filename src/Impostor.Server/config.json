@@ -21,6 +21,12 @@
     "EnableOwnershipChecks": true,
     "EnableRoleChecks": true,
     "EnableTargetChecks": true,
+    "EnableMurderChecks": true,
+    "EnableSabotageChecks": true,
+    "EnableMeetingChecks": true,
+    "EnableVotingChecks": true,
+    "EnableRateLimits": true,
+    "RpcRateLimitPerSecond": 20,
     "ForbidProtocolExtensions": true,
     "EnablePacketSizeChecks": true,
     "PacketSizeLimit": 1203

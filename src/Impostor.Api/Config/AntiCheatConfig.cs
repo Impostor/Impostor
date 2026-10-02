@@ -30,6 +30,18 @@ namespace Impostor.Api.Config
 
         public bool EnableTargetChecks { get; set; } = true;
 
+        public bool EnableMurderChecks { get; set; } = true;
+
+        public bool EnableSabotageChecks { get; set; } = true;
+
+        public bool EnableMeetingChecks { get; set; } = true;
+
+        public bool EnableVotingChecks { get; set; } = true;
+
+        public bool EnableRateLimits { get; set; } = true;
+
+        public int RpcRateLimitPerSecond { get; set; } = 20;
+
         public bool ForbidProtocolExtensions { get; set; } = true;
 
         public bool EnablePacketSizeChecks { get; set; } = true;

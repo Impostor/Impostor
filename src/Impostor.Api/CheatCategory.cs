@@ -38,6 +38,21 @@ public enum CheatCategory
     /// <summary>A packet was sent with more items than possible in the game.</summary>
     ItemLimits,
 
+    /// <summary>A kill that the killer's own cooldown cannot explain, like a second victim inside the window or another hit on a dead one.</summary>
+    Murder,
+
+    /// <summary>A sabotage the current game state cannot produce, like switching systems too fast or sabotaging during a meeting.</summary>
+    Sabotage,
+
+    /// <summary>A meeting or a report that this round cannot produce yet.</summary>
+    Meeting,
+
+    /// <summary>A vote cast outside a meeting, or by a player who is already dead.</summary>
+    Voting,
+
+    /// <summary>A client sent more messages in a window than the room can legitimately produce.</summary>
+    RateLimit,
+
     /// <summary>Legacy category for unsorted anticheat checks.</summary>
     Other,
 }
