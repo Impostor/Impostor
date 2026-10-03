@@ -60,9 +60,9 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public DeathReason LastDeathReason { get; internal set; }
 
-        public string? FriendCode => Game.GetClientPlayer(ClientId)?.Client.FriendCode;
+        public string? FriendCode { get; internal set; }
 
-        public string? Puid => Game.GetClientPlayer(ClientId)?.Client.Puid;
+        public string? Puid { get; internal set; }
 
         public List<TaskInfo> Tasks { get; internal set; } = new List<TaskInfo>(0);
 
@@ -184,18 +184,19 @@ namespace Impostor.Server.Net.Inner.Objects
             var friendCode = reader.ReadString();
             var puid = reader.ReadString();
 
+            if (Game.GetClientPlayer(ClientId) is { } owner)
+            {
+                FriendCode ??= owner.Client.FriendCode;
+                Puid ??= owner.Client.Puid;
+            }
+
             await ValidateIdentifiersAsync(sender, friendCode, puid);
         }
 
         private async ValueTask ValidateIdentifiersAsync(IClientPlayer sender, string? friendCode, string? puid)
         {
-            if (Game.GetClientPlayer(ClientId) is not { } owner)
-            {
-                return;
-            }
-
-            var mismatch = (!string.IsNullOrEmpty(friendCode) && owner.Client.FriendCode != null && owner.Client.FriendCode != friendCode)
-                || (!string.IsNullOrEmpty(puid) && owner.Client.Puid != null && owner.Client.Puid != puid);
+            var mismatch = (!string.IsNullOrEmpty(friendCode) && FriendCode != null && FriendCode != friendCode)
+                || (!string.IsNullOrEmpty(puid) && Puid != null && Puid != puid);
 
             if (!mismatch)
             {
