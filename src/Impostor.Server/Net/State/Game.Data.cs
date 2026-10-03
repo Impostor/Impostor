@@ -162,10 +162,11 @@ namespace Impostor.Server.Net.State
                                     }
                                 }
 
-                                // PlayerInfo must stay with the host when host authority migrates.
-                                if (ownerClientId != InvalidClient)
+                                // The sender must own PlayerInfo even if MustBeHost checks are disabled.
+                                // Host-inherited ownership also keeps it valid after host migration.
+                                if (ownerClientId != InvalidClient || !sender.IsHost)
                                 {
-                                    if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.Ownership, "Spawning NetworkedPlayerInfo with an invalid owner"))
+                                    if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.Ownership, "Spawning NetworkedPlayerInfo without host ownership"))
                                     {
                                         return false;
                                     }
