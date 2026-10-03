@@ -1,4 +1,4 @@
-﻿namespace Impostor.Api.Config
+namespace Impostor.Api.Config
 {
     public class AntiCheatConfig
     {
@@ -10,13 +10,19 @@
 
         public CheatingHostMode AllowCheatingHosts { get; set; } = CheatingHostMode.Never;
 
+        public CheatingHostMode AllowHostOnlyExtensions { get; set; } = CheatingHostMode.IfRequested;
+
         public bool EnableGameFlowChecks { get; set; } = true;
 
         public bool EnableMustBeHostChecks { get; set; } = true;
 
+        public bool EnableInvalidObjectChecks { get; set; } = true;
+
         public bool EnableColorLimitChecks { get; set; } = true;
 
         public bool EnableNameLimitChecks { get; set; } = true;
+
+        public bool EnableItemLimitChecks { get; set; } = true;
 
         public bool EnableOwnershipChecks { get; set; } = true;
 
@@ -25,5 +31,9 @@
         public bool EnableTargetChecks { get; set; } = true;
 
         public bool ForbidProtocolExtensions { get; set; } = true;
+
+        public bool EnablePacketSizeChecks { get; set; } = true;
+
+        public int PacketSizeLimit { get; set; } = 1203;
     }
 }

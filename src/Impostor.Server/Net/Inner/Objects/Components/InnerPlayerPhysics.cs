@@ -37,17 +37,13 @@ namespace Impostor.Server.Net.Inner.Objects.Components
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)
         {
-            if (call != RpcCalls.BootFromVent && !await ValidateOwnership(call, sender))
-            {
-                return false;
-            }
-
             switch (call)
             {
                 case RpcCalls.EnterVent:
                 case RpcCalls.ExitVent:
                 {
-                    if (!await ValidateCanVent(call, sender, _playerControl.PlayerInfo))
+                    if (!await ValidateOwnership(call, sender) ||
+                        !await ValidateCanVent(call, sender, _playerControl.PlayerInfo))
                     {
                         return false;
                     }
@@ -106,17 +102,34 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                 }
 
                 case RpcCalls.ClimbLadder:
+                {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc31ClimbLadder.Deserialize(reader, out var ladderId, out var lastClimbLadderSid);
                     break;
+                }
 
                 case RpcCalls.Pet:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc49Pet.Deserialize(reader, out var position, out var petPosition);
                     break;
                 }
 
                 case RpcCalls.CancelPet:
                 {
+                    if (!await ValidateOwnership(call, sender))
+                    {
+                        return false;
+                    }
+
                     Rpc50CancelPet.Deserialize(reader);
                     break;
                 }

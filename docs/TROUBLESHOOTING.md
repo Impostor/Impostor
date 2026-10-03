@@ -47,6 +47,12 @@ Also check if the port Impostor (ListenPort) is listening on is correctly port-f
 Please check that you only have **working** plugins in the `plugins` folder.
 This error can be caused by non-plugin files or plugins that are not working correctly.
 
+## Disconnected with `You disconnected from the server. If this happens often, check your network strength. This may also be a server issue`
+
+Usually this means that Among Us couldn't connect to Impostor's HTTP server.
+
+Open the address of your server in a web browser, it should show you a small page confirming that Impostor is available.
+
 ## My question is not yet answered and I'm still having problems!
 
 That's unfortunate. Join the [Impostor Discord](https://discord.gg/Mk3w6Tb), ask your question there and we'll try to help you out. Note that we're not always available, so it may take some time to get an answer. To make answering your question easier, please add the following details:

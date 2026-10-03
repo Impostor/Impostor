@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Impostor.Api;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net;
 using Impostor.Server.Net.State;
 
@@ -39,6 +40,8 @@ namespace Impostor.Server.Net
 
         public ClientPlayer? Player { get; set; }
 
+        public ColorType? PreviousColor { get; set; } = null;
+
         IClientPlayer? IClient.Player => Player;
 
         public virtual ValueTask<bool> ReportCheatAsync(CheatContext context, CheatCategory category, string message)
@@ -58,6 +61,21 @@ namespace Impostor.Server.Net
         public async ValueTask DisconnectAsync(DisconnectReason reason, string? message = null)
         {
             await Connection.CustomDisconnectAsync(reason, message);
+        }
+
+        public bool Equals(IClient? other)
+        {
+            return other != null && Id == other.Id;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as ClientBase);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id;
         }
     }
 }

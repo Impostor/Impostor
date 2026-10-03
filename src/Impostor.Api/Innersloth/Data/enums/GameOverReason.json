@@ -1,11 +1,11 @@
 {
-  "HumansByVote": 0,
-  "HumansByTask": 1,
-  "ImpostorByVote": 2,
-  "ImpostorByKill": 3,
-  "ImpostorBySabotage": 4,
+  "CrewmatesByVote": 0,
+  "CrewmatesByTask": 1,
+  "ImpostorsByVote": 2,
+  "ImpostorsByKill": 3,
+  "ImpostorsBySabotage": 4,
   "ImpostorDisconnect": 5,
-  "HumansDisconnect": 6,
-  "HideAndSeek_ByTimer": 7,
-  "HideAndSeek_ByKills": 8
+  "CrewmateDisconnect": 6,
+  "HideAndSeek_CrewmatesByTimer": 7,
+  "HideAndSeek_ImpostorsByKills": 8
 }

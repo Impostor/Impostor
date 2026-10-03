@@ -1,18 +1,23 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using Impostor.Api;
+using Impostor.Api.Config;
 using Impostor.Api.Net;
 using Impostor.Hazel;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Net.Hazel
 {
     internal class HazelConnection : IHazelConnection
     {
         private readonly ILogger<HazelConnection> _logger;
+        private readonly AntiCheatConfig _antiCheatConfig;
 
-        public HazelConnection(Connection innerConnection, ILogger<HazelConnection> logger)
+        public HazelConnection(Connection innerConnection, ILogger<HazelConnection> logger, IOptions<AntiCheatConfig> antiCheatOptions)
         {
             _logger = logger;
+            _antiCheatConfig = antiCheatOptions.Value;
             InnerConnection = innerConnection;
             innerConnection.DataReceived = ConnectionOnDataReceived;
             innerConnection.Disconnected = ConnectionOnDisconnected;
@@ -58,6 +63,19 @@ namespace Impostor.Server.Net.Hazel
                 return;
             }
 
+            // Check raw message size against the configured limit.
+            // Innersloth requires full packet ≤ 1200 bytes (1168 bytes payload after 32 bytes IP+UDP headers).
+            if (e.Message.Length > _antiCheatConfig.PacketSizeLimit)
+            {
+                if (await Client.ReportCheatAsync(
+                        new CheatContext("RootMessage"),
+                        CheatCategory.PacketSize,
+                        $"Received a message that is too large, length: {e.Message.Length}"))
+                {
+                    return;
+                }
+            }
+
             while (true)
             {
                 if (e.Message.Position >= e.Message.Length)
@@ -68,6 +86,11 @@ namespace Impostor.Server.Net.Hazel
                 using (var message = e.Message.ReadMessage())
                 {
                     await Client.HandleMessageAsync(message, e.Type);
+                }
+
+                if (!IsConnected)
+                {
+                    break;
                 }
             }
         }

@@ -49,6 +49,8 @@ public interface IGameOptions
     /// </summary>
     public bool IsDefaults { get; set; }
 
+    public GameTags Tag { get; set; }
+
     public void Serialize(IMessageWriter writer);
 
     public static void EnsureVersionIsModular<TCaller>(byte version)

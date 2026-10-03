@@ -5,11 +5,15 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Web;
 using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameFilters;
+using Impostor.Server.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Http;
@@ -24,6 +28,7 @@ public sealed class GamesController : ControllerBase
     private readonly IGameManager _gameManager;
     private readonly ListingManager _listingManager;
     private readonly HostServer _hostServer;
+    private readonly ILogger<GamesController> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GamesController"/> class.
@@ -31,12 +36,14 @@ public sealed class GamesController : ControllerBase
     /// <param name="gameManager">GameManager containing a list of games.</param>
     /// <param name="listingManager">ListingManager responsible for filtering.</param>
     /// <param name="serverConfig">Impostor configuration section containing the public ip address of this server.</param>
-    public GamesController(IGameManager gameManager, ListingManager listingManager, IOptions<ServerConfig> serverConfig)
+    /// <param name="logger">DI injected logger.</param>
+    public GamesController(IGameManager gameManager, ListingManager listingManager, IOptions<ServerConfig> serverConfig, ILogger<GamesController> logger)
     {
         _gameManager = gameManager;
         _listingManager = listingManager;
         var config = serverConfig.Value;
         _hostServer = HostServer.From(IPAddress.Parse(config.ResolvePublicIp()), config.PublicPort);
+        _logger = logger;
     }
 
     /// <summary>
@@ -50,6 +57,7 @@ public sealed class GamesController : ControllerBase
     [HttpGet]
     public IActionResult Index(int mapId, GameKeywords lang, int numImpostors, [FromHeader] AuthenticationHeaderValue authorization)
     {
+        // NOTE: this method is no longer used by Among Us 16.0.0 and is only kept for backwards compatibility
         if (authorization.Scheme != "Bearer" || authorization.Parameter == null)
         {
             return BadRequest();
@@ -75,6 +83,7 @@ public sealed class GamesController : ControllerBase
     [HttpPost]
     public IActionResult Post(int gameId)
     {
+        // NOTE: this method is no longer used by Among Us 16.0.0 and is only kept for backwards compatibility
         var code = new GameCode(gameId);
         var game = _gameManager.Find(code);
 
@@ -95,6 +104,69 @@ public sealed class GamesController : ControllerBase
     public IActionResult Put()
     {
         return Ok(_hostServer);
+    }
+
+    [HttpGet("{gameId}")]
+    public IActionResult Show([FromRoute] int gameId)
+    {
+        var code = new GameCode(gameId);
+        var game = _gameManager.Find(code);
+
+        // If the game was not found, print an error message.
+        if (game == null)
+        {
+            return NotFound(new FindGameByCodeResponse(new MatchmakerError(DisconnectReason.GameNotFound)));
+        }
+
+        return Ok(new FindGameByCodeResponse(GameListing.From(game)));
+    }
+
+    [HttpGet("filtered")]
+    public IActionResult ShowFilteredLobbies([FromQuery] string filter)
+    {
+        if (string.IsNullOrEmpty(filter))
+        {
+            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "filter query parameter not provided")));
+        }
+
+        try
+        {
+            var decodedFilter = HttpUtility.UrlDecode(filter);
+            var filtersList = JsonSerializer.Deserialize<GameFiltersList>(decodedFilter);
+
+            // filterSets wont be null. It must at least have ChatFilter and LangFilter
+            // Vanilla game only builds one filterSet and InnerSloth officials only handles first one (though you can send multiple filter sets. sloths only handle the first)
+            if (filtersList == null || filtersList.FilterSets.Count != 1
+                || filtersList.FilterSets[0].Filters.Count < 2
+                || !filtersList.FilterSets[0].Filters.Any(x => x.OptionType == "languages")
+                || !filtersList.FilterSets[0].Filters.Any(x => x.OptionType == "chat"))
+            {
+                return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Invalid filterSets")));
+            }
+
+            var filteredGames = _listingManager.FindListingsV2(HttpContext, filtersList);
+            var gameListings = filteredGames.Select(GameListing.From).ToList();
+
+            var response = new
+            {
+                games = gameListings,
+                metadata = new
+                {
+                    allGamesCount = _gameManager.Games.Count(),
+                    matchingGamesCount = gameListings.Count,
+                },
+            };
+
+            return Ok(response);
+        }
+        catch (JsonException ex)
+        {
+            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Unable to deserialize filter json" + ex)));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Unknown exception caught in filter" + ex)));
+        }
     }
 
     private static uint ConvertAddressToNumber(IPAddress address)
@@ -142,13 +214,33 @@ public sealed class GamesController : ControllerBase
     private class MatchmakerError
     {
         [SetsRequiredMembers]
-        public MatchmakerError(DisconnectReason reason)
+        public MatchmakerError(DisconnectReason reason, string message = "")
         {
             Reason = reason;
+            Message = message;
         }
 
         [JsonPropertyName("Reason")]
         public required DisconnectReason Reason { get; init; }
+
+        [JsonPropertyName("Message")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public required string Message { get; init; } = string.Empty;
+    }
+
+    private class FindGameByCodeResponse
+    {
+        [SetsRequiredMembers]
+        public FindGameByCodeResponse(MatchmakerError error) => (Errors, Game) = (new[] { error }, null);
+
+        [SetsRequiredMembers]
+        public FindGameByCodeResponse(GameListing game) => (Errors, Game) = (null, game);
+
+        [JsonPropertyName("Errors")]
+        public required MatchmakerError[]? Errors { get; init; }
+
+        [JsonPropertyName("Game")]
+        public required GameListing? Game { get; init; }
     }
 
     private class GameListing
@@ -168,11 +260,17 @@ public sealed class GamesController : ControllerBase
         [JsonPropertyName("HostName")]
         public required string HostName { get; init; }
 
+        [JsonPropertyName("TrueHostName")]
+        public required string TrueHostName { get; init; }
+
         [JsonPropertyName("HostPlatformName")]
         public required string HostPlatformName { get; init; }
 
         [JsonPropertyName("Platform")]
         public required Platforms Platform { get; init; }
+
+        [JsonPropertyName("QuickChat")]
+        public required QuickChatModes QuickChat { get; init; }
 
         [JsonPropertyName("Age")]
         public required int Age { get; init; }
@@ -189,6 +287,9 @@ public sealed class GamesController : ControllerBase
         [JsonPropertyName("Language")]
         public required GameKeywords Language { get; init; }
 
+        [JsonPropertyName("Options")]
+        public required string Options { get; init; }
+
         public static GameListing From(IGame game)
         {
             var platform = game.Host?.Client.PlatformSpecificData;
@@ -200,13 +301,16 @@ public sealed class GamesController : ControllerBase
                 GameId = game.Code,
                 PlayerCount = game.PlayerCount,
                 HostName = game.DisplayName ?? game.Host?.Client.Name ?? "Unknown host",
+                TrueHostName = game.DisplayName ?? game.Host?.Client.Name ?? "Unknown host",
                 HostPlatformName = platform?.PlatformName ?? string.Empty,
                 Platform = platform?.Platform ?? Platforms.Unknown,
+                QuickChat = game.Host?.Client.ChatMode ?? QuickChatModes.QuickChatOnly,
                 Age = 0,
                 MaxPlayers = game.Options.MaxPlayers,
                 NumImpostors = game.Options.NumImpostors,
                 MapId = game.Options.Map,
                 Language = game.Options.Keywords,
+                Options = game.Options.ToBase64String(),
             };
         }
     }

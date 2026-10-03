@@ -1,0 +1,17 @@
+{
+  "Invalid": 0,
+  "VisualTasks": 1,
+  "GhostsDoTasks": 2,
+  "ConfirmImpostor": 3,
+  "AnonymousVotes": 4,
+  "IsDefaults": 5,
+  "UseFlashlight": 6,
+  "SeekerFinalVents": 7,
+  "SeekerFinalMap": 8,
+  "SeekerPings": 9,
+  "ShowCrewmateNames": 10,
+  "Roles": 11,
+  "ShapeshifterLeaveSkin": 1000,
+  "ImpostorsCanSeeProtect": 1100,
+  "NoisemakerImpostorAlert": 1300
+}

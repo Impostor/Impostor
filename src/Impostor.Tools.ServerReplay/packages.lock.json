@@ -13,19 +13,19 @@
       },
       "Impostor.Hazel": {
         "type": "Transitive",
-        "resolved": "1.0.0",
-        "contentHash": "FgVKuIWK+o6Q+wOPFoZZTeoSuVh4giAhrS8Zvs6O0++Bg8RxH4Lw51uSwnexLiwosXveUCIXICzgGHmRyguVSA==",
+        "resolved": "1.0.1",
+        "contentHash": "DFsZcOa9ptFEj8FCfK63L/bcJ9RUVRZUhUS0qkrmdSqkgeJRdvUOTWR1gKlqbaOJcSEvexAITC0QJEPnJUcI7Q==",
         "dependencies": {
-          "Impostor.Hazel.Abstractions": "1.0.0",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "7.0.0",
-          "Microsoft.Extensions.ObjectPool": "7.0.1",
+          "Impostor.Hazel.Abstractions": "1.0.1",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
+          "Microsoft.Extensions.ObjectPool": "8.0.0",
           "Serilog": "2.12.0"
         }
       },
       "Impostor.Hazel.Abstractions": {
         "type": "Transitive",
-        "resolved": "1.0.0",
-        "contentHash": "x56AEsY5fKU2Z5O7ZrzEqKfr62kq/C05Aevcciwz5yMfOQlpwuFI1awgNGJsoe+bcx+XnFc3+l+eadtY72aZsg=="
+        "resolved": "1.0.1",
+        "contentHash": "de2bMj78xDXOWwyqQVk8o4vbZKGfAgOjnWnkKB1IGGovNtxLeBF8jy3wH5moTZB6juTnLf0ptkCDkRi8c2OcjA=="
       },
       "Microsoft.AspNetCore.Http.Abstractions": {
         "type": "Transitive",
@@ -402,7 +402,7 @@
       "impostor.api": {
         "type": "Project",
         "dependencies": {
-          "Impostor.Hazel.Abstractions": "[1.0.0, )",
+          "Impostor.Hazel.Abstractions": "[1.0.1, )",
           "Microsoft.AspNetCore.Http.Abstractions": "[2.2.0, )",
           "Microsoft.Extensions.Hosting.Abstractions": "[8.0.0, )",
           "Microsoft.Extensions.Logging.Abstractions": "[8.0.0, )"
@@ -411,8 +411,8 @@
       "impostor.server": {
         "type": "Project",
         "dependencies": {
-          "Impostor.Api": "[1.9.0-dev, )",
-          "Impostor.Hazel": "[1.0.0, )",
+          "Impostor.Api": "[1.10.7-dev, )",
+          "Impostor.Hazel": "[1.0.1, )",
           "Microsoft.Extensions.FileSystemGlobbing": "[8.0.0, )",
           "Microsoft.Extensions.Hosting": "[8.0.0, )",
           "Microsoft.Extensions.ObjectPool": "[8.0.1, )",

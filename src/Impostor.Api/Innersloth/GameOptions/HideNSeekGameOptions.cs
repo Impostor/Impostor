@@ -2,7 +2,7 @@ namespace Impostor.Api.Innersloth.GameOptions;
 
 public class HideNSeekGameOptions : IGameOptions
 {
-    public const int LatestVersion = 8;
+    public const int LatestVersion = 12;
 
     public HideNSeekGameOptions(byte version = LatestVersion)
     {
@@ -93,6 +93,11 @@ public class HideNSeekGameOptions : IGameOptions
 
     public float MaxPingTime { get; set; } = 6f;
 
+    /// <summary>
+    ///     Gets or sets the experience level of people in the lobby: Beginner, Intermediate or Expert.
+    /// </summary>
+    public GameTags Tag { get; set; } = 0;
+
     public static HideNSeekGameOptions Deserialize(IMessageReader reader, byte version)
     {
         var options = new HideNSeekGameOptions(version);
@@ -102,6 +107,11 @@ public class HideNSeekGameOptions : IGameOptions
 
     public void Deserialize(IMessageReader reader)
     {
+        if (Version > LatestVersion)
+        {
+            IGameOptions.ThrowUnknownVersion<HideNSeekGameOptions>(Version);
+        }
+
         if (Version >= 8)
         {
             SpecialMode = (SpecialGameModes)reader.ReadByte();
@@ -133,9 +143,9 @@ public class HideNSeekGameOptions : IGameOptions
         MaxPingTime = reader.ReadSingle();
         CrewmateTimeInVent = reader.ReadSingle();
 
-        if (Version > LatestVersion)
+        if (Version >= 9)
         {
-            IGameOptions.ThrowUnknownVersion<HideNSeekGameOptions>(Version);
+            Tag = (GameTags)reader.ReadByte();
         }
     }
 
@@ -171,6 +181,11 @@ public class HideNSeekGameOptions : IGameOptions
         writer.Write(SeekerPlayerId);
         writer.Write(MaxPingTime);
         writer.Write(CrewmateTimeInVent);
+
+        if (Version >= 9)
+        {
+            writer.Write((byte)Tag);
+        }
 
         if (Version > LatestVersion)
         {

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Impostor.Api.Events.Player;
 
@@ -6,6 +6,24 @@ namespace Impostor.Api.Net.Inner.Objects
 {
     public interface IInnerMeetingHud : IInnerNetObject
     {
+        public interface IJudgeOverrule
+        {
+            /// <summary>
+            ///     Gets the player id of the Judge that queued this overrule.
+            /// </summary>
+            byte JudgePlayerId { get; }
+
+            /// <summary>
+            ///     Gets the player id of the player the Judge wants to overrule.
+            /// </summary>
+            byte OverruledPlayerId { get; }
+
+            /// <summary>
+            ///     Gets the overrule nonce used to match this overrule to the voting result.
+            /// </summary>
+            ushort OverruleNonce { get; }
+        }
+
         public interface IPlayerVoteArea
         {
             /// <summary>
@@ -55,5 +73,10 @@ namespace Impostor.Api.Net.Inner.Objects
         ///     Gets the player that started the meeting.
         /// </summary>
         IInnerPlayerInfo? Reporter { get; }
+
+        /// <summary>
+        ///     Gets the Judge overrules queued in this meeting.
+        /// </summary>
+        IReadOnlyCollection<IJudgeOverrule> JudgeOverrules { get; }
     }
 }

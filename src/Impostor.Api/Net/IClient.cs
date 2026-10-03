@@ -8,7 +8,7 @@ namespace Impostor.Api.Net
     /// <summary>
     ///     Represents a connected game client.
     /// </summary>
-    public interface IClient
+    public interface IClient : IEquatable<IClient>
     {
         /// <summary>
         ///     Gets or sets the unique ID of the client.

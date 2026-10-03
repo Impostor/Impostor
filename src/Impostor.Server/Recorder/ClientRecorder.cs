@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Impostor.Api.Config;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net.Custom;
@@ -52,7 +52,7 @@ namespace Impostor.Server.Recorder
             await base.HandleMessageAsync(reader, messageType);
 
             // Player created a game.
-            if (reader.Tag == MessageFlags.HostGame)
+            if (reader.Tag is MessageFlags.HostGame or MessageFlags.HostModdedGame)
             {
                 _createdGame = true;
             }

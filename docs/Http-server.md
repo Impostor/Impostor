@@ -1,19 +1,13 @@
 # HTTP Server
 
-Since Impostor 1.9.0 a HTTP service is included for matchmaking. Recent versions of Among Us require this service in order to connect correctly and not kick players after a round.
+Since Impostor 1.9.0 a HTTP service is included for matchmaking, which is required for clients to connect to the Impostor server.
 
-Depending on whether you want to support mobile players, you can set up the HTTP server in one of two ways:
-
-- Directly expose the HTTP server. Simpler, but only works if you don't want to support mobile players.
-- Use a reverse proxy to expose the HTTP server. More complex, but allows mobile players to connect.
-
-## Directly expose the HTTP server.
-
-In config.json, set "ListenIp" to "0.0.0.0" in the "HttpServer" section. If you don't have this section, look in the example [config.json](https://github.com/Impostor/Impostor/blob/master/src/Impostor.Server/config.json)
+Starting from Among Us 16.0.5, you need to set up HTTPS for players to connect to your server.
+Unfortunately Impostor doesn't handle SSL certificates, so you need to set up a reverse proxy.
 
 ## Use a reverse proxy
 
-A reverse proxy allows you to forward HTTP requests from users to multiple services. If you already have one, you should configure it to add Impostor. This page contains an Nginx configuration you can use for reference.
+A reverse proxy allows you to forward HTTP requests from users to multiple services. If you already have one, you should configure it to add Impostor. 
 
 If you have never set up a reverse proxy before, we recommend you to set up [Caddy](https://caddyserver.com/). It is easy to set up and comes with support for requesting SSL certificates out of the box.
 
@@ -65,3 +59,24 @@ server {
 ```
 
 </details>
+
+## Stop exposing Impostor's HTTP server to the internet directly
+
+To only allow connections to Impostor's HTTP servers via the reverse proxy, we recommend to set the ListenIp of the HTTP server to 127.0.0.1:
+
+```json
+{
+ // NOTE: merge this snippet into the rest of your configuration
+ "HttpServer": {
+   "ListenIp": "127.0.0.1"
+ }
+}
+```
+
+Or if you're configuring Impostor with environment variables:
+
+```sh
+IMPOSTOR_HttpServer__ListenIp=127.0.0.1
+```
+
+For more information on server configuration, see [Server-configuration.md](Server Configuration).
