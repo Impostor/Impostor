@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
@@ -133,8 +134,16 @@ namespace Impostor.Server.Net.Inner.Objects
             return new ValueTask<bool>(true);
         }
 
-        public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
+            if (!IsOwnedBy(sender))
+            {
+                if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, CheatCategory.Ownership, "Serializing unowned NetworkedPlayerInfo"))
+                {
+                    return;
+                }
+            }
+
             PlayerId = reader.ReadByte();
             ClientId = reader.ReadPackedInt32();
 
@@ -178,8 +187,6 @@ namespace Impostor.Server.Net.Inner.Objects
             // Impostor doesn't expose fields that aren't properly validated
             reader.ReadString(); // FriendCode
             reader.ReadString(); // PUID
-
-            return ValueTask.CompletedTask;
         }
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)

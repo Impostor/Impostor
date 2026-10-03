@@ -148,9 +148,32 @@ namespace Impostor.Server.Net.State
                         var objectId = reader.ReadPackedUInt32();
                         if (SpawnableObjects.TryGetValue(objectId, out var spawnableObjectType))
                         {
-                            var innerNetObject = (InnerNetObject)ActivatorUtilities.CreateInstance(_serviceProvider, spawnableObjectType, this);
                             var ownerClientId = reader.ReadPackedInt32();
 
+                            if (spawnableObjectType == typeof(InnerPlayerInfo))
+                            {
+                                // Validate client spawns before creating or registering the object.
+                                // Server-created PlayerInfo objects also use OnSpawnAsync.
+                                if (!IsHostAuthoritive)
+                                {
+                                    if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.Ownership, "Spawning NetworkedPlayerInfo without host authority"))
+                                    {
+                                        return false;
+                                    }
+                                }
+
+                                // The sender must own PlayerInfo even if MustBeHost checks are disabled.
+                                // Host-inherited ownership also keeps it valid after host migration.
+                                if (ownerClientId != InvalidClient || !sender.IsHost)
+                                {
+                                    if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.Ownership, "Spawning NetworkedPlayerInfo without host ownership"))
+                                    {
+                                        return false;
+                                    }
+                                }
+                            }
+
+                            var innerNetObject = (InnerNetObject)ActivatorUtilities.CreateInstance(_serviceProvider, spawnableObjectType, this);
                             innerNetObject.SpawnFlags = (SpawnFlags)reader.ReadByte();
 
                             var components = innerNetObject.GetComponentsInChildren<InnerNetObject>();
