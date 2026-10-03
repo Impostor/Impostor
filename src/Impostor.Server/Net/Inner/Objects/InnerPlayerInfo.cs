@@ -136,17 +136,12 @@ namespace Impostor.Server.Net.Inner.Objects
 
         public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
-            if (OwnerId == -4)
+            if (!IsOwnedBy(sender))
             {
-                if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, CheatCategory.ProtocolExtension, "Serializing server-owned PlayerInfo as vanilla host"))
+                if (await sender.Client.ReportCheatAsync(CheatContext.Deserialize, CheatCategory.Ownership, "Serializing unowned NetworkedPlayerInfo"))
                 {
                     return;
                 }
-            }
-
-            if (!await ValidateHost(CheatContext.Deserialize, sender))
-            {
-                return;
             }
 
             PlayerId = reader.ReadByte();
@@ -192,8 +187,6 @@ namespace Impostor.Server.Net.Inner.Objects
             // Impostor doesn't expose fields that aren't properly validated
             reader.ReadString(); // FriendCode
             reader.ReadString(); // PUID
-
-            return;
         }
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)

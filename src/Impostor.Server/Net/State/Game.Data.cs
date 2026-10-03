@@ -148,9 +148,31 @@ namespace Impostor.Server.Net.State
                         var objectId = reader.ReadPackedUInt32();
                         if (SpawnableObjects.TryGetValue(objectId, out var spawnableObjectType))
                         {
-                            var innerNetObject = (InnerNetObject)ActivatorUtilities.CreateInstance(_serviceProvider, spawnableObjectType, this);
                             var ownerClientId = reader.ReadPackedInt32();
 
+                            if (spawnableObjectType == typeof(InnerPlayerInfo))
+                            {
+                                // Validate client spawns before creating or registering the object.
+                                // Server-created PlayerInfo objects also use OnSpawnAsync.
+                                if (!IsHostAuthoritive)
+                                {
+                                    if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.Ownership, "Spawning NetworkedPlayerInfo without host authority"))
+                                    {
+                                        return false;
+                                    }
+                                }
+
+                                // PlayerInfo must stay with the host when host authority migrates.
+                                if (ownerClientId != InvalidClient)
+                                {
+                                    if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.Ownership, "Spawning NetworkedPlayerInfo with an invalid owner"))
+                                    {
+                                        return false;
+                                    }
+                                }
+                            }
+
+                            var innerNetObject = (InnerNetObject)ActivatorUtilities.CreateInstance(_serviceProvider, spawnableObjectType, this);
                             innerNetObject.SpawnFlags = (SpawnFlags)reader.ReadByte();
 
                             var components = innerNetObject.GetComponentsInChildren<InnerNetObject>();
@@ -347,14 +369,6 @@ namespace Impostor.Server.Net.State
 
                 case InnerPlayerInfo playerInfo:
                 {
-                    if (!IsHostAuthoritive)
-                    {
-                        if (await sender.Client.ReportCheatAsync(new CheatContext(nameof(GameDataTag.SpawnFlag)), CheatCategory.ProtocolExtension, "Spawning NetworkedPlayerInfo as vanilla host"))
-                        {
-                            return;
-                        }
-                    }
-
                     if (!GameNet.GameData.AddPlayer(playerInfo))
                     {
                         _logger.LogWarning(
