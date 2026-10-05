@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Impostor.Api;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
@@ -58,6 +59,10 @@ namespace Impostor.Server.Net.Inner.Objects
         public bool IsDead { get; internal set; }
 
         public DeathReason LastDeathReason { get; internal set; }
+
+        public string? FriendCode { get; internal set; }
+
+        public string? Puid { get; internal set; }
 
         public List<TaskInfo> Tasks { get; internal set; } = new List<TaskInfo>(0);
 
@@ -128,12 +133,13 @@ namespace Impostor.Server.Net.Inner.Objects
                 Tasks[i].Serialize(writer);
             }
 
-            writer.Write(string.Empty); // FriendCode
-            writer.Write(string.Empty); // PUID
+            // Resolved by the matchmaker and pushed onto the player by a plugin
+            writer.Write(FriendCode ?? string.Empty);
+            writer.Write(Puid ?? string.Empty);
             return new ValueTask<bool>(true);
         }
 
-        public override ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
+        public override async ValueTask DeserializeAsync(IClientPlayer sender, IClientPlayer? target, IMessageReader reader, bool initialState)
         {
             PlayerId = reader.ReadByte();
             ClientId = reader.ReadPackedInt32();
@@ -175,11 +181,29 @@ namespace Impostor.Server.Net.Inner.Objects
                 Tasks[i].Deserialize(reader);
             }
 
-            // Impostor doesn't expose fields that aren't properly validated
-            reader.ReadString(); // FriendCode
-            reader.ReadString(); // PUID
+            var friendCode = reader.ReadString();
+            var puid = reader.ReadString();
 
-            return ValueTask.CompletedTask;
+            if (Game.GetClientPlayer(ClientId) is { } owner)
+            {
+                FriendCode ??= owner.Client.FriendCode;
+                Puid ??= owner.Client.Puid;
+            }
+
+            await ValidateIdentifiersAsync(sender, friendCode, puid);
+        }
+
+        private async ValueTask ValidateIdentifiersAsync(IClientPlayer sender, string? friendCode, string? puid)
+        {
+            var mismatch = (!string.IsNullOrEmpty(friendCode) && FriendCode != null && FriendCode != friendCode)
+                || (!string.IsNullOrEmpty(puid) && Puid != null && Puid != puid);
+
+            if (!mismatch)
+            {
+                return;
+            }
+
+            await sender.Client.ReportCheatAsync(CheatContext.Deserialize, CheatCategory.Identifiers, $"Claimed identifiers for player {ClientId} do not match the values known for that player");
         }
 
         public override async ValueTask<bool> HandleRpcAsync(ClientPlayer sender, ClientPlayer? target, RpcCalls call, IMessageReader reader)

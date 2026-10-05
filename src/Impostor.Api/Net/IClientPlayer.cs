@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Impostor.Api.Games;
 using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Inner.Objects;

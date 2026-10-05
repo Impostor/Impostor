@@ -21,6 +21,7 @@
     "EnableOwnershipChecks": true,
     "EnableRoleChecks": true,
     "EnableTargetChecks": true,
+    "EnableIdentifierChecks": true,
     "ForbidProtocolExtensions": true,
     "EnablePacketSizeChecks": true,
     "PacketSizeLimit": 1203
