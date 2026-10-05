@@ -1,5 +1,6 @@
 namespace Impostor.Api;
 
+// NOTE: when adding items to this enum, add them to the bottom for API stability
 public enum CheatCategory
 {
     /// <summary>A packet used a part of the network protocol that is unknown to Impostor, like a custom RPC.</summary>
