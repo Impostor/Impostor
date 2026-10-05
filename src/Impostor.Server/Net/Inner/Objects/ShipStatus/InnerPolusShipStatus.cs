@@ -11,8 +11,9 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
 {
     internal class InnerPolusShipStatus : InnerShipStatus, IInnerPolusShipStatus
     {
-        public InnerPolusShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, Game game) : base(customMessageManager, game, MapTypes.Polus)
+        public InnerPolusShipStatus(ICustomMessageManager<ICustomRpc> customMessageManager, ICustomMessageManager<ICustomSystemType> customSystemManager, Game game) : base(customMessageManager, customSystemManager, game, MapTypes.Polus)
         {
+            InitializeSystems();
         }
 
         public override Vector2 GetSpawnLocation(InnerPlayerControl player, int numPlayers, bool initialSpawn)
@@ -38,10 +39,13 @@ namespace Impostor.Server.Net.Inner.Objects.ShipStatus
         {
             base.AddSystems(systems);
 
-            systems.Add(SystemTypes.Doors, new DoorsSystemType(Doors));
+            systems.Add(SystemTypes.Doors, new DoorsSystemType(Doors, Data.Doors));
             systems.Add(SystemTypes.Comms, new HudOverrideSystemType());
             systems.Add(SystemTypes.Security, new SecurityCameraSystemType());
-            systems.Add(SystemTypes.Laboratory, new ReactorSystemType());
+            systems.Add(SystemTypes.Ventilation, new VentilationSystemType());
+            systems.Add(SystemTypes.Laboratory, new ReactorSystemType(60f, SystemTypes.Laboratory));
+            systems.Add(SystemTypes.Decontamination, new DeconSystemType());
+            systems.Add(SystemTypes.Decontamination2, new DeconSystemType());
         }
     }
 }

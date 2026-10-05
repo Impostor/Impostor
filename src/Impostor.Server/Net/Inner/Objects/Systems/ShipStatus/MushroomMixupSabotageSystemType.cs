@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using Impostor.Api.Net.Inner.Objects;
 
 namespace Impostor.Server.Net.Inner.Objects.Systems.ShipStatus;
 
-public class MushroomMixupSabotageSystemType : ISystemType
+public class MushroomMixupSabotageSystemType : ISystemType, IActivatable
 {
     private readonly Dictionary<byte, CondensedOutfit> _currentMixups = new();
     private State _currentState;
@@ -15,6 +16,8 @@ public class MushroomMixupSabotageSystemType : ISystemType
         IdleButMixedUp,
     }
 
+    public bool IsActive => _currentSecondsUntilHeal > 0f;
+
     public void Serialize(IMessageWriter writer, bool initialState)
     {
         writer.Write((byte)_currentState);
@@ -25,6 +28,11 @@ public class MushroomMixupSabotageSystemType : ISystemType
         {
             writer.Write(playerId);
             outfit.Serialize(writer);
+        }
+
+        if (_currentState == State.JustTriggered)
+        {
+            _currentState = State.IdleButMixedUp;
         }
     }
 
@@ -40,7 +48,22 @@ public class MushroomMixupSabotageSystemType : ISystemType
             var playerId = reader.ReadByte();
             var outfit = CondensedOutfit.Deserialize(reader);
 
-            _currentMixups.Add(playerId, outfit);
+            _currentMixups[playerId] = outfit;
+        }
+    }
+
+    public void UpdateSystem(IInnerPlayerControl? playerControl, IMessageReader reader)
+    {
+        UpdateSystem(playerControl, reader.ReadByte());
+    }
+
+    internal void UpdateSystem(IInnerPlayerControl? playerControl, byte amount)
+    {
+        var operation = amount;
+        if (operation == 1)
+        {
+            _currentMixups.Clear();
+            _currentState = State.JustTriggered;
         }
     }
 

@@ -6,5 +6,7 @@
   "Security": "SecurityCameraSystemType",
   "Ventilation": "VentilationSystem",
   "Laboratory": "ReactorSystemType",
+  "Decontamination": "DeconSystem",
+  "Decontamination2": "DeconSystem",
   "Sabotage": "SabotageSystemType"
 }

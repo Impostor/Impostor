@@ -118,6 +118,7 @@ namespace Impostor.Tools.ServerReplay
             services.AddHazel();
             services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
             services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
+            services.AddSingleton<ICustomMessageManager<ICustomSystemType>, CustomMessageManager<ICustomSystemType>>();
 
             return services.BuildServiceProvider();
         }
