@@ -43,5 +43,21 @@ namespace Impostor.Api.Net.Inner.Objects
         DateTimeOffset LastMurder { get; }
 
         uint PlayerLevel { get; }
+
+        /// <summary>
+        ///     Gets the friendcode of the player.
+        /// </summary>
+        /// <remarks>
+        ///     Impostor's HTTP server does not resolve friendcodes, so this value will remain null unless a plugin has written a value on the player's client.
+        /// </remarks>
+        string? FriendCode { get; }
+
+        /// <summary>
+        ///     Gets the puid of the player.
+        /// </summary>
+        /// <remarks>
+        ///     Impostor's HTTP server does not resolve puids, so this value will remain null unless a plugin has written a value on the player's client.
+        /// </remarks>
+        string? Puid { get; }
     }
 }

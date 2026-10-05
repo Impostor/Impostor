@@ -41,4 +41,7 @@ public enum CheatCategory
 
     /// <summary>A packet was sent with more items than possible in the game.</summary>
     ItemLimits,
+
+    /// <summary>A packet contained an identifier (friendcode or puid) that does not match the one known for that player.</summary>
+    Identifiers,
 }
