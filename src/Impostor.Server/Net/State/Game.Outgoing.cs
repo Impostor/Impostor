@@ -83,6 +83,11 @@ namespace Impostor.Server.Net.State
                 : SendToAllAsync(writer);
         }
 
+        private void WriteStartGameMessage(IMessageWriter message, bool clear)
+        {
+            Message02StartGameS2C.Serialize(message, clear, Code);
+        }
+
         private void WriteRemovePlayerMessage(IMessageWriter message, bool clear, int playerId, DisconnectReason reason)
         {
             Message04RemovePlayerS2C.Serialize(message, clear, Code, playerId, HostId, reason);
