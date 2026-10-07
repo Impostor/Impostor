@@ -12,4 +12,9 @@
     <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Localization/*.json" />
+    <EmbeddedResource Include="Localization/*.json" />
+  </ItemGroup>
+
 </Project>

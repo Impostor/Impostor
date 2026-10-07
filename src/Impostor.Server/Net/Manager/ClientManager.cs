@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -6,10 +5,12 @@ using System.Threading.Tasks;
 using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Localization;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Manager;
 using Impostor.Hazel;
 using Impostor.Server.Events.Client;
+using Impostor.Server.Localization;
 using Impostor.Server.Net.Factories;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -24,9 +25,10 @@ namespace Impostor.Server.Net.Manager
         private readonly ICompatibilityManager _compatibilityManager;
         private readonly CompatibilityConfig _compatibilityConfig;
         private readonly IClientFactory _clientFactory;
+        private readonly ILocalizationService _localizer;
         private int _idLast;
 
-        public ClientManager(ILogger<ClientManager> logger, IEventManager eventManager, IClientFactory clientFactory, ICompatibilityManager compatibilityManager, IOptions<CompatibilityConfig> compatibilityConfig)
+        public ClientManager(ILogger<ClientManager> logger, IEventManager eventManager, IClientFactory clientFactory, ICompatibilityManager compatibilityManager, IOptions<CompatibilityConfig> compatibilityConfig, ILocalizationService localizer)
         {
             _logger = logger;
             _eventManager = eventManager;
@@ -34,6 +36,7 @@ namespace Impostor.Server.Net.Manager
             _clients = new ConcurrentDictionary<int, ClientBase>();
             _compatibilityManager = compatibilityManager;
             _compatibilityConfig = compatibilityConfig.Value;
+            _localizer = localizer;
 
             if (_compatibilityConfig.AllowFutureGameVersions
                 || _compatibilityConfig.AllowHostAuthority
@@ -93,11 +96,10 @@ namespace Impostor.Server.Net.Manager
                 {
                     ICompatibilityManager.VersionCompareResult.ClientTooOld => DisconnectMessages.VersionClientTooOld,
                     ICompatibilityManager.VersionCompareResult.ServerTooOld => DisconnectMessages.VersionServerTooOld,
-                    ICompatibilityManager.VersionCompareResult.Unknown => DisconnectMessages.VersionUnsupported,
-                    _ => throw new ArgumentOutOfRangeException(),
+                    _ => DisconnectMessages.VersionUnsupported,
                 };
 
-                await connection.CustomDisconnectAsync(DisconnectReason.Custom, message);
+                await connection.CustomDisconnectAsync(DisconnectReason.Custom, _localizer.Get(message, language));
                 return;
             }
 
@@ -108,7 +110,7 @@ namespace Impostor.Server.Net.Manager
                 if (!_compatibilityConfig.AllowHostAuthority)
                 {
                     _logger.LogInformation("Player {Name} kicked because they requested host authority.", name);
-                    await connection.CustomDisconnectAsync(DisconnectReason.Custom, DisconnectMessages.HostAuthorityUnsupported);
+                    await connection.CustomDisconnectAsync(DisconnectReason.Custom, _localizer.Get(DisconnectMessages.HostAuthorityUnsupported, language));
                     return;
                 }
 
@@ -117,13 +119,13 @@ namespace Impostor.Server.Net.Manager
 
             if (name.Length > 10)
             {
-                await connection.CustomDisconnectAsync(DisconnectReason.Custom, DisconnectMessages.UsernameLength);
+                await connection.CustomDisconnectAsync(DisconnectReason.Custom, _localizer.Get(DisconnectMessages.UsernameLength, language));
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                await connection.CustomDisconnectAsync(DisconnectReason.Custom, DisconnectMessages.UsernameIllegalCharacters);
+                await connection.CustomDisconnectAsync(DisconnectReason.Custom, _localizer.Get(DisconnectMessages.UsernameIllegalCharacters, language));
                 return;
             }
 

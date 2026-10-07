@@ -1,0 +1,18 @@
+{
+  "Error": "服务器发生内部错误。请查看服务器控制台获取详细信息。如果问题持续发生，请在 Impostor GitHub 上报告。",
+  "ClientOutdated": "请更新游戏后再加入此房间。",
+  "ClientTooNew": "你的游戏版本高于此房间的版本。请降级游戏客户端后再加入。",
+  "Destroyed": "你尝试加入的房间正在关闭。请创建新房间。",
+  "UsernameLength": "你的用户名过长，请缩短用户名。",
+  "UsernameIllegalCharacters": "你的用户名包含不允许使用的字符，请将其删除。",
+  "VersionClientTooOld": "请更新游戏后再连接此服务器。",
+  "VersionServerTooOld": "你的客户端版本过新，请更新 Impostor 服务器后再游玩。",
+  "VersionUnsupported": "此客户端版本不受支持，请更新游戏或 Impostor 服务器。",
+  "UdpMatchmakingUnsupported": "现已不再支持 UDP 匹配。\n请参阅 <link=https://github.com/Impostor/Impostor/blob/master/docs/Upgrading.md#impostor-190>Impostor 文档</link>，了解如何迁移到 HTTP 匹配。",
+  "HostAuthorityUnsupported": "你的客户端请求了房主权限模式，但此 Impostor 服务器未启用该模式。",
+  "InvalidClient": "客户端处于无效状态。",
+  "InvalidLimbo": "加入房间时的等待状态无效。",
+  "UnknownError": "未知错误。",
+  "CheatBanned": "检测到作弊行为，你已被此房间封禁。\n如有疑问，请联系服务器管理员并提供以下代码：{0}。",
+  "CheatKicked": "检测到作弊行为，你已被移出此房间。\n如有疑问，请联系服务器管理员并提供以下代码：{0}。"
+}
