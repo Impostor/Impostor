@@ -85,10 +85,10 @@ namespace Impostor.Server.Net.State
 
             using var message = MessageWriter.Get(MessageType.Reliable);
 
-            // Send message to everyone that this player was kicked.
+            // Send message to target player so it would disconnect itself.
             WriteKickPlayerMessage(message, false, playerId, isBan);
 
-            await SendToAllAsync(message);
+            await SendToAsync(message, playerId);
             await PlayerRemove(playerId, isBan);
 
             // Remove the player from everyone's game.
