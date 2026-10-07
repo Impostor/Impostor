@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
@@ -14,7 +15,7 @@ namespace Impostor.Plugins.Example
         private readonly ILogger<ExamplePlugin> _logger;
         private readonly IGameManager _gameManager;
         private readonly ILocalizationRegistry _localizationRegistry;
-        private ILocalizationRegistration _localizationRegistration;
+        private IDisposable _localizationDisposable;
 
         public ExamplePlugin(ILogger<ExamplePlugin> logger, IGameManager gameManager, ILocalizationRegistry localizationRegistry)
         {
@@ -30,7 +31,7 @@ namespace Impostor.Plugins.Example
             if (!_localizationRegistry.TryRegister(new LocalizationCatalog(
                 "gg.impostor.example",
                 typeof(ExamplePlugin).Assembly,
-                "Impostor.Plugins.Example.Localization"), out _localizationRegistration))
+                "Impostor.Plugins.Example.Localization"), out _localizationDisposable))
             {
                 _logger.LogWarning("Could not register Example localization resources");
             }
@@ -52,7 +53,7 @@ namespace Impostor.Plugins.Example
         public override ValueTask DisableAsync()
         {
             _logger.LogInformation("Example is being disabled.");
-            _localizationRegistration?.Dispose();
+            _localizationDisposable?.Dispose();
             return default;
         }
     }

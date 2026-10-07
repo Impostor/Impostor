@@ -43,9 +43,9 @@ namespace Impostor.Server.Localization
             return LocalizationFormatter.Get(state, message, language, arguments, _logger);
         }
 
-        public bool TryRegister(LocalizationCatalog catalog, out ILocalizationRegistration? registration)
+        public bool TryRegister(LocalizationCatalog catalog, out IDisposable? disposable)
         {
-            registration = null;
+            disposable = null;
             lock (_gate)
             {
                 if (_disposed)
@@ -72,7 +72,7 @@ namespace Impostor.Server.Localization
                 }
 
                 var token = Initialize(defaults!);
-                registration = new LocalizationRegistration(this, defaults!.Owner, token);
+                disposable = new LocalizationDisposable(this, defaults!.Owner, token);
                 return true;
             }
         }
