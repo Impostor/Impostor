@@ -8,6 +8,7 @@ using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
+using Impostor.Api.Localization;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Plugins;
@@ -15,6 +16,7 @@ using Impostor.Api.Utils;
 using Impostor.Hazel.Extensions;
 using Impostor.Server.Events;
 using Impostor.Server.Http;
+using Impostor.Server.Localization;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Custom;
 using Impostor.Server.Net.Factories;
@@ -108,6 +110,10 @@ namespace Impostor.Server
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                     services.Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section));
                     services.Configure<HttpServerConfig>(host.Configuration.GetSection(HttpServerConfig.Section));
+                    services.AddSingleton<LocalizationService>();
+                    services.AddSingleton<ILocalizationService>(p => p.GetRequiredService<LocalizationService>());
+                    services.AddSingleton<ILocalizationRegistry>(p => p.GetRequiredService<LocalizationService>());
+                    services.AddHostedService(p => p.GetRequiredService<LocalizationService>());
 
                     services.AddSingleton<ICompatibilityManager, CompatibilityManager>();
                     services.AddSingleton<ClientManager>();
