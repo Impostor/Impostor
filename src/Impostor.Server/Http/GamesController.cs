@@ -122,8 +122,28 @@ public sealed class GamesController : ControllerBase
     }
 
     [HttpGet("filtered")]
-    public IActionResult ShowFilteredLobbies([FromQuery] string filter)
+    public IActionResult ShowFilteredLobbies([FromQuery] string filter, [FromHeader] AuthenticationHeaderValue? authorization)
     {
+        if (authorization?.Scheme != "Bearer" || authorization.Parameter == null)
+        {
+            return Unauthorized(new MatchmakerResponse(new MatchmakerError(DisconnectReason.NotAuthorized, "Missing or invalid Authorization header")));
+        }
+
+        TokenController.Token? token;
+        try
+        {
+            token = JsonSerializer.Deserialize<TokenController.Token>(Convert.FromBase64String(authorization.Parameter));
+        }
+        catch (Exception ex) when (ex is FormatException or JsonException)
+        {
+            return Unauthorized(new MatchmakerResponse(new MatchmakerError(DisconnectReason.NotAuthorized, "Invalid matchmaking token")));
+        }
+
+        if (token?.Content == null)
+        {
+            return Unauthorized(new MatchmakerResponse(new MatchmakerError(DisconnectReason.NotAuthorized, "Invalid matchmaking token")));
+        }
+
         if (string.IsNullOrEmpty(filter))
         {
             return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "filter query parameter not provided")));
@@ -131,6 +151,7 @@ public sealed class GamesController : ControllerBase
 
         try
         {
+            var clientVersion = new GameVersion(token.Content.ClientVersion);
             var decodedFilter = HttpUtility.UrlDecode(filter);
             var filtersList = JsonSerializer.Deserialize<GameFiltersList>(decodedFilter);
 
@@ -144,7 +165,7 @@ public sealed class GamesController : ControllerBase
                 return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.ServerError, "Invalid filterSets")));
             }
 
-            var filteredGames = _listingManager.FindListingsV2(HttpContext, filtersList);
+            var filteredGames = _listingManager.FindListingsV2(HttpContext, filtersList, clientVersion);
             var gameListings = filteredGames.Select(GameListing.From).ToList();
 
             var response = new
