@@ -170,15 +170,16 @@ namespace Impostor.Server.Net.Inner.Objects
             }
 
             var taskCount = reader.ReadByte();
-
-            if (Tasks.Count < taskCount)
-            {
-                taskCount = (byte)Tasks.Count;
-            }
-
-            for (var i = 0; i < taskCount; i++)
+            var knownTaskCount = Math.Min(Tasks.Count, taskCount);
+            for (var i = 0; i < knownTaskCount; i++)
             {
                 Tasks[i].Deserialize(reader);
+            }
+
+            for (var i = knownTaskCount; i < taskCount; i++)
+            {
+                reader.ReadPackedUInt32(); // Task ID
+                reader.ReadBoolean(); // Completion
             }
 
             var friendCode = reader.ReadString();
