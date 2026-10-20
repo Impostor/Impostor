@@ -37,12 +37,21 @@ public static class GameOptionsFactory
         var optionsReader = reader.ReadMessage();
         var gameMode = (GameModes)optionsReader.ReadByte();
 
-        return gameMode switch
+        switch (gameMode)
         {
-            GameModes.Normal or GameModes.NormalFools => NormalGameOptions.Deserialize(optionsReader, version),
-            GameModes.HideNSeek or GameModes.SeekFools => HideNSeekGameOptions.Deserialize(optionsReader, version),
-            _ => throw new ArgumentOutOfRangeException(),
-        };
+            case GameModes.Normal:
+            case GameModes.NormalFools:
+                var normalOptions = NormalGameOptions.Deserialize(optionsReader, version);
+                normalOptions.GameMode = gameMode;
+                return normalOptions;
+            case GameModes.HideNSeek:
+            case GameModes.SeekFools:
+                var hideNSeekOptions = HideNSeekGameOptions.Deserialize(optionsReader, version);
+                hideNSeekOptions.GameMode = gameMode;
+                return hideNSeekOptions;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     public static void DeserializeInto(IMessageReader reader, IGameOptions gameOptions)
@@ -63,11 +72,15 @@ public static class GameOptionsFactory
         {
             case GameModes.Normal:
             case GameModes.NormalFools:
-                ((NormalGameOptions)gameOptions).Deserialize(optionsReader);
+                var normalOptions = (NormalGameOptions)gameOptions;
+                normalOptions.Deserialize(optionsReader);
+                normalOptions.GameMode = gameMode;
                 break;
             case GameModes.HideNSeek:
             case GameModes.SeekFools:
-                ((HideNSeekGameOptions)gameOptions).Deserialize(optionsReader);
+                var hideNSeekOptions = (HideNSeekGameOptions)gameOptions;
+                hideNSeekOptions.Deserialize(optionsReader);
+                hideNSeekOptions.GameMode = gameMode;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(gameMode), gameMode, null);
