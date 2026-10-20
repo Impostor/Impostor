@@ -17,7 +17,7 @@ public class NormalGameOptions : IGameOptions
     public byte Version { get; }
 
     /// <inheritdoc />
-    public GameModes GameMode => GameModes.Normal;
+    public GameModes GameMode { get; internal set; } = GameModes.Normal;
 
     /// <inheritdoc />
     public SpecialGameModes SpecialMode { get; set; } = SpecialGameModes.None;
