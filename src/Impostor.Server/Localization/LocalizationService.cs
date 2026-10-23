@@ -54,13 +54,25 @@ namespace Impostor.Server.Localization
                     return false;
                 }
 
-                if (catalog == null || string.Equals(catalog.Owner, "impostor", StringComparison.OrdinalIgnoreCase))
+                if (catalog == null)
                 {
-                    _logger.LogWarning("Cannot register localization resources: catalog is missing or owner is reserved");
+                    _logger.LogWarning("Cannot register localization resources: catalog is null");
                     return false;
                 }
 
-                if (catalog.Owner != null && _initializedOwners.Contains(catalog.Owner))
+                if (string.IsNullOrWhiteSpace(catalog.Owner))
+                {
+                    _logger.LogWarning("Cannot register localization resources: owner is null or empty");
+                    return false;
+                }
+
+                if (string.Equals(catalog.Owner, "impostor", StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.LogWarning("Cannot register localization resources: '{Owner}' is reserved", catalog.Owner);
+                    return false;
+                }
+
+                if (_initializedOwners.Contains(catalog.Owner))
                 {
                     _logger.LogWarning("Localization owner {Owner} was already initialized; restart the server to reload resources", catalog.Owner);
                     return false;
