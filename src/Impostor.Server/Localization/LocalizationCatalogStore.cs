@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace Impostor.Server.Localization
 {
@@ -8,7 +7,7 @@ namespace Impostor.Server.Localization
     {
         private Dictionary<string, CatalogState> _catalogs = new(StringComparer.OrdinalIgnoreCase);
 
-        public IReadOnlyDictionary<string, CatalogState> Snapshot => Volatile.Read(ref _catalogs);
+        public IReadOnlyDictionary<string, CatalogState> Snapshot => _catalogs;
 
         public void Publish(string owner, CatalogState? state)
         {
@@ -22,12 +21,12 @@ namespace Impostor.Server.Localization
                 next[owner] = state;
             }
 
-            Volatile.Write(ref _catalogs, next);
+            _catalogs = next;
         }
 
         public void Replace(Dictionary<string, CatalogState> catalogs)
         {
-            Volatile.Write(ref _catalogs, catalogs);
+            _catalogs = catalogs;
         }
     }
 }
