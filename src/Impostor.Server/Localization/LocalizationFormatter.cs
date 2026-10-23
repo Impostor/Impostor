@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Localization;
 using Microsoft.Extensions.Logging;
@@ -14,7 +13,7 @@ namespace Impostor.Server.Localization
             if (state != null && message.Key != null)
             {
                 var selected = LanguageCodes.All.ContainsKey(language) ? language : state.Defaults.DefaultLanguage;
-                var culture = CultureInfo.GetCultureInfo(LanguageCodes.All[selected]);
+                var culture = LanguageCodes.All[selected];
                 foreach (var candidate in Candidates(state, message.Key, selected))
                 {
                     if (!LocalizationResourceLoader.TryFormat(candidate, out var format) || arguments.Length < format!.MinimumArgumentCount)

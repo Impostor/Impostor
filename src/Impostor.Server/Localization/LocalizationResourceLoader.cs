@@ -13,7 +13,7 @@ namespace Impostor.Server.Localization
 {
     internal static class LocalizationResourceLoader
     {
-        private static readonly string[] LanguageSuffixes = LanguageCodes.All.Values.Select(code => "." + code + ".json").ToArray();
+        private static readonly string[] LanguageSuffixes = LanguageCodes.All.Values.Select(culture => "." + culture.Name + ".json").ToArray();
 
         public static bool HasLocalizationResources(Assembly assembly) =>
             assembly.GetManifestResourceNames().Any(name => LanguageSuffixes.Any(suffix => name.EndsWith(suffix, StringComparison.Ordinal)));
@@ -37,9 +37,9 @@ namespace Impostor.Server.Localization
             }
 
             var translations = new Dictionary<Language, IReadOnlyDictionary<string, string>>();
-            foreach (var (language, code) in LanguageCodes.All)
+            foreach (var (language, culture) in LanguageCodes.All)
             {
-                var name = $"{prefix}.{code}.json";
+                var name = $"{prefix}.{culture.Name}.json";
                 if (!names.Contains(name))
                 {
                     continue;

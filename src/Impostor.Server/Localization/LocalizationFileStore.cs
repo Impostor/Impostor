@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Server.Localization
@@ -22,9 +23,9 @@ namespace Impostor.Server.Localization
         {
             var tables = new Dictionary<Language, IReadOnlyDictionary<string, string>>();
             var fallback = state.Defaults.Translations[state.Defaults.DefaultLanguage];
-            foreach (var (language, code) in LanguageCodes.All)
+            foreach (var (language, culture) in LanguageCodes.All)
             {
-                var file = Path.Combine(_directory, state.Defaults.Owner, code + ".json");
+                var file = Path.Combine(_directory, state.Defaults.Owner, culture.Name + ".json");
                 if (!File.Exists(file) || !TryRead(file, out var table))
                 {
                     continue;
@@ -52,7 +53,7 @@ namespace Impostor.Server.Localization
         {
             foreach (var (language, values) in catalog.Translations)
             {
-                var file = Path.Combine(_directory, catalog.Owner, LanguageCodes.All[language] + ".json");
+                var file = Path.Combine(_directory, catalog.Owner, LanguageCodes.All[language].Name + ".json");
                 Dictionary<string, string> existing;
                 if (File.Exists(file))
                 {
