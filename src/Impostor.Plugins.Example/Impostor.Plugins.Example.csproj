@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Localization/*.json" />
     <EmbeddedResource Include="Localization/*.json" />
   </ItemGroup>
 
