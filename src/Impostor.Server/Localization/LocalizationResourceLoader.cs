@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Impostor.Api.Innersloth;
@@ -12,22 +13,33 @@ namespace Impostor.Server.Localization
 {
     internal static class LocalizationResourceLoader
     {
+        private static readonly string[] LanguageSuffixes = LanguageCodes.All.Values.Select(code => "." + code + ".json").ToArray();
+
+        public static bool HasLocalizationResources(Assembly assembly) =>
+            assembly.GetManifestResourceNames().Any(name => LanguageSuffixes.Any(suffix => name.EndsWith(suffix, StringComparison.Ordinal)));
+
         public static bool TryLoad(LocalizationCatalog catalog, ILogger logger, out LoadedCatalog? loaded)
         {
             loaded = null;
             if (catalog == null || string.IsNullOrWhiteSpace(catalog.Owner) || catalog.Owner.Length > 128
                 || catalog.Owner is "." or ".." || catalog.Owner.Any(c => !(char.IsAsciiLetterOrDigit(c) || c is '.' or '_' or '-'))
-                || catalog.Assembly == null || string.IsNullOrWhiteSpace(catalog.ResourcePrefix))
+                || catalog.Assembly == null)
             {
-                logger.LogWarning("Invalid localization catalog owner, assembly or resource prefix");
+                logger.LogWarning("Invalid localization catalog owner or assembly");
+                return false;
+            }
+
+            var names = catalog.Assembly.GetManifestResourceNames().ToHashSet(StringComparer.Ordinal);
+            var prefix = DiscoverPrefix(names, catalog, logger);
+            if (prefix == null)
+            {
                 return false;
             }
 
             var translations = new Dictionary<Language, IReadOnlyDictionary<string, string>>();
-            var names = catalog.Assembly.GetManifestResourceNames().ToHashSet(StringComparer.Ordinal);
             foreach (var (language, code) in LanguageCodes.All)
             {
-                var name = $"{catalog.ResourcePrefix}.{code}.json";
+                var name = $"{prefix}.{code}.json";
                 if (!names.Contains(name))
                 {
                     continue;
@@ -132,5 +144,38 @@ namespace Impostor.Server.Localization
         public static bool ValidArguments(string text, string defaultText) =>
             TryFormat(text, out var format) && TryFormat(defaultText, out var fallback)
             && format!.MinimumArgumentCount <= fallback!.MinimumArgumentCount;
+
+        private static string? DiscoverPrefix(IReadOnlyCollection<string> names, LocalizationCatalog catalog, ILogger logger)
+        {
+            var prefixes = new List<string>();
+            foreach (var name in names)
+            {
+                var suffix = LanguageSuffixes.FirstOrDefault(candidate => name.EndsWith(candidate, StringComparison.Ordinal));
+                if (suffix == null)
+                {
+                    continue;
+                }
+
+                var prefix = name[..^suffix.Length];
+                if (!prefixes.Contains(prefix, StringComparer.Ordinal))
+                {
+                    prefixes.Add(prefix);
+                }
+            }
+
+            if (prefixes.Count == 1)
+            {
+                return prefixes[0];
+            }
+
+            if (prefixes.Count == 0)
+            {
+                logger.LogWarning("No localization resources were found in {Assembly} for {Owner}", catalog.Assembly, catalog.Owner);
+                return null;
+            }
+
+            logger.LogWarning("Localization resources in {Assembly} for {Owner} use several prefixes: {Prefixes}; a catalog must contain a single set of language files", catalog.Assembly, catalog.Owner, string.Join(", ", prefixes));
+            return null;
+        }
     }
 }
