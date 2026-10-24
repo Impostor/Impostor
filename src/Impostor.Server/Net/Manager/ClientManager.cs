@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -10,7 +11,6 @@ using Impostor.Api.Net;
 using Impostor.Api.Net.Manager;
 using Impostor.Hazel;
 using Impostor.Server.Events.Client;
-using Impostor.Server.Localization;
 using Impostor.Server.Net.Factories;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -96,7 +96,8 @@ namespace Impostor.Server.Net.Manager
                 {
                     ICompatibilityManager.VersionCompareResult.ClientTooOld => DisconnectMessages.VersionClientTooOld,
                     ICompatibilityManager.VersionCompareResult.ServerTooOld => DisconnectMessages.VersionServerTooOld,
-                    _ => DisconnectMessages.VersionUnsupported,
+                    ICompatibilityManager.VersionCompareResult.Unknown => DisconnectMessages.VersionUnsupported,
+                    _ => throw new ArgumentOutOfRangeException(),
                 };
 
                 await connection.CustomDisconnectAsync(DisconnectReason.Custom, _localizer.Get(message, language));
