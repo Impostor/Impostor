@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Impostor.Api.Config;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Localization;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Server.Localization
 {
@@ -16,11 +18,13 @@ namespace Impostor.Server.Localization
         private readonly LocalizationCatalogStore _store = new();
         private readonly LocalizationFileStore _files;
         private readonly HashSet<string> _initializedOwners = new(StringComparer.OrdinalIgnoreCase);
+        private readonly bool _generateOverrideFiles;
         private bool _disposed;
 
-        public LocalizationService(ILogger<LocalizationService> logger, IHostEnvironment environment)
+        public LocalizationService(ILogger<LocalizationService> logger, IHostEnvironment environment, IOptions<LocalizationConfig> localizationConfig)
         {
             _logger = logger;
+            _generateOverrideFiles = localizationConfig.Value.GenerateOverrideFiles;
             _files = new LocalizationFileStore(environment.ContentRootPath, logger);
             if (LocalizationResourceLoader.TryLoad(BuiltInMessages.Load(), logger, out var defaults))
             {
@@ -119,7 +123,11 @@ namespace Impostor.Server.Localization
         private Guid Initialize(LoadedCatalog defaults)
         {
             var token = Guid.NewGuid();
-            _files.EnsureFiles(defaults);
+            if (_generateOverrideFiles)
+            {
+                _files.SyncOverrideFiles(defaults);
+            }
+
             var state = new CatalogState(token, defaults, new Dictionary<Language, IReadOnlyDictionary<string, string>>());
             _store.Publish(defaults.Owner, _files.LoadOverrides(state));
             _initializedOwners.Add(defaults.Owner);

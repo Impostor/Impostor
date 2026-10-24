@@ -110,6 +110,7 @@ namespace Impostor.Server
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                     services.Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section));
                     services.Configure<HttpServerConfig>(host.Configuration.GetSection(HttpServerConfig.Section));
+                    services.Configure<LocalizationConfig>(host.Configuration.GetSection(LocalizationConfig.Section));
                     services.AddSingleton<LocalizationService>();
                     services.AddSingleton<ILocalizationService>(p => p.GetRequiredService<LocalizationService>());
                     services.AddSingleton<ILocalizationRegistry>(p => p.GetRequiredService<LocalizationService>());
