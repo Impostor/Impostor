@@ -13,7 +13,6 @@ using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
-using Impostor.Server.Localization;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
