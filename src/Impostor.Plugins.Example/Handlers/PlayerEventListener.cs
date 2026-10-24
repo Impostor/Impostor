@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Player;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Innersloth.GameOptions;
+using Impostor.Api.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example.Handlers
@@ -14,10 +16,12 @@ namespace Impostor.Plugins.Example.Handlers
         private readonly Random _random = new Random();
 
         private readonly ILogger<PlayerEventListener> _logger;
+        private readonly ILocalizationService _localizer;
 
-        public PlayerEventListener(ILogger<PlayerEventListener> logger)
+        public PlayerEventListener(ILogger<PlayerEventListener> logger, ILocalizationService localizer)
         {
             _logger = logger;
+            _localizer = localizer;
         }
 
         [EventListener]
@@ -62,6 +66,15 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public async ValueTask OnPlayerChat(IPlayerChatEvent e)
         {
+            if (e.Message == "localization")
+            {
+                e.IsCancelled = true;
+                var client = e.ClientPlayer.Client;
+                var message = _localizer.Get(new LocalizedMessageKey("gg.impostor.example", "Goodbye"), client.Language, client.Name);
+                await client.DisconnectAsync(DisconnectReason.Custom, message);
+                return;
+            }
+
             _logger.LogInformation("Player {player} > said {message}", e.PlayerControl.PlayerInfo.PlayerName, e.Message);
 
             if (e.Message == "test")

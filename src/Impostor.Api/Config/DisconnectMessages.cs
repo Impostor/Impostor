@@ -1,36 +1,41 @@
-﻿namespace Impostor.Api.Config
+using Impostor.Api.Localization;
+
+namespace Impostor.Api.Config
 {
     public static class DisconnectMessages
     {
-        public const string Error = "There was an internal server error. " +
-                                    "Check the server console for more information. " +
-                                    "Please report the issue on the Impostor GitHub if it keeps happening.";
+        public static LocalizedMessageKey Error => Key("Error");
 
-        public const string ClientOutdated = "Please update your game to play in this lobby.";
+        public static LocalizedMessageKey ClientOutdated => Key("ClientOutdated");
 
-        public const string ClientTooNew = "Your game version is too new for this lobby. " +
-                                           "If you want to join this lobby you need to downgrade your client.";
+        public static LocalizedMessageKey ClientTooNew => Key("ClientTooNew");
 
-        public const string Destroyed = "The game you tried to join is being destroyed. " +
-                                        "Please create a new game.";
+        public static LocalizedMessageKey Destroyed => Key("Destroyed");
 
-        public const string UsernameLength = "Your username is too long, please make it shorter.";
+        public static LocalizedMessageKey UsernameLength => Key("UsernameLength");
 
-        public const string UsernameIllegalCharacters = "Your username contains illegal characters, please remove them.";
+        public static LocalizedMessageKey UsernameIllegalCharacters => Key("UsernameIllegalCharacters");
 
-        public const string VersionClientTooOld = "Please update your game to play on this server.";
+        public static LocalizedMessageKey VersionClientTooOld => Key("VersionClientTooOld");
 
-        public const string VersionServerTooOld = "Your client is too new, please update your Impostor server to play.";
+        public static LocalizedMessageKey VersionServerTooOld => Key("VersionServerTooOld");
 
-        public const string VersionUnsupported = "Your client version is unsupported, please update your Game and/or Impostor server.";
+        public static LocalizedMessageKey VersionUnsupported => Key("VersionUnsupported");
 
-        private const string UpgradingDocsLink = "https://github.com/Impostor/Impostor/blob/master/docs/Upgrading.md";
+        public static LocalizedMessageKey UdpMatchmakingUnsupported => Key("UdpMatchmakingUnsupported");
 
-        public const string UdpMatchmakingUnsupported = $"""
-                                                        Sorry, UDP Matchmaking is no longer supported.
-                                                        See <link={UpgradingDocsLink}#impostor-190>Impostor documentation</link> on how to migrate to HTTP Matchmaking
-                                                        """;
+        public static LocalizedMessageKey HostAuthorityUnsupported => Key("HostAuthorityUnsupported");
 
-        public const string HostAuthorityUnsupported = "Your client is requesting host authority, which is not enabled on this Impostor server.";
+        public static LocalizedMessageKey InvalidClient => Key("InvalidClient");
+
+        public static LocalizedMessageKey InvalidLimbo => Key("InvalidLimbo");
+
+        public static LocalizedMessageKey UnknownError => Key("UnknownError");
+
+        public static LocalizedMessageKey CheatBanned => Key("CheatBanned");
+
+        public static LocalizedMessageKey CheatKicked => Key("CheatKicked");
+
+        private static LocalizedMessageKey Key(string key) => new("impostor", key);
     }
 }

@@ -6,6 +6,7 @@ using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameOptions;
+using Impostor.Api.Localization;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
 using Impostor.Api.Net.Messages;
@@ -25,8 +26,9 @@ namespace Impostor.Server.Net
         private readonly ClientManager _clientManager;
         private readonly GameManager _gameManager;
         private readonly ICustomMessageManager<ICustomRootMessage> _customMessageManager;
+        private readonly ILocalizationService _localizer;
 
-        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, string name, GameVersion gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, IHazelConnection connection)
+        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, ILocalizationService localizer, string name, GameVersion gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, IHazelConnection connection)
             : base(name, gameVersion, language, chatMode, platformSpecificData, connection)
         {
             _logger = logger;
@@ -34,6 +36,7 @@ namespace Impostor.Server.Net
             _clientManager = clientManager;
             _gameManager = gameManager;
             _customMessageManager = customMessageManager;
+            _localizer = localizer;
         }
 
         public override async ValueTask<bool> ReportCheatAsync(CheatContext context, CheatCategory category, string message)
@@ -112,11 +115,10 @@ namespace Impostor.Server.Net
                 await player.Game.HandleRemovePlayer(Id, DisconnectReason.Hacking);
             }
 
-            var disconnectMessage =
-                $"""
-                 You have been caught cheating and were {(_antiCheatConfig.BanIpFromGame ? "banned" : "kicked")} from the lobby.
-                 For questions, contact your server admin and share the following code: {supportCode}.
-                 """;
+            var disconnectMessage = _localizer.Get(
+                _antiCheatConfig.BanIpFromGame ? DisconnectMessages.CheatBanned : DisconnectMessages.CheatKicked,
+                Language,
+                supportCode);
 
             await DisconnectAsync(DisconnectReason.Custom, disconnectMessage);
 
@@ -191,7 +193,7 @@ namespace Impostor.Server.Net
                         case GameJoinError.None:
                             break;
                         case GameJoinError.InvalidClient:
-                            await DisconnectAsync(DisconnectReason.Custom, "Client is in an invalid state.");
+                            await DisconnectAsync(DisconnectReason.Custom, _localizer.Get(DisconnectMessages.InvalidClient, Language));
                             break;
                         case GameJoinError.Banned:
                             await DisconnectAsync(DisconnectReason.Banned);
@@ -200,25 +202,25 @@ namespace Impostor.Server.Net
                             await DisconnectAsync(DisconnectReason.GameFull);
                             break;
                         case GameJoinError.InvalidLimbo:
-                            await DisconnectAsync(DisconnectReason.Custom, "Invalid limbo state while joining.");
+                            await DisconnectAsync(DisconnectReason.Custom, _localizer.Get(DisconnectMessages.InvalidLimbo, Language));
                             break;
                         case GameJoinError.GameStarted:
                             await DisconnectAsync(DisconnectReason.GameStarted);
                             break;
                         case GameJoinError.GameDestroyed:
-                            await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.Destroyed);
+                            await DisconnectAsync(DisconnectReason.Custom, _localizer.Get(DisconnectMessages.Destroyed, Language));
                             break;
                         case GameJoinError.ClientOutdated:
-                            await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.ClientOutdated);
+                            await DisconnectAsync(DisconnectReason.Custom, _localizer.Get(DisconnectMessages.ClientOutdated, Language));
                             break;
                         case GameJoinError.ClientTooNew:
-                            await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.ClientTooNew);
+                            await DisconnectAsync(DisconnectReason.Custom, _localizer.Get(DisconnectMessages.ClientTooNew, Language));
                             break;
                         case GameJoinError.Custom:
                             await DisconnectAsync(DisconnectReason.Custom, result.Message);
                             break;
                         default:
-                            await DisconnectAsync(DisconnectReason.Custom, "Unknown error.");
+                            await DisconnectAsync(DisconnectReason.Custom, _localizer.Get(DisconnectMessages.UnknownError, Language));
                             break;
                     }
 
@@ -417,7 +419,7 @@ namespace Impostor.Server.Net
 
                 case MessageFlags.GetGameListV2:
                 {
-                    await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.UdpMatchmakingUnsupported);
+                    await DisconnectAsync(DisconnectReason.Custom, _localizer.Get(DisconnectMessages.UdpMatchmakingUnsupported, Language));
                     return;
                 }
 
