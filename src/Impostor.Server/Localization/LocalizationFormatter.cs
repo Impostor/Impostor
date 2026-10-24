@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Localization;
@@ -8,6 +9,8 @@ namespace Impostor.Server.Localization
 {
     internal static class LocalizationFormatter
     {
+        private static readonly ConcurrentDictionary<LocalizedMessageKey, byte> Reported = new();
+
         public static string Get(CatalogState? state, LocalizedMessageKey message, Language language, object?[] arguments, ILogger logger)
         {
             if (state != null && message.Key != null)
@@ -33,7 +36,12 @@ namespace Impostor.Server.Localization
                 }
             }
 
-            logger.LogWarning("Missing localization message or arguments for {Message}", message);
+            // This runs for every message that cannot be resolved, so report each missing key once.
+            if (Reported.TryAdd(message, 0))
+            {
+                logger.LogError("No localization message found for {Message}", message);
+            }
+
             return message.ToString();
         }
 
