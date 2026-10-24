@@ -10,6 +10,12 @@ namespace Impostor.Server.Localization
 {
     internal sealed class LocalizationFileStore
     {
+        private static readonly JsonSerializerOptions OverrideFileOptions = new()
+        {
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        };
+
         private readonly ILogger _logger;
         private readonly string _directory;
 
@@ -77,11 +83,7 @@ namespace Impostor.Server.Localization
 
                 if (changed)
                 {
-                    TryWrite(file, JsonSerializer.Serialize(existing, new JsonSerializerOptions
-                    {
-                        WriteIndented = true,
-                        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                    }));
+                    TryWrite(file, JsonSerializer.Serialize(existing, OverrideFileOptions));
                 }
             }
         }
