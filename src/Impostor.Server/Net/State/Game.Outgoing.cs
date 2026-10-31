@@ -95,7 +95,17 @@ namespace Impostor.Server.Net.State
                 .Select(x => x.Value)
                 .ToArray();
 
-            Message07JoinedGameS2C.Serialize(message, clear, Code, player.Client.Id, HostId, players);
+            var client = player.Client as ClientBase;
+            var alias = client?.JoinAlias ?? 0;
+
+            Message07JoinedGameS2C.Serialize(message, clear, alias != 0 ? alias : (int)Code, player.Client.Id, HostId, players);
+
+            if (client != null && alias != 0)
+            {
+                // The client keeps the id it joined with, send the real one.
+                Message00HostGameS2C.Serialize(message, Code);
+                client.JoinAlias = 0;
+            }
         }
 
         private void WriteAlterGameMessage(IMessageWriter message, bool clear, bool isPublic)
@@ -110,7 +120,8 @@ namespace Impostor.Server.Net.State
 
         private void WriteWaitForHostMessage(IMessageWriter message, bool clear, IClientPlayer player)
         {
-            Message12WaitForHostS2C.Serialize(message, clear, Code, player.Client.Id);
+            var alias = (player.Client as ClientBase)?.JoinAlias ?? 0;
+            Message12WaitForHostS2C.Serialize(message, clear, alias != 0 ? alias : (int)Code, player.Client.Id);
         }
 
         private async ValueTask SendObjectSpawnAsync(InnerNetObject obj, int? targetClientId = null)

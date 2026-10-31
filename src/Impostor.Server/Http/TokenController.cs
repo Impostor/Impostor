@@ -1,7 +1,9 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
+using Impostor.Server.Account;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Impostor.Server.Http;
@@ -13,22 +15,50 @@ namespace Impostor.Server.Http;
 [ApiController]
 public sealed class TokenController : ControllerBase
 {
+    private readonly GameCodeAuthManager _accounts;
+    private readonly IFriendCodeResolver _friendCodes;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TokenController"/> class.
+    /// </summary>
+    /// <param name="accounts">Session store used to bind tokens to game connections.</param>
+    /// <param name="friendCodes">Friend code lookup.</param>
+    public TokenController(GameCodeAuthManager accounts, IFriendCodeResolver friendCodes)
+    {
+        _accounts = accounts;
+        _friendCodes = friendCodes;
+    }
+
     /// <summary>
     /// Get an authentication token.
     /// </summary>
     /// <param name="request">Token parameters that need to be put into the token.</param>
+    /// <param name="authorization">Authorization header of the request, if any.</param>
     /// <returns>A bare minimum authentication token that the client will accept.</returns>
     [HttpPost]
-    public IActionResult GetToken([FromBody] TokenRequest request)
+    public async Task<IActionResult> GetToken([FromBody] TokenRequest request, [FromHeader(Name = "Authorization")] string? authorization = null)
     {
+        var hash = "impostor_was_here";
+
+        if (_accounts.Enabled)
+        {
+            var bearer = authorization != null && authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+                ? authorization["Bearer ".Length..]
+                : null;
+
+            var friendCode = await _friendCodes.ResolveAsync(request.ProductUserId, bearer);
+            hash = _accounts.CreateSession(request.ProductUserId, friendCode, request.Username, request.ClientVersion, request.Language);
+        }
+
         var token = new Token
         {
             Content = new TokenPayload
             {
                 ProductUserId = request.ProductUserId,
                 ClientVersion = request.ClientVersion,
+                ExpiresAt = DateTime.UtcNow + _accounts.SessionLifetime,
             },
-            Hash = "impostor_was_here",
+            Hash = hash,
         };
 
         // Wrap into a Base64 sandwich

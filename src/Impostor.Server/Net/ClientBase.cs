@@ -44,6 +44,11 @@ namespace Impostor.Server.Net
 
         public string? Puid { get; set; }
 
+        /// <summary>
+        /// Gets or sets the temporary code this client used to join, until the real one is sent back.
+        /// </summary>
+        public int JoinAlias { get; set; }
+
         public ColorType? PreviousColor { get; set; } = null;
 
         IClientPlayer? IClient.Player => Player;
