@@ -11,6 +11,7 @@ using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameFilters;
+using Impostor.Server.Account;
 using Impostor.Server.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -29,6 +30,7 @@ public sealed class GamesController : ControllerBase
     private readonly ListingManager _listingManager;
     private readonly HostServer _hostServer;
     private readonly ILogger<GamesController> _logger;
+    private readonly GameCodeAuthManager _accounts;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GamesController"/> class.
@@ -37,8 +39,10 @@ public sealed class GamesController : ControllerBase
     /// <param name="listingManager">ListingManager responsible for filtering.</param>
     /// <param name="serverConfig">Impostor configuration section containing the public ip address of this server.</param>
     /// <param name="logger">DI injected logger.</param>
-    public GamesController(IGameManager gameManager, ListingManager listingManager, IOptions<ServerConfig> serverConfig, ILogger<GamesController> logger)
+    /// <param name="accounts">Account binding for token sessions.</param>
+    public GamesController(IGameManager gameManager, ListingManager listingManager, IOptions<ServerConfig> serverConfig, ILogger<GamesController> logger, GameCodeAuthManager accounts)
     {
+        _accounts = accounts;
         _gameManager = gameManager;
         _listingManager = listingManager;
         var config = serverConfig.Value;
@@ -72,7 +76,8 @@ public sealed class GamesController : ControllerBase
         var clientVersion = new GameVersion(token.Content.ClientVersion);
 
         var listings = _listingManager.FindListings(HttpContext, mapId, numImpostors, lang, clientVersion);
-        return Ok(listings.Select(GameListing.From));
+        var session = GetSession();
+        return Ok(listings.Select(g => GameListing.From(g, AliasFor(session, g))));
     }
 
     /// <summary>
@@ -93,6 +98,13 @@ public sealed class GamesController : ControllerBase
             return NotFound(new MatchmakerResponse(new MatchmakerError(DisconnectReason.GameNotFound)));
         }
 
+        // The legacy response has no game id, so the client joins with the code it typed.
+        var session = GetSession();
+        if (session != null)
+        {
+            _accounts.ExpectJoin(session, gameId);
+        }
+
         return Ok(HostServer.From(game.PublicIp));
     }
 
@@ -103,6 +115,12 @@ public sealed class GamesController : ControllerBase
     [HttpPut]
     public IActionResult Put()
     {
+        var session = GetSession();
+        if (session != null)
+        {
+            _accounts.ExpectHost(session);
+        }
+
         return Ok(_hostServer);
     }
 
@@ -118,7 +136,7 @@ public sealed class GamesController : ControllerBase
             return NotFound(new FindGameByCodeResponse(new MatchmakerError(DisconnectReason.GameNotFound)));
         }
 
-        return Ok(new FindGameByCodeResponse(GameListing.From(game)));
+        return Ok(new FindGameByCodeResponse(GameListing.From(game, AliasFor(GetSession(), game))));
     }
 
     [HttpGet("filtered")]
@@ -145,7 +163,8 @@ public sealed class GamesController : ControllerBase
             }
 
             var filteredGames = _listingManager.FindListingsV2(HttpContext, filtersList);
-            var gameListings = filteredGames.Select(GameListing.From).ToList();
+            var session = GetSession();
+            var gameListings = filteredGames.Select(g => GameListing.From(g, AliasFor(session, g))).ToList();
 
             var response = new
             {
@@ -174,6 +193,37 @@ public sealed class GamesController : ControllerBase
 #pragma warning disable CS0618 // Among Us only supports IPv4
         return (uint)address.Address;
 #pragma warning restore CS0618
+    }
+
+    private AccountSession? GetSession()
+    {
+        if (!_accounts.Enabled
+            || !AuthenticationHeaderValue.TryParse(Request.Headers.Authorization.ToString(), out var header)
+            || header.Scheme != "Bearer"
+            || header.Parameter == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            var token = JsonSerializer.Deserialize<TokenController.Token>(Convert.FromBase64String(header.Parameter));
+            return _accounts.GetSession(token?.Hash);
+        }
+        catch (Exception ex) when (ex is JsonException or FormatException)
+        {
+            return null;
+        }
+    }
+
+    private int? AliasFor(AccountSession? session, IGame game)
+    {
+        if (session == null)
+        {
+            return null;
+        }
+
+        return _accounts.IssueAlias(session, game.Code, code => _gameManager.Find(code) != null);
     }
 
     private class HostServer
@@ -290,7 +340,7 @@ public sealed class GamesController : ControllerBase
         [JsonPropertyName("Options")]
         public required string Options { get; init; }
 
-        public static GameListing From(IGame game)
+        public static GameListing From(IGame game, int? gameId = null)
         {
             var platform = game.Host?.Client.PlatformSpecificData;
 
@@ -298,7 +348,7 @@ public sealed class GamesController : ControllerBase
             {
                 Ip = ConvertAddressToNumber(game.PublicIp.Address),
                 Port = (ushort)game.PublicIp.Port,
-                GameId = game.Code,
+                GameId = gameId ?? game.Code,
                 PlayerCount = game.PlayerCount,
                 HostName = game.DisplayName ?? game.Host?.Client.Name ?? "Unknown host",
                 TrueHostName = game.DisplayName ?? game.Host?.Client.Name ?? "Unknown host",
