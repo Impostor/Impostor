@@ -18,6 +18,8 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         private readonly InnerPlayerControl _playerControl;
         private readonly IEventManager _eventManager;
 
+        private byte _lastClimbLadderSid;
+
         public InnerPlayerPhysics(ICustomMessageManager<ICustomRpc> customMessageManager, Game game, ILogger<InnerPlayerPhysics> logger, InnerPlayerControl playerControl, IEventManager eventManager) : base(customMessageManager, game)
         {
             _logger = logger;
@@ -109,6 +111,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
                     }
 
                     Rpc31ClimbLadder.Deserialize(reader, out var ladderId, out var lastClimbLadderSid);
+                    _lastClimbLadderSid = lastClimbLadderSid;
                     break;
                 }
 
