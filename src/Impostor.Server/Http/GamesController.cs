@@ -77,6 +77,12 @@ public sealed class GamesController : ControllerBase
 
         var listings = _listingManager.FindListings(HttpContext, mapId, numImpostors, lang, clientVersion);
         var session = GetSession();
+        if (_accounts.Enabled && session == null)
+        {
+            // 401 makes the client refresh its token and retry.
+            return Unauthorized();
+        }
+
         return Ok(listings.Select(g => GameListing.From(g, AliasFor(session, g))));
     }
 
@@ -98,8 +104,13 @@ public sealed class GamesController : ControllerBase
             return NotFound(new MatchmakerResponse(new MatchmakerError(DisconnectReason.GameNotFound)));
         }
 
-        // The legacy response has no game id, so the client joins with the code it typed.
+        // Legacy response has no game id, the client joins with the typed code.
         var session = GetSession();
+        if (_accounts.Enabled && session == null)
+        {
+            return Unauthorized();
+        }
+
         if (session != null)
         {
             _accounts.ExpectJoin(session, gameId);
@@ -116,6 +127,11 @@ public sealed class GamesController : ControllerBase
     public IActionResult Put()
     {
         var session = GetSession();
+        if (_accounts.Enabled && session == null)
+        {
+            return Unauthorized();
+        }
+
         if (session != null)
         {
             _accounts.ExpectHost(session);
@@ -136,7 +152,13 @@ public sealed class GamesController : ControllerBase
             return NotFound(new FindGameByCodeResponse(new MatchmakerError(DisconnectReason.GameNotFound)));
         }
 
-        return Ok(new FindGameByCodeResponse(GameListing.From(game, AliasFor(GetSession(), game))));
+        var session = GetSession();
+        if (_accounts.Enabled && session == null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(new FindGameByCodeResponse(GameListing.From(game, AliasFor(session, game))));
     }
 
     [HttpGet("filtered")]
@@ -164,6 +186,11 @@ public sealed class GamesController : ControllerBase
 
             var filteredGames = _listingManager.FindListingsV2(HttpContext, filtersList);
             var session = GetSession();
+            if (_accounts.Enabled && session == null)
+            {
+                return Unauthorized();
+            }
+
             var gameListings = filteredGames.Select(g => GameListing.From(g, AliasFor(session, g))).ToList();
 
             var response = new
@@ -197,8 +224,12 @@ public sealed class GamesController : ControllerBase
 
     private AccountSession? GetSession()
     {
-        if (!_accounts.Enabled
-            || !AuthenticationHeaderValue.TryParse(Request.Headers.Authorization.ToString(), out var header)
+        if (!_accounts.Enabled)
+        {
+            return null;
+        }
+
+        if (!AuthenticationHeaderValue.TryParse(Request.Headers.Authorization.ToString(), out var header)
             || header.Scheme != "Bearer"
             || header.Parameter == null)
         {

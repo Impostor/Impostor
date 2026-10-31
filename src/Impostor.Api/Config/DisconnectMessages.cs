@@ -16,6 +16,8 @@
 
         public const string AccountUnmatched = "Your account could not be verified. Please try joining again.";
 
+        public const string AuthenticationFailedRetry = "Authentication failed, please retry.";
+
         public const string UsernameLength = "Your username is too long, please make it shorter.";
 
         public const string UsernameIllegalCharacters = "Your username contains illegal characters, please remove them.";

@@ -102,7 +102,7 @@ namespace Impostor.Server.Net.State
 
             if (client != null && alias != 0)
             {
-                // The client keeps whatever id it joined with, so hand it the real one right away.
+                // The client keeps the id it joined with, send the real one.
                 Message00HostGameS2C.Serialize(message, Code);
                 client.JoinAlias = 0;
             }

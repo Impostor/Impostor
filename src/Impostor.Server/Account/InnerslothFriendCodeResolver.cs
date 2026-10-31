@@ -42,7 +42,7 @@ namespace Impostor.Server.Account
                 return hit.Code;
             }
 
-            // The backend answers for whoever owns the token, so it has to belong to the claimed puid.
+            // The backend answers for the token owner, so it must match the claimed puid.
             if (!TokenBelongsTo(bearerToken, puid))
             {
                 _logger.LogWarning("Token does not belong to {Puid}, friend code skipped.", puid);

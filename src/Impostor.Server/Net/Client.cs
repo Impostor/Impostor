@@ -129,18 +129,50 @@ namespace Impostor.Server.Net
         // Code 0 means hosting. Returns the real game code the client is joining.
         private async ValueTask<(bool Ok, int Target)> BindAccountAsync(int code)
         {
-            if (!_accounts.Enabled || Puid != null)
+            if (!_accounts.Enabled)
             {
                 return (true, code);
             }
 
-            var claim = code == 0
-                ? _accounts.ClaimHost(Name, Language, GameVersion.Value)
-                : _accounts.ClaimJoin(code, Name, Language, GameVersion.Value);
+            var puid = Puid;
+            if (puid != null)
+            {
+                // Already bound, only a temporary code needs swapping.
+                if (code != 0 && _accounts.TryResolveAlias(code, puid, out var realCode))
+                {
+                    return (true, realCode);
+                }
+
+                return (true, code);
+            }
+
+            bool conflict;
+            AccountClaim? claim;
+            if (code == 0)
+            {
+                claim = _accounts.ClaimHost(Name, Language, GameVersion.Value, out conflict);
+            }
+            else
+            {
+                claim = _accounts.ClaimJoin(code, Name, Language, GameVersion.Value, out conflict);
+            }
+
+            if (conflict)
+            {
+                _logger.LogWarning("[{0}] {1} could not be bound, another player with the same name is claiming a game, disconnecting.", Id, Name);
+                await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.AuthenticationFailedRetry);
+                return (false, code);
+            }
 
             if (claim == null)
             {
-                _logger.LogWarning("[{0}] {1} could not be bound to an account.", Id, Name);
+                _logger.LogWarning(
+                    "[{0}] {1} could not be bound to an account (game code {2} ({3})), {4}.",
+                    Id,
+                    Name,
+                    GameCodeParser.IntToGameName(code),
+                    code,
+                    _accounts.RejectUnmatched ? "disconnecting because RejectUnmatched is enabled" : "allowed in anonymously");
 
                 if (_accounts.RejectUnmatched)
                 {
@@ -156,6 +188,7 @@ namespace Impostor.Server.Net
             JoinAlias = claim.Alias;
 
             _logger.LogInformation("[{0}] {1} bound to {2} ({3}).", Id, Name, claim.Puid, claim.FriendCode ?? "no friend code");
+
             return (true, code == 0 ? code : claim.Target);
         }
 

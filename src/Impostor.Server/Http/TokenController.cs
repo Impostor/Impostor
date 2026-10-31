@@ -56,6 +56,7 @@ public sealed class TokenController : ControllerBase
             {
                 ProductUserId = request.ProductUserId,
                 ClientVersion = request.ClientVersion,
+                ExpiresAt = DateTime.UtcNow + _accounts.SessionLifetime,
             },
             Hash = hash,
         };
