@@ -18,9 +18,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v6
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
@@ -28,16 +28,16 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
 
       - name: Run the Cake script
-        uses: cake-build/cake-action@v1
+        uses: cake-build/cake-action@v3
         with:
           verbosity: Diagnostic
 
-      - uses: softprops/action-gh-release@v1
+      - uses: softprops/action-gh-release@v3
         if: github.ref_type == 'tag'
         with:
           draft: true
@@ -47,7 +47,15 @@ jobs:
             ./build/*.nupkg
             ./build/*.snupkg
 
+      # Use NuGet trusted publishing: https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing
+      - name: NuGet login
+        uses: NuGet/login@v1
+        id: login
+        if: github.ref_type == 'tag'
+        with:
+          user: "${{ secrets.NUGET_USER }}"
+
       - name: Push NuGet package
         if: github.ref_type == 'tag'
         run: |
-          dotnet nuget push ./build/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_IMPOSTOR }}
+          dotnet nuget push ./build/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.login.outputs.NUGET_API_KEY }}
