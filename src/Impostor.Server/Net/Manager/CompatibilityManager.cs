@@ -54,6 +54,7 @@ internal class CompatibilityManager : ICompatibilityManager
         {
             new GameVersion(2026, 7, 20), // 19.0   (2026-09-29, build 7489, pc only)
             new GameVersion(2026, 7, 21), // 19.0   (2026-09-29, build 7492, mobile only)
+            new GameVersion(2026, 9, 11), // 19.0.1 (2026-11-03, build 7616, mobile only)
         },
     };
 
