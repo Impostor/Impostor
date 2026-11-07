@@ -127,10 +127,11 @@ namespace Impostor.Server.Net.Inner.Objects
                 writer.Write((ushort)RoleWhenAlive.Value);
             }
 
-            writer.Write((byte)Tasks.Count);
-            for (var i = 0; i < Tasks.Count; i++)
+            var tasks = Tasks;
+            writer.Write((byte)tasks.Count);
+            for (var i = 0; i < tasks.Count; i++)
             {
-                Tasks[i].Serialize(writer);
+                tasks[i].Serialize(writer);
             }
 
             // Resolved by the matchmaker and pushed onto the player by a plugin
@@ -170,16 +171,19 @@ namespace Impostor.Server.Net.Inner.Objects
             }
 
             var taskCount = reader.ReadByte();
-
-            if (Tasks.Count < taskCount)
-            {
-                taskCount = (byte)Tasks.Count;
-            }
-
+            var previousTasks = Tasks;
+            var tasks = new List<TaskInfo>(taskCount);
             for (var i = 0; i < taskCount; i++)
             {
-                Tasks[i].Deserialize(reader);
+                var task = new TaskInfo(this, _eventManager, 0, null);
+                task.Deserialize(reader);
+
+                // Task type is not serialized, so preserve it only for a known ID.
+                task.Task = previousTasks.Find(previous => previous.Id == task.Id)?.Task;
+                tasks.Add(task);
             }
+
+            Tasks = tasks;
 
             var friendCode = reader.ReadString();
             var puid = reader.ReadString();
