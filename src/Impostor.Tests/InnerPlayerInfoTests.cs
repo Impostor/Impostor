@@ -5,6 +5,7 @@ using Impostor.Api.Config;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameOptions;
+using Impostor.Api.Innersloth.Maps;
 using Impostor.Hazel;
 using Impostor.Hazel.Abstractions;
 using Impostor.Hazel.Extensions;
@@ -27,7 +28,7 @@ public sealed class InnerPlayerInfoTests
     [InlineData(2, 2)]
     [InlineData(1, 3)]
     [InlineData(255, 1)]
-    public async Task DeserializeConsumesAllTaskRecords(int wireTaskCount, int knownTaskCount)
+    public async Task DeserializeReplacesTasksWithReceivedRecords(int wireTaskCount, int knownTaskCount)
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddHazel();
@@ -46,11 +47,13 @@ public sealed class InnerPlayerInfoTests
             Options.Create(new CompatibilityConfig()),
             Options.Create(new TimeoutConfig()));
         var playerInfo = new InnerPlayerInfo(null!, null!, game, NullLogger<InnerPlayerInfo>.Instance);
+        var taskTypes = MapData.Maps[MapTypes.Skeld].Tasks.Values.ToArray();
         for (var i = 0; i < knownTaskCount; i++)
         {
-            playerInfo.Tasks.Add(new TaskInfo(playerInfo, null!, (uint)i, null));
+            playerInfo.Tasks.Add(new TaskInfo(playerInfo, null!, (uint)i, taskTypes[i % taskTypes.Length]) { Complete = true });
         }
 
+        var originalList = playerInfo.Tasks;
         var originalTasks = playerInfo.Tasks.ToArray();
         using var writer = MessageWriter.Get(MessageType.Unreliable);
         writer.Write((byte)7); // PlayerId
@@ -63,7 +66,8 @@ public sealed class InnerPlayerInfoTests
         writer.Write((byte)wireTaskCount);
         for (var i = 0; i < wireTaskCount; i++)
         {
-            writer.WritePacked((uint)(128 + i));
+            var taskId = i < knownTaskCount ? (uint)(knownTaskCount - i - 1) : (uint)(128 + i);
+            writer.WritePacked(taskId);
             writer.Write(i % 2 == 0);
         }
 
@@ -79,12 +83,34 @@ public sealed class InnerPlayerInfoTests
         Assert.Equal(playerInfoLength, reader.Position);
         Assert.Equal("following-data", reader.ReadString());
         Assert.Equal(reader.Length, reader.Position);
-        Assert.Equal(knownTaskCount, playerInfo.Tasks.Count);
-        for (var i = 0; i < knownTaskCount; i++)
+        Assert.NotSame(originalList, playerInfo.Tasks);
+        Assert.Equal(originalTasks, originalList);
+        Assert.Equal(wireTaskCount, playerInfo.Tasks.Count);
+        for (var i = 0; i < wireTaskCount; i++)
         {
-            Assert.Same(originalTasks[i], playerInfo.Tasks[i]);
-            Assert.Equal(i < wireTaskCount ? (uint)(128 + i) : (uint)i, playerInfo.Tasks[i].Id);
-            Assert.Equal(i < wireTaskCount && i % 2 == 0, playerInfo.Tasks[i].Complete);
+            var taskId = i < knownTaskCount ? (uint)(knownTaskCount - i - 1) : (uint)(128 + i);
+            Assert.Equal(taskId, playerInfo.Tasks[i].Id);
+            Assert.Equal(i % 2 == 0, playerInfo.Tasks[i].Complete);
+            if (i < knownTaskCount)
+            {
+                var previousTask = originalTasks[knownTaskCount - i - 1];
+                Assert.NotSame(previousTask, playerInfo.Tasks[i]);
+                Assert.Same(previousTask.Task, playerInfo.Tasks[i].Task);
+            }
+            else
+            {
+                Assert.Null(playerInfo.Tasks[i].Task);
+            }
         }
+
+        using var serialized = MessageWriter.Get(MessageType.Unreliable);
+        await playerInfo.SerializeAsync(serialized, false);
+        using var roundTripReader = services.GetRequiredService<ObjectPool<MessageReader>>().Get();
+        roundTripReader.Update(serialized.ToByteArray(false));
+        var roundTrip = new InnerPlayerInfo(null!, null!, game, NullLogger<InnerPlayerInfo>.Instance);
+        await roundTrip.DeserializeAsync(null!, null, roundTripReader, false);
+
+        Assert.Equal(roundTripReader.Length, roundTripReader.Position);
+        Assert.Equal(playerInfo.Tasks.Select(task => (task.Id, task.Complete)), roundTrip.Tasks.Select(task => (task.Id, task.Complete)));
     }
 }

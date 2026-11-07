@@ -135,7 +135,7 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnPlayerCompletedTaskEvent(IPlayerCompletedTaskEvent e)
         {
-            _logger.LogInformation("Player {player} completed {task}, {type}, {category}, visual {visual}", e.PlayerControl.PlayerInfo.PlayerName, e.Task.Task.Name, e.Task.Task.Type, e.Task.Task.Category, e.Task.Task.IsVisual);
+            _logger.LogInformation("Player {player} completed {task}, {type}, {category}, visual {visual}", e.PlayerControl.PlayerInfo.PlayerName, e.Task.Task?.Name, e.Task.Task?.Type, e.Task.Task?.Category, e.Task.Task?.IsVisual);
         }
     }
 }

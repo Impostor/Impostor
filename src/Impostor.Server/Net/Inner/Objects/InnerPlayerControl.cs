@@ -627,7 +627,7 @@ namespace Impostor.Server.Net.Inner.Objects
             }
             else
             {
-                task = PlayerInfo.Tasks.ElementAtOrDefault((int)taskId);
+                task = PlayerInfo.Tasks.FirstOrDefault(t => t.Id == taskId);
             }
 
             if (task != null)
