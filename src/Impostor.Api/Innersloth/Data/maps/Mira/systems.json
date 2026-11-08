@@ -5,5 +5,7 @@
   "Reactor": "ReactorSystemType",
   "LifeSupp": "LifeSuppSystemType",
   "Ventilation": "VentilationSystem",
+  "Decontamination": "DeconSystem",
+  "Decontamination2": "DeconSystem",
   "Sabotage": "SabotageSystemType"
 }
