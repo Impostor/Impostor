@@ -13,6 +13,7 @@ using Impostor.Api.Net.Manager;
 using Impostor.Api.Plugins;
 using Impostor.Api.Utils;
 using Impostor.Hazel.Extensions;
+using Impostor.Server.Account;
 using Impostor.Server.Events;
 using Impostor.Server.Http;
 using Impostor.Server.Net;
@@ -27,6 +28,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.ObjectPool;
 using Serilog;
@@ -108,6 +110,10 @@ namespace Impostor.Server
                     services.Configure<ServerConfig>(host.Configuration.GetSection(ServerConfig.Section));
                     services.Configure<TimeoutConfig>(host.Configuration.GetSection(TimeoutConfig.Section));
                     services.Configure<HttpServerConfig>(host.Configuration.GetSection(HttpServerConfig.Section));
+                    services.Configure<AccountConfig>(host.Configuration.GetSection(AccountConfig.Section));
+
+                    services.AddSingleton<GameCodeAuthManager>();
+                    services.TryAddSingleton<IFriendCodeResolver, InnerslothFriendCodeResolver>();
 
                     services.AddSingleton<ICompatibilityManager, CompatibilityManager>();
                     services.AddSingleton<ClientManager>();

@@ -12,6 +12,7 @@ using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
 using Impostor.Api.Net.Messages.S2C;
 using Impostor.Hazel;
+using Impostor.Server.Account;
 using Impostor.Server.Net.Manager;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -24,15 +25,17 @@ namespace Impostor.Server.Net
         private readonly AntiCheatConfig _antiCheatConfig;
         private readonly ClientManager _clientManager;
         private readonly GameManager _gameManager;
+        private readonly GameCodeAuthManager _accounts;
         private readonly ICustomMessageManager<ICustomRootMessage> _customMessageManager;
 
-        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, ICustomMessageManager<ICustomRootMessage> customMessageManager, string name, GameVersion gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, IHazelConnection connection)
+        public Client(ILogger<Client> logger, IOptions<AntiCheatConfig> antiCheatOptions, ClientManager clientManager, GameManager gameManager, GameCodeAuthManager accounts, ICustomMessageManager<ICustomRootMessage> customMessageManager, string name, GameVersion gameVersion, Language language, QuickChatModes chatMode, PlatformSpecificData platformSpecificData, IHazelConnection connection)
             : base(name, gameVersion, language, chatMode, platformSpecificData, connection)
         {
             _logger = logger;
             _antiCheatConfig = antiCheatOptions.Value;
             _clientManager = clientManager;
             _gameManager = gameManager;
+            _accounts = accounts;
             _customMessageManager = customMessageManager;
         }
 
@@ -123,6 +126,56 @@ namespace Impostor.Server.Net
             return true;
         }
 
+        // Code 0 means hosting. Returns the real game code the client is joining.
+        private async ValueTask<(bool Ok, int Target)> BindAccountAsync(int code)
+        {
+            if (!_accounts.Enabled)
+            {
+                return (true, code);
+            }
+
+            var puid = Puid;
+            if (puid != null)
+            {
+                // Already bound, only a temporary code needs swapping.
+                if (code != 0 && _accounts.TryResolveAlias(code, puid, out var realCode))
+                {
+                    return (true, realCode);
+                }
+
+                return (true, code);
+            }
+
+            var claim = code == 0 ? _accounts.ClaimHost(Name) : _accounts.ClaimJoin(code, Name);
+
+            if (claim == null)
+            {
+                _logger.LogWarning(
+                    "[{0}] {1} could not be bound to an account (game code {2} ({3})), {4}.",
+                    Id,
+                    Name,
+                    GameCodeParser.IntToGameName(code),
+                    code,
+                    _accounts.RejectUnmatched ? "disconnecting because RejectUnmatched is enabled" : "allowed in anonymously");
+
+                if (_accounts.RejectUnmatched)
+                {
+                    await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.AccountUnmatched);
+                    return (false, code);
+                }
+
+                return (true, code);
+            }
+
+            Puid = claim.Session.Puid;
+            FriendCode = await _accounts.ResolveFriendCodeAsync(claim.Session);
+            JoinAlias = claim.Alias;
+
+            _logger.LogInformation("[{0}] {1} bound to {2} ({3}).", Id, Name, Puid, FriendCode ?? "no friend code");
+
+            return (true, code == 0 ? code : claim.Target);
+        }
+
         public override async ValueTask HandleMessageAsync(IMessageReader reader, MessageType messageType)
         {
             var flag = reader.Tag;
@@ -134,6 +187,11 @@ namespace Impostor.Server.Net
                 case MessageFlags.HostGame:
                 case MessageFlags.HostModdedGame:
                 {
+                    if (!(await BindAccountAsync(0)).Ok)
+                    {
+                        return;
+                    }
+
                     IGameOptions gameOptions;
                     GameFilterOptions gameFilterOptions;
                     Guid? modGuid = null;
@@ -176,6 +234,14 @@ namespace Impostor.Server.Net
                 case MessageFlags.JoinGame:
                 {
                     Message01JoinGameC2S.Deserialize(reader, out var gameCode);
+
+                    var (bound, realCode) = await BindAccountAsync(gameCode);
+                    if (!bound)
+                    {
+                        return;
+                    }
+
+                    gameCode = realCode;
 
                     var game = _gameManager.Find(gameCode);
                     if (game == null)

@@ -10,6 +10,14 @@
     "ListenIp": "0.0.0.0",
     "ListenPort": 22023
   },
+  "Account": {
+    "Enabled": true,
+    "GameCodeLifetimeSeconds": 180,
+    "RejectUnmatched": false,
+    "ResolveFriendCode": true,
+    "FriendCodeCacheMinutes": 30,
+    "FriendCodeTimeoutSeconds": 5
+  },
   "AntiCheat": {
     "Enabled": true,
     "BanIpFromGame": true,

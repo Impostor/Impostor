@@ -2,6 +2,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Impostor.Api.Innersloth;
+using Impostor.Server.Account;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Impostor.Server.Http;
@@ -13,22 +14,49 @@ namespace Impostor.Server.Http;
 [ApiController]
 public sealed class TokenController : ControllerBase
 {
+    // Backdated so the token is already expired for any other server that receives it.
+    private static readonly TimeSpan ExpiryBackdate = TimeSpan.FromHours(2);
+
+    private readonly GameCodeAuthManager _accounts;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TokenController"/> class.
+    /// </summary>
+    /// <param name="accounts">Session store used to bind tokens to game connections.</param>
+    public TokenController(GameCodeAuthManager accounts)
+    {
+        _accounts = accounts;
+    }
+
     /// <summary>
     /// Get an authentication token.
     /// </summary>
     /// <param name="request">Token parameters that need to be put into the token.</param>
+    /// <param name="authorization">Authorization header of the request, if any.</param>
     /// <returns>A bare minimum authentication token that the client will accept.</returns>
     [HttpPost]
-    public IActionResult GetToken([FromBody] TokenRequest request)
+    public IActionResult GetToken([FromBody] TokenRequest request, [FromHeader(Name = "Authorization")] string? authorization = null)
     {
+        var hash = GameCodeAuthManager.HashPrefix + "was_here";
+
+        if (_accounts.Enabled)
+        {
+            var bearer = authorization != null && authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+                ? authorization["Bearer ".Length..]
+                : null;
+
+            hash = _accounts.CreateSession(request.ProductUserId, request.Username, bearer);
+        }
+
         var token = new Token
         {
             Content = new TokenPayload
             {
                 ProductUserId = request.ProductUserId,
                 ClientVersion = request.ClientVersion,
+                ExpiresAt = DateTime.UtcNow - ExpiryBackdate,
             },
-            Hash = "impostor_was_here",
+            Hash = hash,
         };
 
         // Wrap into a Base64 sandwich

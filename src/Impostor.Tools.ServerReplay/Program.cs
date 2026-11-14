@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
@@ -18,6 +19,7 @@ using Impostor.Api.Utils;
 using Impostor.Hazel;
 using Impostor.Hazel.Extensions;
 using Impostor.Server;
+using Impostor.Server.Account;
 using Impostor.Server.Events;
 using Impostor.Server.Net;
 using Impostor.Server.Net.Custom;
@@ -106,6 +108,9 @@ namespace Impostor.Tools.ServerReplay
 
             services.AddSingleton<GameManager>();
             services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
+
+            services.Configure<AccountConfig>(config => config.Enabled = false);
+            services.AddSingleton<GameCodeAuthManager>();
 
             services.AddSingleton<MockGameCodeFactory>();
             services.AddSingleton<IGameCodeFactory>(p => p.GetRequiredService<MockGameCodeFactory>());
