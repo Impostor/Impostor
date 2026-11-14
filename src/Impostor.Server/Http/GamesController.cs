@@ -111,9 +111,9 @@ public sealed class GamesController : ControllerBase
             return Unauthorized();
         }
 
-        if (session != null)
+        if (session != null && !_accounts.TryExpectJoin(session, gameId))
         {
-            _accounts.ExpectJoin(session, gameId);
+            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.Custom, DisconnectMessages.AuthenticationFailedRetry)));
         }
 
         return Ok(HostServer.From(game.PublicIp));
@@ -132,9 +132,9 @@ public sealed class GamesController : ControllerBase
             return Unauthorized();
         }
 
-        if (session != null)
+        if (session != null && !_accounts.TryExpectHost(session))
         {
-            _accounts.ExpectHost(session);
+            return BadRequest(new MatchmakerResponse(new MatchmakerError(DisconnectReason.Custom, DisconnectMessages.AuthenticationFailedRetry)));
         }
 
         return Ok(_hostServer);

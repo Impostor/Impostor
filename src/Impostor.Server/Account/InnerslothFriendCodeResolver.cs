@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Config;
@@ -12,27 +13,25 @@ namespace Impostor.Server.Account
 {
     internal sealed class InnerslothFriendCodeResolver : IFriendCodeResolver, IDisposable
     {
-        private const int PruneThreshold = 5000;
+        private const string Endpoint = "https://backend.innersloth.com/api/user/username";
 
         private readonly ILogger<InnerslothFriendCodeResolver> _logger;
         private readonly AccountConfig _config;
         private readonly HttpClient _http = new();
         private readonly ConcurrentDictionary<string, (string Code, DateTime Expires)> _cache = new();
+        private readonly ConcurrentDictionary<string, Lazy<Task<string?>>> _pending = new();
+        private readonly Timer _cleaner;
 
         public InnerslothFriendCodeResolver(ILogger<InnerslothFriendCodeResolver> logger, IOptions<AccountConfig> config)
         {
             _logger = logger;
             _config = config.Value;
+            _cleaner = new Timer(_ => Cleanup(), null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
         }
 
         public async ValueTask<string?> ResolveAsync(string puid, string? bearerToken)
         {
-            if (!_config.ResolveFriendCode)
-            {
-                return null;
-            }
-
-            if (string.IsNullOrEmpty(bearerToken))
+            if (!_config.ResolveFriendCode || string.IsNullOrEmpty(bearerToken))
             {
                 return null;
             }
@@ -49,38 +48,24 @@ namespace Impostor.Server.Account
                 return null;
             }
 
+            // One request per player at a time.
+            var lazy = _pending.GetOrAdd(puid, _ => new Lazy<Task<string?>>(() => FetchAsync(puid, bearerToken)));
+
             try
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(Math.Max(1, _config.FriendCodeTimeoutSeconds)));
-                using var request = new HttpRequestMessage(HttpMethod.Get, _config.FriendCodeEndpoint);
-                request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + bearerToken);
-                request.Headers.TryAddWithoutValidation("Accept", "application/vnd.api+json");
-
-                using var response = await _http.SendAsync(request, cts.Token);
-                if (!response.IsSuccessStatusCode)
-                {
-                    _logger.LogWarning("Friend code request for {Puid} returned {Status}.", puid, (int)response.StatusCode);
-                    return null;
-                }
-
-                var code = ParseFriendCode(await response.Content.ReadAsStringAsync(cts.Token));
-                if (code == null)
-                {
-                    _logger.LogWarning("Friend code response for {Puid} had no username.", puid);
-                    return null;
-                }
-
-                Remember(puid, code);
-                return code;
+                return await lazy.Value;
             }
-            catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException or JsonException)
+            finally
             {
-                _logger.LogWarning("Friend code request for {Puid} failed: {Message}", puid, ex.Message);
-                return null;
+                _pending.TryRemove(puid, out _);
             }
         }
 
-        public void Dispose() => _http.Dispose();
+        public void Dispose()
+        {
+            _cleaner.Dispose();
+            _http.Dispose();
+        }
 
         private static bool TokenBelongsTo(string token, string puid)
         {
@@ -95,87 +80,93 @@ namespace Impostor.Server.Account
 
             try
             {
-                using var doc = JsonDocument.Parse(Convert.FromBase64String(payload));
-
-                foreach (var claim in new[] { "sub", "puid" })
-                {
-                    if (doc.RootElement.TryGetProperty(claim, out var value)
-                        && value.ValueKind == JsonValueKind.String
-                        && string.Equals(value.GetString(), puid, StringComparison.Ordinal))
-                    {
-                        return true;
-                    }
-                }
+                var claims = JsonSerializer.Deserialize<TokenClaims>(Convert.FromBase64String(payload));
+                return string.Equals(claims?.Subject, puid, StringComparison.Ordinal)
+                    || string.Equals(claims?.ProductUserId, puid, StringComparison.Ordinal);
             }
             catch (Exception ex) when (ex is FormatException or JsonException)
             {
-            }
-
-            return false;
-        }
-
-        private static string? ParseFriendCode(string json)
-        {
-            using var doc = JsonDocument.Parse(json);
-            var node = doc.RootElement;
-
-            if (TryGet(node, "data", out var data))
-            {
-                node = data;
-            }
-
-            if (TryGet(node, "attributes", out var attributes))
-            {
-                node = attributes;
-            }
-
-            if (!TryGet(node, "username", out var username) || !TryGet(node, "discriminator", out var discriminator))
-            {
-                return null;
-            }
-
-            var name = username.ToString();
-            var tag = discriminator.ToString();
-            return string.IsNullOrEmpty(name) || string.IsNullOrEmpty(tag) ? null : $"{name}#{tag}";
-        }
-
-        private static bool TryGet(JsonElement element, string name, out JsonElement value)
-        {
-            value = default;
-
-            if (element.ValueKind != JsonValueKind.Object)
-            {
                 return false;
             }
-
-            foreach (var property in element.EnumerateObject())
-            {
-                if (property.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-                {
-                    value = property.Value;
-                    return true;
-                }
-            }
-
-            return false;
         }
 
-        private void Remember(string puid, string code)
+        private async Task<string?> FetchAsync(string puid, string bearerToken)
+        {
+            try
+            {
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(Math.Max(1, _config.FriendCodeTimeoutSeconds)));
+                using var request = new HttpRequestMessage(HttpMethod.Get, Endpoint);
+                request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + bearerToken);
+                request.Headers.TryAddWithoutValidation("Accept", "application/vnd.api+json");
+
+                using var response = await _http.SendAsync(request, cts.Token);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("Friend code request for {Puid} returned {Status}.", puid, (int)response.StatusCode);
+                    return null;
+                }
+
+                await using var body = await response.Content.ReadAsStreamAsync(cts.Token);
+                var attributes = (await JsonSerializer.DeserializeAsync<UsernameResponse>(body, cancellationToken: cts.Token))?.Data?.Attributes;
+
+                if (string.IsNullOrEmpty(attributes?.Username) || string.IsNullOrEmpty(attributes.Discriminator))
+                {
+                    _logger.LogWarning("Friend code response for {Puid} had no username.", puid);
+                    return null;
+                }
+
+                var code = $"{attributes.Username}#{attributes.Discriminator}";
+                _cache[puid] = (code, DateTime.UtcNow.AddMinutes(Math.Max(1, _config.FriendCodeCacheMinutes)));
+                return code;
+            }
+            catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException or JsonException)
+            {
+                _logger.LogWarning("Friend code request for {Puid} failed: {Message}", puid, ex.Message);
+                return null;
+            }
+        }
+
+        private void Cleanup()
         {
             var now = DateTime.UtcNow;
 
-            if (_cache.Count > PruneThreshold)
+            foreach (var (puid, entry) in _cache)
             {
-                foreach (var (key, entry) in _cache)
+                if (entry.Expires <= now)
                 {
-                    if (entry.Expires <= now)
-                    {
-                        _cache.TryRemove(key, out _);
-                    }
+                    _cache.TryRemove(puid, out _);
                 }
             }
+        }
 
-            _cache[puid] = (code, now.AddMinutes(Math.Max(1, _config.FriendCodeCacheMinutes)));
+        private sealed class TokenClaims
+        {
+            [JsonPropertyName("sub")]
+            public string? Subject { get; init; }
+
+            [JsonPropertyName("puid")]
+            public string? ProductUserId { get; init; }
+        }
+
+        private sealed class UsernameResponse
+        {
+            [JsonPropertyName("data")]
+            public UsernameData? Data { get; init; }
+        }
+
+        private sealed class UsernameData
+        {
+            [JsonPropertyName("attributes")]
+            public UsernameAttributes? Attributes { get; init; }
+        }
+
+        private sealed class UsernameAttributes
+        {
+            [JsonPropertyName("username")]
+            public string? Username { get; init; }
+
+            [JsonPropertyName("discriminator")]
+            public string? Discriminator { get; init; }
         }
     }
 }

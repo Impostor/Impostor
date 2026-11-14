@@ -3,15 +3,15 @@ using System.Threading.Tasks;
 namespace Impostor.Server.Account
 {
     /// <summary>
-    /// Looks up the friend code for a player when a token is requested.
+    /// Looks up the friend code for a player when a player is bound.
     /// </summary>
     public interface IFriendCodeResolver
     {
         /// <summary>
-        /// Looks up the friend code of the player behind a token request.
+        /// Looks up the friend code of a player.
         /// </summary>
-        /// <param name="puid">Product user id from the token request.</param>
-        /// <param name="bearerToken">Bearer value of the token request, if any.</param>
+        /// <param name="puid">Product user id of the player.</param>
+        /// <param name="bearerToken">Login token of the player, if any.</param>
         /// <returns>The friend code, or null when unknown.</returns>
         ValueTask<string?> ResolveAsync(string puid, string? bearerToken);
     }

@@ -146,23 +146,7 @@ namespace Impostor.Server.Net
                 return (true, code);
             }
 
-            bool conflict;
-            AccountClaim? claim;
-            if (code == 0)
-            {
-                claim = _accounts.ClaimHost(Name, Language, GameVersion.Value, out conflict);
-            }
-            else
-            {
-                claim = _accounts.ClaimJoin(code, Name, Language, GameVersion.Value, out conflict);
-            }
-
-            if (conflict)
-            {
-                _logger.LogWarning("[{0}] {1} could not be bound, another player with the same name is claiming a game, disconnecting.", Id, Name);
-                await DisconnectAsync(DisconnectReason.Custom, DisconnectMessages.AuthenticationFailedRetry);
-                return (false, code);
-            }
+            var claim = code == 0 ? _accounts.ClaimHost(Name) : _accounts.ClaimJoin(code, Name);
 
             if (claim == null)
             {
@@ -183,11 +167,11 @@ namespace Impostor.Server.Net
                 return (true, code);
             }
 
-            Puid = claim.Puid;
-            FriendCode = claim.FriendCode;
+            Puid = claim.Session.Puid;
+            FriendCode = await _accounts.ResolveFriendCodeAsync(claim.Session);
             JoinAlias = claim.Alias;
 
-            _logger.LogInformation("[{0}] {1} bound to {2} ({3}).", Id, Name, claim.Puid, claim.FriendCode ?? "no friend code");
+            _logger.LogInformation("[{0}] {1} bound to {2} ({3}).", Id, Name, Puid, FriendCode ?? "no friend code");
 
             return (true, code == 0 ? code : claim.Target);
         }

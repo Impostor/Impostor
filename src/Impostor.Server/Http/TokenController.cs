@@ -1,7 +1,6 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Impostor.Api.Innersloth;
 using Impostor.Server.Account;
 using Microsoft.AspNetCore.Mvc;
@@ -15,18 +14,18 @@ namespace Impostor.Server.Http;
 [ApiController]
 public sealed class TokenController : ControllerBase
 {
+    // Backdated so the token is already expired for any other server that receives it.
+    private static readonly TimeSpan ExpiryBackdate = TimeSpan.FromHours(2);
+
     private readonly GameCodeAuthManager _accounts;
-    private readonly IFriendCodeResolver _friendCodes;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TokenController"/> class.
     /// </summary>
     /// <param name="accounts">Session store used to bind tokens to game connections.</param>
-    /// <param name="friendCodes">Friend code lookup.</param>
-    public TokenController(GameCodeAuthManager accounts, IFriendCodeResolver friendCodes)
+    public TokenController(GameCodeAuthManager accounts)
     {
         _accounts = accounts;
-        _friendCodes = friendCodes;
     }
 
     /// <summary>
@@ -36,9 +35,9 @@ public sealed class TokenController : ControllerBase
     /// <param name="authorization">Authorization header of the request, if any.</param>
     /// <returns>A bare minimum authentication token that the client will accept.</returns>
     [HttpPost]
-    public async Task<IActionResult> GetToken([FromBody] TokenRequest request, [FromHeader(Name = "Authorization")] string? authorization = null)
+    public IActionResult GetToken([FromBody] TokenRequest request, [FromHeader(Name = "Authorization")] string? authorization = null)
     {
-        var hash = "impostor_was_here";
+        var hash = GameCodeAuthManager.HashPrefix + "was_here";
 
         if (_accounts.Enabled)
         {
@@ -46,8 +45,7 @@ public sealed class TokenController : ControllerBase
                 ? authorization["Bearer ".Length..]
                 : null;
 
-            var friendCode = await _friendCodes.ResolveAsync(request.ProductUserId, bearer);
-            hash = _accounts.CreateSession(request.ProductUserId, friendCode, request.Username, request.ClientVersion, request.Language);
+            hash = _accounts.CreateSession(request.ProductUserId, request.Username, bearer);
         }
 
         var token = new Token
@@ -56,7 +54,7 @@ public sealed class TokenController : ControllerBase
             {
                 ProductUserId = request.ProductUserId,
                 ClientVersion = request.ClientVersion,
-                ExpiresAt = DateTime.UtcNow + _accounts.SessionLifetime,
+                ExpiresAt = DateTime.UtcNow - ExpiryBackdate,
             },
             Hash = hash,
         };

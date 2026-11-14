@@ -1,4 +1,4 @@
 namespace Impostor.Server.Account
 {
-    public sealed record AccountClaim(string Puid, string? FriendCode, int Target, int Alias);
+    public sealed record AccountClaim(AccountSession Session, int Target, int Alias);
 }

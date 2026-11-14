@@ -13,10 +13,8 @@
   "Account": {
     "Enabled": true,
     "GameCodeLifetimeSeconds": 180,
-    "SessionLifetimeMinutes": 30,
     "RejectUnmatched": false,
     "ResolveFriendCode": true,
-    "FriendCodeEndpoint": "https://backend.innersloth.com/api/user/username",
     "FriendCodeCacheMinutes": 30,
     "FriendCodeTimeoutSeconds": 5
   },

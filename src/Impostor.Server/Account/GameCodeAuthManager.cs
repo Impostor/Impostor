@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading;
+using System.Threading.Tasks;
 using Impostor.Api.Config;
 using Impostor.Api.Innersloth;
 using Microsoft.Extensions.Logging;
@@ -13,18 +14,22 @@ namespace Impostor.Server.Account
     /// <summary>
     /// Binds the HTTP token session to the UDP connection without looking at addresses.
     /// Joiners get a one-off alias code in the listing, which comes back in the join packet.
-    /// Hosts (and joins that only know the real code) are matched by name, language and version.
+    /// Hosts (and joins that only know the real code) hold a ticket that is unique per name.
     /// </summary>
     public sealed class GameCodeAuthManager : IDisposable
     {
+        public const string HashPrefix = "impostor_";
+
         private const int HostKey = 0;
+        private const int AliasAttempts = 16;
+
+        private static readonly TimeSpan SessionLifetime = TimeSpan.FromHours(1);
+        private static readonly TimeSpan HostLifetime = TimeSpan.FromSeconds(15);
 
         private readonly ILogger<GameCodeAuthManager> _logger;
         private readonly AccountConfig _config;
+        private readonly IFriendCodeResolver? _friendCodes;
         private readonly TimeSpan _codeLifetime;
-        private readonly TimeSpan _sessionLifetime;
-
-        private readonly TimeSpan _hostLifetime;
 
         private readonly ConcurrentDictionary<string, AccountSession> _sessions = new();
         private readonly ConcurrentDictionary<int, Ticket> _aliases = new();
@@ -32,13 +37,12 @@ namespace Impostor.Server.Account
         private readonly ConcurrentDictionary<int, List<Ticket>> _waiting = new();
         private readonly Timer _sweeper;
 
-        public GameCodeAuthManager(ILogger<GameCodeAuthManager> logger, IOptions<AccountConfig> config)
+        public GameCodeAuthManager(ILogger<GameCodeAuthManager> logger, IOptions<AccountConfig> config, IFriendCodeResolver? friendCodes = null)
         {
             _logger = logger;
             _config = config.Value;
+            _friendCodes = friendCodes;
             _codeLifetime = TimeSpan.FromSeconds(Math.Max(5, _config.GameCodeLifetimeSeconds));
-            _sessionLifetime = TimeSpan.FromMinutes(Math.Max(1, _config.SessionLifetimeMinutes));
-            _hostLifetime = TimeSpan.FromSeconds(Math.Min(_codeLifetime.TotalSeconds, 30));
             _sweeper = new Timer(_ => Sweep(), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
         }
 
@@ -46,33 +50,40 @@ namespace Impostor.Server.Account
 
         public bool RejectUnmatched => _config.RejectUnmatched;
 
-        public TimeSpan SessionLifetime => _sessionLifetime;
-
-        public string CreateSession(string puid, string? friendCode, string name, int clientVersion, Language language)
+        /// <summary>
+        /// Stores a session and returns the hash to put into the token.
+        /// </summary>
+        /// <param name="puid">Product user id from the token request.</param>
+        /// <param name="name">Player name from the token request.</param>
+        /// <param name="eosToken">Login token of the player, kept to look up the friend code later.</param>
+        /// <returns>The token hash.</returns>
+        public string CreateSession(string puid, string name, string? eosToken)
         {
             var id = Convert.ToHexString(RandomNumberGenerator.GetBytes(16));
-            _sessions[id] = new AccountSession(id, puid, friendCode, name, clientVersion, language, DateTime.UtcNow + _sessionLifetime);
-            return id;
+            _sessions[id] = new AccountSession(id, puid, name, eosToken, DateTime.UtcNow + SessionLifetime);
+            return HashPrefix + id;
         }
 
-        public AccountSession? GetSession(string? id)
+        public AccountSession? GetSession(string? hash)
         {
-            if (string.IsNullOrEmpty(id))
+            if (hash == null || !hash.StartsWith(HashPrefix, StringComparison.Ordinal))
             {
                 return null;
             }
 
-            if (!_sessions.TryGetValue(id, out var session))
+            if (!_sessions.TryGetValue(hash[HashPrefix.Length..], out var session))
             {
                 return null;
             }
 
-            if (session.ExpiresAt <= DateTime.UtcNow)
-            {
-                return null;
-            }
+            return session.ExpiresAt > DateTime.UtcNow ? session : null;
+        }
 
-            return session;
+        public ValueTask<string?> ResolveFriendCodeAsync(AccountSession session)
+        {
+            return _friendCodes == null
+                ? new ValueTask<string?>((string?)null)
+                : _friendCodes.ResolveAsync(session.Puid, session.EosToken);
         }
 
         public bool IsAlias(int code) => _aliases.ContainsKey(code);
@@ -96,7 +107,7 @@ namespace Impostor.Server.Account
                 return current;
             }
 
-            for (var i = 0; i < 16; i++)
+            for (var i = 0; i < AliasAttempts; i++)
             {
                 var code = GameCodeParser.GenerateCode(6);
                 if (inUse(code))
@@ -111,26 +122,23 @@ namespace Impostor.Server.Account
                 }
             }
 
-            // No free alias, fall back to name matching on the real code.
             _logger.LogWarning(
-                "[Account] Could not find a free temporary game code for {0} ({1}) and game {2}, falling back to name matching.",
+                "[Account] No free temporary game code for {0} ({1}), falling back to a name ticket for game {2}.",
                 session.Name,
                 session.Puid,
                 GameCodeParser.IntToGameName(target));
-            ExpectJoin(session, target);
+            TryExpectJoin(session, target);
             return target;
         }
 
-        public void ExpectHost(AccountSession session) => Enqueue(HostKey, session, HostKey, _hostLifetime);
+        public bool TryExpectHost(AccountSession session) => Enqueue(HostKey, session, HostKey, HostLifetime < _codeLifetime ? HostLifetime : _codeLifetime);
 
-        public void ExpectJoin(AccountSession session, int target) => Enqueue(target, session, target);
+        public bool TryExpectJoin(AccountSession session, int target) => Enqueue(target, session, target, _codeLifetime);
 
-        public AccountClaim? ClaimHost(string name, Language language, int clientVersion, out bool conflict) => ClaimWaiting(HostKey, name, language, clientVersion, out conflict);
+        public AccountClaim? ClaimHost(string name) => ClaimWaiting(HostKey, name);
 
-        public AccountClaim? ClaimJoin(int code, string name, Language language, int clientVersion, out bool conflict)
+        public AccountClaim? ClaimJoin(int code, string name)
         {
-            conflict = false;
-
             if (_aliases.TryRemove(code, out var ticket))
             {
                 _aliasOwners.TryRemove((ticket.Session.Id, ticket.Target), out _);
@@ -145,10 +153,10 @@ namespace Impostor.Server.Account
                     return null;
                 }
 
-                return new AccountClaim(ticket.Session.Puid, ticket.Session.FriendCode, ticket.Target, code);
+                return new AccountClaim(ticket.Session, ticket.Target, code);
             }
 
-            return ClaimWaiting(code, name, language, clientVersion, out conflict);
+            return ClaimWaiting(code, name);
         }
 
         // Swaps a temporary code for the real one on an already bound connection.
@@ -187,117 +195,56 @@ namespace Impostor.Server.Account
 
         public void Dispose() => _sweeper.Dispose();
 
-        private void Enqueue(int key, AccountSession session, int target, TimeSpan? lifetime = null)
+        private bool Enqueue(int key, AccountSession session, int target, TimeSpan lifetime)
         {
             var list = _waiting.GetOrAdd(key, static _ => new List<Ticket>());
+            var now = DateTime.UtcNow;
 
             lock (list)
             {
-                list.RemoveAll(t => t.Session.Id == session.Id);
-                list.Add(new Ticket(session, target, DateTime.UtcNow + (lifetime ?? _codeLifetime)));
+                list.RemoveAll(t => t.ExpiresAt <= now);
+
+                foreach (var other in list)
+                {
+                    if (string.Equals(other.Session.Name, session.Name, StringComparison.Ordinal)
+                        && !string.Equals(other.Session.Puid, session.Puid, StringComparison.Ordinal))
+                    {
+                        _logger.LogWarning(
+                            "[Account] {0} ({1}) has to wait, the name is held by another account.",
+                            session.Name,
+                            session.Puid);
+                        return false;
+                    }
+                }
+
+                list.RemoveAll(t => string.Equals(t.Session.Puid, session.Puid, StringComparison.Ordinal));
+                list.Add(new Ticket(session, target, now + lifetime));
+                return true;
             }
         }
 
-        private AccountClaim? ClaimWaiting(int key, string name, Language language, int clientVersion, out bool conflict)
+        private AccountClaim? ClaimWaiting(int key, string name)
         {
-            conflict = false;
-
             if (!_waiting.TryGetValue(key, out var list))
             {
                 return null;
             }
 
+            var now = DateTime.UtcNow;
+
             lock (list)
             {
-                list.RemoveAll(t => t.ExpiresAt <= DateTime.UtcNow);
+                list.RemoveAll(t => t.ExpiresAt <= now);
 
-                var best = -1;
-                var bestScore = -1;
-                var ambiguous = false;
-
-                for (var i = 0; i < list.Count; i++)
-                {
-                    var session = list[i].Session;
-                    if (!string.Equals(session.Name, name, StringComparison.Ordinal))
-                    {
-                        continue;
-                    }
-
-                    var score = (session.Language == language ? 2 : 0) + (session.ClientVersion == clientVersion ? 1 : 0);
-                    if (score > bestScore)
-                    {
-                        best = i;
-                        bestScore = score;
-                        ambiguous = false;
-                    }
-                    else if (score == bestScore)
-                    {
-                        ambiguous = true;
-                    }
-                }
-
-                if (ambiguous)
-                {
-                    string? pendingPuid = null;
-                    AccountClaim? sameAccount = null;
-                    var tied = new List<int>();
-
-                    for (var i = 0; i < list.Count; i++)
-                    {
-                        var session = list[i].Session;
-                        if (!string.Equals(session.Name, name, StringComparison.Ordinal))
-                        {
-                            continue;
-                        }
-
-                        var score = (session.Language == language ? 2 : 0) + (session.ClientVersion == clientVersion ? 1 : 0);
-                        if (score != bestScore)
-                        {
-                            continue;
-                        }
-
-                        tied.Add(i);
-
-                        if (tied.Count == 1)
-                        {
-                            pendingPuid = session.Puid;
-                            sameAccount = new AccountClaim(session.Puid, session.FriendCode, list[i].Target, 0);
-                        }
-                        else if (!string.Equals(pendingPuid, session.Puid, StringComparison.Ordinal))
-                        {
-                            conflict = true;
-                        }
-                    }
-
-                    if (!conflict)
-                    {
-                        // Same player requested a token several times, keep a single ticket.
-                        for (var i = tied.Count - 1; i >= 0; i--)
-                        {
-                            list.RemoveAt(tied[i]);
-                        }
-
-                        return sameAccount;
-                    }
-
-                    // Different players share this name, both have to retry shortly.
-                    var retryAt = DateTime.UtcNow + TimeSpan.FromSeconds(3);
-                    foreach (var i in tied)
-                    {
-                        list[i] = new Ticket(list[i].Session, list[i].Target, retryAt);
-                    }
-
-                    return null;
-                }
-
-                if (best < 0)
+                var index = list.FindIndex(t => string.Equals(t.Session.Name, name, StringComparison.Ordinal));
+                if (index < 0)
                 {
                     return null;
                 }
 
-                var hit = list[best];
-                list.RemoveAt(best);
-                return new AccountClaim(hit.Session.Puid, hit.Session.FriendCode, hit.Target, 0);
+                var hit = list[index];
+                list.RemoveAt(index);
+                return new AccountClaim(hit.Session, hit.Target, 0);
             }
         }
 

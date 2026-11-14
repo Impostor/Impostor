@@ -13,6 +13,7 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Manager;
+using Impostor.Server.Account;
 using Impostor.Server.Events;
 using Impostor.Server.Net.State;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +31,7 @@ namespace Impostor.Server.Net.Manager
         private readonly IServiceProvider _serviceProvider;
         private readonly IEventManager _eventManager;
         private readonly IGameCodeFactory _gameCodeFactory;
+        private readonly GameCodeAuthManager _accounts;
         private readonly ICompatibilityManager _compatibilityManager;
         private readonly ConcurrentDictionary<IClient, Game?> _gamesCreatedBy;
 
@@ -39,6 +41,7 @@ namespace Impostor.Server.Net.Manager
             IServiceProvider serviceProvider,
             IEventManager eventManager,
             IGameCodeFactory gameCodeFactory,
+            GameCodeAuthManager accounts,
             IOptions<CompatibilityConfig> compatibilityConfig,
             ICompatibilityManager compatibilityManager)
         {
@@ -46,6 +49,7 @@ namespace Impostor.Server.Net.Manager
             _serviceProvider = serviceProvider;
             _eventManager = eventManager;
             _gameCodeFactory = gameCodeFactory;
+            _accounts = accounts;
             _publicIp = new IPEndPoint(IPAddress.Parse(config.Value.ResolvePublicIp()), config.Value.PublicPort);
             _games = new ConcurrentDictionary<int, Game>();
             _compatibilityConfig = compatibilityConfig.Value;
@@ -129,6 +133,12 @@ namespace Impostor.Server.Net.Manager
         private async ValueTask<(bool Success, Game? Game)> TryCreateAsync(IGameOptions options, GameFilterOptions filterOptions, IClient? owner, GameCode? desiredGameCode = null, Guid? modGuid = null)
         {
             var gameCode = desiredGameCode ?? _gameCodeFactory.Create();
+
+            if (_accounts.IsAlias(gameCode))
+            {
+                return (false, null);
+            }
+
             var game = modGuid.HasValue
                 ? ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options, filterOptions, modGuid.Value)
                 : ActivatorUtilities.CreateInstance<Game>(_serviceProvider, _publicIp, gameCode, options, filterOptions);
