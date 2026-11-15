@@ -36,6 +36,9 @@ jobs:
         uses: cake-build/cake-action@v3
         with:
           verbosity: Diagnostic
+          cake-version: 7.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: softprops/action-gh-release@v3
         if: github.ref_type == 'tag'
