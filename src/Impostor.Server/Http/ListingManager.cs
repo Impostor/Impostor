@@ -109,7 +109,7 @@ public sealed class ListingManager
         }
     }
 
-    public IEnumerable<IGame> FindListingsV2(HttpContext ctx, GameFiltersList filtersList, int maxListings = 10)
+    public IEnumerable<IGame> FindListingsV2(HttpContext ctx, GameFiltersList filtersList, GameVersion gameVersion, int maxListings = 10)
     {
         if (filtersList == null || filtersList.FilterSets.Count == 0)
         {
@@ -125,6 +125,13 @@ public sealed class ListingManager
         foreach (var game in _gameManager.Games)
         {
             if (!game.IsPublic || game.GameState != GameStates.NotStarted || game.PlayerCount >= game.Options.MaxPlayers)
+            {
+                continue;
+            }
+
+            if (!_compatibilityConfig.AllowVersionMixing &&
+                game.Host is { } host &&
+                _compatibilityManager.CanJoinGame(host.Client.GameVersion, gameVersion) != GameJoinError.None)
             {
                 continue;
             }
