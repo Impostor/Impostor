@@ -17,7 +17,7 @@ namespace Impostor.Api.Innersloth
             Platform = (Platforms)reader.Tag;
             PlatformName = reader.ReadString();
 
-            XboxPlatformId = Platform == Platforms.Xbox ? reader.ReadUInt64() : null;
+            XboxPlatformId = Platform is Platforms.StandaloneWin10 or Platforms.Xbox ? reader.ReadUInt64() : null;
             PsnPlatformId = Platform == Platforms.Playstation ? reader.ReadUInt64() : null;
         }
 
@@ -35,8 +35,9 @@ namespace Impostor.Api.Innersloth
             writer.Write(PlatformName);
             switch (Platform)
             {
+                case Platforms.StandaloneWin10:
                 case Platforms.Xbox:
-                    writer.Write(XboxPlatformId ?? throw new NullReferenceException($"{nameof(XboxPlatformId)} shouldn't be null when {nameof(Platform)} is Xbox"));
+                    writer.Write(XboxPlatformId ?? throw new NullReferenceException($"{nameof(XboxPlatformId)} shouldn't be null when {nameof(Platform)} is {Platform}"));
                     break;
                 case Platforms.Playstation:
                     writer.Write(PsnPlatformId ?? throw new NullReferenceException($"{nameof(PsnPlatformId)} shouldn't be null when {nameof(Platform)} is Playstation"));
