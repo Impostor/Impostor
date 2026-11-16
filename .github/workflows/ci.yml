@@ -12,6 +12,12 @@ on:
       - 'src/**/**'
       - 'build.cake'
 
+permissions:
+  # Needed to get an OIDC token for NuGet Trusted Publishing
+  id-token: write
+  # Needed to create a Github release
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
