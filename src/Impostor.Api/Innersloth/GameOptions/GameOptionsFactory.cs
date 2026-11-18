@@ -37,12 +37,21 @@ public static class GameOptionsFactory
         var optionsReader = reader.ReadMessage();
         var gameMode = (GameModes)optionsReader.ReadByte();
 
-        return gameMode switch
+        switch (gameMode)
         {
-            GameModes.Normal or GameModes.NormalFools => NormalGameOptions.Deserialize(optionsReader, version),
-            GameModes.HideNSeek or GameModes.SeekFools => HideNSeekGameOptions.Deserialize(optionsReader, version),
-            _ => throw new ArgumentOutOfRangeException(),
-        };
+            case GameModes.Normal:
+            case GameModes.NormalFools:
+                var normalOptions = NormalGameOptions.Deserialize(optionsReader, version);
+                normalOptions.GameMode = gameMode;
+                return normalOptions;
+            case GameModes.HideNSeek:
+            case GameModes.SeekFools:
+                var hideNSeekOptions = HideNSeekGameOptions.Deserialize(optionsReader, version);
+                hideNSeekOptions.GameMode = gameMode;
+                return hideNSeekOptions;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     public static void DeserializeInto(IMessageReader reader, IGameOptions gameOptions)

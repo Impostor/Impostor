@@ -14,7 +14,7 @@ public class HideNSeekGameOptions : IGameOptions
     public byte Version { get; }
 
     /// <inheritdoc />
-    public GameModes GameMode => GameModes.HideNSeek;
+    public GameModes GameMode { get; internal set; } = GameModes.HideNSeek;
 
     /// <inheritdoc />
     public SpecialGameModes SpecialMode { get; set; } = SpecialGameModes.None;
